@@ -705,6 +705,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 3.5a5.5 5.5 0 0 0-6.9 6.9L3 16v5h5l5.6-5.6a5.5 5.5 0 0 0 6.9-6.9L17.5 6 15 8.5 12 5.5z"/></symbol>
 <symbol id="i-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></symbol>
 <symbol id="i-chev-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></symbol>
+<symbol id="i-chev-d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 9 7 7 7-7"/></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
 <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
@@ -2190,11 +2191,27 @@ function passToken(){
   for (let i=0;i<12;i++) t += "0123456789ABCDEFGHJKMNPQRSTUVWXYZ".charAt(Math.floor(Math.random()*33));
   return t;
 }
+/* Two tokens per pass, and they are not interchangeable.
+   token: The scan reference. Rotates every PASS_TTL seconds, so a screenshot dies.
+   share: The link reference. Stable for the life of the pass, because the player it
+          was sent to has to be able to open it more than once. Neither encodes
+          anything personal; both are opaque. */
 function buildPasses(n){
   const out = [];
-  for (let i=0;i<n;i++) out.push({ n:i+1, name:"", token:passToken(), usedAt:null, usedBy:null });
+  for (let i=0;i<n;i++) out.push({ n:i+1, name:"", token:passToken(), share:passToken(), usedAt:null, usedBy:null });
   return out;
 }
+/* Resolves a share token to its order and pass, or null. */
+function findShared(tok){
+  let hit = null;
+  Object.keys(S.orders).forEach(function(k){
+    const o = S.orders[k];
+    if (!o.passes) return;
+    o.passes.forEach(function(p){ if (p.share === tok) hit = { o:o, p:p }; });
+  });
+  return hit;
+}
+function passLink(p){ return "#/t/pass/" + p.share; }
 function passesOf(o){
   if (!o.passes || !o.passes.length) o.passes = buildPasses(Math.max(1, o.admissions.length || 1));
   return o.passes;
@@ -2244,6 +2261,23 @@ function passChip(state){
   return state === "used" ? '<span class="chip chip--strong">' + icon("check-double") + "<span>Checked in</span></span>"
     : state === "live" ? '<span class="chip chip--strong">' + icon("ticket") + "<span>Ready to scan</span></span>"
     : '<span class="chip chip--quiet">' + icon("clock") + "<span>Opens later</span></span>";
+}
+/* A row that opens a panel underneath itself, inside the same list item, so the
+   panel is unambiguously attached to the row that opened it. */
+function discloseRow(key, glyph, title, sub){
+  return '<button class="row" data-action="reveal" data-key="' + esc(key) + '" data-fk="rv-' + esc(key) + '"' +
+    ' aria-expanded="' + (S.reveal[key] ? "true" : "false") + '">' + icon(glyph) +
+    '<span class="row__main"><span class="row__title">' + esc(title) + "</span>" +
+    '<span class="row__sub">' + esc(sub) + "</span></span>" +
+    (S.reveal[key] ? icon("chev-d") : icon("chev-r")) + "</button>";
+}
+function passNamePanel(o, p, key, label, save, legal){
+  return '<div class="card" style="margin-top:var(--s3)">' +
+    '<div class="form">' + fieldHtml("pname" + p.n, label, { optional:true, value:p.name || "" }) + "</div>" +
+    '<div class="btn-stack" style="margin-top:var(--s3)">' +
+    '<button class="btn btn--primary btn--sm" data-action="passname" data-id="' + esc(o.id) + '" data-n="' + p.n +
+    '" data-rk="' + esc(key) + '">' + esc(save) + "</button></div>" +
+    '<p class="legal" style="margin-top:var(--s3)">' + esc(legal) + "</p></div>";
 }
 function arrivalToggle(){
   return '<div class="card card--sunken hatch" style="margin-top:var(--s6);border:2px dashed var(--border-default)">' +
@@ -2326,13 +2360,30 @@ function scrPass(params){
   }
   html += "</div></div>";
 
+  /* Both of these were a window.prompt and a window.alert. A modal browser dialog
+     is the one control on the page that cannot be styled, cannot be read by the
+     status region, and blocks the whole document, so both are inline disclosures. */
+  const nameKey = "pn" + o.id + "-" + p.n;
+  const shareKey = "ps" + o.id + "-" + p.n;
   html += '<div class="section"><ul class="rows">' +
-    '<li><button class="row" data-action="passname" data-id="' + esc(o.id) + '" data-n="' + p.n + '">' + icon("person") +
-      '<span class="row__main"><span class="row__title">' + (p.name ? "Change the name" : "Add a name") + "</span>" +
-      '<span class="row__sub">Helps the front desk find this player</span></span>' + icon("chev-r") + "</button></li>" +
-    '<li><button class="row" data-action="passshare">' + icon("share") +
-      '<span class="row__main"><span class="row__title">Send to this player</span>' +
-      '<span class="row__sub">They get their own pass link</span></span>' + icon("chev-r") + "</button></li>" +
+    "<li>" + discloseRow(nameKey, "person", p.name ? "Change the name" : "Add a name", "Helps the front desk find this player") +
+      (S.reveal[nameKey] ? passNamePanel(o, p, nameKey, "Display name for this pass", "Save the name",
+        "A name only helps the front desk find this player by hand. The pass works without one, and the name is not inside the token.") : "") +
+      "</li>" +
+    "<li>" + discloseRow(shareKey, "share", "Send to this player", "They get their own pass link") +
+      (S.reveal[shareKey]
+        ? '<div class="card" style="margin-top:var(--s3)"><h3 class="sec">This pass\'s own link</h3>' +
+          '<p class="code" style="margin-top:var(--s3);font-size:var(--fs-label);word-break:break-all">' + esc(passLink(p)) + "</p>" +
+          '<div class="btn-stack" style="margin-top:var(--s3)">' +
+          '<button class="btn btn--secondary btn--sm" data-action="copy" data-value="' + esc(passLink(p)) + '">Copy the link</button>' +
+          '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="/t/pass/' + esc(p.share) + '">Open it here</button>' +
+          "</div>" +
+          '<p class="legal" style="margin-top:var(--s3)">' + icon("flask") +
+          " <strong>Nothing is sent from this prototype.</strong> Copy the link and open it yourself to see what the player sees. " +
+          "In the real build the organizer hands this out, and it opens this one pass only: Not the booking, not the other players, and not the organizer's details.</p>" +
+          '<p class="legal" style="margin-top:var(--s2)">Whether these may go out by SMS is an open owner decision.</p></div>'
+        : "") +
+      "</li>" +
     "</ul></div>";
 
   html += '<div class="section"><div class="card card--sunken"><h2 class="sec">If the scan fails</h2>' +
@@ -2700,6 +2751,84 @@ function scrTokName(params){
   html += '<p style="margin-top:var(--s3)">' + pickleqChip(named === o.admissions.length ? "Ready for PickleQ" : "Not ready for PickleQ") + "</p>";
   return { id:"tok-name", shell:"token", title:"Add your display name", html:html,
     dock:{ action:{ label:"Save player names", action:"savenames", id:o.id } } };
+}
+
+/* ---------- SCR tok-pass ----------
+   One pass, opened by the player it was sent to. It deliberately shows less than
+   the organizer's pass screen: No pass list, no other players, no organizer name
+   or number, and no way to reach the booking. The token is the only thing the
+   holder has, and it must not become a key to the rest of the order. */
+function scrTokPass(params){
+  const t = params.token;
+  if (t === "expired") return scrLink({ kind:"expired" });
+  if (t === "revoked") return scrLink({ kind:"revoked" });
+  const hit = findShared(t);
+  if (!hit) return scrLink({});
+  const o = hit.o, p = hit.p;
+  const state = passState(o, p);
+
+  /* A pass is only ever as true as the booking under it, and this holder cannot
+     see the booking, so the reason has to be stated here in full. */
+  if (state === "none"){
+    const st = displayStatus(o);
+    let h = '<h1 class="screen">This pass is not active</h1>';
+    h += '<div class="section">' + plate(st.key,{ phrase:st.phrase,
+      truth:["There is no confirmed booking behind this pass, so there is nothing to scan."],
+      meta:["Ask the organizer who sent you this link."] }) + "</div>";
+    return { id:"tok-pass", shell:"token", title:"Pass not active", html:h, dock:null };
+  }
+
+  let html = '<h1 class="screen">Your pass</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">' + esc(o.meta.when) + "</p>";
+  html += '<p class="legal" style="margin-top:var(--s2)">Pass ' + p.n + " of " + passesOf(o).length +
+    ", sent to you by the organizer. It admits one person.</p>";
+
+  html += '<div class="section"><div class="passcard">' +
+    '<div class="passcard__top">' + icon(o.product === "court" ? "court" : "users") +
+    '<span class="passcard__n">' + esc(p.name || ("Player " + p.n)) + "</span>" +
+    '<span style="flex:1"></span>' + passChip(state) + "</div>";
+
+  if (state === "used"){
+    html += '<div class="stamp">' + icon("check-double") +
+      '<p class="display" style="margin-top:var(--s3)">Checked in</p>' +
+      '<p class="legal" style="margin-top:var(--s3);color:var(--text-inverse-secondary)">' +
+      esc(clockTime(p.usedAt)) + " by " + esc(p.usedBy || "Front Desk") + ". This pass cannot be used again.</p></div>";
+  } else if (state === "dormant"){
+    html += '<div class="qrbox"><div class="qrdead">' + icon("clock") +
+      "<span>Opens 30 minutes before your time. There is nothing to scan yet.</span></div>" +
+      '<p class="legal" style="text-align:center">Arrival window: To be confirmed.</p></div>';
+  } else {
+    html += '<div class="qrbox">' +
+      '<div class="qrlive" id="qrlive">' + qrMatrix(p.token) + "</div>" +
+      '<p class="ring"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rbg" cx="18" cy="18" r="15"/>' +
+      '<circle class="rfg" id="ringfg" cx="18" cy="18" r="15" stroke-dasharray="94.2" stroke-dashoffset="0"/></svg>' +
+      '<span id="ringtxt" aria-live="polite">Refreshes in ' + PASS_TTL + " seconds</span></p>" +
+      '<p class="legal" style="text-align:center;max-width:32ch">Sample pattern. Not scannable in this prototype. A screenshot stops working within a minute.</p></div>';
+  }
+  html += "</div></div>";
+
+  const nameKey = "tp" + p.share;
+  html += '<div class="section"><ul class="rows"><li>' +
+    discloseRow(nameKey, "person", p.name ? "Change your name" : "Add your name", "Helps the front desk find you") +
+    (S.reveal[nameKey] ? passNamePanel(o, p, nameKey, "Your display name", "Save my name",
+      "A name only helps the front desk find you by hand. Your pass works without one, and the name is not inside the token.") : "") +
+    "</li></ul></div>";
+
+  html += '<div class="section"><div class="card card--sunken"><h2 class="sec">If the scan fails</h2>' +
+    '<p class="legal" style="margin-top:var(--s3)">Give the front desk your name and say who organized the booking. ' +
+    "For privacy, the booking code is not shown on a shared pass: Ask the organizer for it.</p></div></div>";
+
+  if (state === "live"){
+    html += '<div class="card card--sunken hatch" style="margin-top:var(--s6);border:2px dashed var(--border-default)">' +
+      '<p class="legal"><strong>Staging control.</strong></p>' +
+      '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="passscan" data-id="' + esc(o.id) + '" data-n="' + p.n + '">Simulate a door scan</button></p></div>';
+  } else if (state === "dormant"){
+    html += arrivalToggle();
+  }
+
+  return { id:"tok-pass", shell:"token", title:"Your pass", html:html,
+    mount: state === "live" ? function(){ mountPassTimer(o, p); } : null,
+    dock:null };
 }
 
 /* ---------- SCR tok-quote ---------- */
@@ -3239,17 +3368,47 @@ function openDemo(){
     "</div>" +
     '<p class="legal" style="margin-top:var(--s2)">Prototype control. In the real system a payment link is a stored order resumed from the server. Reopening creates no second hold and no second booking code.</p></div>';
 
+  /* The order-scoped screens cannot live in the static index, because their routes
+     need a live order. Without this block the pass system, which is the headline of
+     this redesign, is unreachable from the harness. */
+  const hlink = function(href, label){
+    return '<a class="h" style="display:block;text-align:center;text-decoration:none" href="#' + esc(href) + '" data-action="closesheet">' + esc(label) + "</a>";
+  };
+  b += '<div><h3>This order\'s screens</h3><div class="grid1">';
+  if (o){
+    const paid = displayStatus(o).key === "confirmed" || displayStatus(o).key === "checked_in";
+    const codeSeg = encodeURIComponent(o.bookingCode);
+    b += hlink("/hold/" + o.id, "Hold and payment") +
+      hlink("/pay/" + o.id, "Simulated Maya Checkout") +
+      hlink("/status/" + o.id, "Payment status") +
+      hlink("/save/" + o.id, "Save your details");
+    if (paid){
+      b += hlink("/booking/" + codeSeg, "Booking detail") +
+        hlink("/booking/" + codeSeg + "/passes", "Pass list, all passes") +
+        hlink("/booking/" + codeSeg + "/pass/1", "Pass 1, organizer's view") +
+        hlink("/t/pass/" + passesOf(o)[0].share, "Pass 1, as the player sees it");
+    } else {
+      b += '<span class="legal">The booking detail and the passes appear here once this order is confirmed.</span>';
+    }
+    b += hlink("/staff/booking/" + o.id, "Booking detail, staff view");
+  } else {
+    b += '<span class="legal">Create a booking first. These routes need a live order.</span>';
+  }
+  b += '</div><p class="legal" style="margin-top:var(--s2)">Currently pointing at ' +
+    (o ? esc(o.bookingCode || o.id) : "no order") + ". Passes are dormant until the arrival window is open, which is the control on the pass screens themselves.</p></div>";
+
   b += '<div><h3>Token links</h3><div class="grid1">' +
-    (o && o.product === "openplay" ? '<a class="h" style="display:block;text-align:center;text-decoration:none" href="#/t/name/' + esc(o.id) + '" data-action="closesheet">Player name invite, valid</a>' : "") +
-    '<a class="h" style="display:block;text-align:center;text-decoration:none" href="#/t/name/expired" data-action="closesheet">Player name invite, expired</a>' +
-    '<a class="h" style="display:block;text-align:center;text-decoration:none" href="#/sys/link" data-action="closesheet">Invalid or revoked link</a>' +
-    "</div></div>";
+    (o && o.product === "openplay" ? hlink("/t/name/" + o.id, "Player name invite, valid") : "") +
+    hlink("/t/name/expired", "Player name invite, expired") +
+    hlink("/t/pass/expired", "Shared pass link, expired") +
+    hlink("/sys/link", "Invalid or revoked link") +
+    '</div><p class="legal" style="margin-top:var(--s2)">A shared pass link opens one pass and nothing else: No pass list, no other players, no organizer details, and no route to the booking.</p></div>';
 
   b += '<div><h3>Every screen</h3><div class="routelist">' +
     ALL_ROUTES.map(function(r){
       const parts = r[1].split(", ");
       return '<a href="#' + esc(r[0]) + '" data-action="closesheet">' + esc(parts[1]) + "<code>" + esc(r[0]) + " &middot; " + esc(parts[0]) + "</code></a>";
-    }).join("") + "</div></div>";
+    }).join("") + '</div><p class="legal" style="margin-top:var(--s2)">Every route that needs no live order. The rest are under This order\'s screens above.</p></div>';
 
   b += '<div><button class="h" style="width:100%" data-action="resetall">Reset all state</button></div>';
 
@@ -3267,12 +3426,13 @@ function scrDemo(){
   html += '<p class="lede" style="margin-top:var(--s3)">Everything in this build is simulated in memory and is lost on refresh. Nothing here reaches a real customer, a real court, or a real payment.</p>';
   html += '<div class="section"><h2 class="sec">What the harness controls</h2><ul class="rows">' +
     [["Surface","Visitor, signed-in player, Front Desk, or Operations Manager."],
-     ["Scenario","Twelve one-tap seeded states, including hold expiry, payment failure, late payment, amount mismatch, and a full window."],
+     [SCENARIOS.length + " scenarios","One-tap seeded states, including hold expiry, payment failure, late payment, amount mismatch, and a full window."],
      ["Simulated clock","Advance time or expire a hold now, so you do not wait ten minutes to see the escalation."],
      ["Connectivity","Live availability down, payment provider down, or full maintenance."],
      ["Open Play capacity","Places available, Almost full, or Full."],
+     ["This order's screens","The hold, the checkout, the booking detail, and the passes, which need a live order and so cannot sit in a static index."],
      ["Token links","Valid, expired, and revoked variants, since no real link can be issued without a backend."],
-     ["Screen index","Every route in the build, by screen id."]].map(function(r){
+     ["Screen index","Every route that needs no live order, by screen id."]].map(function(r){
       return '<li class="row"><span class="row__main"><span class="row__title">' + esc(r[0]) + '</span><span class="row__sub">' + esc(r[1]) + "</span></span></li>";
     }).join("") + "</ul></div>";
   html += '<p class="legal section">A forced state always renders a hatched marker under the app bar, so nothing you see during a walkthrough is mistaken for natural behaviour.</p>';
@@ -3325,6 +3485,7 @@ route("/save/:orderId", scrSave);
 route("/event", scrEvent);
 route("/event/:ref", scrEventStatus);
 route("/t/name/:token", scrTokName);
+route("/t/pass/:token", scrTokPass);
 route("/t/quote/:token", scrTokQuote);
 route("/signin", scrSignIn);
 route("/me", scrMe);
@@ -3430,12 +3591,20 @@ const ACTIONS = {
   },
   passname: function(el){
     const o = S.orders[el.getAttribute("data-id")];
-    const p = passesOf(o)[parseInt(el.getAttribute("data-n"),10) - 1];
-    const v = window.prompt("Name for this pass", p.name || "");
-    if (v !== null){ p.name = v.trim(); S.inPlace = true; render(); }
-  },
-  passshare: function(){
-    window.alert("In the real build this sends a single pass link to that player. Nothing is sent from this prototype.");
+    if (!o) return;
+    const n = parseInt(el.getAttribute("data-n"),10);
+    const p = passesOf(o)[n - 1];
+    if (!p) return;
+    const f = document.getElementById("pname" + n);
+    p.name = f ? f.value.trim() : p.name;
+    /* Mirror onto the admission, so the pass list, the booking detail, and the
+       staff roster do not disagree about who this player is. */
+    const a = o.admissions && o.admissions[n - 1];
+    if (a) a.name = p.name;
+    const rk = el.getAttribute("data-rk");
+    if (rk) S.reveal[rk] = false;
+    announce(p.name ? "Pass " + n + " named " + p.name : "Name cleared on pass " + n + ".");
+    S.inPlace = true; render();
   },
   pax: function(el){
     const n = Math.max(1, Math.min(12, S.draft.pax + parseInt(el.getAttribute("data-d"),10)));
@@ -3563,7 +3732,12 @@ const ACTIONS = {
   savenames: function(el){
     const o = S.orders[el.getAttribute("data-id")];
     if (!o) return;
-    o.admissions.forEach(function(a,i){ const f = document.getElementById("n" + i); if (f) a.name = f.value.trim(); });
+    o.admissions.forEach(function(a,i){
+      const f = document.getElementById("n" + i);
+      if (f) a.name = f.value.trim();
+      /* Mirrored onto the pass, so naming here and naming on the pass agree. */
+      if (o.passes && o.passes[i]) o.passes[i].name = a.name;
+    });
     announce("Player names saved.");
     render();
   },

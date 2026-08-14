@@ -13,8 +13,8 @@ to be walked through, argued with, and signed off before anything is implemented
 | `v2/REDESIGN-PLAN.md` | The plan this build was made from: The visual system, the accessibility rules, and the eight product changes. |
 | `v2/assets/` | The source photography, wordmark, and concrete texture, before they were inlined. |
 | `v2/build/` | The porting scripts that produced the redesign from the previous build. Kept as a record; they carry absolute paths from the machine that ran them and are not runnable here. |
-| `v2/index.html` | Byte-identical copy of what is now `index.html`. Safe to delete once you are happy with the promotion. |
-| `v2/app.html` | The redesign exactly as the porting scripts produced it, before the three defects listed under Verification were fixed. Kept as the before-and-after reference. |
+| `v2/index.html` | The build at the moment it was promoted, before the pass-system fixes below. Safe to delete. |
+| `v2/app.html` | The redesign exactly as the porting scripts produced it, before any fix. Kept as the before-and-after reference. |
 
 ## Running it
 
@@ -36,8 +36,17 @@ Eight product behaviours changed alongside the visual system. The full argument 
 1. **Expiring QR passes, one per player.** A reservation issues a pass per person, not one code per
    booking. A four-player court reservation issues four passes, numbered 1 of 4 to 4 of 4. Each pass
    carries a token that regenerates every 60 seconds behind a countdown ring, stays dormant until the
-   arrival window opens, is single use, and can be sent to its own player as a link. The booking code
-   survives in large type as the fallback for a dead phone or a failed scan.
+   arrival window opens, and is single use. The booking code survives in large type as the fallback
+   for a dead phone or a failed scan.
+
+   Each pass also has its own shareable link at `#/t/pass/<token>`, so four people arriving
+   separately do not need the organizer physically present. Every pass carries two tokens and they
+   are not interchangeable: The scan token rotates every 60 seconds, so a screenshot dies; the share
+   token is stable, because the player it was sent to has to be able to open the link more than
+   once. Neither encodes anything personal. A shared pass link opens that one pass and nothing else:
+   No pass list, no other players, no organizer name or number, no booking code, and no route to the
+   booking. A player can set their own display name from it, and that name appears on the organizer's
+   pass list and on the staff roster.
 2. **Time selection is a drag.** The start-time radio list and the separate duration control are
    replaced by one vertical hour rail. Press and hold an open hour, then drag to extend. Unavailable
    hours are hatched and the drag refuses to cross them. Tapping still works: One tap selects an
@@ -125,11 +134,17 @@ The hatched **Demo** button in the top right of every screen opens the harness, 
 - **Simulated clock:** Advance 1, 5, or 9 minutes, or expire the current hold immediately
 - **Connectivity:** Live availability down, payments down, full maintenance
 - **Open Play capacity:** Places available, Almost full, Full
-- **Token links:** Valid, expired, and revoked variants of each token flow
-- **Screen index:** Every route in the build, listed by screen id
+- **This order's screens:** The hold, the simulated checkout, the payment status, the booking detail,
+  the pass list, one pass as the organizer sees it, and the same pass as the player who was sent the
+  link sees it. These routes need a live order, so they cannot sit in a static index, and the block
+  says which order it is currently pointing at
+- **Token links:** Valid, expired, and revoked variants of each token flow, including an expired
+  shared pass link
+- **Screen index:** Every route that needs no live order, listed by screen id
 
 The pass screens carry their own staging control: "Open the arrival window" wakes dormant passes, and
-"Simulate a door scan" flips a pass to Checked in.
+"Simulate a door scan" flips a pass to Checked in. The scan control appears on both the organizer's
+pass and the shared pass link, so either side of the handoff can be walked through.
 
 The staff surface is absent from every public navigation surface and from the footer. It is
 reachable only through the harness or by typing `#/staff/today`.
@@ -138,18 +153,25 @@ reachable only through the harness or by typing `#/staff/today`.
 
 Driven in Chrome inside a device frame, dark and light:
 
-- Every route renders with no JavaScript errors and exactly one `h1`
-- No horizontal scrolling on any route at 345, 355, and 390 pixels
+- All 36 routes render with no JavaScript errors and exactly one `h1`
+- No horizontal scrolling on any route at 345, 375, and 415 pixel viewports, including with both
+  pass disclosures open at once
 - The full court funnel end to end: rail, review, hold, simulated Maya, Checking payment, Confirmed,
   booking detail, pass list, single pass, simulated scan
 - The full Open Play funnel end to end, including the admissions stepper and player names
 - The drag rail by synthesized pointer events: A downward drag extends, an upward drag extends
   backwards, a drag refuses to cross a hatched hour, and the run caps at the 4 hour maximum with the
   running total correct at every step
+- The shared pass link end to end: Dormant, live with a rotating token and a counting ring, scanned
+  once, then refusing reuse. A name set on the shared link appears on the organizer's pass list, and
+  a name set through the player-name invite appears on the pass
+- A shared pass link carries none of the booking: no booking code, no organizer name, no pass list,
+  no link to the booking. Expired, revoked, and unrecognized tokens each render their own plate
 - No path from a provider return to a confirmed booking: every simulated outcome
   passes through Checking payment first
+- Zero `window.alert`, `window.confirm`, or `window.prompt` calls anywhere in the file
 
-Three defects were found in the redesigned build and fixed:
+Seven defects were found in the redesigned build and fixed:
 
 1. The app bar wordmark hid its text with `text-indent`, which does not indent the line after a
    `<br>`, so the word "Courts" printed over the logo on every screen. The mark is now painted on a
@@ -159,6 +181,19 @@ Three defects were found in the redesigned build and fixed:
    valid." It now points at `/booking/:code/passes`.
 3. The quantity stepper rendered "1 admission" as one 42 pixel string, which overflowed a 360 pixel
    viewport by 14 pixels. The count stays 42 pixels and the noun is demoted to 17.
+4. The pass screens were unreachable from the staging harness. The screen index lists static routes
+   only, and every pass route needs a live order, so the headline feature of the redesign could only
+   be found by completing a booking by hand. The harness now carries a "This order's screens" block.
+5. "Add a name" on a pass was a `window.prompt` and "Send to this player" was a `window.alert`. A
+   modal browser dialog is the one control on the page that cannot be styled, cannot be read by the
+   status region, and blocks the whole document. Both are now inline disclosures that open underneath
+   the row that triggered them.
+6. The plan called for each pass to be sendable to its own player, but no such route existed and the
+   share control was a placeholder. `#/t/pass/<token>` now exists, backed by a stable per-pass share
+   token that is separate from the rotating scan token.
+7. A pass name and its admission name were stored separately and never reconciled, so naming a player
+   through the pass and naming them through the player-name invite produced two different answers on
+   two screens. They are now mirrored in both directions.
 
 ## Known deviations from the redesign plan
 
