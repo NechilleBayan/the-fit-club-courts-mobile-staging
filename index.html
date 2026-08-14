@@ -568,6 +568,72 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
 .hero .duo .duocard:nth-child(2):active, .hero .duo .duocard:nth-child(2).is-on{
   background:#F4F2ED; border-color:#F4F2ED; }
 
+/* ---------- community marquee ----------
+   Edge to edge in the app column, the same break out the hero uses. The track, the
+   veil, and the copy are stacked in one grid cell so the strip sets the height and
+   the words sit on top without absolute positioning. */
+.marquee{
+  --strip-h:clamp(150px, 42vw, 230px);
+  position:relative; display:grid; align-items:center; isolation:isolate;
+  min-height:var(--strip-h);
+  margin-inline:calc(-1 * var(--gutter));
+  border-radius:var(--r-card); overflow:hidden;
+  background:var(--surface-sunken);
+}
+/* The track is taken out of flow deliberately. As a grid item its max-content width
+   sized the column, which stretched the copy to the width of the whole strip and
+   pushed the centred text thousands of pixels off screen. */
+/* No will-change. A transform animation is composited anyway, and pre-promoting a
+   layer this wide, 11500px of decoded photographs, costs memory for nothing. */
+.marquee__track{
+  position:absolute; inset:0; z-index:0;
+  display:flex; width:max-content;
+  animation:marquee-run var(--marquee-dur, 45s) linear infinite;
+}
+.marquee__seq{ display:flex; flex:none; height:100%; }
+/* Height fills the section, width auto: aspect ratio is preserved and nothing is
+   cropped. Grayscale, because the palette rule allows no third hue. */
+.marquee__seq img{
+  display:block; height:100%; width:auto; flex:none;
+  filter:grayscale(1) contrast(1.02) brightness(1.16);
+}
+@keyframes marquee-run{
+  from{ transform:translate3d(0,0,0); }
+  to{ transform:translate3d(-50%,0,0); }
+}
+/* A flat veil heavy enough to carry white text at 6:1 also crushes these photographs
+   to black, because they are dark and grayscale to begin with. So the scrim is
+   centre weighted: dark where the words are, thin at the edges where the strip needs
+   to stay readable as a strip. */
+.marquee__veil{
+  position:absolute; inset:0; z-index:1;
+  background:rgba(26,26,26,.34);
+}
+/* The scrim rides with the words rather than covering the whole strip, so the film
+   stays legible as film at the edges while the text sits on something dark enough
+   to clear 6:1 over the brightest frame. */
+.marquee__copy{
+  position:relative; z-index:2;
+  padding:var(--s6) var(--gutter); text-align:center; color:#F4F2ED;
+  text-shadow:0 1px 12px rgba(16,16,16,.7);
+  background:radial-gradient(ellipse 78% 64% at 50% 50%,
+    rgba(16,16,16,.88) 0%, rgba(16,16,16,.58) 62%, rgba(16,16,16,0) 100%);
+}
+.marquee__copy h2{
+  font-size:clamp(25px, 7.2vw, 34px); line-height:1.1; font-weight:800; letter-spacing:-.02em;
+}
+.marquee__copy p{
+  margin-top:var(--s3); font-size:17px; line-height:24px;
+  max-width:34ch; margin-inline:auto; color:#EAE7E1;
+}
+@media (prefers-reduced-motion: reduce){
+  .marquee__track{ animation-play-state:paused; }
+}
+@media (prefers-contrast: more){
+  .marquee__veil{ background:rgba(18,18,18,.72); }
+  .marquee__copy{ text-shadow:none; background:rgba(16,16,16,.86); }
+}
+
 /* ---------- back to top ----------
    Ghosted on purpose: it is a convenience, not a decision, so it must never read
    as loud as a real action. Sits clear of the dock and the tab bar. */
@@ -1552,8 +1618,7 @@ function scrLanding(){
     "<div><b>Indoor</b><span>Rain or shine</span></div>" +
     "</div></div>";
 
-  html += '<div class="section"><div class="photo"><div class="photo__img photo__img--op" role="img" aria-label="Players gathered on court at The Fit Club Courts"></div>' +
-    '<span class="photo__cap">Show up alone. Leave with a game.</span></div>' +
+  html += '<div class="section">' + communityMarquee() +
     '<p class="lede" style="margin-top:var(--s4)">Open Play is one admission. You rotate in with everyone else. No group needed.</p>' +
     '<p style="margin-top:var(--s4)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay">See Open Play times' + icon("chev-r") + "</button></p></div>";
 
@@ -1575,8 +1640,55 @@ function scrLanding(){
     '<p style="margin-top:var(--s4)">' + navBtn("/rates","See the full rates and policies") + "</p></div>";
 
   html += footerBlock();
-  return { id:"pub-landing", shell:"browse", title:"Fit Club Courts", html:html, dock:null };
+  return { id:"pub-landing", shell:"browse", title:"Fit Club Courts", html:html,
+    mount:mountMarquee, dock:null };
 }
+/* ---------- community marquee ----------
+   The only images in this build that are not inlined. All 18 come to 3.4MB, which
+   as base64 would put this file past 5MB, so they are fetched from ./carousel.
+   That is the one network request the build makes, and it is why the file is no
+   longer strictly self-contained. */
+const CAROUSEL = ["c1","c2","c3","c4","c5","c6","c7","c8","c9","c10",
+                  "c11","c12","c13","c14","c15","c16","c17","c18"];
+function marqueeSeq(){
+  /* Height is fixed by CSS and width is auto, so every frame keeps its own aspect
+     ratio and nothing is cropped or stretched. */
+  return '<div class="marquee__seq">' + CAROUSEL.map(function(n){
+    /* Not lazy. The loop needs the whole strip measured to know where the seam is,
+       and a lazy frame below the fold never loads, so the track collapses to zero. */
+    return '<img src="carousel/' + n + '.jpg" alt="" decoding="async">';
+  }).join("") + "</div>";
+}
+function communityMarquee(){
+  return '<section class="marquee">' +
+    '<div class="marquee__track" aria-hidden="true">' + marqueeSeq() + marqueeSeq() + "</div>" +
+    '<div class="marquee__veil" aria-hidden="true"></div>' +
+    '<div class="marquee__copy">' +
+      '<h2>Come for a game.<br>Find your community.</h2>' +
+      "<p>Open Play brings people together. Just show up, join in, and leave with new connections.</p>" +
+    "</div></section>";
+}
+/* One sequence is exactly half the track, so translating by -50% lands on an
+   identical frame and the loop has no seam. Duration is measured rather than fixed,
+   so the strip travels at the same speed whatever the images add up to. */
+function mountMarquee(){
+  const track = document.querySelector(".marquee__track");
+  if (!track) return;
+  const seq = track.firstElementChild;
+  function setDur(){
+    const w = seq.getBoundingClientRect().width;
+    if (w > 0) track.style.setProperty("--marquee-dur", Math.round(w / 70) + "s");
+  }
+  setDur();
+  const imgs = track.querySelectorAll("img");
+  let left = imgs.length;
+  imgs.forEach(function(im){
+    if (im.complete) { if (--left === 0) setDur(); return; }
+    im.addEventListener("load", function(){ if (--left === 0) setDur(); }, { once:true });
+    im.addEventListener("error", function(){ if (--left === 0) setDur(); }, { once:true });
+  });
+}
+
 /* One list, printed on the landing and on the rates screen, so they cannot drift. */
 const HOW_IT_WORKS = [
   "Choose your time. Availability and the full price come first.",

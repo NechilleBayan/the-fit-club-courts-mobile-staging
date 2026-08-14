@@ -8,7 +8,8 @@ to be walked through, argued with, and signed off before anything is implemented
 
 | File | What it is |
 |---|---|
-| `index.html` | The entire application. One self-contained document: inline CSS, inline vanilla JavaScript, inline SVG, and the photography and wordmark embedded as data URIs. No framework, no build step, no network request of any kind. |
+| `index.html` | The entire application. Inline CSS, inline vanilla JavaScript, inline SVG, and the hero photography and wordmark embedded as data URIs. No framework and no build step. |
+| `carousel/` | The 18 frames of the community film strip on the landing page. These are the one exception to the inlining rule: at 3.4MB they would push `index.html` past 5MB as base64, so they are fetched over the network. They are the only request this build makes. |
 | `preview.html` | Device-frame preview. Runs `index.html` at 360, 390, 430, and 768 pixel viewports. |
 | `v2/REDESIGN-PLAN.md` | The plan this build was made from: The visual system, the accessibility rules, and the eight product changes. |
 | `v2/assets/` | The source photography, wordmark, and concrete texture, before they were inlined. |
@@ -67,6 +68,28 @@ Eight product behaviours changed alongside the visual system. The full argument 
    The sample-data band stays, because a staging build must not pass as production, but it moves
    below the hero and shrinks.
 8. **Group size is collected** on a court reservation, because every player now needs their own pass.
+
+## The community film strip
+
+The Open Play section on the landing page is a marquee: The 18 frames in `carousel/`
+run side by side at a single height with their aspect ratios intact, nothing cropped
+or stretched, moving right to left.
+
+- The sequence is printed twice and the track translates by exactly -50%, so the
+  restart lands on a pixel-identical frame and there is no seam.
+- Speed is measured, not fixed. The mount reads the width of one sequence after the
+  images load and sets the duration for a constant 70 pixels per second, so the strip
+  moves at the same rate whatever the frames add up to.
+- The frames are grayscale, because the palette rule allows no third hue.
+- A flat gray veil subdues the whole strip, and a softer scrim rides with the words,
+  so the film stays readable as film at the edges while the text clears 6:1 over the
+  brightest frame.
+- Under `prefers-reduced-motion` the strip stops. Under `prefers-contrast: more` both
+  the veil and the scrim go heavier and the text shadow is dropped.
+
+The frames are not lazy loaded. The loop needs the whole strip measured to know where
+the seam is, and a lazy frame below the fold never loads, so the track would collapse
+to zero width.
 
 ## Visual system
 
