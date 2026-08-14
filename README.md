@@ -54,8 +54,8 @@ Eight product behaviours changed alongside the visual system. The full argument 
    hour, tapping the hour below extends, and both handles are focusable with arrow key support, so
    the rail is fully operable without any drag.
 3. **Buttons stop being edge to edge.** Actions sit in a 22rem container with a 20 pixel gutter.
-   Primary actions are 56 pixels tall with a 12 pixel radius; secondary actions are pills that shrink
-   to their content.
+   Primary actions are 56 pixels tall. Nothing paints a solid plate: a call to action is a thin, high
+   contrast edge with a light wash behind the primary one, and the corners are close to square.
 4. **Reserve a Court and Join Open Play sit side by side** on the landing hero, each a card with an
    icon, the price as a large number, and a two word label.
 5. **"Current rate" is gone**, in copy, in `aria-label` text, and in the dock summary. The price shown
@@ -75,21 +75,93 @@ The Open Play section on the landing page is a marquee: The 18 frames in `carous
 run side by side at a single height with their aspect ratios intact, nothing cropped
 or stretched, moving right to left.
 
+- Every frame is square cornered and butted straight against its neighbours, with no
+  gap, margin, or radius, so the eighteen pictures read as one strip of film. The
+  strip itself is square cornered too.
 - The sequence is printed twice and the track translates by exactly -50%, so the
   restart lands on a pixel-identical frame and there is no seam.
 - Speed is measured, not fixed. The mount reads the width of one sequence after the
   images load and sets the duration for a constant 70 pixels per second, so the strip
   moves at the same rate whatever the frames add up to.
 - The frames are grayscale, because the palette rule allows no third hue.
-- A flat gray veil subdues the whole strip, and a softer scrim rides with the words,
-  so the film stays readable as film at the edges while the text clears 6:1 over the
-  brightest frame.
+- A flat gray veil subdues the whole strip, and a band scrim rides with the words, so
+  the film stays readable as film at the ends while the text clears 6:1 over the
+  brightest frame. On a phone the band is symmetrical under centred copy. From 1024px
+  the copy moves into a left column and the band goes with it, which leaves the right
+  half of a much wider strip as clear film.
 - Under `prefers-reduced-motion` the strip stops. Under `prefers-contrast: more` both
   the veil and the scrim go heavier and the text shadow is dropped.
 
 The frames are not lazy loaded. The loop needs the whole strip measured to know where
 the seam is, and a lazy frame below the fold never loads, so the track would collapse
 to zero width.
+
+One defect was fixed here. The scrim was a centred `radial-gradient(ellipse 78% 64%)`,
+and the two lengths in that function are radii rather than diameters, so the horizontal
+radius reached well past the edge of the strip. The fade never finished inside the box,
+the outermost frame still sat under roughly half strength scrim, and the film rendered
+black end to end at every width. It is a band gradient now, which has no radius to get
+wrong and holds full height instead of drawing a visible oval on a short box.
+
+## What each choice buys you
+
+"Pick your way in" now carries the explanation inside the choice rather than beside it.
+Each panel prints its label, its price, and one smaller, lighter sentence:
+
+- **Reserve a court, ₱350 per hour.** Your court, your time. Reserve the full space for a
+  private game with your own group.
+- **Join Open Play, ₱150 per player.** One admission gets you into the rotation. Come solo,
+  play with everyone, and meet a new community, no group needed.
+
+The loose sentence that used to sit under the film strip ("Open Play is one admission. You
+rotate in with everyone else. No group needed.") is gone. A sentence sitting somewhere else
+on the page is not part of the decision, and its replacement is inside the Open Play panel.
+The hero keeps the compact pair with no supporting copy, because the photograph is doing the
+selling there. Both forms come from one `duoCTA(detail)`, so the prices cannot drift.
+
+## Responsive layout
+
+Everything keys off viewport width and input capability. There is no user-agent string,
+no device name, and no touch test anywhere in the file: A wide window on a touch laptop
+gets the desktop layout and no hover behaviour, a narrow window on a desktop gets the
+phone layout, and both are correct.
+
+Three widths are tracked separately, because they answer different questions:
+`--shell-max` is the page container, `--measure` is the longest a line of body copy may
+get whatever the container does, and `--content-max` is the small-screen reading column
+that the bottom sheet and the dock are built around.
+
+| Breakpoint | Gutter | Container | Navigation |
+|---|---|---|---|
+| Phone | 20px | Full width | Fixed bottom bar, icon and label |
+| 600px | 28px | 38rem | Fixed bottom bar |
+| 768px | 40px | 44rem | Fixed bottom bar |
+| 1024px | 48px | 1280px | Sticky header, bottom bar removed |
+| 1440px | 64px | 1400px | Sticky header |
+
+- **Two navigations, one set of destinations.** Both are built from the same `PUBLIC_TABS`
+  and `STAFF_TABS` arrays in the same pass of `render()`, so they cannot drift. Below
+  1024px the header nav is `display:none`; from 1024px up the bottom bar is. Exactly one
+  is in the document, and therefore in the accessibility tree, at any width. On a task
+  route both are removed from the DOM entirely, as before.
+- **Current page is an accent line plus a weight change.** The brand swoosh under the
+  wordmark on the bottom bar, a straight 2px underline that wipes in on the header nav.
+  Neither is a filled pill.
+- **Content clears both.** The bottom bar is reserved with padding while it exists, and
+  `--tabbar-h` drops to zero at 1024px so nothing reserves space for a bar that is gone.
+  The header is sticky rather than fixed, so it occupies flow and cannot cover anything.
+- **The landing page is the only screen that takes the whole container.** It returns
+  `wide:true`, which puts a `wide` class on the body. Every task route keeps a reading
+  column, because a form is not improved by being 1280px wide. The hero, the film strip,
+  and the footer run to the container edges; body copy never does.
+- **Desktop composition, not an enlarged phone.** The hero is a left column over a
+  horizontal scrim with the photograph clear to its right, what is open sits beside the
+  proof numbers in two columns, the two front doors become wide panels with their
+  supporting copy, and the four steps run across in four columns under thin rules.
+- **Hover belongs to a fine pointer.** Every lift, wash, and arrow slide is inside
+  `@media (hover:hover) and (pointer:fine)`, so a tap on a touch screen cannot leave a
+  control latched in its hover state. Focus is separate and always present: 3px outline
+  plus a 5px halo. All of it collapses under `prefers-reduced-motion`.
 
 ## Visual system
 
@@ -107,8 +179,12 @@ to zero width.
   Checked in and nothing else; a 3 pixel double border means a hold and nothing else.
 - Type is bigger and there are fewer sizes. Body is 18px, nothing anywhere is under 15px, and
   numbers, prices, times, and codes are the loudest thing on the screen at 34 to 56px.
-- Motion is restrained: 140ms fades and 8 pixel rises on entry, a sweep on the pass countdown ring,
-  nothing else. All of it disabled under `prefers-reduced-motion`.
+- Corners are close to square. A radius is a softening of a control, never a shape in its own right,
+  and photography carries none at all. The interface is held together by typography, alignment,
+  whitespace, and thin rules instead.
+- Motion is restrained: 140ms fades and 8 pixel rises on entry, a 200ms lift and wash on hover where
+  there is a fine pointer, a sweep on the pass countdown ring, nothing else. All of it disabled under
+  `prefers-reduced-motion`.
 
 ## Theme
 
@@ -179,6 +255,9 @@ Driven in Chrome inside a device frame, dark and light:
 - All 36 routes render with no JavaScript errors and exactly one `h1`
 - No horizontal scrolling on any route at 345, 375, and 415 pixel viewports, including with both
   pass disclosures open at once
+- Every static route swept again at 375, 753, and 1265 pixel viewports: No JavaScript errors, no
+  horizontal scrolling, exactly one `h1`, the bottom bar present below 1024px and absent above it,
+  and the header nav the other way round
 - The full court funnel end to end: rail, review, hold, simulated Maya, Checking payment, Confirmed,
   booking detail, pass list, single pass, simulated scan
 - The full Open Play funnel end to end, including the admissions stepper and player names

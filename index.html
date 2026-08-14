@@ -92,16 +92,26 @@
 
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:40px; --s9:56px;
   --gutter:20px; --card-pad:20px; --block-gap:24px; --section-gap:32px;
-  --r-chip:999px; --r-input:10px; --r-card:14px; --r-btn:12px; --r-plate:14px; --r-sheet:18px; --r-pill:999px;
+  --pad-top:20px;
+  /* Corners are close to square by default. The interface is held together by
+     typography, alignment, thin rules, and sharp-edged photography, so a radius
+     is only ever a softening of a control, never a shape in its own right. */
+  --r-chip:999px; --r-input:4px; --r-card:3px; --r-btn:4px; --r-plate:3px; --r-sheet:10px; --r-pill:999px;
   --bar-w:6px;
   --tap-min:48px; --tap-row:52px; --tap-decision:58px;
   --appbar-h:56px; --tabbar-h:62px;
   --dock-h:0px;
+  /* Three widths, deliberately separate. --shell-max is the page container and
+     grows to a real desktop width. --measure is the longest a line of body copy
+     may get, whatever the container does. --content-max stays the small-screen
+     reading column that the bottom sheet and the dock are built around. */
   --content-max:34rem;
-  --dur-fast:120ms; --dur-sheet:180ms; --ease:cubic-bezier(.2,.7,.3,1);
+  --shell-max:34rem;
+  --measure:34rem;
+  --dur-fast:120ms; --dur-sheet:180ms; --dur-ui:200ms; --ease:cubic-bezier(.2,.7,.3,1);
 }
-@media (max-width:374px){ :root{ --gutter:16px; --card-pad:16px; } }
-@media (prefers-reduced-motion: reduce){ :root{ --dur-fast:0.01ms; --dur-sheet:0.01ms; } }
+@media (max-width:359px){ :root{ --card-pad:16px; } }
+@media (prefers-reduced-motion: reduce){ :root{ --dur-fast:0.01ms; --dur-sheet:0.01ms; --dur-ui:0.01ms; } }
 
 /* ---------- RESET ---------- */
 *,*::before,*::after{ box-sizing:border-box; }
@@ -165,8 +175,8 @@ body.shell-staff .appbar{ background:var(--surface-inverse); color:var(--text-in
 .textbtn svg{ width:18px; height:18px; }
 
 main{
-  flex:1 1 auto; width:100%; max-width:var(--content-max); margin:0 auto;
-  padding:var(--s5) var(--gutter) calc(var(--dock-h) + var(--s6) + env(safe-area-inset-bottom));
+  flex:1 1 auto; width:100%; max-width:var(--shell-max); margin:0 auto;
+  padding:var(--pad-top) var(--gutter) calc(var(--dock-h) + var(--s6) + env(safe-area-inset-bottom));
 }
 /* When a browse route carries both, the dock stacks ABOVE the tab bar and the
    content reserves room for both. Neither may cover the other. */
@@ -209,17 +219,25 @@ body.shell-staff .tabbar a[aria-current="page"] .tabpill{ background:var(--text-
 .dock__note{ margin-top:var(--s2); font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
 
 /* ---------- BUTTONS ---------- */
+/* Nothing here paints a solid plate. A call to action is a thin, high contrast
+   edge over whatever is behind it, with a light wash for the primary one so the
+   hierarchy survives without an opaque block. */
 .btn{
   display:flex; align-items:center; justify-content:center; gap:var(--s2); width:100%;
   min-height:var(--tap-decision); padding:var(--s3) var(--s4);
-  border-radius:var(--r-btn); border:2px solid var(--border-strong);
+  border-radius:var(--r-btn); border:1.5px solid var(--border-strong);
   font-size:var(--fs-h3); font-weight:700; line-height:1.25; text-align:center;
-  transition:background var(--dur-fast) var(--ease);
+  color:var(--text-primary); background:transparent;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
 }
 .btn small{ display:block; font-size:var(--fs-legal); font-weight:600; opacity:.92; }
-.btn svg{ width:20px; height:20px; flex:none; }
-.btn--primary{ background:var(--surface-inverse); color:var(--text-inverse); }
-.btn--secondary{ background:var(--surface-raised); color:var(--text-primary); }
+.btn svg{ width:20px; height:20px; flex:none; transition:transform var(--dur-ui) var(--ease); }
+.btn--primary{
+  background:color-mix(in srgb, var(--text-primary) 15%, transparent);
+  color:var(--text-primary); border-color:var(--border-strong);
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+}
+.btn--secondary{ background:transparent; color:var(--text-primary); border-color:color-mix(in srgb, var(--text-primary) 52%, transparent); }
 .btn--ghost{ background:transparent; border-width:1px; border-style:dashed; min-height:var(--tap-min); font-size:var(--fs-label); }
 .btn--sm{ min-height:var(--tap-min); font-size:var(--fs-label); }
 .btn[disabled]{ cursor:not-allowed; border-style:dashed; background:var(--surface-sunken); color:var(--text-secondary); }
@@ -431,7 +449,7 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; }
 dialog{ padding:0; border:0; background:transparent; max-width:100%; max-height:100%; color:var(--text-primary); }
 dialog::backdrop{ background:var(--overlay); }
 .sheet{
-  width:100vw; max-width:var(--content-max); margin:auto auto 0; background:var(--surface-raised);
+  width:100vw; max-width:min(var(--content-max), 40rem); margin:auto auto 0; background:var(--surface-raised);
   border:1px solid var(--border-strong); border-radius:var(--r-sheet) var(--r-sheet) 0 0;
   max-height:85svh; display:flex; flex-direction:column;
 }
@@ -475,11 +493,12 @@ dialog[open]{ display:flex; flex-direction:column; justify-content:flex-end; wid
 /* ---------- FOOTER ---------- */
 .pagefoot{ margin-top:var(--section-gap); padding-top:var(--s5); border-top:1px solid var(--hairline); display:grid; gap:var(--s3); font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
 
-/* ---------- DESKTOP ---------- */
-@media (min-width:720px){
-  .appbar{ padding-inline:var(--s5); }
-  .dock__inner,.appbar{ }
-  .tabbar{ position:fixed; }
+/* ---------- DESKTOP ----------
+   The full width and navigation rules live in the RESPONSIVE LAYER at the end of
+   this sheet. All that is needed here is that the app bar keeps step with the
+   content gutter as the gutter grows. */
+@media (min-width:600px){
+  .appbar{ padding-inline:var(--gutter); }
 }
 
 /* ============================================================
@@ -520,64 +539,83 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
 .tabbar a svg{ width:25px; height:25px; }
 
 /* ---------- buttons stop being edge to edge ---------- */
-.btn{ width:auto; max-width:24rem; margin-inline:auto; padding:var(--s3) var(--s6); border-radius:12px; }
-.btn--sm{ border-radius:var(--r-pill); border-width:1.5px; padding:0 var(--s5); min-height:var(--tap-min); }
-.btn--ghost{ border-radius:var(--r-pill); }
+.btn{ width:auto; max-width:24rem; margin-inline:auto; padding:var(--s3) var(--s6); border-radius:var(--r-btn); }
+.btn--sm{ border-radius:var(--r-btn); border-width:1.5px; padding:0 var(--s5); min-height:var(--tap-min); }
+.btn--ghost{ border-radius:var(--r-btn); }
 .btn-col{ gap:var(--s3); }
 .btn-col .btn, .btn-stack .btn{ width:100%; }
 .dock .btn{ width:100%; max-width:22rem; }
 .btn:active{ transform:scale(.985); }
 
-/* ---------- the two front doors, side by side ---------- */
+/* ---------- the two front doors, side by side ----------
+   Near square corners, a thin high contrast edge, and a wash rather than a plate.
+   The two choices are told apart by fill weight and by typography, never by hue:
+   this build carries no third colour anywhere. */
 .duo{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 @media (max-width:339px){ .duo{ grid-template-columns:1fr; } }
 .duocard{
   display:flex; flex-direction:column; gap:8px; min-height:138px; padding:16px 14px 14px;
-  border-radius:var(--r-card); border:1.5px solid var(--border-default);
-  background:color-mix(in srgb, var(--surface-raised) 58%, transparent);
-  backdrop-filter:blur(8px); color:var(--text-primary);
-  transition:background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  border-radius:var(--r-card); border:1.5px solid color-mix(in srgb, var(--text-primary) 40%, transparent);
+  background:color-mix(in srgb, var(--text-primary) 6%, transparent);
+  color:var(--text-primary);
+  transition:background var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
 }
 .duocard svg{ width:28px; height:28px; }
 .duocard b{ font-size:19px; line-height:23px; font-weight:800; letter-spacing:-.01em; }
 .duocard .num{ margin-top:auto; font-size:30px; line-height:32px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
 .duocard .per{ font-size:14px; line-height:18px; color:var(--text-secondary); font-weight:600; }
-.duocard:hover, .duocard:focus-visible{ background:color-mix(in srgb, var(--surface-raised) 82%, transparent); }
+/* The supporting line is smaller, lighter, and capped well short of the panel it
+   sits in, so it never competes with the price above it. */
+.duocard .note{
+  margin-top:10px; font-size:15px; line-height:21px; font-weight:400;
+  color:var(--text-secondary); max-width:42ch; text-wrap:pretty;
+}
+.duocard:focus-visible{ background:color-mix(in srgb, var(--text-primary) 14%, transparent); }
 .duocard:active, .duocard.is-on{
   background:var(--surface-inverse); color:var(--text-inverse); border-color:var(--surface-inverse); transform:scale(.985);
 }
-.duocard:active .per, .duocard.is-on .per{ color:var(--text-inverse-secondary); }
-/* The two cards are told apart by fill, not by hue: a dark gray plate for the court
-   and an off white plate for Open Play. Both sit at 80% so the photograph stays
-   legible underneath, and both go fully opaque on hover and focus. */
-.hero .duocard{ opacity:.8; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
-  transition:opacity var(--dur-fast) var(--ease); }
-.hero .duocard:hover, .hero .duocard:focus-visible{ opacity:1; }
+.duocard:active .per, .duocard.is-on .per,
+.duocard:active .note, .duocard.is-on .note{ color:var(--text-inverse-secondary); }
+
+/* Over the photograph both panels carry off white text, because the hero gradient
+   is at its darkest exactly where they sit. They stay distinct through fill weight
+   and border weight instead. Restrained blur: enough to settle the text, not
+   enough to turn either one into a frosted card. */
+.hero .duocard{
+  color:#F4F2ED; opacity:1;
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  text-shadow:0 1px 10px rgba(16,16,16,.55);
+}
+.hero .duocard .per, .hero .duocard .note{ color:#DAD7D0; }
+
+/* Both washes are dark, because both carry off white text and a light wash over a
+   bright frame of the photograph is the one thing that would break it. Weight of
+   fill and weight of border tell them apart; the palette rule forbids doing it
+   with a hue, and the icon, the label, and the price do the rest. */
+.hero .duo .duocard:nth-child(1){ background:rgba(16,16,18,.46); border:2px solid rgba(244,242,237,.82); }
+.hero .duo .duocard:nth-child(2){ background:rgba(16,16,18,.24); border:1px solid rgba(244,242,237,.62); }
+.hero .duo .duocard:active, .hero .duo .duocard.is-on{
+  background:rgba(18,18,18,.72); border-color:#F4F2ED; color:#F4F2ED; }
+.hero .duo .duocard:active .per, .hero .duo .duocard.is-on .per{ color:#DAD7D0; }
 @media (prefers-reduced-motion:reduce){ .hero .duocard{ transition:none; } }
-@media (prefers-contrast:more){ .hero .duocard{ opacity:1; } }
-
-.hero .duo .duocard:nth-child(1){ background:rgba(46,46,46,.74); border-color:rgba(244,242,237,.42); color:#F4F2ED; }
-.hero .duo .duocard:nth-child(1) .per{ color:#D6D3CC; }
-.hero .duo .duocard:nth-child(1):active, .hero .duo .duocard:nth-child(1).is-on{
-  background:#2E2E2E; border-color:#F4F2ED; }
-
-.hero .duo .duocard:nth-child(2){ background:rgba(244,242,237,.86); border-color:rgba(244,242,237,.7); color:#2E2E2E; }
-/* Not the usual secondary grey: at 80% over a photograph that lands near 3.6:1.
-   The line stays secondary through size and weight instead of through colour. */
-.hero .duo .duocard:nth-child(2) .per{ color:#2E2E2E; }
-.hero .duo .duocard:nth-child(2):active, .hero .duo .duocard:nth-child(2).is-on{
-  background:#F4F2ED; border-color:#F4F2ED; }
+@media (prefers-contrast:more){
+  .hero .duocard{ -webkit-backdrop-filter:none; backdrop-filter:none; text-shadow:none; }
+  .hero .duo .duocard:nth-child(1){ background:rgba(12,12,12,.88); }
+  .hero .duo .duocard:nth-child(2){ background:rgba(12,12,12,.72); border-color:#F4F2ED; }
+}
 
 /* ---------- community marquee ----------
    Edge to edge in the app column, the same break out the hero uses. The track, the
    veil, and the copy are stacked in one grid cell so the strip sets the height and
    the words sit on top without absolute positioning. */
+/* Square cornered, like the hero. Rounding the strip would round the frames at
+   both ends of it and stop it reading as one continuous piece of film. */
 .marquee{
   --strip-h:clamp(150px, 42vw, 230px);
   position:relative; display:grid; align-items:center; isolation:isolate;
   min-height:var(--strip-h);
   margin-inline:calc(-1 * var(--gutter));
-  border-radius:var(--r-card); overflow:hidden;
+  border-radius:0; overflow:hidden;
   background:var(--surface-sunken);
 }
 /* The track is taken out of flow deliberately. As a grid item its max-content width
@@ -587,14 +625,18 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
    layer this wide, 11500px of decoded photographs, costs memory for nothing. */
 .marquee__track{
   position:absolute; inset:0; z-index:0;
-  display:flex; width:max-content;
+  display:flex; gap:0; width:max-content;
   animation:marquee-run var(--marquee-dur, 45s) linear infinite;
 }
-.marquee__seq{ display:flex; flex:none; height:100%; }
+.marquee__seq{ display:flex; gap:0; flex:none; height:100%; }
 /* Height fills the section, width auto: aspect ratio is preserved and nothing is
-   cropped. Grayscale, because the palette rule allows no third hue. */
+   cropped. Square cornered and butted straight against its neighbours, with no
+   gap, margin, or radius, so the eighteen frames read as one strip of film rather
+   than as eighteen pictures. Grayscale, because the palette rule allows no third
+   hue. */
 .marquee__seq img{
   display:block; height:100%; width:auto; flex:none;
+  margin:0; border:0; border-radius:0;
   filter:grayscale(1) contrast(1.02) brightness(1.16);
 }
 @keyframes marquee-run{
@@ -607,17 +649,25 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
    to stay readable as a strip. */
 .marquee__veil{
   position:absolute; inset:0; z-index:1;
-  background:rgba(26,26,26,.34);
+  background:rgba(26,26,26,.30);
 }
 /* The scrim rides with the words rather than covering the whole strip, so the film
    stays legible as film at the edges while the text sits on something dark enough
    to clear 6:1 over the brightest frame. */
+/* This was a centred ellipse, and the two lengths in radial-gradient(ellipse X Y)
+   are radii rather than diameters: at 78% of the width the horizontal radius ran
+   well past the edge of the strip, the fade never finished inside the box, and the
+   scrim sat at roughly half strength on the outermost frame. The film went black
+   end to end. A horizontal band replaces it. It fades on the left and right only,
+   which is where the strip has to stay readable as a strip, and it holds full
+   height in the middle rather than drawing a visible oval on a short box. */
 .marquee__copy{
   position:relative; z-index:2;
   padding:var(--s6) var(--gutter); text-align:center; color:#F4F2ED;
   text-shadow:0 1px 12px rgba(16,16,16,.7);
-  background:radial-gradient(ellipse 78% 64% at 50% 50%,
-    rgba(16,16,16,.88) 0%, rgba(16,16,16,.58) 62%, rgba(16,16,16,0) 100%);
+  background:linear-gradient(90deg,
+    rgba(16,16,16,.30) 0%, rgba(16,16,16,.78) 14%, rgba(16,16,16,.88) 42%,
+    rgba(16,16,16,.88) 58%, rgba(16,16,16,.78) 86%, rgba(16,16,16,.30) 100%);
 }
 .marquee__copy h2{
   font-size:clamp(25px, 7.2vw, 34px); line-height:1.1; font-weight:800; letter-spacing:-.02em;
@@ -656,11 +706,13 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 @media (prefers-contrast:more){ .totop{ opacity:1; background:var(--surface-raised); border-color:var(--border-strong); } }
 
 /* ---------- hero ---------- */
+/* Square cornered on every side. The hero is a photograph, not a panel laid over
+   one, so it meets the edges of its container at 90 degrees. */
 .hero{
   position:relative; isolation:isolate; margin-inline:calc(-1 * var(--gutter));
-  margin-top:calc(-1 * var(--s5)); padding:20px var(--gutter) 24px;
+  margin-top:calc(-1 * var(--pad-top)); padding:20px var(--gutter) 24px;
   min-height:70svh; display:flex; flex-direction:column; justify-content:flex-end;
-  background:#1C1C1C; color:#F4F2ED; border-radius:0 0 var(--r-sheet) var(--r-sheet); overflow:hidden;
+  background:#1C1C1C; color:#F4F2ED; border-radius:0; overflow:hidden;
 }
 .hero::before{ content:""; position:absolute; inset:0; z-index:-2; background:var(--img-hero) center 28%/cover no-repeat; filter:grayscale(1) contrast(1.08); }
 .hero::after{ content:""; position:absolute; inset:0; z-index:-1;
@@ -685,7 +737,9 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 .hero .duo{ margin-top:22px; }
 
 /* ---------- photography, colour except the hero ---------- */
-.photo{ position:relative; border-radius:var(--r-card); overflow:hidden; border:1.5px solid var(--hairline); }
+/* Photography is square cornered everywhere. A rounded photograph reads as a card
+   of a picture rather than as the picture. */
+.photo{ position:relative; border-radius:0; overflow:hidden; border:1.5px solid var(--hairline); }
 .photo__img{ width:100%; height:200px; background-size:cover; background-position:center; }
 .photo__img--op{ background-image:var(--img-op); }
 .photo__img--paddle{ background-image:var(--img-paddle); }
@@ -751,7 +805,7 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 .daybtn{ width:68px; min-height:82px; border-width:1.5px; }
 .daybtn small{ letter-spacing:.06em; }
 .daybtn strong{ font-size:25px; }
-.seg button{ border-radius:var(--r-pill); border-width:1.5px; }
+.seg button{ border-radius:var(--r-btn); border-width:1.5px; }
 .field input,.field select,.field textarea{ border-width:1.5px; }
 .stepper button{ width:60px; height:60px; border-radius:var(--r-pill); flex:none; }
 .stepper button svg{ width:26px; height:26px; }
@@ -834,6 +888,263 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 .plate--fullbleed{ border-radius:0; }
 .qr{ border-width:1.5px; }
 
+/* ============================================================
+   RESPONSIVE LAYER
+   Everything below keys off viewport width and input capability. There is no
+   user-agent sniffing and no device name anywhere in this file: a wide window on
+   a touch laptop gets the desktop layout and no hover behaviour, a narrow window
+   on a desktop gets the phone layout, and both are correct.
+   ============================================================ */
+
+/* ---------- INPUT CAPABILITY ----------
+   Hover and lift belong to a fine pointer. On a touch screen :hover latches after
+   a tap and leaves a control looking permanently pressed, so none of this is
+   allowed to reach one. Focus states are separate and always present. */
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{ transform:translateY(-2px); }
+  .btn--primary:hover{ background:color-mix(in srgb, var(--text-primary) 26%, transparent); }
+  .btn--secondary:hover{ background:color-mix(in srgb, var(--text-primary) 9%, transparent); border-color:var(--border-strong); }
+  .btn--ghost:hover{ background:color-mix(in srgb, var(--text-primary) 7%, transparent); border-color:var(--border-strong); }
+  .btn:hover svg:last-child{ transform:translateX(3px); }
+  .btn[disabled]:hover{ transform:none; background:var(--surface-sunken); }
+  .btn:active{ transform:translateY(0) scale(.985); }
+
+  .duocard:hover{
+    transform:translateY(-3px);
+    background:color-mix(in srgb, var(--text-primary) 13%, transparent);
+    border-color:var(--border-strong);
+  }
+  .hero .duo .duocard:nth-child(1):hover{ background:rgba(16,16,18,.62); border-color:#F4F2ED; }
+  .hero .duo .duocard:nth-child(2):hover{ background:rgba(16,16,18,.44); border-color:#F4F2ED; }
+  /* the panelled pair sets its own fills, so its hover has to out-specify them */
+  .duo--detail .duocard:nth-child(1):hover{ background:color-mix(in srgb, var(--text-primary) 20%, transparent); border-color:var(--border-strong); }
+  .duo--detail .duocard:nth-child(2):hover{ background:color-mix(in srgb, var(--text-primary) 9%, transparent); border-color:var(--border-strong); }
+  .duocard:active{ transform:translateY(0) scale(.985); }
+
+  .tlink:hover svg{ transform:translateX(4px); }
+  .topnav a:hover::after{ transform:scaleX(1); }
+  .sched__row:hover .sched__chev{ transform:translateX(3px); }
+}
+.tlink svg, .sched__chev{ transition:transform var(--dur-ui) var(--ease); }
+
+@media (prefers-reduced-motion:reduce){
+  .btn, .btn svg, .duocard, .tlink svg, .sched__chev, .topnav a::after{ transition:none; }
+  .btn:hover, .duocard:hover, .btn:active, .duocard:active{ transform:none; }
+  .btn:hover svg:last-child, .tlink:hover svg, .sched__row:hover .sched__chev{ transform:none; }
+}
+
+/* ---------- DESKTOP HEADER NAVIGATION ----------
+   Hidden until the bottom bar goes away, so exactly one primary navigation is in
+   the document at any width. Current page is an accent line plus a weight change,
+   never a filled shape. */
+.topnav{ display:none; }
+.topnav a{
+  position:relative; display:inline-flex; align-items:center;
+  min-height:var(--tap-min); padding:0 1px;
+  font-size:16px; line-height:20px; font-weight:600; white-space:nowrap; text-decoration:none;
+}
+.topnav a[aria-current="page"]{ font-weight:800; }
+.topnav a::after{
+  content:""; position:absolute; left:0; right:0; bottom:11px; height:2px;
+  background:currentColor; transform:scaleX(0); transform-origin:left center;
+  transition:transform var(--dur-ui) var(--ease);
+}
+.topnav a[aria-current="page"]::after{ transform:scaleX(1); }
+
+/* ---------- EDITORIAL BANDS ----------
+   Two column bands and the rented-venue promo. Single column and unremarkable
+   until there is width to justify anything else. */
+.band2{ display:grid; gap:var(--section-gap); align-items:start; }
+.band2__col{ display:grid; gap:var(--block-gap); align-content:start; }
+.promo{
+  display:grid; gap:var(--s3);
+  background:transparent; border:0; border-radius:0;
+  border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline);
+  padding:var(--s6) 0;
+}
+.promo .btn{ margin-inline:0; }
+/* With a supporting sentence in each panel, two 160px columns on a phone would set
+   the copy four words to a line. It stacks until there is room for two. */
+.duo--detail{ grid-template-columns:1fr; gap:12px; }
+@media (min-width:600px){ .duo--detail{ grid-template-columns:1fr 1fr; gap:16px; } }
+.duo--detail .duocard{ min-height:0; padding:18px 16px 16px; }
+/* In the compact hero pair the price is pinned to the foot of the card. Here the
+   supporting sentence follows it, and two sentences of different lengths would
+   leave the two prices sitting at different heights. Straight stack instead. */
+.duo--detail .duocard .num{ margin-top:12px; }
+/* One panel filled, one panel outlined. That is the whole distinction, and it is
+   made of fill weight and border weight rather than of a second colour. */
+.duo--detail .duocard:nth-child(1){
+  background:color-mix(in srgb, var(--text-primary) 12%, transparent);
+  border-color:color-mix(in srgb, var(--text-primary) 62%, transparent);
+}
+.duo--detail .duocard:nth-child(2){
+  background:transparent;
+  border-color:color-mix(in srgb, var(--text-primary) 30%, transparent);
+}
+
+/* ---------- TABLET ----------
+   The gutter and the reading column widen together. The layout is still one
+   column, because a 600 to 1000 pixel window has no room for a second one that is
+   worth having. */
+@media (min-width:600px){
+  :root{
+    --gutter:28px; --card-pad:24px; --pad-top:24px;
+    --content-max:38rem; --shell-max:38rem; --measure:38rem;
+    --block-gap:26px; --section-gap:40px;
+  }
+  .tabbar{ padding-inline:max(0px, calc((100% - 34rem) / 2)); }
+  .hero{ min-height:64svh; padding:var(--s6) var(--gutter) var(--s7); }
+  .hero .duo{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width:768px){
+  :root{
+    --gutter:40px; --pad-top:28px;
+    --content-max:42rem; --shell-max:44rem; --measure:42rem;
+    --section-gap:48px;
+  }
+}
+
+/* ---------- DESKTOP ----------
+   The bottom bar is removed from the layout and the primary navigation moves into
+   the sticky header. The container stops being a phone column and becomes a real
+   page: wide for the hero and the film strip, still narrow for anything anyone has
+   to read. */
+@media (min-width:1024px){
+  :root{
+    --gutter:48px; --card-pad:28px; --pad-top:32px;
+    --shell-max:1280px; --content-max:44rem; --measure:40rem;
+    --appbar-h:72px; --tabbar-h:0px;
+    --block-gap:28px; --section-gap:64px;
+    --fs-h1:38px; --lh-h1:44px;
+    --fs-h2:28px; --lh-h2:34px;
+  }
+
+  /* app bar: logo left, destinations right, account and search at the far right.
+     The inline padding lands the header content on the same line as the body
+     content, so the wordmark and the hero headline share a left edge while the
+     full-width visuals run out past both of them to the container edge.
+     gap is zero on purpose: the back-button slot is present but empty on most
+     routes, and a flex gap would push the wordmark off that shared edge. */
+  .appbar{
+    display:flex; align-items:center; gap:0;
+    padding-inline:calc(max(0px, (100% - var(--shell-max)) / 2) + var(--gutter));
+  }
+  .appbar--ends{ grid-template-columns:none; }
+  #bar-start .textbtn{ padding-right:var(--s5); }
+  #bar-mid{ display:flex; align-items:center; justify-self:auto; }
+  .wordmark__img{ width:142px; height:31px; }
+  .topnav{ display:flex; align-items:center; gap:var(--s6); margin-left:auto; }
+  .topnav:empty{ display:none; }
+  .topnav:empty + .appbar__slot--end{ margin-left:auto; }
+  .appbar__slot--end{ gap:var(--s3); margin-left:var(--s7); }
+  .iconbtn--bare svg{ width:23px; height:23px; }
+
+  /* the bottom bar is gone, not hidden behind the content */
+  #tabhost.tabbar{ display:none; }
+
+  /* a task route keeps a reading column; only a route that asks for the whole
+     container gets it */
+  main{ max-width:calc(var(--measure) + 2 * var(--gutter)); }
+  body.wide main{ max-width:var(--shell-max); }
+  .dock{ padding-inline:calc(max(0px, (100% - var(--shell-max)) / 2) + var(--gutter)); }
+  /* the dock's contents line up with the task column above them, not with the
+     wider landing container */
+  .dock__inner{ max-width:var(--measure); }
+
+  /* text-heavy blocks stay on a readable measure inside the wider frame */
+  .sampleband, .banner, .lede, .steps__b p, .promo__t p, .marquee__copy p{ max-width:var(--measure); }
+  .duocard .note{ max-width:46ch; }
+
+  /* HERO: full container width, square cornered, composed to the left */
+  .hero{
+    min-height:min(80svh, 760px);
+    padding:var(--s9) var(--gutter) var(--s9);
+    border-radius:0;
+  }
+  /* A wide hero is a different contrast problem from a tall one. The phone
+     gradient runs top to bottom because the copy fills the width; here the copy
+     is a left column and the photograph has to stay visible to the right of it,
+     so a horizontal scrim carries the text and the vertical one only seats the
+     top and bottom edges. */
+  .hero::after{
+    background:
+      linear-gradient(90deg, rgba(18,18,20,.86) 0%, rgba(18,18,20,.72) 40%, rgba(18,18,20,.26) 64%, rgba(18,18,20,0) 82%),
+      linear-gradient(180deg, rgba(26,26,26,.58) 0%, rgba(26,26,26,.10) 30%, rgba(26,26,26,.34) 64%, rgba(26,26,26,.86) 100%);
+  }
+  /* The sticky header carries the wordmark on every screen now, so the hero does
+     not need to carry it a second time. */
+  .hero__mark{ display:none; }
+  .hero h1{ font-size:clamp(58px, 5.6vw, 78px); max-width:13ch; }
+  .hero p.sub{ margin-top:var(--s4); font-size:21px; line-height:29px; max-width:34ch; }
+  .hero .maplink{ margin-top:var(--s4); font-size:16px; }
+  .hero .duo{ margin-top:var(--s7); grid-template-columns:repeat(2, minmax(0, 290px)); gap:var(--s4); }
+  .hero .duocard{ min-height:160px; padding:20px 20px 18px; }
+  .hero .duocard b{ font-size:21px; line-height:25px; }
+  .hero .duocard .num{ font-size:34px; line-height:36px; }
+
+  /* what is open, beside the proof numbers */
+  .band2{ grid-template-columns:1.55fr 1fr; gap:var(--s9); }
+  .band2__col--facts{ padding-top:var(--s2); }
+  .band2__col--facts .facts{ flex-direction:column; }
+  .band2__col--facts .facts li{ text-align:left; padding:var(--s3) 0; }
+  .band2__col--facts .facts li + li{ border-left:0; border-top:1px solid var(--hairline); }
+  .band2__col--facts .facts b{ font-size:30px; line-height:34px; }
+  .band2__col--facts .facts span{ font-size:14px; }
+  .sched__t{ font-size:19px; line-height:24px; }
+  .sched__s{ font-size:15px; line-height:20px; }
+  .sched__row{ min-height:72px; }
+
+  /* FILM STRIP: full container width, taller, still square cornered */
+  .marquee{ --strip-h:clamp(300px, 26vw, 400px); border-radius:0; }
+  /* The phone scrim is a centre weighted ellipse, which is right when the strip is
+     barely wider than the sentence sitting on it. At this width a centred block
+     leaves nowhere for the scrim to fade, so the whole strip goes black and there
+     is no film left to look at. The copy moves into a left column and the scrim
+     becomes horizontal, dark under the words and gone by two thirds across, so
+     the right half of the strip stays visible film. The flat veil lightens, since
+     it is no longer carrying any of the contrast. */
+  .marquee__veil{ background:rgba(24,24,24,.22); }
+  .marquee__copy{
+    text-align:left; padding:var(--s7) var(--gutter);
+    background:linear-gradient(90deg,
+      rgba(12,12,12,.92) 0%, rgba(12,12,12,.88) 34%, rgba(12,12,12,.55) 52%, rgba(12,12,12,0) 72%);
+  }
+  .marquee__copy h2{ font-size:clamp(40px, 3.4vw, 52px); max-width:13ch; }
+  .marquee__copy p{ margin-top:var(--s4); margin-inline:0; font-size:19px; line-height:27px; max-width:38ch; }
+
+  /* PICK YOUR WAY IN: two wide panels, straight edges, hierarchy by type */
+  .duo--detail{ gap:var(--s6); }
+  .duo--detail .duocard{ padding:var(--s7) var(--s7) var(--s6); gap:10px; }
+  .duo--detail .duocard svg{ width:32px; height:32px; }
+  .duo--detail .duocard b{ font-size:26px; line-height:31px; }
+  .duo--detail .duocard .num{ font-size:42px; line-height:46px; }
+  .duo--detail .duocard .per{ font-size:15px; }
+  .duo--detail .duocard .note{ margin-top:14px; font-size:17px; line-height:25px; }
+
+  /* the promo reads across rather than down */
+  .promo{ grid-template-columns:1fr auto; align-items:center; column-gap:var(--s9); padding:var(--s7) 0; }
+  .promo__a{ margin:0; }
+
+  /* four steps across, numbered above a thin rule */
+  .steps{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s6); }
+  .steps > li{ display:block; }
+  .steps__n{ width:auto; font-size:20px; line-height:24px; }
+  .steps__b{ border-left:0; border-top:1px solid var(--hairline); margin-top:var(--s3); padding:var(--s4) 0 0; }
+  .steps > li:last-child .steps__b{ padding-bottom:0; }
+
+  /* footer fills the container. The auto inline margins have to go with the max
+     width: .pagefoot is a grid, and an auto margin on a grid item shrinks it to
+     its content instead of stretching it. */
+  .pagefoot{ padding:var(--s9) var(--gutter) var(--s8); }
+  .footgrid{ max-width:none; margin-inline:0; grid-template-columns:1.4fr 1fr; gap:var(--s9); }
+  .footnote{ max-width:none; margin:var(--s7) 0 0; }
+}
+
+@media (min-width:1440px){
+  :root{ --gutter:64px; --shell-max:1400px; --measure:42rem; }
+}
+
 </style>
 
 </head>
@@ -889,6 +1200,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   <header class="appbar">
     <div class="appbar__slot" id="bar-start"></div>
     <div id="bar-mid"></div>
+    <nav class="topnav" id="bar-nav" aria-label="Primary"></nav>
     <div class="appbar__slot appbar__slot--end" id="bar-end"></div>
   </header>
   <div id="bands"></div>
@@ -1356,7 +1668,8 @@ function render(){
   if (path !== S.route){ S.lastRoute = S.route; S.route = path; }
   const view = hit ? hit.fn(hit.params) : { id:"sys-404", shell:"token", title:"Link not valid", html: scrLink({}).html, dock:null };
 
-  document.body.className = "shell-" + view.shell + (view.shell === "browse" || view.shell === "staff" ? " has-tabbar" : "");
+  const navigable = view.shell === "browse" || view.shell === "staff";
+  document.body.className = "shell-" + view.shell + (navigable ? " has-tabbar" : "") + (view.wide ? " wide" : "");
   document.title = view.title + " | Fit Club Courts Staging";
 
   /* app bar */
@@ -1413,20 +1726,32 @@ function render(){
   dockhost.innerHTML = view.dock ? dockHtml(view.dock) : "";
   measureDock();
 
-  /* tab bar: removed from the DOM on task routes, never merely hidden */
+  /* NAVIGATION
+     Two layouts, one set of destinations, chosen by viewport width in CSS rather
+     than by anything this function knows. Below 1024px the bottom bar is the
+     primary navigation and the header nav is display:none; from 1024px up the
+     bottom bar is display:none and the header nav takes over. Both are removed
+     from the DOM entirely on a task route, never merely hidden. */
   const tabhost = document.getElementById("tabhost");
-  if (view.shell === "browse" || view.shell === "staff"){
+  const topnav = document.getElementById("bar-nav");
+  if (navigable){
     const set = view.shell === "staff" ? STAFF_TABS : PUBLIC_TABS;
+    const items = set.map(function(t){
+      return { href: tabHref(t), cur: t.match.indexOf(path) >= 0, t: t };
+    });
     tabhost.className = "tabbar";
-    tabhost.innerHTML = set.map(function(t){
-      const href = tabHref(t);
-      const cur = t.match.indexOf(path) >= 0;
-      return '<a href="#' + esc(href) + '" aria-label="' + esc(t.aria) + '"' + (cur ? ' aria-current="page"' : "") + ">" +
-        '<span class="tabpill">' + icon(t.glyph) + "</span><span>" + esc(t.label) + "</span></a>";
+    tabhost.innerHTML = items.map(function(it){
+      return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
+        '<span class="tabpill">' + icon(it.t.glyph) + "</span><span>" + esc(it.t.label) + "</span></a>";
+    }).join("");
+    topnav.innerHTML = items.map(function(it){
+      return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
+        esc(it.t.label) + "</a>";
     }).join("");
   } else {
     tabhost.className = "";
     tabhost.innerHTML = "";
+    topnav.innerHTML = "";
   }
 
   startTick();
@@ -1587,15 +1912,26 @@ function readForm(ids){
 /* ---------- v2 shared blocks ---------- */
 var MAPS_URL = "https://www.google.com/maps/search/?api=1&query=The+Fit+Club+Courts+Silway-8+Polomolok+South+Cotabato";
 
-function duoCTA(){
-  return '<div class="duo">' +
-    '<button class="duocard" data-action="startcourt" aria-label="Reserve a court, 350 pesos per hour">' +
-      icon("court") + '<b>Reserve<br>a court</b>' +
-      '<span class="num">₱350</span><span class="per">per hour</span></button>' +
-    '<button class="duocard" data-action="nav" data-to="/openplay" aria-label="Join Open Play, 150 pesos per player">' +
-      icon("users") + '<b>Join<br>Open Play</b>' +
-      '<span class="num">₱150</span><span class="per">per player</span></button>' +
-  '</div>';
+/* What each choice actually buys you. Printed inside the choice itself, because a
+   sentence sitting somewhere else on the page is not part of the decision. */
+var COURT_NOTE = "Your court, your time. Reserve the full space for a private game with your own group.";
+var OPENPLAY_NOTE = "One admission gets you into the rotation. Come solo, play with everyone, and meet a new community, no group needed.";
+
+/* detail:true prints the supporting copy and lets the two panels breathe. The hero
+   uses the compact form, where the photograph is doing the selling. */
+function duoCTA(detail){
+  const noteA = detail ? '<span class="note">' + COURT_NOTE + "</span>" : "";
+  const noteB = detail ? '<span class="note">' + OPENPLAY_NOTE + "</span>" : "";
+  return '<div class="duo' + (detail ? " duo--detail" : "") + '">' +
+    '<button class="duocard" data-action="startcourt" aria-label="Reserve a court, 350 pesos per hour.' +
+      (detail ? " " + COURT_NOTE : "") + '">' +
+      icon("court") + "<b>" + (detail ? "Reserve a court" : "Reserve<br>a court") + "</b>" +
+      '<span class="num">₱350</span><span class="per">per hour</span>' + noteA + "</button>" +
+    '<button class="duocard" data-action="nav" data-to="/openplay" aria-label="Join Open Play, 150 pesos per player.' +
+      (detail ? " " + OPENPLAY_NOTE : "") + '">' +
+      icon("users") + "<b>" + (detail ? "Join Open Play" : "Join<br>Open Play") + "</b>" +
+      '<span class="num">₱150</span><span class="per">per player</span>' + noteB + "</button>" +
+  "</div>";
 }
 function footerBlock(){
   return '<footer class="pagefoot">' +
@@ -1638,7 +1974,9 @@ function scrLanding(){
       '<p class="legal">Nothing is being held or reserved. Call the venue on ' + esc(VENUE.phone) + " to ask about court time.</p></div></div></div>";
   }
 
-  html += '<div class="section"><h2 class="sec">Open right now</h2>';
+  /* What is open and what the venue is, side by side once there is width for it.
+     One column and unchanged below 1024px. */
+  html += '<div class="section band2"><div class="band2__col"><h2 class="sec">Open right now</h2>';
   if (availOff){
     html += '<div class="banner">' + icon("alert") + "<div><p><strong>Live availability could not be loaded.</strong></p>" +
       '<p class="legal">Prices and contact details below are still correct.</p>' +
@@ -1660,22 +1998,24 @@ function scrLanding(){
   }
   html += "</div>";
 
-  html += '<div class="section"><ul class="facts">' +
+  html += '<div class="band2__col band2__col--facts"><ul class="facts">' +
     "<li><b>4</b><span>Courts</span></li>" +
     "<li><b>7</b><span>Days a week</span></li>" +
     "<li><b>Indoor</b><span>Rain or shine</span></li>" +
-    "</ul></div>";
+    "</ul></div></div>";
 
+  /* The film strip carries the headline and nothing else. What Open Play actually
+     is now belongs to the Open Play choice itself, further down. */
   html += '<div class="section">' + communityMarquee() +
-    '<p class="lede" style="margin-top:var(--s4)">Open Play is one admission. You rotate in with everyone else. No group needed.</p>' +
-    '<p style="margin-top:var(--s4)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay">See Open Play times' + icon("chev-r") + "</button></p></div>";
+    '<p style="margin-top:var(--s5)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay">See Open Play times' + icon("chev-r") + "</button></p></div>";
 
-  html += '<div class="section"><div class="card card--sunken"><h2 class="sec">Rent the whole place</h2>' +
-    '<p class="legal" style="margin-top:var(--s2)">All 4 courts for a club day, tournament, or company event.</p>' +
-    '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/event">Plan a private event</button></p></div></div>';
+  html += '<div class="section"><div class="promo">' +
+    '<div class="promo__t"><h2 class="sec">Rent the whole place</h2>' +
+    '<p class="legal" style="margin-top:var(--s2)">All 4 courts for a club day, tournament, or company event.</p></div>' +
+    '<p class="promo__a"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/event">Plan a private event' + icon("chev-r") + "</button></p></div></div>";
 
   if (!bookingOff){
-    html += '<div class="section"><h2 class="sec">Pick your way in</h2>' + duoCTA() + "</div>";
+    html += '<div class="section"><h2 class="sec">Pick your way in</h2>' + duoCTA(true) + "</div>";
   }
 
   /* How it works is a section, not a link out. Find My Booking and Sign in are in
@@ -1690,8 +2030,11 @@ function scrLanding(){
     "See the full rates and policies" + icon("chev-r") + "</button></p></div>";
 
   html += footerBlock();
+  /* wide:true asks for the whole desktop container rather than a reading column.
+     The landing page is the only screen that composes across it; every task route
+     keeps a measure, because a form is not improved by being 1280px wide. */
   return { id:"pub-landing", shell:"browse", title:"Fit Club Courts", html:html,
-    mount:mountMarquee, dock:null };
+    wide:true, mount:mountMarquee, dock:null };
 }
 /* ---------- community marquee ----------
    The only images in this build that are not inlined. All 18 come to 3.4MB, which
