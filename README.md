@@ -34,20 +34,18 @@ Then open `http://127.0.0.1:8231/preview.html`.
 Eight product behaviours changed alongside the visual system. The full argument is in
 `v2/REDESIGN-PLAN.md`; the short version:
 
-1. **Expiring QR passes, one per player.** A reservation issues a pass per person, not one code per
-   booking. A four-player court reservation issues four passes, numbered 1 of 4 to 4 of 4. Each pass
-   carries a token that regenerates every 60 seconds behind a countdown ring, stays dormant until the
-   arrival window opens, and is single use. The booking code survives in large type as the fallback
-   for a dead phone or a failed scan.
+1. **A QR pass per participant, issued at payment.** A reservation issues a pass per person, not one
+   code per booking. A four-player court reservation issues four passes, numbered 1 of 4 to 4 of 4.
+   The full workflow is in **Entry passes** below. The booking code survives in large type as the
+   fallback for a dead phone or a failed scan.
 
    Each pass also has its own shareable link at `#/t/pass/<token>`, so four people arriving
    separately do not need the organizer physically present. Every pass carries two tokens and they
-   are not interchangeable: The scan token rotates every 60 seconds, so a screenshot dies; the share
-   token is stable, because the player it was sent to has to be able to open the link more than
-   once. Neither encodes anything personal. A shared pass link opens that one pass and nothing else:
-   No pass list, no other players, no organizer name or number, no booking code, and no route to the
-   booking. A player can set their own display name from it, and that name appears on the organizer's
-   pass list and on the staff roster.
+   are not interchangeable: The scan token is what the door reads; the share token is what a link
+   resolves. Neither encodes anything personal. A shared pass link opens that one pass and nothing
+   else: No pass list, no other players, no organizer name or number, no booking code, and no route
+   to the booking. A player can set their own display name from it, and that name appears on the
+   organizer's pass list and on the staff roster.
 2. **Time selection is a drag.** The start-time radio list and the separate duration control are
    replaced by one vertical hour rail. Press and hold an open hour, then drag to extend. Unavailable
    hours are hatched and the drag refuses to cross them. Tapping still works: One tap selects an
@@ -102,6 +100,135 @@ radius reached well past the edge of the strip. The fade never finished inside t
 the outermost frame still sat under roughly half strength scrim, and the film rendered
 black end to end at every width. It is a band gradient now, which has no radius to get
 wrong and holds full height instead of drawing a visible oval on a short box.
+
+## Entry passes
+
+Every paid participant gets their own QR pass, and every pass belongs to one shared booking.
+
+### The booking sequence
+
+1. Choose **Reserve a Court** or **Join Open Play**.
+2. Choose the date, the time, the session, and how many are playing.
+3. Give the organizer's details.
+4. Name every participant. A booking for one carries the organizer's name; a booking for more than
+   one requires a name for each, and the list can be added to, edited, and shortened right up to
+   payment. After payment a name change stops being an edit and becomes a reissue, below.
+5. Check the summary: schedule, venue, participant list, price breakdown, total.
+6. Pay through Maya Checkout.
+7. While payment is incomplete the booking reads **Payment pending** and no usable pass exists. This
+   is not a hidden control: `buildPasses()` creates every pass with a null token, and `issuePasses()`
+   is called from exactly one place, inside `verifyPayment()`, which is the only function in the file
+   that may promote an order. There is no code path from a browser return to a scannable pass.
+8. On confirmation the booking reads **Confirmed**, one unique code is minted per participant, and
+   the screen says: *You're booked. Your entry passes are ready in My Bookings.* The primary action
+   is **View QR passes**; the secondary is **Go to My Bookings**.
+
+### What a pass carries
+
+A unique QR, the participant's full name, the shared booking number, the date and time, the booking
+type, the venue and court or session, its position in the set as "Pass 2 of 4", and its status. The
+four statuses are **Valid**, **Checked in**, **Cancelled**, and **Expired**, with a fifth, *Payment
+pending*, for the state before a pass exists at all.
+
+The code is an opaque reference. It carries no name, no booking number, and nothing derivable from
+either, and it is the server that resolves it and records the check-in.
+
+### The scan token no longer rotates
+
+The previous build regenerated the scan token every 60 seconds behind a countdown ring, so a
+screenshot died within a minute. **That property has been removed**, deliberately and with a cost:
+a pass the organizer downloads as a PNG, sends to a player, and presents at the door has to still
+work an hour later, so a code that expires in 60 seconds is a broken download rather than a security
+feature. The defence moved to where it can hold with a stable code:
+
+- **Single use.** The first scan admits that participant. A second scan of the same code is refused
+  and shown as "Already checked in at [time]", so a copied screenshot buys nothing.
+- **Revocable.** Reissuing or cancelling a pass mints a new code and retires the old one. A retired
+  code stops admitting anyone the instant it is retired.
+- **Opaque.** As above.
+
+This is worth an owner decision. If rotation matters more than downloadable passes, the two cannot
+both be had, and the download has to go.
+
+### The modal
+
+**View QR passes** opens a modal over the page: a bottom sheet on a phone, a centred modal with a
+dimmed backdrop on a desktop, with a short entrance animation that `prefers-reduced-motion` removes.
+It is a native `<dialog>` opened with `showModal()`, so focus is trapped, Escape closes it, and focus
+returns to the control that opened it. There is a visible close button and every control is labelled.
+
+One participant shows one pass and one **Download QR** button: no arrows, no pagination, no
+"Download all". More than one participant becomes a carousel: previous and next buttons, horizontal
+swipe, left and right arrow keys, a "2 of 4" count, and position dots. The pager sits in the footer
+rather than in the scrolling body, because a previous button you have to scroll to find is not a
+previous button.
+
+### Downloads
+
+**Download QR** saves the participant on screen. **Download all** saves every valid pass on the
+booking. There is no ZIP: this build carries no archiver and fetches nothing, so Download all is one
+clearly named PNG per participant, saved in sequence:
+
+```
+TFC-BOOKING-XK3M-PX9J-Maria-Santos-QR.png
+```
+
+Browsers gate the second and later files behind an allow-multiple-downloads permission. The modal
+says so, and if the prompt is declined every pass can still be saved one at a time.
+
+A download is not a bare code. It is a 1080 by 1640 pass drawn on a canvas carrying the wordmark, the
+QR with a real quiet zone around it, the participant, the booking number, the date and time, the
+venue, the booking type, the status, and one instruction: *Present this pass at the entrance.* Module
+edges are snapped to whole pixels, because a fractional module is what makes a downloaded code look
+soft, and a soft code is a code that does not scan. The screen and the file are drawn from the same
+`qrModules()` grid, so they can never be two different patterns.
+
+### The organizer owns the set
+
+Every pass under a booking is viewed and downloaded from My Bookings by the organizer.
+
+- **Renaming after payment** is a reissue, not an edit. It is confirmed by a button that names its
+  own consequence, mints a new code for that participant, and retires the previous one, so two live
+  passes can never exist for the same place. Nobody else's pass changes.
+- **Cancelling one participant** revokes that one code behind a two-step confirmation. The rest of
+  the booking stays valid.
+- **Cancelling the booking** invalidates every pass under it at once.
+
+Cancellation, refund, and reschedule *policy* is still unstated, because it is still unapproved. What
+is implemented is what cancelling has to do to the passes.
+
+### The door
+
+`scanPass()` is the only entry point, so the simulated scan on a pass screen and the staff scanner at
+`#/staff/scan` cannot disagree. A valid scan shows the participant and the booking, marks that pass
+and only that pass, records the time, and says how many on the booking have not arrived. Every
+refusal is specific rather than a generic failure:
+
+| Presented code | Result |
+|---|---|
+| Valid | Checked in, time recorded |
+| Same code again | Already checked in at [time] |
+| Cancelled | Cancelled, with the reason |
+| Retired by a reissue | Replaced, ask for the current pass |
+| Expired | Expired, the session has ended |
+| Refunded booking | Refunded |
+| Unknown | Not a valid pass |
+
+A revoked code is moved to a retired list rather than dropped. It can never admit anyone, because
+only `p.token` is a live reference, but the door can still recognise it well enough to say why it is
+being refused. A scanner that answers "not a valid pass" to a code the venue itself revoked sends the
+holder to argue with the wrong person.
+
+## My Bookings
+
+Reservations are grouped into **Upcoming**, **Past**, and **Cancelled**, decided by the clock and by
+cancellation rather than by whether the reader has something to do about them. Each entry gives its
+booking number, booking type, schedule, venue, number of players, and payment status.
+
+A confirmed booking carries a prominent **View QR pass** or **View 4 QR passes**, counted from the
+booking. A booking whose payment is unfinished carries **Complete payment** where payment can still
+be resumed, and a plain statement of what happened where it cannot. The QR action is never offered
+where no usable pass exists.
 
 ## What each choice buys you
 
@@ -162,6 +289,11 @@ that the bottom sheet and the dock are built around.
   `@media (hover:hover) and (pointer:fine)`, so a tap on a touch screen cannot leave a
   control latched in its hover state. Focus is separate and always present: 3px outline
   plus a 5px halo. All of it collapses under `prefers-reduced-motion`.
+- **The footer runs to both edges of the viewport** at every width, while the footer box itself stays
+  on the content column so its text still lines up with the page above it. A spread `box-shadow`
+  paints the bleed rather than a `100vw` width, because `100vw` counts the scrollbar and would shift
+  the whole column by half of one. `clip-path` lets the shadow out sideways and holds it in
+  vertically.
 
 ## Visual system
 
@@ -188,9 +320,19 @@ that the bottom sheet and the dock are built around.
 
 ## Theme
 
-The document is pinned to dark with `data-theme="dark"` on the `<html>` element, because that is the
-look the redesign was reviewed in. Light is fully built and tested. Delete that one attribute and the
-page follows the viewer's system theme instead.
+The document ships pinned to dark with `data-theme="dark"` on the `<html>` element, because that is
+the look the redesign was reviewed in. The base surface is a charcoal with a trace of blue in it,
+which is what stops a full screen of it reading as flat television grey. It is still one hue plus
+opacity: the palette rule is unchanged.
+
+A day and night control sits in the app bar on every screen. It flips the pin rather than removing
+it, so the choice is always explicit and never falls back to whatever the operating system happens to
+say mid-session. The preference is the one thing in this build that outlives a refresh, stored in
+`localStorage` behind a `try`/`catch`, because it is a display setting and not booking data.
+
+Below 420px a fourth control in the app bar no longer fits beside the wordmark, so the harness button
+keeps its icon and drops its label. Its accessible name is on the button rather than in the text for
+exactly that reason.
 
 ## What is simulated
 
@@ -203,6 +345,11 @@ The build is nonetheless truthful about product rules. Specifically:
 - There is no code path from a browser return to a confirmed booking. Every simulated payment
   outcome lands on **Checking payment** first, and only `verifyPayment()` may promote an order,
   after checking hold validity and amount match.
+- There is no code path from a browser return to a scannable pass either. Passes are built with a
+  null token and `issuePasses()` is called from exactly one place, inside `verifyPayment()`. An
+  unpaid booking has nothing to leak, and the QR action is absent rather than disabled.
+- A scan touches one pass. Admitting one participant never admits the rest of their group, and the
+  booking is marked checked in without any other pass being marked with it.
 - A hold never renders without its absolute expiry time.
 - Every provisional state carries a sentence saying what is not true: A hold is not a booking, and
   Checking payment is not a confirmation.
@@ -246,7 +393,10 @@ The pass screens carry their own staging control: "Open the arrival window" wake
 pass and the shared pass link, so either side of the handoff can be walked through.
 
 The staff surface is absent from every public navigation surface and from the footer. It is
-reachable only through the harness or by typing `#/staff/today`.
+reachable only through the harness or by typing `#/staff/today`. It carries a **Scan** screen at
+`#/staff/scan`, which stands in for a camera: a field for a pass code, and a list of every issued
+code in the build so the accept, the duplicate, and every rejection can be walked through by hand.
+The code behind each button is the same opaque token a real scanner would read.
 
 ## Verification
 
@@ -258,6 +408,19 @@ Driven in Chrome inside a device frame, dark and light:
 - Every static route swept again at 375, 753, and 1265 pixel viewports: No JavaScript errors, no
   horizontal scrolling, exactly one `h1`, the bottom bar present below 1024px and absent above it,
   and the header nav the other way round
+- The pass workflow end to end: A four-participant court booking collects four names, refuses to
+  continue while one is blank, creates four passes with null tokens, mints four distinct codes at
+  confirmation and not before, and opens them in the modal
+- The carousel by arrow button, by left and right arrow keys, and by synthesized pointer swipe in
+  both directions. It stops at both ends, and a vertical drag scrolls rather than paging
+- A single-participant booking shows one pass, one Download QR, and no arrows, pagination, or
+  Download all
+- Download writes a real PNG to disk. Download all fires one per valid participant; the second and
+  later files are subject to the browser's allow-multiple-downloads permission
+- The door: accept, the same code again, a cancelled code, a code retired by a reissue, and an
+  unknown code each produce their own result, and scanning one pass leaves the other three unscanned
+- Reissue mints a new code, retires the old one, and mirrors the new name onto the admission
+- Day and night both render every screen and the modal, and the preference survives a reload
 - The full court funnel end to end: rail, review, hold, simulated Maya, Checking payment, Confirmed,
   booking detail, pass list, single pass, simulated scan
 - The full Open Play funnel end to end, including the admissions stepper and player names
@@ -325,9 +488,13 @@ Two, both deliberate, both worth an owner decision:
 
 ## Open questions for the owner
 
-1. Arrival window length and grace period, needed before passes can state when they open and when
+1. **Rotating codes or downloadable passes.** Only one of the two is possible. This build chose the
+   download, and moved the defence to single use and revocation. See **Entry passes** above.
+2. Arrival window length and grace period, needed before passes can state when they open and when
    they die.
-2. Group size for a court reservation: Is it required, and is there a maximum per court.
-3. Whether a scanned pass may be reversed by the front desk.
-4. Whether pass links may be sent by SMS, or only shared by the organizer.
-5. Confirmation of the court rate, per the deviation above.
+3. Group size for a court reservation: Is it required, and is there a maximum per court.
+4. Whether a scanned pass may be reversed by the front desk.
+5. Whether pass links may be sent by SMS, or only shared by the organizer.
+6. Confirmation of the court rate, per the deviation above.
+7. Cancellation, refund, and reschedule policy. The pass mechanics for each are built; the rules are
+   not, so this build states none.

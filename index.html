@@ -50,25 +50,29 @@
   --shadow-card:rgba(34,38,43,0.06);
 }
 
+/* ---------- DARK tokens. Charcoal, not neutral grey. ----------
+   The base surface is a charcoal with a trace of blue in it, which is what stops
+   a full screen of it reading as flat television grey. It is still one hue plus
+   opacity: the palette rule is unchanged. */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --surface:#2E2E2E; --surface-raised:#383838; --surface-sunken:#242424;
-    --surface-inverse:#F4F2ED; --text-primary:#F4F2ED; --text-secondary:#B4B0A8;
-    --text-inverse:#2E2E2E; --text-inverse-secondary:#4F4F4F;
-    --border-default:#7A7A7A; --border-strong:#F4F2ED; --hairline:#434343;
-    --focus-ring:#F4F2ED; --focus-halo:#2E2E2E;
-    --overlay:rgba(12,12,12,0.74); --hatch:rgba(244,242,237,0.18);
+    --surface:#26292D; --surface-raised:#2E3238; --surface-sunken:#1E2125;
+    --surface-inverse:#F4F2ED; --text-primary:#F4F2ED; --text-secondary:#B2AFA8;
+    --text-inverse:#26292D; --text-inverse-secondary:#4C5057;
+    --border-default:#767C84; --border-strong:#F4F2ED; --hairline:#3A3E44;
+    --focus-ring:#F4F2ED; --focus-halo:#26292D;
+    --overlay:rgba(10,11,13,0.78); --hatch:rgba(244,242,237,0.18);
     --hatch-strong:rgba(244,242,237,0.28); --shadow-print:rgba(0,0,0,0.55);
     --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
   }
 }
 :root[data-theme="dark"]{
-    --surface:#2E2E2E; --surface-raised:#383838; --surface-sunken:#242424;
-  --surface-inverse:#F4F2ED; --text-primary:#F4F2ED; --text-secondary:#B4B0A8;
-  --text-inverse:#2E2E2E; --text-inverse-secondary:#4F4F4F;
-  --border-default:#7A7A7A; --border-strong:#F4F2ED; --hairline:#434343;
-  --focus-ring:#F4F2ED; --focus-halo:#2E2E2E;
-  --overlay:rgba(12,12,12,0.74); --hatch:rgba(244,242,237,0.18);
+  --surface:#26292D; --surface-raised:#2E3238; --surface-sunken:#1E2125;
+  --surface-inverse:#F4F2ED; --text-primary:#F4F2ED; --text-secondary:#B2AFA8;
+  --text-inverse:#26292D; --text-inverse-secondary:#4C5057;
+  --border-default:#767C84; --border-strong:#F4F2ED; --hairline:#3A3E44;
+  --focus-ring:#F4F2ED; --focus-halo:#26292D;
+  --overlay:rgba(10,11,13,0.78); --hatch:rgba(244,242,237,0.18);
   --hatch-strong:rgba(244,242,237,0.28); --shadow-print:rgba(0,0,0,0.55);
   --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
 }
@@ -853,11 +857,9 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 .qrdead{ display:grid; place-items:center; text-align:center; gap:10px; color:var(--text-secondary);
   font-size:15px; line-height:21px; font-weight:600; padding:30px 24px;
   width:min(258px,72vw); aspect-ratio:1; border:1.5px dashed var(--border-default); border-radius:10px; }
-.ring{ display:flex; align-items:center; gap:12px; font-size:15px; font-weight:700; color:var(--text-secondary); }
-.ring svg{ width:34px; height:34px; }
-.ring circle{ fill:none; stroke-width:4; }
-.ring .rbg{ stroke:var(--hairline); }
-.ring .rfg{ stroke:var(--border-strong); stroke-linecap:round; transform:rotate(-90deg); transform-origin:50% 50%; transition:stroke-dashoffset 1s linear; }
+/* The countdown ring went with the rotating token. A pass code that has to
+   survive being downloaded cannot expire in 60 seconds, so single use and
+   revocation carry the defence instead. */
 .stamp{ background:var(--surface-inverse); color:var(--text-inverse); padding:26px 18px; text-align:center; }
 .stamp svg{ width:34px; height:34px; margin-inline:auto; }
 
@@ -1145,6 +1147,214 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   :root{ --gutter:64px; --shell-max:1400px; --measure:42rem; }
 }
 
+/* ============================================================
+   FOOTER, EDGE TO EDGE
+   The black runs to both edges of the viewport at every width, while the footer
+   box itself stays on the content column so its text still lines up with the
+   page above it. A spread box-shadow paints the bleed instead of a 100vw width,
+   because 100vw counts the scrollbar and would shift the whole column by half of
+   one. clip-path lets the shadow out sideways and holds it in vertically.
+   ============================================================ */
+.pagefoot{
+  box-shadow:0 0 0 100vmax #000;
+  clip-path:inset(0 -100vmax);
+}
+
+/* ============================================================
+   APP BAR AT NARROW WIDTHS
+   Four controls now sit to the right of the wordmark on a browse route: search,
+   account, theme, and the harness. Below 420px the harness keeps its icon and
+   drops its label, which is the difference between fitting and not.
+   ============================================================ */
+@media (max-width:419px){
+  .iconbtn__t{ position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .iconbtn--demo{ min-width:var(--tap-min); padding:0; }
+  .appbar__slot--end{ gap:0; }
+}
+
+/* ============================================================
+   QR PASS MODAL
+   One participant pass at a time, above the page it was opened from. Nothing in
+   here is a soft card: the pass is a rectangle with a hairline around it, and
+   the hierarchy is type and space.
+   ============================================================ */
+#qrmodal{ padding:0; border:0; background:transparent; max-width:100%; max-height:100%; color:var(--text-primary); }
+#qrmodal::backdrop{ background:var(--overlay); }
+#qrmodal[open]{ display:flex; width:100vw; height:100svh; }
+
+.qrm{
+  display:flex; flex-direction:column; width:100%;
+  background:var(--surface); color:var(--text-primary);
+  border:1px solid var(--border-default);
+}
+.qrm__head{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:var(--s4);
+  padding:var(--s5) var(--gutter) var(--s4);
+  border-bottom:1px solid var(--hairline);
+}
+.qrm__head h2{ font-size:var(--fs-h2); line-height:var(--lh-h2); font-weight:800; letter-spacing:-.01em; }
+.qrm__head .legal{ margin-top:4px; }
+.qrm__close{
+  flex:none; display:grid; place-items:center; min-width:var(--tap-min); min-height:var(--tap-min);
+  border:1px solid var(--border-default); border-radius:var(--r-btn); background:transparent;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.qrm__body{ flex:1 1 auto; overflow-y:auto; padding:var(--s5) var(--gutter) var(--s6); }
+/* The footer never scrolls, so every row in it is taken straight out of the pass
+   above. The two download actions sit side by side at every width for that
+   reason, and a single-pass booking gives its one button the whole row. */
+.qrm__foot{
+  flex:none; display:grid; gap:var(--s3); grid-template-columns:1fr 1fr;
+  padding:var(--s4) var(--gutter) calc(var(--s4) + max(0px, env(safe-area-inset-bottom)));
+  border-top:1px solid var(--hairline);
+}
+.qrm__foot .btn{ width:100%; max-width:none; margin:0; padding-inline:var(--s3); }
+.qrm__foot .btn--full, .qrm__pager, .qrm__hint{ grid-column:1 / -1; }
+
+/* the pass itself */
+.pass{
+  border:1px solid var(--border-default); background:var(--surface-raised);
+  border-radius:var(--r-card); overflow:hidden;
+  max-width:26rem; margin-inline:auto;
+}
+.pass__top{
+  display:flex; align-items:baseline; justify-content:space-between; gap:var(--s3);
+  padding:var(--s4) var(--s5); border-bottom:1px solid var(--hairline);
+}
+.pass__who{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:800; letter-spacing:-.01em; }
+.pass__of{ flex:none; font-size:var(--fs-legal); font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-secondary); font-variant-numeric:tabular-nums; }
+/* The quiet zone is part of the code, not padding around a picture. A scanner
+   needs it, so it is stated in the markup rather than left to a layout accident. */
+.pass__qr{ display:grid; place-items:center; padding:var(--s5) var(--s5); background:#FFFFFF; }
+.pass__qrbox{ width:min(228px, 58vw); aspect-ratio:1; background:#FFFFFF; padding:14px; }
+.pass__qrbox svg{ width:100%; height:100%; display:block; }
+.pass__dead{
+  width:min(228px, 58vw); aspect-ratio:1; display:grid; place-items:center; text-align:center; gap:10px;
+  padding:var(--s5); border:1.5px dashed var(--border-default); color:var(--text-secondary);
+  font-size:var(--fs-legal); line-height:var(--lh-legal); font-weight:600; background:var(--surface-sunken);
+}
+.pass__dead svg{ width:30px; height:30px; }
+.pass__facts{ padding:var(--s4) var(--s5) var(--s5); display:grid; gap:0; }
+.pass__facts > div{
+  display:flex; justify-content:space-between; align-items:baseline; gap:var(--s4);
+  padding:10px 0; border-bottom:1px solid var(--hairline); font-size:var(--fs-label); line-height:var(--lh-label);
+}
+.pass__facts > div:last-child{ border-bottom:0; }
+.pass__facts dt{ color:var(--text-secondary); flex:none; }
+.pass__facts dd{ margin:0; font-weight:700; text-align:right; }
+.pass__note{ padding:0 var(--s5) var(--s5); font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
+
+/* Carousel controls. Present only when there is more than one pass.
+   One control set, under the pass, at every width. Arrows beside the pass were
+   centred against its full height, which on a short window put them below the
+   fold: a previous button you have to scroll to find is not a previous button. */
+.qrm__track{ touch-action:pan-y; }
+.qrm__arrow{
+  flex:none; display:grid; place-items:center; width:var(--tap-min); height:var(--tap-min);
+  border:1px solid var(--border-default); border-radius:var(--r-btn); background:transparent;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
+}
+.qrm__arrow[disabled]{ opacity:.35; cursor:not-allowed; }
+.qrm__pager{
+  display:flex; align-items:center; justify-content:center; gap:var(--s3);
+  padding-bottom:var(--s2);
+}
+.qrm__count{ font-size:var(--fs-label); font-weight:700; font-variant-numeric:tabular-nums; }
+.qrm__dots{ display:flex; gap:6px; }
+.qrm__dots i{
+  display:block; width:7px; height:7px; border-radius:50%;
+  box-shadow:inset 0 0 0 1.5px var(--border-default);
+}
+.qrm__dots i[data-on="1"]{ background:var(--text-primary); box-shadow:none; }
+
+/* mobile: a near full screen sheet. desktop: a centred modal. */
+#qrmodal[open]{ align-items:flex-end; justify-content:center; }
+.qrm{ max-height:96svh; border-radius:var(--r-sheet) var(--r-sheet) 0 0; }
+@media (min-width:600px){
+  #qrmodal[open]{ align-items:center; }
+  .qrm{ max-width:34rem; max-height:92svh; border-radius:var(--r-card); }
+  .qrm__head, .qrm__body, .qrm__foot{ padding-inline:var(--s7); }
+  .qrm__foot .btn{ padding-inline:var(--s5); }
+}
+/* The footer never scrolls, so anything that grows in it is taken straight out of
+   the pass above. Kept small and tight for that reason. */
+.qrm__hint{ margin:0; font-size:14px; line-height:19px; }
+@media (prefers-reduced-motion: no-preference){
+  #qrmodal[open] .qrm{ animation:qrm-in 190ms var(--ease) both; }
+  #qrmodal[open]::backdrop{ animation:qrm-fade 190ms var(--ease) both; }
+}
+@keyframes qrm-in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+@keyframes qrm-fade{ from{ opacity:0; } to{ opacity:1; } }
+
+@media (hover:hover) and (pointer:fine){
+  .qrm__close:hover, .qrm__arrow:not([disabled]):hover{
+    background:color-mix(in srgb, var(--text-primary) 10%, transparent); border-color:var(--border-strong);
+  }
+  .qrm__arrow:not([disabled]):hover{ transform:translateY(-2px); }
+}
+@media (prefers-reduced-motion:reduce){
+  .qrm__close, .qrm__arrow{ transition:none; }
+  .qrm__arrow:not([disabled]):hover{ transform:none; }
+}
+
+/* ============================================================
+   MY BOOKINGS
+   A list of reservations, set as editorial entries rather than as a stack of
+   cards: a rule between them, the schedule as the loudest line, and one clear
+   action each.
+   ============================================================ */
+.bklist{ border-top:1px solid var(--hairline); }
+.bklist > li{ border-bottom:1px solid var(--hairline); padding:var(--s6) 0; }
+.bk__head{
+  display:flex; align-items:baseline; justify-content:space-between; gap:var(--s4);
+  font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--text-secondary);
+}
+.bk__code{ flex:none; font-variant-numeric:tabular-nums; letter-spacing:.14em; }
+.bk__when{ margin-top:var(--s3); font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:800; letter-spacing:-.01em; }
+.bk__meta{ margin-top:var(--s2); font-size:var(--fs-label); line-height:var(--lh-label); color:var(--text-secondary); }
+.bk__act{ display:flex; flex-wrap:wrap; gap:var(--s3); margin-top:var(--s4); }
+.bk__act .btn{ width:auto; margin:0; }
+@media (min-width:600px){
+  .bklist > li{ display:grid; grid-template-columns:1fr auto; column-gap:var(--s7); align-items:start; }
+  .bk__head, .bk__when, .bk__meta{ grid-column:1; }
+  .bk__act{ grid-column:2; grid-row:1 / span 3; margin-top:0; flex-direction:column; align-items:stretch; }
+  .bk__act .btn{ justify-content:center; }
+}
+
+/* ============================================================
+   PARTICIPANT EDITOR
+   A list of names, not a stack of cards. Rules between rows, one control each.
+   ============================================================ */
+.plist{ border-top:1px solid var(--hairline); }
+.plist > li{ border-bottom:1px solid var(--hairline); padding:var(--s3) 0; }
+.plist__row{ display:flex; align-items:flex-end; gap:var(--s3); }
+.plist__row .field{ flex:1 1 auto; min-width:0; }
+.plist__n{
+  flex:none; width:2.4rem; padding-bottom:15px; font-size:var(--fs-label); font-weight:700;
+  color:var(--text-secondary); font-variant-numeric:tabular-nums;
+}
+.plist__drop{
+  flex:none; display:grid; place-items:center; width:var(--tap-min); height:var(--tap-min);
+  border:1px solid var(--border-default); border-radius:var(--r-btn); background:transparent;
+}
+.plist__drop[disabled]{ opacity:.35; cursor:not-allowed; }
+
+/* ============================================================
+   SCAN RESULT
+   Accept and reject are told apart by border weight, fill, and the words, never
+   by a hue that does not exist in this build.
+   ============================================================ */
+.scanres{ border:2px solid var(--border-strong); border-radius:var(--r-card); padding:var(--s5); }
+.scanres--reject{
+  border-style:dashed; background:var(--surface-sunken);
+  background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px);
+}
+.scanres__head{ display:flex; align-items:center; gap:var(--s3); font-size:var(--fs-txn); line-height:var(--lh-txn); font-weight:800; }
+.scanres__head svg{ width:26px; height:26px; flex:none; }
+.scanres__who{ margin-top:var(--s4); font-size:var(--fs-h1); line-height:var(--lh-h1); font-weight:800; letter-spacing:-.02em; }
+.scanres__meta{ margin-top:var(--s3); font-size:var(--fs-label); line-height:var(--lh-label); color:var(--text-secondary); }
+
 </style>
 
 </head>
@@ -1194,6 +1404,13 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <symbol id="i-flask" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9V3"/><path d="M7.4 15h9.2"/></symbol>
 <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.4"/></symbol>
 <symbol id="i-draft" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 2.5"><rect x="4" y="4" width="16" height="16" rx="2"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="m7.6 10.2 4.4 4.4 4.4-4.4"/><path d="M4.5 16.5v2a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2"/></symbol>
+<symbol id="i-qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6.5" height="6.5"/><rect x="14" y="3.5" width="6.5" height="6.5"/><rect x="3.5" y="14" width="6.5" height="6.5"/><path d="M14 14h3v3h-3zM20.5 14v3M17.5 20.5h3M14 20.5h.01"/></symbol>
+<symbol id="i-arrow-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></symbol>
+<symbol id="i-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
 </defs></svg>
 
 <div id="shell">
@@ -1214,6 +1431,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <p id="announcer" class="vh" role="status" aria-live="polite"></p>
 <p id="alerter" class="vh" role="alert" aria-live="assertive"></p>
 <dialog id="sheet" aria-labelledby="sheet-title"></dialog>
+<dialog id="qrmodal" aria-labelledby="qrm-title"></dialog>
 
 <script>
 /* ============================================================
@@ -1264,6 +1482,9 @@ const S = {
     players: []
   },
   account: null,                    // {name, mobile, email}
+  mbTab: "upcoming",                // My Bookings group: upcoming | past | cancelled
+  lastScan: null,                   // last door-scan result, staff scanner only
+  qr: null,                         // { orderId, index } while the pass modal is open
   toast: null,
   formErrors: {},
   forms: {},                        // last typed value of every field, by id
@@ -1283,6 +1504,15 @@ function clockTime(ms){ return TFMT.format(new Date(ms)); }
 function dayLabel(ms){ return DFMT.format(new Date(ms)); }
 function minutesLeft(deadlineMs){ return Math.max(0, Math.ceil((deadlineMs - now())/60000)); }
 function isExpired(o){ return o && o.holdDeadline && now() >= o.holdDeadline; }
+/* "7:00 PM" to milliseconds past midnight. Every schedule in this build is written
+   as a label, and Upcoming, Past, and pass expiry all need it as a number. */
+function hourMs(label){
+  const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(label || "").trim());
+  if (!m) return 0;
+  let h = parseInt(m[1],10) % 12;
+  if (/PM/i.test(m[3])) h += 12;
+  return (h * 60 + parseInt(m[2],10)) * 60000;
+}
 
 /* ---------- FORMAT ---------- */
 function esc(v){
@@ -1295,6 +1525,20 @@ function plural(n, one, many){ return n === 1 ? one : many; }
 function icon(id, cls){ return '<svg class="' + (cls||"") + '" aria-hidden="true" focusable="false"><use href="#i-' + id + '"></use></svg>'; }
 function sampleMark(text){ return '<span class="sample">' + icon("flask") + (text || "Sample") + "</span>"; }
 function tbd(text){ return '<span class="tbd">' + esc(text) + "</span>"; }
+
+/* ---------- BOOKING LABELS ---------- */
+function bookingTypeLabel(o){ return o.product === "court" ? "Reserve a Court" : "Open Play"; }
+function bookingPlaceLabel(o){
+  return o.product === "court"
+    ? VENUE.name + ", court assigned on arrival"
+    : VENUE.name + ", Open Play rotation";
+}
+function participantsOf(o){
+  if (o.admissions && o.admissions.length) return o.admissions;
+  /* An order made before participants were collected still has passes, so the
+     pass list is the fallback roster rather than an empty one. */
+  return passesOf(o).map(function(p){ return { name:p.name, state:"confirmed" }; });
+}
 
 /* ---------- ORDER MATH: total is always derived, never stored ---------- */
 function orderTotal(o){ return o.lineItems.reduce(function(sum, li){ return sum + li.unitPrice * li.qty; }, 0); }
@@ -1578,6 +1822,11 @@ function createOrder(spec){
     paymentStatus: "none",
     refund: null,
     assignedCourt: spec.product === "court" ? ((S.seq % VENUE.courts) + 1) : null,
+    /* Real timestamps as well as the printed label, so Upcoming, Past, and pass
+       expiry are decided by the clock rather than by parsing a sentence. */
+    startsAt: spec.startsAt || null,
+    endsAt: spec.endsAt || null,
+    venue: spec.venue || VENUE.area,
     checkinAt: null,
     createdAt: now(),
     lastChecked: null,
@@ -1588,7 +1837,10 @@ function createOrder(spec){
   S.currentOrderId = id;
   return o;
 }
-/* The only promotion path. A browser return can never call this directly. */
+/* The only promotion path. A browser return can never call this directly.
+   Passes are issued here and nowhere else, so an unpaid order has no scannable
+   pass to leak. Before this runs, every pass carries issuedAt:null and a null
+   token, and passStatus() reports it as pending rather than valid. */
 function verifyPayment(o, evt){
   if (o.seenEvents[evt.eventId]) return "duplicate";   // idempotent
   o.seenEvents[evt.eventId] = true;
@@ -1599,7 +1851,20 @@ function verifyPayment(o, evt){
   o.paymentStatus = "paid";
   o.paidAmount = evt.amount;
   o.admissions.forEach(function(a){ a.state = "confirmed"; });
+  issuePasses(o);
   return "confirmed";
+}
+/* One unique pass per participant, minted at confirmation. Idempotent: a second
+   verified event on the same order must not hand out a second set of codes. */
+function issuePasses(o){
+  const list = passesOf(o);
+  list.forEach(function(p){
+    if (p.issuedAt) return;
+    p.token = passToken();
+    p.share = passToken();
+    p.issuedAt = now();
+    p.version = 1;
+  });
 }
 function expireOrder(o){
   if (o.orderStatus === "awaiting_payment"){ o.orderStatus = "expired"; o.paymentStatus = "expired"; }
@@ -1638,6 +1903,7 @@ const PUBLIC_TABS = [
 ];
 const STAFF_TABS = [
   { to:"/staff/today",      label:"Today",      aria:"Today",           glyph:"cal",    match:["/staff/today"] },
+  { to:"/staff/scan",       label:"Scan",       aria:"Scan a pass",     glyph:"scan",   match:["/staff/scan"] },
   { to:"/staff/walkin",     label:"Walk-in",    aria:"Walk-in",         glyph:"plus",   match:["/staff/walkin"] },
   { to:"/staff/openplay/w1",label:"Open Play",  aria:"Open Play",       glyph:"users",  match:["/staff/openplay/w1"] },
   { to:"/staff/exceptions", label:"Exceptions", aria:"Exceptions",      glyph:"alert",  match:["/staff/exceptions"] }
@@ -1693,7 +1959,12 @@ function render(){
     endHtml += '<button class="iconbtn iconbtn--bare" data-action="nav" data-to="/find" aria-label="Find My Booking">' + icon("search") + "</button>";
     endHtml += '<button class="iconbtn iconbtn--bare" data-action="nav" data-to="/signin" aria-label="Sign in">' + icon("person") + "</button>";
   }
-  endHtml += '<button class="iconbtn iconbtn--demo" data-action="demo" aria-haspopup="dialog">' + icon("flask") + "Demo</button>";
+  endHtml += themeButton();
+  /* The label is dropped below 420px, where a fourth control in this slot no
+     longer fits beside the wordmark. The accessible name is on the button rather
+     than in the text for exactly that reason. */
+  endHtml += '<button class="iconbtn iconbtn--demo" data-action="demo" aria-haspopup="dialog" aria-label="Staging harness">' +
+    icon("flask") + '<span class="iconbtn__t">Demo</span></button>';
   end.innerHTML = endHtml;
   document.querySelector(".appbar").classList.toggle("appbar--ends", view.shell === "browse");
 
@@ -2424,6 +2695,60 @@ function endTimeFor(start, hours){
   return disp + ":" + m[2] + " " + ap;
 }
 
+/* ============================================================
+   PARTICIPANTS
+   Every paid participant gets their own pass, so every paid participant needs a
+   name before checkout. The list is editable up to the moment of payment: add,
+   remove, and retype. After payment a change is a reissue, which is a different
+   and guarded operation.
+   ============================================================ */
+var MAX_PARTICIPANTS = 12;
+function participantCount(kind){ return kind === "court" ? S.draft.pax : S.draft.qty; }
+function participantEditor(kind){
+  const count = participantCount(kind);
+  const cap = kind === "court" ? MAX_PARTICIPANTS : DEMO_QTY_CAP;
+  let h = '<ul class="plist">';
+  for (let i=0;i<count;i++){
+    h += "<li><div class=\"plist__row\">" +
+      fieldHtml("p" + i, "Participant " + (i+1) + " full name", {
+        value: S.draft.players[i] || "",
+        placeholder: i === 0 ? "The organizer, if they are playing" : "As it should read on the pass"
+      }) +
+      '<button class="plist__drop" type="button" data-action="dropplayer" data-kind="' + esc(kind) + '" data-i="' + i +
+        '" data-fk="drop' + i + '" aria-label="Remove participant ' + (i+1) + '"' + (count <= 1 ? " disabled" : "") + ">" +
+        icon("x") + "</button></div></li>";
+  }
+  h += "</ul>";
+  h += '<p style="margin-top:var(--s4)"><button class="btn btn--secondary btn--sm" type="button" data-action="addplayer" data-kind="' +
+    esc(kind) + '" data-fk="addplayer"' + (count >= cap ? " disabled" : "") + ">" + icon("plus") + "Add a participant</button></p>";
+  if (count >= cap){
+    h += '<p class="legal" style="margin-top:var(--s3)">' + icon("info") +
+      " That is the most this staging build accepts in one booking. The real limit is a configured value.</p>";
+  }
+  return h;
+}
+/* Reads the typed names back out of the DOM before the list is re-rendered, so a
+   removal shifts the data rather than only the boxes. */
+function capturePlayers(kind){
+  const count = participantCount(kind);
+  for (let i=0;i<count;i++){
+    const f = document.getElementById("p" + i);
+    if (f) S.draft.players[i] = f.value;
+  }
+  S.draft.players.length = count;
+}
+/* One name per paid participant, required only when there is more than one, since
+   a solo booking already has the organizer's name on it. */
+function participantRules(kind){
+  const count = participantCount(kind);
+  if (count < 2) return [];
+  const out = [];
+  for (let i=0;i<count;i++){
+    out.push({ id:"p" + i, label:"A full name for participant " + (i+1), required:true });
+  }
+  return out;
+}
+
 /* ---------- SCR pub-court-review ---------- */
 function scrCourtReview(){
   const d = S.draft;
@@ -2468,6 +2793,13 @@ function scrCourtReview(){
     '<p><button type="button" class="btn btn--ghost" data-action="nav" data-to="/signin">Sign in to prefill. This does not reset the form.</button></p>' +
     "</form>";
 
+  html += '<div class="section"><h2 class="sec">Who is playing</h2>' +
+    '<p class="legal" style="margin-top:var(--s2)">' + d.pax + " " + plural(d.pax,"participant","participants") + ". " +
+    (d.pax > 1
+      ? "Every participant gets their own QR pass, so every participant needs a name before you pay."
+      : "You are the only participant, so your organizer name goes on the pass.") + "</p>" +
+    '<div class="form" style="margin-top:var(--s4)">' + participantEditor("court") + "</div></div>";
+
   html += '<p class="legal section">Nothing is held yet. The next step holds this court until a stated time.</p>';
 
   return { id:"pub-court-review", shell:"task", title:"Court review and organizer details", html:html,
@@ -2491,9 +2823,9 @@ function scrHold(params){
   const expired = st.key === "expired";
   const paid = st.key === "confirmed" || st.key === "checked_in";
   const held = st.key === "held";
-  let html = stepRail(3,4,"Hold and payment");
+  let html = stepRail(3,4,"Booking summary");
   html += '<h1 class="screen">' +
-    (expired ? "Your hold expired" : paid ? "This booking is already paid" : held ? "Held, not booked" : "This booking needs attention") + "</h1>";
+    (expired ? "Your hold expired" : paid ? "This booking is already paid" : held ? "Check this, then pay" : "This booking needs attention") + "</h1>";
 
   if (expired){
     html += '<div class="section">' + plate("expired",{ phrase:"Hold expired",
@@ -2516,17 +2848,29 @@ function scrHold(params){
       '<p class="legal">The countdown is a guide. The time above is the fact that matters.</p></div>';
   }
 
-  html += '<div class="section">' + itemisation(o) + "</div>";
-
-  html += '<div class="section"><div class="card"><dl class="dl">' +
+  /* The summary the reader checks before paying: schedule, venue, who is coming,
+     what each line costs, and the total. */
+  html += '<div class="section"><h2 class="sec">Schedule and venue</h2><div class="card"><dl class="dl">' +
+    "<div><dt>Booking type</dt><dd>" + esc(bookingTypeLabel(o)) + "</dd></div>" +
     "<div><dt>" + (o.product === "court" ? "When" : "Window") + "</dt><dd>" + esc(o.meta.when) + "</dd></div>" +
+    "<div><dt>Venue</dt><dd>" + esc(VENUE.name) + "</dd></div>" +
+    "<div><dt>Address</dt><dd>" + esc(VENUE.area) + "</dd></div>" +
     (o.product === "court"
-      ? "<div><dt>Court</dt><dd>" + (paid ? "Assigned, staff will direct you" : "Not assigned") + "</dd></div>"
-      : "<div><dt>Admissions</dt><dd>" + o.admissions.length + "</dd></div>") +
+      ? "<div><dt>Court</dt><dd>" + (paid ? "Assigned, staff will direct you" : "Assigned when payment is verified") + "</dd></div>"
+      : "<div><dt>Session</dt><dd>Open Play rotation</dd></div>") +
     "<div><dt>Organizer</dt><dd>" + esc(o.organizer.name || "Not given") + "</dd></div>" +
-    "</dl>" +
-    (o.product === "court" && paid ? '<p class="legal" style="margin-top:var(--s3)">A court has been assigned. Staff will direct you on arrival.</p>' : "") +
-    "</div></div>";
+    "</dl></div></div>";
+
+  html += '<div class="section"><h2 class="sec">Participants</h2>' +
+    "<p>" + o.admissions.length + " " + plural(o.admissions.length,"participant","participants") +
+    ", one QR pass each once payment is confirmed.</p>" +
+    '<ul class="rows" style="margin-top:var(--s3)">' +
+    o.admissions.map(function(a,i){
+      return '<li class="row"><span class="row__main"><span class="row__title">' + esc(a.name || ("Participant " + (i+1))) +
+        '</span><span class="row__sub">Pass ' + (i+1) + " of " + o.admissions.length + "</span></span></li>";
+    }).join("") + "</ul></div>";
+
+  html += '<div class="section"><h2 class="sec">Price</h2>' + itemisation(o) + "</div>";
 
   html += '<div class="section">' + codeBox(o) +
     '<p class="legal" style="margin-top:var(--s2)">Save this code. You can reopen this booking with the code and your mobile number.</p></div>';
@@ -2658,15 +3002,28 @@ function scrStatus(params){
   }
   html += "</div>";
 
+  const settled = st.key === "confirmed" || st.key === "checked_in";
+  if (settled){
+    const n = passesOf(o).length;
+    html += '<div class="section"><h2 class="sec">You’re booked. Your entry passes are ready in My Bookings.</h2>' +
+      '<p class="lede" style="margin-top:var(--s3)">' + n + " unique QR " + plural(n,"pass","passes") +
+      ", one for each participant, " + plural(n,"was","were") + " generated the moment the venue verified your payment.</p>" +
+      '<div class="btn-col" style="margin-top:var(--s5)">' +
+      '<button class="btn btn--primary" data-action="openqr" data-id="' + esc(o.id) + '">' + icon("qr") +
+        (n === 1 ? "View QR pass" : "View QR passes") + "</button>" +
+      '<button class="btn btn--secondary" data-action="gotobookings" data-id="' + esc(o.id) + '">Go to My Bookings</button>' +
+      "</div></div>";
+  }
+
   html += '<div class="section"><div class="card"><dl class="dl">' +
     "<div><dt>Order reference</dt><dd>" + esc(o.bookingCode) + "</dd></div>" +
     "<div><dt>Amount</dt><dd>" + esc(peso(orderTotal(o))) + "</dd></div></dl></div></div>";
 
-  html += '<div class="section"><button class="btn btn--ghost" data-action="nav" data-to="/find">Find My Booking</button></div>';
+  if (!settled) html += '<div class="section"><button class="btn btn--ghost" data-action="nav" data-to="/find">Find My Booking</button></div>';
 
   let dock;
   if (st.key === "checking") dock = { action:{ label:"Refresh status", action:"refreshstatus", id:o.id }, note:"Do not pay again yet." };
-  else if (st.key === "confirmed" || st.key === "checked_in") dock = { action:{ label:"View confirmed booking", action:"nav", to:"/booking/" + encodeURIComponent(o.bookingCode) } };
+  else if (settled) dock = { action:{ label:"View confirmed booking", action:"nav", to:"/booking/" + encodeURIComponent(o.bookingCode) } };
   else if (st.key === "expired") dock = { action:{ label:"Check availability again", action:"nav", to: o.product === "court" ? "/court" : "/openplay" } };
   else if (st.key === "needs_review" || st.key === "late_payment") dock = { action:{ label:"Contact the venue", action:"nav", to:"/visit" }, note:"Keep your order reference. Do not pay again." };
   else if (isExpired(o)) dock = { action:{ label:"Check availability again", action:"nav", to: o.product === "court" ? "/court" : "/openplay" } };
@@ -2682,7 +3039,7 @@ function scrBooking(params){
   Object.keys(S.orders).forEach(function(k){ if (S.orders[k].bookingCode === code) o = S.orders[k]; });
   if (!o) return scrLink({});
   const st = displayStatus(o);
-  const named = o.admissions.filter(function(a){ return a.name; }).length;
+  const named = participantsOf(o).filter(function(a){ return a.name; }).length;
   /* Arrival facts belong only to a booking that actually exists. */
   const paid = st.key === "confirmed" || st.key === "checked_in";
   let html = "";
@@ -2720,36 +3077,106 @@ function scrBooking(params){
 
   html += '<div class="section">' + codeBox(o) + "</div>";
 
+  /* Participants, and the passes that belong to them. The organizer owns every
+     pass under the booking, so this is the one place all of them are managed. */
+  const roster = participantsOf(o);
+  const passList = passesOf(o);
+  html += '<div class="section"><h2 class="sec">Participants</h2>' +
+    "<p>" + roster.length + " " + plural(roster.length,"participant","participants") + " " +
+    (paid ? "confirmed, one QR pass each" : st.key === "held" ? "held, not confirmed" : "not confirmed") +
+    (named < roster.length ? ", " + (roster.length - named) + " " + plural(roster.length - named,"name","names") + " still needed" : "") + ".</p>";
+
+  html += '<ul class="rows" style="margin-top:var(--s3)">' + passList.map(function(p, i){
+    const ps = passStatus(o, p);
+    const key = "pp" + o.id + "-" + p.n;
+    let li = "<li>" + discloseRow(key, "ticket",
+      p.name || ("Participant " + p.n),
+      "Pass " + p.n + " of " + passList.length + ", " + ps.label);
+    if (S.reveal[key]){
+      li += '<div class="card" style="margin-top:var(--s3)">';
+      if (!paid){
+        li += '<div class="form">' + fieldHtml("pname" + p.n, "Full name for this participant", { value:p.name || "" }) + "</div>" +
+          '<div class="btn-stack" style="margin-top:var(--s3)">' +
+          '<button class="btn btn--primary btn--sm" data-action="passname" data-id="' + esc(o.id) + '" data-n="' + p.n +
+          '" data-rk="' + esc(key) + '">Save the name</button></div>' +
+          '<p class="legal" style="margin-top:var(--s3)">Nothing is issued yet, so a change here simply updates the list.</p>';
+      } else if (ps.key === "cancelled"){
+        li += "<p><strong>This pass is cancelled.</strong></p>" +
+          '<p class="legal" style="margin-top:var(--s2)">' + esc(ps.note || "") +
+          " Its code was revoked, so it cannot be scanned. The other participants are unaffected.</p>";
+      } else {
+        li += '<div class="form">' + fieldHtml("pname" + p.n, "Full name on this pass", { value:p.name || "" }) + "</div>" +
+          '<div class="btn-stack" style="margin-top:var(--s3)">' +
+          '<button class="btn btn--primary btn--sm" data-action="renamepass" data-id="' + esc(o.id) + '" data-n="' + p.n +
+          '" data-rk="' + esc(key) + '">Reissue this pass with the new name</button>' +
+          '<button class="btn btn--secondary btn--sm" data-action="openqr" data-id="' + esc(o.id) + '" data-i="' + i + '">' +
+          icon("qr") + "View this pass</button>" +
+          "</div>" +
+          '<p class="legal" style="margin-top:var(--s3)">Changing the name on a paid booking issues a new code for this participant and revokes the old one, so two live passes can never exist for the same place. Nobody else\'s pass changes.</p>';
+        const ck = "pc" + o.id + "-" + p.n;
+        li += '<hr class="rule" style="margin:var(--s5) 0">';
+        if (!S.reveal[ck]){
+          li += '<button class="btn btn--ghost btn--sm" data-action="reveal" data-key="' + esc(ck) + '" data-fk="rv-' + esc(ck) + '">Cancel this participant</button>';
+        } else {
+          li += "<p><strong>Cancel the pass for " + esc(p.name || ("participant " + p.n)) + "?</strong></p>" +
+            '<p class="legal" style="margin-top:var(--s2)">This revokes that one code immediately. The rest of the booking stays valid. Any refund is handled separately, and the refund rule is not approved yet.</p>' +
+            '<div class="btn-stack" style="margin-top:var(--s3)">' +
+            '<button class="btn btn--primary btn--sm" data-action="cancelpass" data-id="' + esc(o.id) + '" data-n="' + p.n + '">Yes, cancel this pass</button>' +
+            '<button class="btn btn--secondary btn--sm" data-action="reveal" data-key="' + esc(ck) + '">Keep it</button></div>';
+        }
+      }
+      li += "</div>";
+    }
+    return li + "</li>";
+  }).join("") + "</ul>";
+
   if (o.product === "openplay"){
-    html += '<div class="section"><h2 class="sec">Players</h2>' +
-      "<p>" + o.admissions.length + " " + plural(o.admissions.length,"admission","admissions") + " " +
-      (paid ? "confirmed" : st.key === "held" ? "held, not confirmed" : "not confirmed") +
-      (named < o.admissions.length ? ", " + (o.admissions.length - named) + " player " + plural(o.admissions.length - named,"name","names") + " still needed" : ", all names supplied") + ".</p>" +
-      '<ul class="rows" style="margin-top:var(--s3)">' +
-      o.admissions.map(function(a,i){
-        return '<li class="row' + (a.name ? "" : " row--bar") + '"><span class="row__main"><span class="row__title">' +
-          esc(a.name || ("Player " + (i+1))) + '</span><span class="row__sub">' + esc(a.name ? "Name supplied" : "No display name yet") + "</span></span>" +
-          chip(a.name ? "named" : "nameneeded") + "</li>";
-      }).join("") + "</ul>" +
-      '<p class="legal" style="margin-top:var(--s3)">A display name is needed before a player enters the live rotation. ' + "</p>" +
-      '<p style="margin-top:var(--s2)">' + pickleqChip(named === o.admissions.length ? "Ready for PickleQ" : "Not ready for PickleQ") + "</p></div>";
+    html += '<p class="legal" style="margin-top:var(--s3)">A display name is needed before a player enters the live rotation.</p>' +
+      '<p style="margin-top:var(--s2)">' + pickleqChip(named === roster.length ? "Ready for PickleQ" : "Not ready for PickleQ") + "</p>";
   }
+  html += "</div>";
 
   if (paid){
-    html += '<div class="section"><h2 class="sec">Checking in</h2>' +
-      '<div class="btn-stack"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/booking/' + esc(encodeURIComponent(o.bookingCode)) + '/passes">Show my passes</button></div>' +
+    const n = passList.length;
+    html += '<div class="section"><h2 class="sec">Entry passes</h2>' +
+      "<p>" + n + " unique QR " + plural(n,"pass","passes") + ", one per participant. Scanning one admits that participant only.</p>" +
+      '<div class="btn-col" style="margin-top:var(--s4)">' +
+      '<button class="btn btn--primary" data-action="openqr" data-id="' + esc(o.id) + '">' + icon("qr") + esc(passesLabel(o)) + "</button>" +
+      '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="/booking/' + esc(encodeURIComponent(o.bookingCode)) + '/passes">Send a pass to a player</button>' +
+      "</div>" +
       '<p class="legal" style="margin-top:var(--s3)">We will send your confirmation to the contact details you provided.</p></div>';
   } else {
-    html += '<div class="section"><h2 class="sec">Checking in</h2>' +
-      '<p>There are no passes, because there is no confirmed booking on this order.</p></div>';
+    html += '<div class="section"><h2 class="sec">Entry passes</h2>' +
+      "<p>No pass exists yet. Passes are generated only once the venue has verified payment.</p></div>";
   }
 
   html += '<div class="section"><h2 class="sec">Managing this booking</h2><div class="card">' +
-    "<p>Cancellation policy: To be confirmed. Contact the venue.</p>" +
-    '<div class="btn-stack" style="margin-top:var(--s3)">' +
-    '<button class="btn btn--secondary btn--sm" disabled>Cancel booking</button>' +
-    '<button class="btn btn--secondary btn--sm" disabled>Reschedule</button></div>' +
-    '<p class="legal" style="margin-top:var(--s2)">Not available yet. Cancellation and reschedule rules are not approved, so this build offers neither.</p></div></div>';
+    "<p>Cancellation and refund policy: To be confirmed. Contact the venue.</p>" +
+    '<p class="legal" style="margin-top:var(--s2)">The rules are not approved, so this build states none. What it does implement is what cancelling has to do to the passes.</p>';
+  if (st.key === "cancelled"){
+    html += '<p style="margin-top:var(--s4)"><strong>This booking is cancelled.</strong></p>' +
+      '<p class="legal" style="margin-top:var(--s2)">Every pass under it was invalidated at the same moment.</p>';
+  } else if (paid){
+    if (!S.reveal["bc" + o.id]){
+      html += '<div class="btn-stack" style="margin-top:var(--s4)">' +
+        '<button class="btn btn--secondary btn--sm" data-action="reveal" data-key="bc' + esc(o.id) + '" data-fk="rv-bc' + esc(o.id) + '">Cancel this booking</button>' +
+        '<button class="btn btn--secondary btn--sm" disabled>Reschedule</button></div>' +
+        '<p class="legal" style="margin-top:var(--s2)">Reschedule is not available: the rule for it is not approved.</p>';
+    } else {
+      html += '<p style="margin-top:var(--s4)"><strong>Cancel the whole booking?</strong></p>' +
+        '<p class="legal" style="margin-top:var(--s2)">All ' + passList.length + " " + plural(passList.length,"pass","passes") +
+        " under it " + plural(passList.length,"is","are") + " invalidated immediately and cannot be reinstated. Any refund is a separate step and its rule is not approved.</p>" +
+        '<div class="btn-stack" style="margin-top:var(--s3)">' +
+        '<button class="btn btn--primary btn--sm" data-action="cancelbooking" data-id="' + esc(o.id) + '">Yes, cancel the booking</button>' +
+        '<button class="btn btn--secondary btn--sm" data-action="reveal" data-key="bc' + esc(o.id) + '">Keep it</button></div>';
+    }
+  } else {
+    html += '<div class="btn-stack" style="margin-top:var(--s4)">' +
+      '<button class="btn btn--secondary btn--sm" disabled>Cancel booking</button>' +
+      '<button class="btn btn--secondary btn--sm" disabled>Reschedule</button></div>' +
+      '<p class="legal" style="margin-top:var(--s2)">Nothing is confirmed on this order, so there is nothing to cancel.</p>';
+  }
+  html += "</div></div>";
 
   if ((o.orderStatus === "confirmed" || o.orderStatus === "checked_in") && !S.account){
     html += '<div class="section"><div class="card card--sunken"><h2 class="sec">Save your details?</h2>' +
@@ -2759,9 +3186,9 @@ function scrBooking(params){
   html += '<div class="section"><button class="btn btn--ghost" data-action="nav" data-to="/visit">Directions and contact</button></div>';
 
   let dock;
-  if (st.key === "held") dock = { summary:{ label:"Amount due", value:peso(orderTotal(o)) }, action:{ label:"Resume payment", action:"nav", to:"/hold/" + o.id } };
-  else if (o.product === "openplay" && named < o.admissions.length && (o.orderStatus === "confirmed")) dock = { action:{ label:"Add player names", action:"nav", to:"/t/name/" + o.id } };
-  else if (st.key === "confirmed" || st.key === "checked_in") dock = { action:{ label:"Show my passes", action:"nav", to:"/booking/" + encodeURIComponent(o.bookingCode) + "/passes" } };
+  if (st.key === "held") dock = { summary:{ label:"Amount due", value:peso(orderTotal(o)) }, action:{ label:"Complete payment", action:"nav", to:"/hold/" + o.id } };
+  else if (o.product === "openplay" && named < roster.length && (o.orderStatus === "confirmed")) dock = { action:{ label:"Add player names", action:"nav", to:"/t/name/" + o.id } };
+  else if (st.key === "confirmed" || st.key === "checked_in") dock = { action:{ label:passesLabel(o), action:"openqr", id:o.id } };
   else if (st.key === "expired") dock = { action:{ label:"Check availability again", action:"nav", to: o.product === "court" ? "/court" : "/openplay" } };
   else dock = { action:{ label:"Contact the venue", action:"nav", to:"/visit" } };
 
@@ -2772,50 +3199,190 @@ function scrBooking(params){
 
 /* ============================================================
    PASSES
-   One per paid admission. The token rotates, so a screenshot
-   handed to a stranger is worthless within a minute.
+   One per paid participant, minted at payment confirmation.
+
+   The scan token used to rotate every 60 seconds, which killed a screenshot
+   inside a minute. That property cannot survive a downloadable pass: a code the
+   organizer saves as a PNG, sends to a player, and presents at the door has to
+   still work an hour later, so a code that dies in 60 seconds is a broken
+   download rather than a security feature. The token is stable for the life of
+   the pass now, and the defence moved to where it can actually hold:
+
+   - single use. The first scan marks the pass; a second scan of the same code is
+     refused and shown as Already checked in, so a copied screenshot buys nothing.
+   - revocable. Renaming a participant or cancelling their place mints a new code
+     and retires the old one, which stops resolving immediately.
+   - opaque. The code carries no name, no booking number, and nothing derivable
+     from either. It is a reference the server resolves, and nothing else.
    ============================================================ */
-var PASS_TTL = 60;
 function passToken(){
   let t = "";
   for (let i=0;i<12;i++) t += "0123456789ABCDEFGHJKMNPQRSTUVWXYZ".charAt(Math.floor(Math.random()*33));
   return t;
 }
 /* Two tokens per pass, and they are not interchangeable.
-   token: The scan reference. Rotates every PASS_TTL seconds, so a screenshot dies.
-   share: The link reference. Stable for the life of the pass, because the player it
-          was sent to has to be able to open it more than once. Neither encodes
+   token: The scan reference. Stable until the pass is reissued or cancelled.
+   share: The link reference, for handing one pass to one player. Neither encodes
           anything personal; both are opaque. */
+/* Built empty. A pass has no token and no share link until issuePasses() runs at
+   payment confirmation, so there is nothing scannable on an unpaid order. */
 function buildPasses(n){
   const out = [];
-  for (let i=0;i<n;i++) out.push({ n:i+1, name:"", token:passToken(), share:passToken(), usedAt:null, usedBy:null });
+  for (let i=0;i<n;i++) out.push({
+    n:i+1, name:"", token:null, share:null,
+    issuedAt:null, version:0, reissuedAt:null,
+    cancelledAt:null, cancelReason:null,
+    usedAt:null, usedBy:null
+  });
   return out;
 }
-/* Resolves a share token to its order and pass, or null. */
+/* Resolves a share token to its order and pass, or null. An unissued pass carries
+   a null share, and null must never match null. */
 function findShared(tok){
+  if (!tok) return null;
   let hit = null;
   Object.keys(S.orders).forEach(function(k){
     const o = S.orders[k];
     if (!o.passes) return;
-    o.passes.forEach(function(p){ if (p.share === tok) hit = { o:o, p:p }; });
+    o.passes.forEach(function(p){ if (p.share && p.share === tok) hit = { o:o, p:p }; });
   });
   return hit;
 }
-function passLink(p){ return "#/t/pass/" + p.share; }
+/* Resolves a scan token to its order and pass, or null. This is the only lookup a
+   door scan is allowed to use. */
+function findScan(tok){
+  if (!tok) return null;
+  let hit = null;
+  Object.keys(S.orders).forEach(function(k){
+    const o = S.orders[k];
+    if (!o.passes) return;
+    o.passes.forEach(function(p){ if (p.token && p.token === tok) hit = { o:o, p:p }; });
+  });
+  return hit;
+}
+function passLink(p){ return p.share ? "#/t/pass/" + p.share : ""; }
 function passesOf(o){
   if (!o.passes || !o.passes.length) o.passes = buildPasses(Math.max(1, o.admissions.length || 1));
   return o.passes;
 }
-/* A pass is only ever as true as the booking under it. */
-function passState(o, p){
+/* The four statuses a pass is allowed to be in, plus the one it sits in before
+   payment. A pass is never more true than the booking under it, and a per
+   participant cancellation outranks the booking being otherwise fine. */
+function passStatus(o, p){
   const st = displayStatus(o);
-  if (st.key !== "confirmed" && st.key !== "checked_in") return "none";
-  if (p.usedAt) return "used";
+  if (st.key === "cancelled" || p.cancelledAt){
+    return { key:"cancelled", label:"Cancelled",
+      note: p.cancelReason || (st.key === "cancelled" ? "The whole booking was cancelled." : "This place was cancelled.") };
+  }
+  if (!p.issuedAt) return { key:"pending", label:"Payment pending", note:"No pass exists until payment is confirmed." };
+  if (p.usedAt) return { key:"checked_in", label:"Checked in", note:"Checked in at " + clockTime(p.usedAt) + "." };
+  if (o.endsAt && now() > o.endsAt) return { key:"expired", label:"Expired", note:"This session has already ended." };
+  return { key:"valid", label:"Valid", note:null };
+}
+function passStatusIcon(key){
+  return key === "checked_in" ? "check-double" : key === "cancelled" ? "ban" :
+    key === "expired" ? "clock-slash" : key === "pending" ? "clock" : "ticket";
+}
+/* Scannability, which is a narrower question than status: a Valid pass is still
+   dormant until the arrival window opens. */
+function passState(o, p){
+  const s = passStatus(o, p);
+  if (s.key === "pending" || s.key === "cancelled" || s.key === "expired") return "none";
+  if (s.key === "checked_in") return "used";
   if (!S.arrivalOpen) return "dormant";
   return "live";
 }
-/* Sample matrix, deterministic from the token. Not a real encoder. */
-function qrMatrix(seed){
+/* ---------- guarded pass transitions ----------
+   Every one of these invalidates precisely what it is allowed to invalidate and
+   nothing else. */
+/* A retired code is moved to the revoked list rather than simply dropped. It can
+   never admit anyone again, because only p.token is a live reference, but the
+   door can still recognise it well enough to say why it is being refused. A
+   scanner that answers "not a valid pass" to a code the venue itself revoked
+   sends the holder to argue with the wrong person. */
+function revoke(p){
+  p.revoked = (p.revoked || []).concat([p.token, p.share].filter(Boolean));
+  p.token = null;
+  p.share = null;
+}
+function reissuePass(o, p, name){
+  if (!p.issuedAt) { p.name = name; return false; }   /* nothing issued, nothing to invalidate */
+  p.name = name;
+  revoke(p);
+  p.token = passToken();
+  p.share = passToken();
+  p.version = (p.version || 1) + 1;
+  p.reissuedAt = now();
+  return true;
+}
+function cancelPass(o, p, reason){
+  if (p.cancelledAt) return false;
+  p.cancelledAt = now();
+  p.cancelReason = reason || "This place was cancelled.";
+  revoke(p);
+  const a = o.admissions && o.admissions[p.n - 1];
+  if (a){ a.state = "cancelled"; a.cancelled = true; }
+  return true;
+}
+/* Lookup over retired codes only. Never used to admit anyone: every caller of it
+   is producing a rejection. */
+function findRevoked(tok){
+  if (!tok) return null;
+  let hit = null;
+  Object.keys(S.orders).forEach(function(k){
+    const o = S.orders[k];
+    if (!o.passes) return;
+    o.passes.forEach(function(p){
+      if (p.revoked && p.revoked.indexOf(tok) >= 0) hit = { o:o, p:p };
+    });
+  });
+  return hit;
+}
+function cancelBooking(o, reason){
+  o.orderStatus = "cancelled";
+  passesOf(o).forEach(function(p){ cancelPass(o, p, reason || "The whole booking was cancelled."); });
+}
+/* ---------- the door ----------
+   One entry point for every scan, so the simulated door scanner on a pass screen
+   and the staff scanner cannot disagree about what a code means. Only the pass
+   whose token was presented is ever touched. */
+function scanPass(tok, by){
+  const hit = findScan(tok);
+  if (!hit){
+    const dead = findRevoked(tok);
+    if (dead){
+      const why = dead.p.cancelledAt
+        ? { key:"cancelled", head:"Cancelled", detail:(dead.p.cancelReason || "This place was cancelled.") + " This code was revoked and cannot admit anyone." }
+        : { key:"replaced", head:"Replaced", detail:"This pass was reissued, so this copy of the code is dead. Ask for the current pass." };
+      return { ok:false, key:why.key, o:dead.o, p:dead.p, head:why.head, detail:why.detail };
+    }
+    return { ok:false, key:"unknown", head:"Not a valid pass", detail:"This code does not match any pass on this system." };
+  }
+  const o = hit.o, p = hit.p;
+  const st = passStatus(o, p);
+  if (st.key === "cancelled") return { ok:false, key:"cancelled", o:o, p:p, head:"Cancelled", detail:st.note };
+  if (st.key === "expired")   return { ok:false, key:"expired", o:o, p:p, head:"Expired", detail:st.note };
+  if (st.key === "pending")   return { ok:false, key:"pending", o:o, p:p, head:"Not paid", detail:st.note };
+  if (o.refund === "done")    return { ok:false, key:"refunded", o:o, p:p, head:"Refunded", detail:"This booking was refunded, so the pass is not valid for entry." };
+  if (p.usedAt){
+    return { ok:false, key:"duplicate", o:o, p:p, head:"Already checked in",
+      detail:"Already checked in at " + clockTime(p.usedAt) + " by " + (p.usedBy || "Front Desk") + "." };
+  }
+  p.usedAt = now();
+  p.usedBy = by || "Front Desk";
+  const a = o.admissions && o.admissions[p.n - 1];
+  if (a){ a.checkedIn = true; a.state = "checked_in"; }
+  /* The booking is marked checked in once anyone arrives, but the other passes
+     stay untouched and still have to be scanned on their own. */
+  if (!o.checkinAt){ o.checkinAt = now(); o.checkinBy = by || "Front Desk"; }
+  if (o.orderStatus === "confirmed") o.orderStatus = "checked_in";
+  return { ok:true, key:"accepted", o:o, p:p, head:"Checked in", detail:"Recorded at " + clockTime(p.usedAt) + "." };
+}
+/* Sample matrix, deterministic from the token. Not a real encoder.
+   qrModules returns the grid; qrMatrix paints it as SVG for the screen and
+   drawQrOnCanvas paints the same grid into a downloaded file, so what a reader
+   sees and what they save can never be two different patterns. */
+function qrModules(seed){
   const N = 25;
   let h = 2166136261, i, j;
   for (i=0;i<seed.length;i++){ h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -2843,9 +3410,27 @@ function qrMatrix(seed){
     const e = (i===0||i===4||j===0||j===4), c2 = (i===2&&j===2);
     g[N-9+i][N-9+j] = (e||c2) ? 1 : 0;
   }
+  return g;
+}
+function qrMatrix(seed){
+  const g = qrModules(seed), N = g.length;
   let path = "";
-  for (i=0;i<N;i++) for (j=0;j<N;j++) if (g[i][j]) path += "M" + j + " " + i + "h1v1h-1z";
+  for (let i=0;i<N;i++) for (let j=0;j<N;j++) if (g[i][j]) path += "M" + j + " " + i + "h1v1h-1z";
   return '<svg viewBox="0 0 ' + N + ' ' + N + '" shape-rendering="crispEdges" aria-hidden="true"><path fill="#141618" d="' + path + '"/></svg>';
+}
+/* Whole-pixel module edges. A fractional module size is what makes a downloaded
+   code look soft, and a soft code is a code that does not scan. */
+function drawQrOnCanvas(ctx, seed, x, y, size){
+  const g = qrModules(seed), N = g.length;
+  const m = Math.floor(size / N);
+  const span = m * N;
+  const ox = Math.round(x + (size - span) / 2);
+  const oy = Math.round(y + (size - span) / 2);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(ox, oy, span, span);
+  ctx.fillStyle = "#141618";
+  for (let i=0;i<N;i++) for (let j=0;j<N;j++) if (g[i][j]) ctx.fillRect(ox + j*m, oy + i*m, m, m);
+  return { x:ox, y:oy, size:span };
 }
 function passChip(state){
   return state === "used" ? '<span class="chip chip--strong">' + icon("check-double") + "<span>Checked in</span></span>"
@@ -2943,10 +3528,8 @@ function scrPass(params){
   } else {
     html += '<div class="qrbox">' +
       '<div class="qrlive" id="qrlive">' + qrMatrix(p.token) + "</div>" +
-      '<p class="ring"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rbg" cx="18" cy="18" r="15"/>' +
-      '<circle class="rfg" id="ringfg" cx="18" cy="18" r="15" stroke-dasharray="94.2" stroke-dashoffset="0"/></svg>' +
-      '<span id="ringtxt" aria-live="polite">Refreshes in ' + PASS_TTL + " seconds</span></p>" +
-      '<p class="legal" style="text-align:center;max-width:32ch">Sample pattern. Not scannable in this prototype. A screenshot stops working within a minute.</p></div>';
+      '<p class="legal" style="text-align:center;max-width:34ch">Sample pattern. Not scannable in this prototype. ' +
+      'This code works once: the first scan admits this participant and any later scan of the same code is refused.</p></div>';
   }
   html += "</div></div>";
 
@@ -2990,29 +3573,286 @@ function scrPass(params){
 
   return { id:"pub-pass", shell:"task", title:"Pass " + p.n, html:html,
     back:{ label:"All passes", to:"/booking/" + encodeURIComponent(o.bookingCode) + "/passes" },
-    mount: state === "live" ? function(){ mountPassTimer(o, p); } : null,
+    mount: null,
     dock:null };
 }
-var passTimer = null;
-function mountPassTimer(o, p){
-  if (passTimer) clearInterval(passTimer);
-  let left = PASS_TTL;
-  const C = 94.2;
-  passTimer = setInterval(function(){
-    const txt = document.getElementById("ringtxt");
-    const fg = document.getElementById("ringfg");
-    const box = document.getElementById("qrlive");
-    if (!txt || !box){ clearInterval(passTimer); passTimer = null; return; }
-    left -= 1;
-    if (left <= 0){
-      p.token = passToken(); left = PASS_TTL;
-      box.innerHTML = qrMatrix(p.token);
-      if (fg){ fg.style.transition = "none"; fg.setAttribute("stroke-dashoffset","0"); void fg.getBoundingClientRect(); fg.style.transition = ""; }
-    } else if (fg){
-      fg.setAttribute("stroke-dashoffset", String(C * (1 - left / PASS_TTL)));
+
+/* ============================================================
+   QR PASS MODAL
+   The organizer's window onto every pass under one booking. One participant at a
+   time; a carousel only when there is more than one participant to move between.
+   ============================================================ */
+var qrOpener = null;       /* the control that opened the modal, so focus can go back */
+
+function qrOrder(){ return S.qr ? S.orders[S.qr.orderId] : null; }
+function qrList(){ const o = qrOrder(); return o ? passesOf(o) : []; }
+
+function passesLabel(o){
+  const n = passesOf(o).length;
+  return n === 1 ? "View QR pass" : "View " + n + " QR passes";
+}
+
+function qrPassMarkup(o, p){
+  const list = passesOf(o);
+  const st = passStatus(o, p);
+  const scannable = st.key === "valid" || st.key === "checked_in";
+  let h = '<article class="pass" aria-label="Pass ' + p.n + " of " + list.length + '">';
+  h += '<div class="pass__top"><span class="pass__who">' + esc(p.name || ("Participant " + p.n)) + "</span>" +
+    '<span class="pass__of">' + p.n + " of " + list.length + "</span></div>";
+
+  if (scannable){
+    h += '<div class="pass__qr"><div class="pass__qrbox">' + qrMatrix(p.token) + "</div></div>";
+  } else {
+    h += '<div class="pass__qr" style="background:transparent"><div class="pass__dead">' + icon(passStatusIcon(st.key)) +
+      "<span>" + esc(st.key === "pending" ? "No QR code yet. Passes are generated once payment is confirmed."
+        : st.key === "cancelled" ? "This pass was cancelled. The code no longer resolves."
+        : "This pass has expired. The session has already ended.") + "</span></div></div>";
+  }
+
+  h += '<dl class="pass__facts">' +
+    "<div><dt>Status</dt><dd>" + esc(st.label) + "</dd></div>" +
+    "<div><dt>Booking number</dt><dd>" + esc(o.bookingCode) + "</dd></div>" +
+    "<div><dt>Booking type</dt><dd>" + esc(bookingTypeLabel(o)) + "</dd></div>" +
+    "<div><dt>Date and time</dt><dd>" + esc(o.meta.when) + "</dd></div>" +
+    "<div><dt>Venue</dt><dd>" + esc(VENUE.name) + "</dd></div>" +
+    (o.product === "court" ? "<div><dt>Court</dt><dd>Assigned on arrival</dd></div>"
+                           : "<div><dt>Session</dt><dd>Open Play rotation</dd></div>") +
+    "</dl>";
+  h += '<p class="pass__note">Present this pass at the entrance.' +
+    (st.note ? " " + esc(st.note) : "") + "</p>";
+  h += "</article>";
+  return h;
+}
+
+function paintQrModal(){
+  const d = document.getElementById("qrmodal");
+  const o = qrOrder();
+  if (!o) return;
+  const list = passesOf(o);
+  const many = list.length > 1;
+  const i = Math.max(0, Math.min(S.qr.index, list.length - 1));
+  S.qr.index = i;
+  const p = list[i];
+  const st = passStatus(o, p);
+  const downloadable = st.key === "valid" || st.key === "checked_in";
+
+  const arrow = function(dir, where){
+    const dis = dir < 0 ? i === 0 : i === list.length - 1;
+    return '<button type="button" class="qrm__arrow" id="qrm-' + where + (dir < 0 ? "-prev" : "-next") + '"' +
+      ' data-action="qrstep" data-d="' + dir + '"' + (dis ? " disabled" : "") +
+      ' aria-label="' + (dir < 0 ? "Previous participant pass" : "Next participant pass") + '">' +
+      icon(dir < 0 ? "arrow-l" : "arrow-r") + "</button>";
+  };
+
+  let h = '<div class="qrm">';
+  h += '<div class="qrm__head"><div><h2 id="qrm-title">' + (many ? "Entry passes" : "Entry pass") + "</h2>" +
+    '<p class="legal">' + esc(o.bookingCode) + " &middot; " + esc(bookingTypeLabel(o)) + "</p></div>" +
+    '<button type="button" class="qrm__close" data-action="qrclose" aria-label="Close entry passes">' + icon("x") + "</button></div>";
+
+  h += '<div class="qrm__body">' +
+    '<div class="qrm__track" id="qrm-track" aria-live="polite">' + qrPassMarkup(o, p) + "</div>";
+  if (many){
+    h += '<p class="legal" style="margin-top:var(--s5);text-align:center">Swipe, or use the left and right arrow keys.</p>';
+  }
+  h += "</div>";
+
+  /* The pager lives in the footer, not in the scrolling body. A previous button
+     you have to scroll down to find is not a previous button. */
+  h += '<div class="qrm__foot">';
+  if (many){
+    h += '<div class="qrm__pager">' + arrow(-1,"pg") +
+      '<span class="qrm__count">' + (i+1) + " of " + list.length + "</span>" +
+      '<span class="qrm__dots" aria-hidden="true">' +
+      list.map(function(_,k){ return "<i" + (k === i ? ' data-on="1"' : "") + "></i>"; }).join("") +
+      "</span>" + arrow(1,"pg") + "</div>";
+  }
+  h += '<button type="button" class="btn btn--primary' + (many ? "" : " btn--full") + '" data-action="qrdownload"' +
+    (downloadable ? "" : " disabled") + '>' + icon("download") + "Download QR</button>";
+  if (many){
+    h += '<button type="button" class="btn btn--secondary" data-action="qrdownloadall">' + icon("download") + "Download all</button>";
+    /* Saving several files in a row is a permission in every current browser, and
+       it is asked for on the second file, not the first. Saying so here is the
+       difference between a reader who allows it and a reader who thinks the
+       button is broken. */
+    h += '<p class="legal qrm__hint">One named PNG per participant. If your browser blocks multiple downloads, use Download QR on each pass.</p>';
+  }
+  h += "</div></div>";
+
+  d.innerHTML = h;
+}
+
+function openQrModal(orderId, index){
+  const o = S.orders[orderId];
+  if (!o) return;
+  qrOpener = document.activeElement;
+  S.qr = { orderId:orderId, index: index || 0 };
+  const d = document.getElementById("qrmodal");
+  paintQrModal();
+  if (!d.open) d.showModal();
+  const c = d.querySelector(".qrm__close");
+  if (c) c.focus();
+}
+function closeQrModal(){
+  const d = document.getElementById("qrmodal");
+  if (d.open) d.close();
+}
+function qrStep(delta, fromId){
+  const list = qrList();
+  if (!list.length) return;
+  const next = S.qr.index + delta;
+  if (next < 0 || next >= list.length) return;
+  S.qr.index = next;
+  paintQrModal();
+  const d = document.getElementById("qrmodal");
+  /* Keep the key or the tap on the same control it was pressed on, unless that
+     control has just become the disabled end of the run. */
+  let back = fromId ? d.querySelector("#" + fromId) : null;
+  if (!back || back.disabled) back = d.querySelector(".qrm__arrow:not([disabled])") || d.querySelector(".qrm__close");
+  if (back) back.focus();
+  announce("Pass " + (next+1) + " of " + list.length + ", " + (list[next].name || ("participant " + list[next].n)));
+}
+
+/* ---------- the downloaded pass ----------
+   More than the bare code: the mark, the participant, the booking, when and
+   where, and one instruction. Drawn at 3x so the modules stay hard edged. */
+var PASS_W = 1080, PASS_H = 1640;
+function logoDataUrl(){
+  const v = getComputedStyle(document.documentElement).getPropertyValue("--img-logo");
+  const m = /url\(["']?(data:[^"')]+)["']?\)/.exec(v || "");
+  return m ? m[1] : null;
+}
+function renderPassCanvas(o, p, cb){
+  const c = document.createElement("canvas");
+  c.width = PASS_W; c.height = PASS_H;
+  const x = c.getContext("2d");
+  const F = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+  const M = 84;                       /* page margin */
+  const INK = "#141618", DIM = "#5C6169", RULE = "#D8D5CE";
+
+  x.fillStyle = "#FFFFFF"; x.fillRect(0,0,PASS_W,PASS_H);
+
+  function rule(y){ x.fillStyle = RULE; x.fillRect(M, y, PASS_W - M*2, 2); }
+  function text(s, y, size, weight, color, align){
+    x.fillStyle = color || INK;
+    x.font = (weight || 400) + " " + size + "px " + F;
+    x.textAlign = align || "left";
+    x.textBaseline = "alphabetic";
+    x.fillText(s, align === "center" ? PASS_W/2 : M, y);
+  }
+  function fact(label, value, y){
+    x.font = "600 26px " + F; x.fillStyle = DIM; x.textAlign = "left";
+    x.fillText(String(label).toUpperCase(), M, y);
+    x.font = "700 32px " + F; x.fillStyle = INK; x.textAlign = "right";
+    x.fillText(String(value), PASS_W - M, y);
+    x.fillStyle = RULE; x.fillRect(M, y + 22, PASS_W - M*2, 1);
+  }
+
+  const st = passStatus(o, p);
+  const list = passesOf(o);
+
+  function paintRest(){
+    /* Clear of the mark above it. The wordmark is close to 1.9:1, so a 300px
+       drawing of it is 158 tall and finishes at 246. */
+    let y = 306;
+    text("ENTRY PASS", y, 26, 700, DIM); y += 14;
+    x.font = "700 26px " + F; x.textAlign = "right"; x.fillStyle = DIM;
+    x.fillText(bookingTypeLabel(o).toUpperCase(), PASS_W - M, y - 14);
+    y += 20; rule(y); y += 78;
+
+    /* participant */
+    x.textAlign = "left";
+    let name = p.name || ("Participant " + p.n);
+    x.font = "800 62px " + F;
+    while (x.measureText(name).width > PASS_W - M*2 && name.length > 8) name = name.slice(0, -2);
+    text(name, y, 62, 800, INK); y += 38;
+    text("Pass " + p.n + " of " + list.length, y, 30, 600, DIM);
+
+    /* the code, with a real quiet zone around it */
+    const qz = 44;
+    const box = 560;
+    const bx = (PASS_W - box) / 2, by = y + 54;
+    x.fillStyle = "#FFFFFF"; x.fillRect(bx, by, box, box);
+    x.strokeStyle = RULE; x.lineWidth = 2; x.strokeRect(bx + 1, by + 1, box - 2, box - 2);
+    if (st.key === "valid" || st.key === "checked_in"){
+      drawQrOnCanvas(x, p.token, bx + qz, by + qz, box - qz*2);
+    } else {
+      x.fillStyle = DIM; x.font = "700 34px " + F; x.textAlign = "center";
+      x.fillText(st.label, PASS_W/2, by + box/2);
     }
-    txt.textContent = "Refreshes in " + left + " seconds";
-  }, 1000);
+    y = by + box + 66;
+
+    fact("Booking number", o.bookingCode, y); y += 74;
+    fact("Date and time", o.meta.when, y); y += 74;
+    fact("Venue", VENUE.name, y); y += 74;
+    fact("Status", st.label, y); y += 92;
+
+    x.textAlign = "center";
+    text("Present this pass at the entrance.", y, 34, 700, INK, "center"); y += 44;
+    text(VENUE.area, y, 26, 400, DIM, "center"); y += 52;
+    text("Staging sample. This pattern is not a scannable code.", y, 22, 400, DIM, "center");
+
+    cb(c);
+  }
+
+  const src = logoDataUrl();
+  if (!src){ paintRest(); return; }
+  const img = new Image();
+  img.onload = function(){
+    const w = 300, h = w * (img.height / img.width);
+    x.drawImage(img, (PASS_W - w)/2, 88, w, h);
+    paintRest();
+  };
+  img.onerror = function(){ paintRest(); };
+  img.src = src;
+}
+
+function slugPart(s){ return String(s || "").trim().replace(/[^A-Za-z0-9]+/g,"-").replace(/^-+|-+$/g,""); }
+function passFilename(o, p){
+  return "TFC-BOOKING-" + slugPart(o.bookingCode) + "-" +
+    (slugPart(p.name) || ("Pass-" + p.n)) + "-QR.png";
+}
+function triggerDownload(href, filename){
+  const a = document.createElement("a");
+  a.href = href; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function saveCanvas(c, filename){
+  if (c.toBlob){
+    c.toBlob(function(blob){
+      if (!blob){ triggerDownload(c.toDataURL("image/png"), filename); return; }
+      const url = URL.createObjectURL(blob);
+      triggerDownload(url, filename);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 8000);
+    }, "image/png");
+  } else {
+    triggerDownload(c.toDataURL("image/png"), filename);
+  }
+}
+function downloadPass(o, p){
+  renderPassCanvas(o, p, function(c){ saveCanvas(c, passFilename(o, p)); });
+  announce("Downloading the pass for " + (p.name || ("participant " + p.n)) + ".");
+}
+/* No ZIP: this build carries no archiver and fetches nothing, so Download all is
+   one clearly named PNG per participant, saved in sequence. Browsers gate the
+   second and later files behind an allow-multiple-downloads permission, so the
+   run is paced and the modal says plainly that the prompt is coming. A declined
+   prompt costs the reader nothing: Download QR on each pass still works. */
+function downloadAllPasses(o){
+  const list = passesOf(o).filter(function(p){
+    const k = passStatus(o, p).key;
+    return k === "valid" || k === "checked_in";
+  });
+  if (!list.length){ announce("There are no downloadable passes on this booking."); return; }
+  let i = 0;
+  (function next(){
+    if (i >= list.length){ announce("Saved " + list.length + " " + plural(list.length,"pass","passes") + "."); return; }
+    const p = list[i++];
+    renderPassCanvas(o, p, function(c){
+      saveCanvas(c, passFilename(o, p));
+      setTimeout(next, 400);
+    });
+  })();
+  announce("Downloading " + list.length + " " + plural(list.length,"pass","passes") + ", one file each.");
 }
 
 /* ---------- SCR pub-find ---------- */
@@ -3201,13 +4041,12 @@ function scrOpPlayers(params){
     fieldHtml("email","Email",{ type:"email", inputmode:"email", autocomplete:"email", optional:true, value:d.email }) +
     "</form>";
 
-  html += '<div class="section"><h2 class="sec">Player display names</h2>' +
-    '<p class="legal">You can add the remaining names after payment or at check-in. Names never block the sale.</p>' +
-    '<div class="form" style="margin-top:var(--s4)">';
-  for (let i=0;i<qty;i++){
-    html += fieldHtml("p" + i, "Player " + (i+1) + " display name", { optional:true, value: d.players[i] || "" });
-  }
-  html += "</div>" +
+  html += '<div class="section"><h2 class="sec">Who is playing</h2>' +
+    '<p class="legal" style="margin-top:var(--s2)">' + qty + " " + plural(qty,"admission","admissions") + ". " +
+    (qty > 1
+      ? "Every admission gets its own QR pass, so every participant needs a name before you pay."
+      : "One admission, so your organizer name goes on the pass.") + "</p>" +
+    '<div class="form" style="margin-top:var(--s4)">' + participantEditor("openplay") + "</div>" +
     '<p class="legal" style="margin-top:var(--s3)">' + sampleMark("Sample group") + ' A saved group called "Saturday group" would be offered here as a suggestion. It is never applied automatically.</p></div>';
 
   html += '<div class="section form">' +
@@ -3390,10 +4229,8 @@ function scrTokPass(params){
   } else {
     html += '<div class="qrbox">' +
       '<div class="qrlive" id="qrlive">' + qrMatrix(p.token) + "</div>" +
-      '<p class="ring"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rbg" cx="18" cy="18" r="15"/>' +
-      '<circle class="rfg" id="ringfg" cx="18" cy="18" r="15" stroke-dasharray="94.2" stroke-dashoffset="0"/></svg>' +
-      '<span id="ringtxt" aria-live="polite">Refreshes in ' + PASS_TTL + " seconds</span></p>" +
-      '<p class="legal" style="text-align:center;max-width:32ch">Sample pattern. Not scannable in this prototype. A screenshot stops working within a minute.</p></div>';
+      '<p class="legal" style="text-align:center;max-width:34ch">Sample pattern. Not scannable in this prototype. ' +
+      'This code works once: the first scan admits this participant and any later scan of the same code is refused.</p></div>';
   }
   html += "</div></div>";
 
@@ -3417,7 +4254,7 @@ function scrTokPass(params){
   }
 
   return { id:"tok-pass", shell:"token", title:"Your pass", html:html,
-    mount: state === "live" ? function(){ mountPassTimer(o, p); } : null,
+    mount: null,
     dock:null };
 }
 
@@ -3477,48 +4314,86 @@ function scrSignIn(){
     dock:{ action:{ label:"Verify and sign in", action:"verifyotp" } } };
 }
 
+/* ---------- MY BOOKINGS ---------- */
+function paymentLabel(o){
+  if (o.paymentStatus === "paid") return "Paid " + peso(o.paidAmount);
+  if (o.paymentStatus === "in_person") return "Paid " + peso(o.paidAmount) + " in person";
+  if (o.paymentStatus === "none") return "Payment pending";
+  if (o.paymentStatus === "checking") return "Checking payment";
+  return humanState(o.paymentStatus);
+}
+/* Three buckets, decided by the clock and by cancellation, never by whether the
+   reader has something to do about it. */
+function bookingBucket(o){
+  if (o.orderStatus === "cancelled") return "cancelled";
+  if (o.endsAt && now() > o.endsAt) return "past";
+  return "upcoming";
+}
+function bookingEntry(o, bucket){
+  const st = displayStatus(o);
+  const paid = st.key === "confirmed" || st.key === "checked_in";
+  const list = passesOf(o);
+  const people = participantsOf(o).length || list.length;
+  const issued = list.some(function(p){ return p.issuedAt; });
+
+  let h = "<li>";
+  h += '<p class="bk__head"><span>' + esc(bookingTypeLabel(o)) + "</span>" +
+    '<span class="bk__code">' + esc(o.bookingCode) + "</span></p>";
+  h += '<p class="bk__when">' + esc(o.meta.when) + "</p>";
+  h += '<p class="bk__meta">' + esc(VENUE.name) + " &middot; " + people + " " + esc(plural(people,"player","players")) +
+    " &middot; " + esc(paymentLabel(o)) + "</p>";
+
+  h += '<div class="bk__act">';
+  if (bucket !== "cancelled" && paid && issued){
+    /* The QR action is offered only where a usable pass actually exists. */
+    h += '<button class="btn btn--primary btn--sm" data-action="openqr" data-id="' + esc(o.id) + '">' +
+      icon("qr") + esc(passesLabel(o)) + "</button>";
+  } else if (st.key === "held"){
+    h += '<button class="btn btn--primary btn--sm" data-action="nav" data-to="/hold/' + esc(o.id) + '">Complete payment</button>';
+  } else if (bucket === "cancelled"){
+    h += '<span class="chip chip--quiet">' + icon("ban") + "<span>Passes invalidated</span></span>";
+  } else if (!paid){
+    h += '<span class="chip chip--quiet">' + icon(st.key === "expired" ? "clock-slash" : "alert") +
+      "<span>" + esc(st.key === "expired" ? "Hold expired, nothing charged" : st.phrase) + "</span></span>";
+  }
+  h += '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="/booking/' +
+    esc(encodeURIComponent(o.bookingCode)) + '">Open booking</button>';
+  h += "</div>";
+
+  if (!paid && bucket === "upcoming" && st.key !== "held"){
+    h += '<p class="legal" style="margin-top:var(--s3)">' + esc(truthLines(st, o)[0] || "There is no confirmed booking on this order, so there are no passes.") + "</p>";
+  }
+  h += "</li>";
+  return h;
+}
 function scrMe(){
   if (!S.account) return scrSignIn();
-  const list = Object.keys(S.orders).map(function(k){ return S.orders[k]; });
-  const needsAction = list.filter(function(o){
-    const k = displayStatus(o).key;
-    return k === "held" || k === "needs_review" || k === "late_payment" || k === "expired" ||
-      (o.product === "openplay" && o.orderStatus === "confirmed" && o.admissions.some(function(a){ return !a.name; }));
-  });
-  const upcoming = list.filter(function(o){ return needsAction.indexOf(o) < 0 && (o.orderStatus === "confirmed" || o.orderStatus === "checked_in"); });
+  const all = Object.keys(S.orders).map(function(k){ return S.orders[k]; });
+  const tab = S.mbTab || "upcoming";
+  const groups = { upcoming:[], past:[], cancelled:[] };
+  all.forEach(function(o){ groups[bookingBucket(o)].push(o); });
+  const shown = groups[tab];
 
-  let html = '<h1 class="screen">Upcoming</h1>';
+  let html = '<h1 class="screen">My Bookings</h1>';
   html += '<p class="legal" style="margin-top:var(--s2)">Signed in as ' + esc(S.account.name || S.account.mobile) + "</p>";
 
-  if (needsAction.length){
-    html += '<div class="section"><h2 class="sec">Needs your attention</h2><div class="stack-sm">';
-    needsAction.forEach(function(o){
-      const st = displayStatus(o);
-      const unnamed = o.admissions.filter(function(a){ return !a.name; }).length;
-      html += "<div>" + plate(st.key, {
-        phrase: st.key === "held" ? "Held until " + clockTime(o.holdDeadline) : st.phrase,
-        truth: truthLines(st, o),
-        meta: [o.meta.when]
-      }) + '<p style="margin-top:var(--s2)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="' +
-        (st.key === "held" ? "/hold/" + o.id : "/booking/" + encodeURIComponent(o.bookingCode)) + '">' +
-        (st.key === "held" ? "Pay " + peso(orderTotal(o)) + " before " + clockTime(o.holdDeadline) : "Open this booking") + "</button></p></div>";
-      if (unnamed && o.orderStatus === "confirmed"){
-        html += '<p class="legal">' + unnamed + " player " + plural(unnamed,"name","names") + " still needed.</p>";
-      }
-    });
-    html += "</div></div>";
-  }
+  html += '<div class="section"><div class="seg" role="group" aria-label="Filter bookings">' +
+    [["upcoming","Upcoming"],["past","Past"],["cancelled","Cancelled"]].map(function(t){
+      return '<button data-action="mbtab" data-v="' + t[0] + '" data-fk="mbtab-' + t[0] + '" aria-pressed="' +
+        (tab === t[0]) + '">' + t[1] + " (" + groups[t[0]].length + ")</button>";
+    }).join("") + "</div>";
 
-  html += '<div class="section"><h2 class="sec">Confirmed</h2>';
-  if (!upcoming.length){
-    html += '<div class="card"><p><strong>Nothing upcoming.</strong></p><p class="legal" style="margin-top:var(--s2)">When you book, it appears here with its booking code and check-in options.</p></div>';
+  if (!shown.length){
+    const empty = tab === "upcoming"
+      ? ["Nothing upcoming.", "When you book, it appears here with its booking number and its entry passes."]
+      : tab === "past"
+        ? ["Nothing in the past yet.", "A booking moves here once its session has finished. Passes stay on the record but no longer admit anyone."]
+        : ["Nothing cancelled.", "A cancelled booking stays here for reference. Its passes are invalidated."];
+    html += '<div class="card" style="margin-top:var(--s5)"><p><strong>' + esc(empty[0]) + "</strong></p>" +
+      '<p class="legal" style="margin-top:var(--s2)">' + esc(empty[1]) + "</p></div>";
   } else {
-    html += '<ul class="rows">' + upcoming.map(function(o){
-      return '<li><button class="row" style="width:100%" data-action="nav" data-to="/booking/' + esc(encodeURIComponent(o.bookingCode)) + '">' +
-        '<span class="row__main"><span class="row__title">' + esc(o.meta.when) + '</span><span class="row__sub">' +
-        esc(o.product === "court" ? "Court booking" : o.admissions.length + " Open Play " + plural(o.admissions.length,"admission","admissions")) +
-        " &middot; " + esc(o.bookingCode) + "</span></span>" + chip(o.orderStatus === "checked_in" ? "checkedin" : "booked") + icon("chev-r") + "</button></li>";
-    }).join("") + "</ul>";
+    html += '<ul class="bklist" style="margin-top:var(--s5)">' +
+      shown.map(function(o){ return bookingEntry(o, tab); }).join("") + "</ul>";
   }
   html += "</div>";
 
@@ -3530,7 +4405,7 @@ function scrMe(){
 
   html += '<div class="section"><div class="btn-stack">' +
     navBtn("/me/history","History") + navBtn("/me/groups","Saved groups") + navBtn("/me/profile","Profile and preferences") + "</div></div>";
-  return { id:"ply-upcoming", shell:"browse", title:"Upcoming", html:html, dock:null };
+  return { id:"ply-bookings", shell:"browse", title:"My Bookings", html:html, dock:null };
 }
 
 function scrHistory(){
@@ -3768,6 +4643,68 @@ function scrStaffBooking(params){
     back:{ label:"Back to Today", to:"/staff/today" }, dock:dock };
 }
 
+/* ---------- SCR staff-scan ----------
+   The door. One pass in, one pass out: scanning a code admits the participant it
+   belongs to and touches nobody else on the booking. */
+function scrScan(){
+  const r = S.lastScan;
+  let html = '<h1 class="screen">Scan a pass</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">One scan admits one participant. A booking of four needs four scans.</p>';
+
+  if (r){
+    html += '<div class="section"><div class="scanres' + (r.ok ? "" : " scanres--reject") + '" tabindex="-1" id="scanres">' +
+      '<p class="scanres__head">' + icon(r.ok ? "check-double" : r.key === "duplicate" ? "clock-slash" : "ban") +
+      "<span>" + esc(r.head) + "</span></p>";
+    if (r.p){
+      html += '<p class="scanres__who">' + esc(r.p.name || ("Participant " + r.p.n)) + "</p>" +
+        '<p class="scanres__meta">Pass ' + r.p.n + " of " + passesOf(r.o).length + " &middot; " + esc(r.o.bookingCode) +
+        "<br>" + esc(bookingTypeLabel(r.o)) + " &middot; " + esc(r.o.meta.when) +
+        "<br>Organizer " + esc(r.o.organizer.name || "not given") + "</p>";
+    }
+    html += '<p class="scanres__meta">' + esc(r.detail || "") + "</p>";
+    if (r.ok && r.o){
+      const left = passesOf(r.o).filter(function(p){ return !p.usedAt && !p.cancelledAt; }).length;
+      html += '<p class="scanres__meta">' + (left
+        ? left + " " + plural(left,"participant","participants") + " on this booking " + plural(left,"has","have") + " not arrived yet."
+        : "Everyone on this booking has now checked in.") + "</p>";
+    }
+    html += '<p style="margin-top:var(--s5)"><button class="btn btn--secondary btn--sm" data-action="clearscan">Scan the next pass</button></p>';
+    html += "</div></div>";
+  }
+
+  html += '<form class="form section" id="scanform" novalidate>' +
+    fieldHtml("scancode","Pass code from the scanner",{ placeholder:"Paste or type the code", value:"" }) +
+    '<p><button class="btn btn--primary btn--sm" data-action="doscan">' + icon("scan") + "Check this pass</button></p>" +
+    "</form>";
+
+  /* Standing in for a camera. Every issued code in the build, so the accept, the
+     duplicate, and every rejection can be walked through by hand. */
+  const rows = [];
+  Object.keys(S.orders).forEach(function(k){
+    const o = S.orders[k];
+    passesOf(o).forEach(function(p){
+      if (!p.issuedAt) return;
+      rows.push({ o:o, p:p });
+    });
+  });
+  html += '<div class="section"><div class="card card--sunken hatch" style="border:2px dashed var(--border-default)">' +
+    '<p class="legal"><strong>Staging control.</strong> There is no camera here, so these stand in for one. The code behind each button is the same opaque token the real scanner would read.</p>';
+  if (!rows.length){
+    html += '<p class="legal" style="margin-top:var(--s3)">No passes have been issued yet. Complete a booking first.</p>';
+  } else {
+    html += '<ul class="rows" style="margin-top:var(--s4)">' + rows.map(function(x){
+      const ps = passStatus(x.o, x.p);
+      return '<li><button class="row" data-action="scantok" data-tok="' + esc(x.p.token || "") + '" data-id="' + esc(x.o.id) + '" data-n="' + x.p.n + '">' +
+        icon("qr") + '<span class="row__main"><span class="row__title">' + esc(x.p.name || ("Participant " + x.p.n)) + "</span>" +
+        '<span class="row__sub">' + esc(x.o.bookingCode) + " &middot; Pass " + x.p.n + " of " + passesOf(x.o).length + " &middot; " + esc(ps.label) + "</span></span>" +
+        icon("chev-r") + "</button></li>";
+    }).join("") + "</ul>";
+  }
+  html += "</div></div>";
+
+  return { id:"stf-scan", shell:"staff", title:"Scan a pass", html:html, dock:null };
+}
+
 function scrWalkin(){
   const p = S.walkinProduct || "court";
   const method = S.walkinMethod || "cash";
@@ -3909,9 +4846,9 @@ const ALL_ROUTES = [
   ["/openplay/w1/players","pub-op-players, Organizer and player names"],
   ["/find","pub-find, Find My Booking"], ["/policies","pub-policies, Policies and waiver"],
   ["/event","pub-event, Plan a Private Event"],
-  ["/signin","ply-signin, Sign in"], ["/me","ply-upcoming, Upcoming"], ["/me/history","ply-history, History"],
+  ["/signin","ply-signin, Sign in"], ["/me","ply-bookings, My Bookings"], ["/me/history","ply-history, History"],
   ["/me/groups","ply-groups, Saved groups"], ["/me/profile","ply-profile, Profile and preferences"],
-  ["/staff/today","stf-today, Today"], ["/staff/walkin","stf-walkin, Walk-in"],
+  ["/staff/today","stf-today, Today"], ["/staff/scan","stf-scan, Scan a pass"], ["/staff/walkin","stf-walkin, Walk-in"],
   ["/staff/openplay/w1","stf-openplay, Open Play window, staff"], ["/staff/exceptions","stf-exceptions, Exception queue"],
   ["/sys/link","sys-link, Link not valid"], ["/sys/interruption","sys-interruption, Service interruption"],
   ["/demo","sys-demo, Staging harness"],
@@ -4084,6 +5021,7 @@ route("/me/groups", scrGroups);
 route("/me/profile", scrProfile);
 route("/staff/today", scrToday);
 route("/staff/booking/:id", scrStaffBooking);
+route("/staff/scan", scrScan);
 route("/staff/walkin", scrWalkin);
 route("/staff/openplay/:windowId", scrStaffOpenPlay);
 route("/staff/exceptions", scrExceptions);
@@ -4108,7 +5046,7 @@ function captureForms(){
   const e = g("email"); if (e !== undefined) S.draft.email = e;
   const p = g("policy"); if (p !== undefined) S.draft.policy = p;
   const mk = g("marketing"); if (mk !== undefined) S.draft.marketing = mk;
-  for (let i=0;i<DEMO_QTY_CAP;i++){ const v = g("p" + i); if (v !== undefined) S.draft.players[i] = v; }
+  for (let i=0;i<MAX_PARTICIPANTS;i++){ const v = g("p" + i); if (v !== undefined) S.draft.players[i] = v; }
   const c = g("code"); if (c !== undefined) S.findCode = c;
 }
 /* An in-place re-render keeps the reader where they were. It must not scroll to
@@ -4135,23 +5073,44 @@ function seedOrganizer(){
 }
 function makeCourtOrder(){
   const d = S.draft;
-  return createOrder({
+  const startMs = baseDay(d.dayIndex) + hourMs(d.time);
+  /* A court reservation also carries one admission per player, so the participant
+     list, the pass list, and the staff roster are the same list everywhere. */
+  const adm = [];
+  for (let i=0;i<d.pax;i++) adm.push({ id:"a"+i, name:(d.players[i] || "").trim(), state:"held", checkedIn:false });
+  const o = createOrder({
     product:"court",
     lineItems:[{ label:"Court time", unitPrice:RATE_COURT, qty:d.duration, unitNoun:"hour", unitNounPlural:"hours" }],
     passCount: d.pax,
+    admissions: adm,
+    startsAt: startMs,
+    endsAt: startMs + d.duration * 3600000,
     meta:{ when: dayLabel(baseDay(d.dayIndex)) + ", " + d.time + " to " + endTimeFor(d.time, d.duration) }
   });
+  syncPassNames(o);
+  return o;
 }
 function makeOpOrder(windowId){
   const d = S.draft, w = OP_WINDOWS[windowId] || OP_WINDOWS.w1;
   const adm = [];
   for (let i=0;i<d.qty;i++) adm.push({ id:"a"+i, name:(d.players[i] || "").trim(), state:"held", checkedIn:false });
-  return createOrder({
+  const base = baseDay(w.dayOffset);
+  const o = createOrder({
     product:"openplay",
     lineItems:[{ label:"Open Play admission", unitPrice:RATE_OPENPLAY, qty:d.qty, unitNoun:"admission", unitNounPlural:"admissions" }],
     admissions: adm,
+    startsAt: base + hourMs(w.start),
+    endsAt: base + hourMs(w.end),
     meta:{ when: windowTitle(w) + ", " + w.start + " to " + w.end, windowId: w.id }
   });
+  syncPassNames(o);
+  return o;
+}
+/* The admission list is where a name is typed; the pass list is where it is read.
+   One copy step, called wherever names change, so the two cannot drift. */
+function syncPassNames(o){
+  const list = passesOf(o);
+  (o.admissions || []).forEach(function(a, i){ if (list[i]) list[i].name = a.name || ""; });
 }
 
 const ACTIONS = {
@@ -4176,14 +5135,84 @@ const ACTIONS = {
     const h1 = document.querySelector("#app h1");
     if (h1) h1.focus({ preventScroll:true });
   },
-  arrival: function(){ S.arrivalOpen = !S.arrivalOpen; S.inPlace = true; render(); },
+  arrival: function(){ S.arrivalOpen = !S.arrivalOpen; S.inPlace = true; render(); if (S.qr) paintQrModal(); },
+
+  /* ---------- QR pass modal ---------- */
+  openqr: function(el){ openQrModal(el.getAttribute("data-id"), parseInt(el.getAttribute("data-i") || "0", 10)); },
+  qrclose: function(){ closeQrModal(); },
+  qrstep: function(el){ qrStep(parseInt(el.getAttribute("data-d"),10), el.id); },
+  qrdownload: function(){
+    const o = qrOrder(); if (!o) return;
+    downloadPass(o, passesOf(o)[S.qr.index]);
+  },
+  qrdownloadall: function(){ const o = qrOrder(); if (o) downloadAllPasses(o); },
+  gotobookings: function(el){
+    /* My Bookings sits behind the account. A reader who paid as a visitor does not
+       have one yet, so they go through the existing save-my-details screen rather
+       than into a sign-in wall with no explanation of why it appeared. */
+    closeQrModal();
+    const id = el && el.getAttribute("data-id");
+    go(S.account ? "/me" : (id ? "/save/" + id : "/find"));
+  },
+
+  mbtab: function(el){ S.mbTab = el.getAttribute("data-v"); rerenderFrom(el); },
+
+  /* ---------- theme ---------- */
+  theme: function(){ setTheme(currentTheme() === "dark" ? "light" : "dark"); },
+  /* Routed through the same door as the staff scanner, so a simulated scan here
+     and a real one there cannot disagree about what a code means. */
   passscan: function(el){
     const o = S.orders[el.getAttribute("data-id")];
+    if (!o) return;
     const p = passesOf(o)[parseInt(el.getAttribute("data-n"),10) - 1];
-    p.usedAt = now(); p.usedBy = "Front Desk";
-    if (!o.checkinAt){ o.checkinAt = now(); o.checkinBy = "Front Desk"; o.orderStatus = "checked_in"; }
-    announce("Pass " + p.n + " checked in.");
+    if (!p) return;
+    const r = scanPass(p.token, "Front Desk");
+    S.lastScan = r;
+    announce(r.head + ". " + (r.detail || ""));
     S.inPlace = true; render();
+    if (S.qr) paintQrModal();
+  },
+
+  /* A name change on a paid booking is a reissue, not an edit. */
+  renamepass: function(el){
+    const o = S.orders[el.getAttribute("data-id")];
+    if (!o) return;
+    const n = parseInt(el.getAttribute("data-n"),10);
+    const p = passesOf(o)[n - 1];
+    if (!p) return;
+    const f = document.getElementById("pname" + n);
+    const name = f ? f.value.trim() : p.name;
+    const reissued = reissuePass(o, p, name);
+    const a = o.admissions && o.admissions[n - 1];
+    if (a) a.name = p.name;
+    const rk = el.getAttribute("data-rk");
+    if (rk) S.reveal[rk] = false;
+    announce(reissued
+      ? "Pass " + n + " reissued for " + (p.name || "this participant") + ". The previous code no longer works."
+      : "Pass " + n + " named " + (p.name || "nobody") + ".");
+    S.inPlace = true; render();
+    if (S.qr) paintQrModal();
+  },
+  cancelpass: function(el){
+    const o = S.orders[el.getAttribute("data-id")];
+    if (!o) return;
+    const n = parseInt(el.getAttribute("data-n"),10);
+    const p = passesOf(o)[n - 1];
+    if (!p) return;
+    cancelPass(o, p, "This participant was cancelled by the organizer.");
+    S.reveal["pc" + o.id + "-" + n] = false;
+    announce("Pass " + n + " cancelled. The other passes on this booking are unaffected.");
+    S.inPlace = true; render();
+    if (S.qr) paintQrModal();
+  },
+  cancelbooking: function(el){
+    const o = S.orders[el.getAttribute("data-id")];
+    if (!o) return;
+    cancelBooking(o, "The whole booking was cancelled by the organizer.");
+    S.reveal["bc" + o.id] = false;
+    announce("Booking cancelled. Every pass under it has been invalidated.");
+    closeQrModal();
+    render();
   },
   passname: function(el){
     const o = S.orders[el.getAttribute("data-id")];
@@ -4223,13 +5252,41 @@ const ACTIONS = {
     rerender("dur" + n);
   },
   gotoreview: function(){ go("/court/review"); },
+  addplayer: function(el){
+    const kind = el.getAttribute("data-kind");
+    capturePlayers(kind); captureForms();
+    const cap = kind === "court" ? MAX_PARTICIPANTS : DEMO_QTY_CAP;
+    if (kind === "court"){ if (S.draft.pax < cap) S.draft.pax++; }
+    else { if (S.draft.qty < cap) S.draft.qty++; }
+    S.draft.players.length = participantCount(kind);
+    announce(participantCount(kind) + " participants.");
+    rerenderFrom(el, "addplayer");
+  },
+  dropplayer: function(el){
+    const kind = el.getAttribute("data-kind");
+    capturePlayers(kind); captureForms();
+    const i = parseInt(el.getAttribute("data-i"),10);
+    if (participantCount(kind) <= 1) return;
+    S.draft.players.splice(i, 1);
+    if (kind === "court") S.draft.pax--; else S.draft.qty--;
+    /* The removed row's typed value is still in S.forms under its old id, and the
+       list has now shifted up into it. Clearing them makes the draft the only
+       source the fields read from. */
+    for (let j=0;j<MAX_PARTICIPANTS;j++) delete S.forms["p" + j];
+    delete S.formErrors["p" + participantCount(kind)];
+    announce("Participant " + (i+1) + " removed. " + participantCount(kind) + " left.");
+    rerenderFrom(el, "addplayer");
+  },
+
   holdcourt: function(){
+    capturePlayers("court");
     captureForms();
     if (!validate([
       { id:"name", label:"Organizer name", required:true },
-      { id:"mobile", label:"Mobile number", required:true, mobile:true },
+      { id:"mobile", label:"Mobile number", required:true, mobile:true }
+    ].concat(participantRules("court")).concat([
       { id:"policy", label:"Confirm you have read the booking terms before holding a time.", check:true }
-    ])){ render(); const s = document.getElementById("errsummary"); if (s) s.focus(); return; }
+    ]))){ render(); const s = document.getElementById("errsummary"); if (s) s.focus(); return; }
     S.formErrors = {};
     const o = makeCourtOrder();
     resetDraft();
@@ -4247,12 +5304,14 @@ const ACTIONS = {
   },
   gotoplayers: function(el){ go("/openplay/" + el.getAttribute("data-id") + "/players"); },
   holdop: function(el){
+    capturePlayers("openplay");
     captureForms();
     if (!validate([
       { id:"name", label:"Organizer name", required:true },
-      { id:"mobile", label:"Mobile number", required:true, mobile:true },
+      { id:"mobile", label:"Mobile number", required:true, mobile:true }
+    ].concat(participantRules("openplay")).concat([
       { id:"policy", label:"Confirm you have read the booking terms before holding places.", check:true }
-    ])){ render(); const s = document.getElementById("errsummary"); if (s) s.focus(); return; }
+    ]))){ render(); const s = document.getElementById("errsummary"); if (s) s.focus(); return; }
     S.formErrors = {};
     const o = makeOpOrder(el.getAttribute("data-id"));
     resetDraft();
@@ -4359,6 +5418,23 @@ const ACTIONS = {
   signinreset: function(){ S.signinStage = "identify"; render(); },
   signout: function(){ S.account = null; S.surface = "visitor"; go("/"); },
   saveprofile: function(){ announce("Changes saved. A new mobile number stays pending until it is verified."); },
+
+  doscan: function(){
+    captureForms();
+    const f = document.getElementById("scancode");
+    const tok = (f ? f.value : "").trim().toUpperCase();
+    if (!tok){ announce("Enter a pass code first."); return; }
+    S.lastScan = scanPass(tok, roleLabel());
+    delete S.forms.scancode;
+    render();
+    const box = document.getElementById("scanres"); if (box) box.focus();
+  },
+  scantok: function(el){
+    S.lastScan = scanPass(el.getAttribute("data-tok"), roleLabel());
+    render();
+    const box = document.getElementById("scanres"); if (box) box.focus();
+  },
+  clearscan: function(){ S.lastScan = null; render(); },
 
   checkin: function(el){
     const o = S.orders[el.getAttribute("data-id")];
@@ -4501,6 +5577,76 @@ function loadScenario(key){
   }
   closeSheet();
 }
+
+/* ============================================================
+   THEME
+   The document ships pinned to dark, which is the look this redesign was reviewed
+   in. The control flips the pin rather than removing it, so the choice is always
+   explicit and never falls back to whatever the operating system happens to say
+   mid-session. The preference is the one thing in this build that outlives a
+   refresh, because it is a display setting and not booking data.
+   ============================================================ */
+function currentTheme(){
+  const set = document.documentElement.getAttribute("data-theme");
+  if (set === "dark" || set === "light") return set;
+  return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+}
+function setTheme(mode){
+  document.documentElement.setAttribute("data-theme", mode);
+  try { localStorage.setItem("tfc-theme", mode); } catch (e) {}
+  announce(mode === "dark" ? "Night theme." : "Day theme.");
+  S.inPlace = true; render();
+  if (S.qr) paintQrModal();
+}
+(function(){
+  let saved = null;
+  try { saved = localStorage.getItem("tfc-theme"); } catch (e) {}
+  if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
+})();
+function themeButton(){
+  const dark = currentTheme() === "dark";
+  return '<button class="iconbtn iconbtn--bare" data-action="theme" aria-pressed="' + dark + '"' +
+    ' aria-label="' + (dark ? "Switch to the day theme" : "Switch to the night theme") + '">' +
+    icon(dark ? "sun" : "moon") + "</button>";
+}
+
+/* ============================================================
+   QR MODAL INTERACTION
+   Native <dialog> already traps focus and closes on Escape. What it does not do
+   is move between passes, so the arrow keys and the swipe live here.
+   ============================================================ */
+(function(){
+  const d = document.getElementById("qrmodal");
+  if (!d) return;
+  d.addEventListener("close", function(){
+    S.qr = null;
+    d.innerHTML = "";
+    if (qrOpener && document.contains(qrOpener)) qrOpener.focus();
+    qrOpener = null;
+  });
+  /* A click on the backdrop lands on the dialog itself, never on .qrm. */
+  d.addEventListener("click", function(ev){ if (ev.target === d) closeQrModal(); });
+  d.addEventListener("keydown", function(ev){
+    if (!S.qr) return;
+    if (ev.key === "ArrowLeft"){ ev.preventDefault(); qrStep(-1, document.activeElement && document.activeElement.id); }
+    else if (ev.key === "ArrowRight"){ ev.preventDefault(); qrStep(1, document.activeElement && document.activeElement.id); }
+  });
+  let sx = 0, sy = 0, id = null;
+  d.addEventListener("pointerdown", function(ev){
+    const t = ev.target.closest && ev.target.closest("#qrm-track");
+    if (!t) return;
+    id = ev.pointerId; sx = ev.clientX; sy = ev.clientY;
+  });
+  d.addEventListener("pointerup", function(ev){
+    if (id === null || ev.pointerId !== id) return;
+    const dx = ev.clientX - sx, dy = ev.clientY - sy;
+    id = null;
+    /* Horizontal intent only, or a vertical scroll inside the body would page. */
+    if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    qrStep(dx < 0 ? 1 : -1, null);
+  });
+  d.addEventListener("pointercancel", function(){ id = null; });
+})();
 
 /* ============================================================
    EVENT DELEGATION
