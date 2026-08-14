@@ -335,8 +335,11 @@ svg{ display:block; width:20px; height:20px; flex:none; }
 :root.over-hero .headergroup{
   --ghost-edge:246,244,221;
   color:#F5F3DC;
+  /* Nudged up one step from .42/.20/.06. The fade still ends at nothing and the
+     photograph still reads straight through it; what the extra few percent buys is
+     a steadier seat for the navigation over the bright end of the frame. */
   background:linear-gradient(to bottom,
-    rgba(5,5,5,.42) 0%, rgba(5,5,5,.20) 45%, rgba(5,5,5,.06) 75%, rgba(5,5,5,0) 100%);
+    rgba(5,5,5,.50) 0%, rgba(5,5,5,.26) 45%, rgba(5,5,5,.09) 75%, rgba(5,5,5,0) 100%);
   /* The surface is sheer; the type is not. A shadow on the glyphs is what carries the
      navigation over the bright end of the photograph, and it costs nothing in
      transparency, which is what a heavier wash or a stronger blur would have cost. */
@@ -371,20 +374,71 @@ body.shell-staff .headergroup{
 /* Borderless, so the two account controls do not compete with the Demo button. */
 .iconbtn--bare{ border-color:transparent; padding:0; min-width:var(--tap-min); }
 .iconbtn--bare svg{ width:22px; height:22px; }
-.appbar__slot--end{ gap:2px; }
+.appbar__slot--end{ gap:6px; }
 .textbtn{ display:inline-flex; align-items:center; gap:6px; min-height:var(--tap-min); padding-right:var(--s2); font-size:var(--fs-label); font-weight:600; }
 .textbtn svg{ width:18px; height:18px; }
 
 /* ---------- HEADER ACCOUNT AND OVERFLOW ----------
-   Two controls occupy the right of the navigation strip and exactly one of them is
-   ever displayed. Below 1024px it is the overflow menu, which is where the theme
-   toggle and the staging harness live so they stop taking permanent room on a
-   phone. From 1024px up it is the sign-in action, because the utility strip has
-   taken the theme and the harness by then. display:none rather than visibility, so
-   the hidden one is out of the tab order and out of the accessibility tree and
-   there is never a second copy of a control to find. */
-.headeraccount{ display:none; }
+   The account control is present at every width now. It is the only thing standing
+   between a phone reader and their bookings, and burying it behind a menu on the one
+   screen where the hero has nothing to say about accounts was the wrong trade.
+   The menu button beside it is a phone control: from 1024px up its two build
+   controls are in the utility strip and its destinations are in the navigation
+   strip, so it is display:none rather than duplicated. */
+.headeraccount{ display:flex; align-items:center; }
 .barmenu{ display:inline-flex; }
+
+/* ---------- THE SWAP SLOT ----------
+   On a phone the account control and the booking action are the same slot, one
+   showing at a time, because a 360px bar cannot carry the wordmark, two 100px
+   controls, and a menu button. Stacking them in one grid cell rather than swapping
+   one out for the other is what holds the bar still: the cell is as wide as the
+   wider of the two at all times, so nothing to its left or right can move when the
+   contents change. From 1024px up there is room for both and the slot becomes a
+   row, where the hidden action still reserves its width for the same reason. */
+.navswap{ display:grid; justify-items:end; align-items:center; }
+.navswap > *{ grid-area:1 / 1; }
+
+/* ---------- THE SCROLLED BOOKING ACTION ----------
+   Absent while the hero's own two cards are on screen, because a third copy of an
+   action the reader is already looking at is noise. It arrives when they leave, and
+   it arrives as one action rather than two: the hero offers the choice, the header
+   offers the way back to it.
+   visibility, not display. display:none cannot be transitioned, and opacity alone
+   would leave a control that is invisible and still tabbable. visibility is both
+   animatable, by delaying it to the end of the fade, and honest, because a hidden
+   subtree is out of the tab order and out of the accessibility tree.
+   --dur-ui is 200ms and is already zeroed under prefers-reduced-motion, so the token
+   carries the reduced-motion requirement instead of a second rule repeating it. */
+.nav-book-cta{
+  display:inline-flex; align-items:center; gap:8px;
+  min-height:40px; padding:0 var(--s5);
+  background:rgba(var(--ghost-edge),.08); color:inherit;
+  border:1px solid rgba(var(--ghost-edge),.42); border-radius:var(--r-btn);
+  font-size:var(--fs-label); line-height:1; font-weight:700; white-space:nowrap;
+  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  opacity:0; visibility:hidden; transform:translateX(8px); pointer-events:none;
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+             background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease),
+             visibility 0s linear var(--dur-ui);
+}
+:root.nav-cta .nav-book-cta{
+  opacity:1; visibility:visible; transform:none; pointer-events:auto;
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+             background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease),
+             visibility 0s;
+}
+/* The other half of the phone swap. Above 1024px this is cancelled and both are
+   shown; the account is only stood down where there is no room for both, and where
+   it is, the menu below it carries the same actions. */
+.navswap .headeraccount{
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), visibility 0s;
+}
+:root.nav-cta .navswap .headeraccount{
+  opacity:0; visibility:hidden; transform:translateX(-8px); pointer-events:none;
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+             visibility 0s linear var(--dur-ui);
+}
 
 /* The one prominent action in the header, and it is prominent by being the only
    bordered thing up there rather than by being a filled block. Ghost like the rest:
@@ -394,7 +448,7 @@ body.shell-staff .headergroup{
   display:inline-flex; align-items:center; gap:8px;
   min-height:40px; padding:0 var(--s5);
   background:rgba(var(--ghost-edge),.04); color:inherit;
-  border:1px solid rgba(var(--ghost-edge),.38); border-radius:var(--r-btn);
+  border:1px solid rgba(var(--ghost-edge),.35); border-radius:var(--r-btn);
   font-size:var(--fs-label); line-height:1; font-weight:700; white-space:nowrap;
   -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
   transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
@@ -819,8 +873,23 @@ body::before{
    .vh span. Hiding real text with text-indent does not work here, because a line
    after a <br> is not indented and prints straight over the logo. */
 .wordmark{ gap:0; letter-spacing:0; text-transform:none; }
-.wordmark__img{ display:block; width:118px; height:26px;
-  background:var(--img-logo) left center/contain no-repeat; }
+/* SIZED ON THE AXIS THAT IS ACTUALLY CONSTRAINED.
+   The mark is 640x337, which is 1.9:1, and the box used to be 118x26, which is
+   4.5:1. background-size:contain fits by the tighter axis, so the painted mark was
+   26px tall and 49px wide inside a 118px box, and the other 69px was empty. That is
+   why it read as small and why the wordmark seemed to sit in a gap.
+   The box now carries the mark's own ratio, so the box and the mark are the same
+   thing, and the size is driven from height because height is what the app bar
+   fixes. Width follows from aspect-ratio, which is what makes it impossible to
+   stretch, squash, or crop it: there is only one free dimension. The clamp is fluid
+   across the phone range and the ceiling leaves 7px of air top and bottom inside the
+   56px bar, so nothing here changes the bar's height. */
+.wordmark__img{
+  display:block; width:auto;
+  height:clamp(36px, 10vw, 42px);
+  aspect-ratio:640 / 337;
+  background:var(--img-logo) left center/contain no-repeat;
+}
 :root[data-theme="dark"] .wordmark__img{ filter:invert(1); }
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .wordmark__img{ filter:invert(1); } }
 body.shell-staff .wordmark__img{ filter:invert(1); }
@@ -1052,18 +1121,20 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 /* Nothing in the hero's text column is interactive, so nothing in it may be drawn
    as though it were. Stated rather than assumed, because the rectangle that used to
    flash here came from a rule that had no idea it was reaching a headline. */
-.hero h1, .hero p.sub, .hero__mark{ border:0; outline:0; box-shadow:none; background-color:transparent; }
+.hero h1, .hero p.sub{ border:0; outline:0; box-shadow:none; background-color:transparent; }
 .hero h1:focus, .hero h1:focus-visible{ outline:none; box-shadow:none; }
 .hero::after{ content:""; position:absolute; inset:0; z-index:-1;
   background:linear-gradient(180deg, rgba(26,26,26,.78) 0%, rgba(26,26,26,.24) 32%, rgba(26,26,26,.55) 60%, rgba(26,26,26,.95) 100%); }
-/* In normal flow, not absolute. Absolute put the mark in a band the content column
-   was free to grow into, and on a short viewport the headline rose straight through
-   it. margin-bottom:auto pins it to the top while the rest stays bottom aligned, and
-   the box is 18px taller than the logo it paints, so the gap survives with no slack. */
-/* Height locked, width auto, so the mark can never be stretched off its 1.9:1.
-   The box is 18px taller than the paint, which is the clearance under it. */
-.hero__mark{ flex:none; width:100px; height:62px;
-  background:var(--img-logo) left top/auto 44px no-repeat; filter:invert(1); margin-bottom:auto; }
+/* THE HERO CARRIES NO MARK OF ITS OWN.
+   It used to, and the sticky header carries one too, so a phone showed the brand
+   twice inside 200 vertical pixels: once at 42px in the bar and again at 44px
+   directly under it. The header's is the one that persists down the page, so the
+   header's is the one that stays. The hero now opens on the headline, which is what
+   the photograph is there to introduce.
+   Nothing needed rebalancing underneath it. The column is bottom aligned and the
+   mark was pinned to the top of it by margin-bottom:auto, so what it vacated was
+   never a gap between the navigation and the headline: it was slack the photograph
+   already owned, and the headline has not moved. */
 .hero h1{ font-size:clamp(38px,12vw,54px); line-height:1.02; letter-spacing:-.035em; font-weight:800; }
 .hero h1 span{ display:block; }
 /* A ch in a monospaced face is a real character, not an average one, so the measures
@@ -1292,7 +1363,10 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
      nothing gains an outline, and none of it reaches a touch screen. */
   .topnav a:hover::after{ transform:scaleX(1); }
   .topnav a:hover{ opacity:.9; }
-  .btn-login:hover{ transform:translateY(-2px); background:rgba(var(--ghost-edge),.14); border-color:rgba(var(--ghost-edge),.72); }
+  .btn-login:hover{ transform:translateY(-2px); background:rgba(var(--ghost-edge),.12); border-color:rgba(var(--ghost-edge),.65); }
+  /* One step above the login button at rest and one step above it on hover, which
+     is the whole of the hierarchy between them. Still a wash, still see-through. */
+  :root.nav-cta .nav-book-cta:hover{ background:rgba(var(--ghost-edge),.18); border-color:rgba(var(--ghost-edge),.72); }
   .acct__btn:hover{ background:rgba(var(--ghost-fill),.16); border-color:rgba(var(--ghost-edge),.55); }
   .acct__menu button:hover{ background:color-mix(in srgb, var(--text-primary) 8%, transparent); }
   .utilbar .iconbtn:hover{ color:inherit; opacity:1; }
@@ -1306,6 +1380,12 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .btn:hover svg:last-child, .tlink:hover svg, .sched__row:hover .sched__chev{ transform:none; }
   .btn-login:hover{ transform:none; }
   .acct__btn .chev, .acct.is-open .acct__btn .chev{ transition:none; }
+  /* --dur-ui is already 0.01ms at this setting, so the fade is effectively instant
+     without this rule. What this rule removes is the movement itself: the control
+     appears and disappears in place rather than sliding 8px, which is what was
+     actually asked for. visibility keeps its zero duration either way. */
+  .nav-book-cta, :root.nav-cta .nav-book-cta,
+  .navswap .headeraccount, :root.nav-cta .navswap .headeraccount{ transform:none; }
 }
 
 /* ---------- DESKTOP HEADER NAVIGATION ----------
@@ -1455,7 +1535,10 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .appbar--ends{ grid-template-columns:none; }
   #bar-start .textbtn{ padding-right:var(--s5); }
   #bar-mid{ display:flex; align-items:center; justify-self:auto; }
-  .wordmark__img{ width:142px; height:31px; }
+  /* The bar is 68px up here rather than 56px, so the mark takes 48px of it and
+     still keeps 10px of air above and below. Height only: the width is the aspect
+     ratio's business, and it comes out at about 91px. */
+  .wordmark__img{ height:48px; }
   .topnav{ display:flex; align-items:center; gap:var(--s6); margin-left:auto; }
   .topnav:empty{ display:none; }
   .topnav:empty + .appbar__slot--end{ margin-left:auto; }
@@ -1463,10 +1546,18 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .appbar__slot--end:empty{ margin-left:0; }
   .iconbtn--bare svg{ width:23px; height:23px; }
 
-  /* the overflow menu is a phone control; up here its two contents are the
-     utility strip, and the account has its own place in the navigation */
+  /* the menu button is a phone control; up here its build controls are in the
+     utility strip, its destinations are in the navigation strip, and the account
+     has its own place at the end of it */
   .barmenu{ display:none; }
-  .headeraccount{ display:flex; align-items:center; }
+
+  /* There is room for both, so the swap slot stops being a swap and becomes a row:
+     the booking action, then the account. The hidden action still holds its width
+     and the row still holds its gap, which is what keeps the navigation to its left
+     from sliding when the action arrives. */
+  .navswap{ display:flex; align-items:center; gap:var(--s3); }
+  .navswap > *{ grid-area:auto; }
+  :root.nav-cta .navswap .headeraccount{ opacity:1; visibility:visible; transform:none; pointer-events:auto; }
 
   /* the bottom bar is gone, not hidden behind the content */
   #tabhost.tabbar{ display:none; }
@@ -1503,9 +1594,6 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
       linear-gradient(90deg, rgba(18,18,20,.86) 0%, rgba(18,18,20,.72) 40%, rgba(18,18,20,.26) 64%, rgba(18,18,20,0) 82%),
       linear-gradient(180deg, rgba(26,26,26,.58) 0%, rgba(26,26,26,.10) 30%, rgba(26,26,26,.34) 64%, rgba(26,26,26,.86) 100%);
   }
-  /* The sticky header carries the wordmark on every screen now, so the hero does
-     not need to carry it a second time. */
-  .hero__mark{ display:none; }
   .hero h1{ font-size:clamp(58px, 5.6vw, 78px); max-width:13ch; }
   .hero p.sub{ margin-top:var(--s4); font-size:20px; line-height:30px; max-width:42ch; }
   .hero .maplink{ margin-top:var(--s4); font-size:16px; }
@@ -1596,14 +1684,17 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 
 /* ============================================================
    APP BAR AT NARROW WIDTHS
-   Four controls now sit to the right of the wordmark on a browse route: search,
-   account, theme, and the harness. Below 420px the harness keeps its icon and
-   drops its label, which is the difference between fitting and not.
+   Two controls sit to the right of the wordmark on a browse route now: the swap
+   slot, holding whichever of the account and the booking action applies, and the
+   menu. Below 420px the swap slot tightens its padding, which is the difference
+   between "Book Court" fitting beside the mark at 320px and not.
    ============================================================ */
 @media (max-width:419px){
   .iconbtn__t{ position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
   .iconbtn--demo{ min-width:var(--tap-min); padding:0; }
-  .appbar__slot--end{ gap:0; }
+  .appbar__slot--end{ gap:2px; }
+  .nav-book-cta, .btn-login{ padding-inline:var(--s3); font-size:15px; }
+  .acct__btn{ padding-inline:var(--s2); }
 }
 
 /* ============================================================
@@ -1909,6 +2000,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6 22 20H2z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.4" r=".9" fill="currentColor"/></symbol>
 <symbol id="i-square-exclaim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r=".9" fill="currentColor"/></symbol>
 <symbol id="i-dots" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
 <symbol id="i-list-pos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 5.5h1.6V9"/><path d="M3.6 12h2.2L3.6 15h2.2"/><circle cx="4.6" cy="18" r="1.4"/></symbol>
 <symbol id="i-envelope-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m3 7 9 6 9-6"/><path d="m8 15.5 2 2 4-4.4"/></symbol>
 <symbol id="i-return" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10H8"/></symbol>
@@ -2429,19 +2521,29 @@ function resolve(path){
 function go(path){ if (location.hash.slice(1) === path) render(); else location.hash = path; }
 function currentPath(){ const h = location.hash.slice(1); return h && h[0] === "/" ? h : "/"; }
 
-/* ---------- TAB SETS ---------- */
-/* One list of destinations, still, and both navigations are still built from it in
-   one pass. bottomOnly is the single exception: Visit is a real task on a phone,
-   where directions and a phone number are what someone standing outside needs, and
-   it is a footer link on a desktop page that already prints the address. So it
-   stays in the bottom bar and is left out of the header, which keeps the header to
-   the four things a customer comes here to do. */
-const PUBLIC_TABS = [
-  { to:"/",         label:"Book",        aria:"Book",                   glyph:"cal",    match:["/","/court","/court/review"] },
-  { to:"/openplay", label:"Open Play",   aria:"Open Play",              glyph:"users",  match:["/openplay"] },
+/* ---------- CUSTOMER DESTINATIONS ----------
+   One list, and one navigation built from it. There used to be two: a five item bar
+   pinned to the bottom of a phone and a header nav that took over at 1024px. Both
+   were rendered on every route, so a phone carried two competing primary
+   navigations at once and the landing page carried Book and Open Play in the bar
+   while the hero's own two cards were on screen saying the same thing.
+   What is left is the header, at every width, and these three destinations.
+   Book and Open Play are not among them on purpose. They are conversion actions,
+   the hero owns them, and once the hero's cards scroll away the header offers one
+   compact Book Court in their place rather than both of them back again.
+
+   menuOnly:  in the phone menu, never in the desktop navigation strip. Visit is
+              directions and a phone number, which is a task for someone standing
+              outside the building and a footer line on a desktop page that already
+              prints the address.
+   authHide:  leaves the navigation when there is an account to put it behind.
+              My Bookings beside an Account button is the same destination twice.
+   dyn:       resolves against the account, so signed out it lands on Find My
+              Booking rather than on a sign-in wall with no explanation. */
+const PUBLIC_NAV = [
   { to:"/rates",    label:"Rates",       aria:"Rates & How It Works",   glyph:"tag",    match:["/rates"] },
-  { to:"/visit",    label:"Visit",       aria:"Visit / Contact",        glyph:"pin",    match:["/visit"], bottomOnly:true },
-  { to:null,        label:"My Bookings", aria:"My Bookings",            glyph:"person", match:["/find","/me","/signin"], dyn:true }
+  { to:"/visit",    label:"Visit",       aria:"Visit / Contact",        glyph:"pin",    match:["/visit"], menuOnly:true },
+  { to:null,        label:"My Bookings", aria:"My Bookings",            glyph:"person", match:["/find","/me","/signin"], dyn:true, authHide:true }
 ];
 const STAFF_TABS = [
   { to:"/staff/today",      label:"Today",      aria:"Today",           glyph:"cal",    match:["/staff/today"] },
@@ -2453,6 +2555,14 @@ const STAFF_TABS = [
 function tabHref(t){
   if (!t.dyn) return t.to;
   return S.account ? "/me" : "/find";
+}
+/* The customer destinations that belong in the navigation strip at this moment.
+   The phone menu takes the whole list instead, so nothing is ever unreachable
+   because of a width. */
+function navItems(path){
+  return PUBLIC_NAV
+    .filter(function(t){ return !t.menuOnly && !(t.authHide && S.account); })
+    .map(function(t){ return { href: tabHref(t), cur: t.match.indexOf(path) >= 0, t: t }; });
 }
 
 /* ============================================================
@@ -2476,8 +2586,10 @@ function render(){
   if (path !== S.route){ S.lastRoute = S.route; S.route = path; }
   const view = hit ? hit.fn(hit.params) : { id:"sys-404", shell:"token", title:"Link not valid", html: scrLink({}).html, dock:null };
 
-  const navigable = view.shell === "browse" || view.shell === "staff";
-  document.body.className = "shell-" + view.shell + (navigable ? " has-tabbar" : "") + (view.wide ? " wide" : "");
+  /* has-tabbar reserves the bottom of the page for a bar, and only the staff shell
+     still has one. A customer route that kept the class would reserve 62px for a
+     bar that is no longer rendered. */
+  document.body.className = "shell-" + view.shell + (view.shell === "staff" ? " has-tabbar" : "") + (view.wide ? " wide" : "");
   document.title = view.title + " | Fit Club Courts Staging";
 
   /* app bar */
@@ -2504,18 +2616,22 @@ function render(){
   document.getElementById("bar-util").innerHTML = themeButton() + demoButton();
 
   /* NAVIGATION STRIP, right hand end.
-     The search icon and the anonymous person icon are gone. Find My Booking was
-     the search icon's only destination and My Bookings already routes there when
-     nobody is signed in, and a person icon beside a Log in button is the same
-     control drawn twice. What is left is one action: Log in, or the account it
-     turns into. The overflow menu beside it is displayed on phones only, and the
-     account only on desktop; CSS picks, so exactly one is ever in the tab order. */
+     Two things, in this order: the swap slot and the menu button.
+     The swap slot holds the booking action and the account control. Which of them
+     is showing is CSS's business, not this function's, because the answer depends
+     on scroll position and viewport width and both of those change without a
+     render. Both are always written; :root.nav-cta and the 1024px breakpoint decide
+     between them, and the hidden one is visibility:hidden, so it is out of the tab
+     order and out of the accessibility tree rather than merely faded.
+     The menu button is displayed on phones only. Up here its build controls are in
+     the utility strip and its destinations are in the navigation strip. */
   let endHtml = "";
   if (view.shell === "browse"){
-    endHtml += S.account ? accountMenuHtml() : loginButtonHtml();
+    endHtml += '<div class="navswap">' + bookCtaHtml() +
+      (S.account ? accountMenuHtml() : loginButtonHtml()) + "</div>";
   }
   endHtml += '<button class="iconbtn iconbtn--bare barmenu" data-action="appmenu"' +
-    ' aria-haspopup="dialog" aria-label="Menu">' + icon("dots") + "</button>";
+    ' aria-haspopup="dialog" aria-label="Menu">' + icon("menu") + "</button>";
   end.innerHTML = endHtml;
   document.querySelector(".appbar").classList.toggle("appbar--ends", view.shell === "browse");
 
@@ -2549,16 +2665,19 @@ function render(){
   measureDock();
 
   /* NAVIGATION
-     Two layouts, one set of destinations, chosen by viewport width in CSS rather
-     than by anything this function knows. Below 1024px the bottom bar is the
-     primary navigation and the header nav is display:none; from 1024px up the
-     bottom bar is display:none and the header nav takes over. Both are removed
-     from the DOM entirely on a task route, never merely hidden. */
+     The customer side has one navigation now, in the header, at every width. Below
+     1024px its destinations are behind the menu button and its two actions are in
+     the swap slot; from 1024px up the destinations open out into the navigation
+     strip. There is no bottom bar on a customer route any more, and there is no
+     second copy of anything to keep in step.
+     Staff keep theirs. Today, Scan, Walk-in, Open Play, and Exceptions are five
+     destinations with no hero and no conversion action behind them, the phone menu
+     carries none of them, and a shift is spent moving between them. It is a
+     different application wearing the same chrome. */
   const tabhost = document.getElementById("tabhost");
   const topnav = document.getElementById("bar-nav");
-  if (navigable){
-    const set = view.shell === "staff" ? STAFF_TABS : PUBLIC_TABS;
-    const items = set.map(function(t){
+  if (view.shell === "staff"){
+    const items = STAFF_TABS.map(function(t){
       return { href: tabHref(t), cur: t.match.indexOf(path) >= 0, t: t };
     });
     tabhost.className = "tabbar";
@@ -2566,7 +2685,14 @@ function render(){
       return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
         '<span class="tabpill">' + icon(it.t.glyph) + "</span><span>" + esc(it.t.label) + "</span></a>";
     }).join("");
-    topnav.innerHTML = items.filter(function(it){ return !it.t.bottomOnly; }).map(function(it){
+    topnav.innerHTML = items.map(function(it){
+      return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
+        esc(it.t.label) + "</a>";
+    }).join("");
+  } else if (view.shell === "browse"){
+    tabhost.className = "";
+    tabhost.innerHTML = "";
+    topnav.innerHTML = navItems(path).map(function(it){
       return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
         esc(it.t.label) + "</a>";
     }).join("");
@@ -2623,9 +2749,32 @@ function syncOverHero(){
      under the header's bottom edge. */
   root.classList.toggle("over-hero", hero.getBoundingClientRect().bottom > h);
 }
+/* ---------- THE SCROLLED BOOKING ACTION ----------
+   The header offers Book Court only once the hero's own two cards have gone. While
+   they are on screen the reader is already looking at the choice and a third copy
+   of it in the bar is noise; once they are past it, the bar is the only way back to
+   the decision without scrolling up.
+   The gate is the bottom of the hero's card pair against the bottom of the header,
+   which is the same geometry read syncOverHero does and for the same reason: an
+   IntersectionObserver constructed in this document never delivers a callback, not
+   even the initial one, so the CTA would never arrive. Both reads happen on a frame
+   that is already being laid out for the back-to-top button.
+   Every route that is not the landing page has no hero cards at all, so the action
+   is present from the first frame there. A task route has no header nav and no
+   button to find, and the class comes off. */
+function syncNavCta(){
+  const root = document.documentElement;
+  if (!document.querySelector(".nav-book-cta")){ root.classList.remove("nav-cta"); return; }
+  const duo = document.querySelector(".hero .duo");
+  if (!duo){ root.classList.add("nav-cta"); return; }
+  const group = document.getElementById("headergroup");
+  const h = group ? group.getBoundingClientRect().height : 0;
+  root.classList.toggle("nav-cta", duo.getBoundingClientRect().bottom <= h);
+}
 /* Called on every render so a route change lands in the right state on the first
-   frame rather than on the first scroll. */
-function watchHero(){ syncOverHero(); }
+   frame rather than on the first scroll. A control created already in its final
+   state does not animate, which is correct: a route change is not a transition. */
+function watchHero(){ syncOverHero(); syncNavCta(); }
 
 function dockHtml(d){
   let h = '<div class="dock lvl2" id="dock"><div class="dock__inner">';
@@ -2802,6 +2951,13 @@ function footerBlock(){
         '<a href="tel:+639991953170">' + icon("phone") + esc(VENUE.phone) + "</a>" +
         '<a href="mailto:' + esc(VENUE.email) + '">' + icon("mail") + esc(VENUE.email) + "</a>" +
         '<p>' + icon("clock") + " Open daily, 6AM to 11PM</p>" +
+        /* Visit folded into the phone menu when the bottom bar went, and the menu
+           button is a phone control, so from 1024px up this is the way to the page.
+           A plain hash link: the router already answers to one.
+           The label names what the page actually holds. It carries no directions
+           and no parking: the exact address and the arrival window are both marked
+           to be confirmed on this build and the Directions control is disabled. */
+        '<a href="#/visit">' + icon("info") + "Hours, contact, and checking in</a>" +
       "</div>" +
     "</div>" +
     '<p class="footnote">Staging prototype. Every booking, hold, payment, and message on this build is simulated in memory and is lost on refresh.</p>' +
@@ -2813,9 +2969,13 @@ function scrLanding(){
   const availOff = S.connectivity === "availability_down";
   let html = "";
 
+  /* No mark here. The sticky header carries one at every width and it is the one
+     that stays on screen, so a second copy directly under it was the brand twice in
+     the same glance. The hero opens on the headline.
+     Two spans, and .hero h1 span is display:block, so the break is structural at
+     every width rather than a wrap that a wider column could undo. */
   html += '<section class="hero">' +
-    '<span class="hero__mark" role="img" aria-label="The Fit Club Courts"></span>' +
-    '<h1><span>Get on court</span><span>tonight.</span></h1>' +
+    '<h1><span>Ready when</span><span>you are.</span></h1>' +
     '<p class="sub">Pick a time, pay, walk straight in.</p>' +
     '<a class="maplink" href="' + MAPS_URL + '" target="_blank" rel="noopener">' + icon("pin") +
       '<span>Silway 8, Polomolok, South Cotabato</span></a>';
@@ -6242,10 +6402,21 @@ function demoButton(){
 /* ============================================================
    HEADER ACCOUNT
    Signed out, one prominent action. Signed in, the same corner becomes a compact
-   menu holding the two things that belong to an account and nothing else: the
-   profile and the way out. My Bookings is not in here. It is a primary customer
-   task, so it stays a destination in the navigation at both states.
+   menu holding what belongs to an account: the bookings, the profile, and the way
+   out. My Bookings moved in here when the account appeared. It is a primary
+   customer task and it used to be a permanent destination in the navigation, which
+   is right while there is nobody to attach it to; once there is an Account button
+   beside it, a My Bookings link is the same destination drawn twice, and the one
+   that reads as an account's contents is the one inside the account.
    ============================================================ */
+/* One action, not two. The hero offers the choice between a private court and Open
+   Play because that is a decision worth a pair of cards; the header, once that pair
+   has scrolled away, offers the way back into booking and lets the flow ask which.
+   startcourt rather than a plain nav, so the maintenance interruption is handled by
+   the same guard the hero card goes through and there is no second booking route. */
+function bookCtaHtml(){
+  return '<button class="nav-book-cta" data-action="startcourt">Book Court</button>';
+}
 function loginButtonHtml(){
   return '<div class="headeraccount">' +
     '<button class="btn-login" data-action="nav" data-to="/signin">Log in</button></div>';
@@ -6262,6 +6433,7 @@ function accountMenuHtml(){
       icon("person") + "<span>" + esc(firstName()) + "</span>" + icon("chev-d", "chev") + "</button>" +
     '<div class="acct__menu" id="acct-menu" role="menu">' +
       '<div class="acct__who">Signed in as<strong>' + esc(a.name || a.mobile || "Account") + "</strong></div>" +
+      '<button role="menuitem" data-action="acctnav" data-to="/me">' + icon("ticket") + "<span>My Bookings</span></button>" +
       '<button role="menuitem" data-action="acctnav" data-to="/me/profile">' + icon("person") + "<span>Profile</span></button>" +
       '<button role="menuitem" data-action="signout">' + icon("return") + "<span>Log out</span></button>" +
     "</div></div>";
@@ -6275,30 +6447,47 @@ function closeAccountMenu(){
 }
 
 /* ============================================================
-   OVERFLOW MENU, PHONES
-   Below 1024px there is no utility strip, and the theme toggle and the staging
-   harness are not worth a permanent slot each in a 360px app bar. They live here,
-   one tap behind a single control, together with whichever account action applies.
+   THE MENU, PHONES
+   Not an overflow any more. Below 1024px this is where the whole of the navigation
+   lives, because the app bar carries the wordmark, one action, and this button, and
+   there is no room in it for destinations as well. It holds three things in this
+   order: where you can go, who you are, and what this build is.
+   What it deliberately does not hold is Book or Open Play. Those are the hero's two
+   cards, and once they scroll away the bar itself carries Book Court, so putting
+   them in here as well would be the third and fourth copy of the same action.
    This is the same sheet the harness uses, so it already traps focus, closes on
    Escape, and restores focus on the way out.
    ============================================================ */
 function openAppMenu(){
   const dlg = document.getElementById("sheet");
   const dark = currentTheme() === "dark";
+  const path = currentPath();
   let b = '<div class="menusheet">';
   if (S.account){
     b += '<p class="acct__who" style="border:0;padding:0 0 var(--s3)">Signed in as<strong>' +
       esc(S.account.name || S.account.mobile) + "</strong></p>";
-    b += '<button class="menurow" data-action="acctnav" data-to="/me">' + icon("ticket") + "<span>My Bookings</span></button>";
+  }
+  /* The same list the navigation strip is built from, unfiltered: a width is a
+     reason to fold destinations away, never a reason to lose one. My Bookings
+     resolves against the account exactly as it does up there, so signed out it
+     lands on Find My Booking rather than on an unexplained sign-in wall. */
+  PUBLIC_NAV.forEach(function(t){
+    const href = tabHref(t);
+    b += '<button class="menurow" data-action="acctnav" data-to="' + esc(href) + '"' +
+      (t.match.indexOf(path) >= 0 ? ' aria-current="page"' : "") + ">" +
+      icon(t.glyph) + "<span>" + esc(t.label) + "</span></button>";
+  });
+  if (S.account){
     b += '<button class="menurow" data-action="acctnav" data-to="/me/profile">' + icon("person") + "<span>Profile</span></button>";
+    b += '<button class="menurow" data-action="signout">' + icon("return") + "<span>Log out</span></button>";
   } else {
     b += '<button class="menurow" data-action="acctnav" data-to="/signin">' + icon("person") + "<span>Log in</span></button>";
-    b += '<button class="menurow" data-action="acctnav" data-to="/find">' + icon("search") + "<span>Find my booking</span></button>";
   }
+  /* The build controls, last. Neither is a customer task, and from 1024px up they
+     are in the utility strip instead, so no width shows two copies of either. */
   b += '<button class="menurow" data-action="theme" aria-pressed="' + dark + '">' +
     icon(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>";
   b += '<button class="menurow" data-action="demo">' + icon("flask") + "<span>Staging harness</span></button>";
-  if (S.account) b += '<button class="menurow" data-action="signout">' + icon("return") + "<span>Log out</span></button>";
   b += "</div>";
   dlg.innerHTML = '<div class="sheet"><div class="sheet__head"><h2 id="sheet-title">Menu</h2>' +
     '<button class="sheet__close" data-action="closesheet" aria-label="Close the menu">' + icon("x") + "</button></div>" +
@@ -6455,7 +6644,7 @@ if (window.visualViewport){
   function sync(){
     queued = false;
     btn.hidden = window.scrollY < window.innerHeight * 0.6;
-    syncOverHero();
+    watchHero();
   }
   window.addEventListener("scroll", function(){
     if (queued) return;
