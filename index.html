@@ -546,15 +546,19 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
 /* ---------- hero ---------- */
 .hero{
   position:relative; isolation:isolate; margin-inline:calc(-1 * var(--gutter));
-  margin-top:calc(-1 * var(--s5)); padding:0 var(--gutter) 24px;
+  margin-top:calc(-1 * var(--s5)); padding:20px var(--gutter) 24px;
   min-height:70svh; display:flex; flex-direction:column; justify-content:flex-end;
   background:#141618; color:#F4F2ED; border-radius:0 0 var(--r-sheet) var(--r-sheet); overflow:hidden;
 }
 .hero::before{ content:""; position:absolute; inset:0; z-index:-2; background:var(--img-hero) center 28%/cover no-repeat; filter:grayscale(1) contrast(1.08); }
 .hero::after{ content:""; position:absolute; inset:0; z-index:-1;
   background:linear-gradient(180deg, rgba(20,22,24,.78) 0%, rgba(20,22,24,.24) 32%, rgba(20,22,24,.55) 60%, rgba(20,22,24,.95) 100%); }
-.hero__mark{ position:absolute; top:20px; left:var(--gutter); width:150px; height:34px;
-  background:var(--img-logo) left center/contain no-repeat; filter:invert(1); }
+/* In normal flow, not absolute. Absolute put the mark in a band the content column
+   was free to grow into, and on a short viewport the headline rose straight through
+   it. margin-bottom:auto pins it to the top while the rest stays bottom aligned, and
+   the box is 18px taller than the logo it paints, so the gap survives with no slack. */
+.hero__mark{ flex:none; width:150px; height:52px;
+  background:var(--img-logo) left top/150px 34px no-repeat; filter:invert(1); margin-bottom:auto; }
 .hero h1{ font-size:clamp(38px,12vw,54px); line-height:1.02; letter-spacing:-.035em; font-weight:800; }
 .hero h1 span{ display:block; }
 .hero p.sub{ margin-top:12px; font-size:18px; line-height:26px; color:#DAD7D0; max-width:24ch; }
