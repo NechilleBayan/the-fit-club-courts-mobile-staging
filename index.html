@@ -52,23 +52,23 @@
 
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --surface:#212428; --surface-raised:#2A2E33; --surface-sunken:#191C20;
+    --surface:#2E2E2E; --surface-raised:#383838; --surface-sunken:#242424;
     --surface-inverse:#F4F2ED; --text-primary:#F4F2ED; --text-secondary:#B4B0A8;
-    --text-inverse:#212428; --text-inverse-secondary:#4A4F55;
-    --border-default:#767B82; --border-strong:#F4F2ED; --hairline:#3D4247;
-    --focus-ring:#F4F2ED; --focus-halo:#212428;
-    --overlay:rgba(10,11,13,0.74); --hatch:rgba(244,242,237,0.18);
+    --text-inverse:#2E2E2E; --text-inverse-secondary:#4F4F4F;
+    --border-default:#7A7A7A; --border-strong:#F4F2ED; --hairline:#434343;
+    --focus-ring:#F4F2ED; --focus-halo:#2E2E2E;
+    --overlay:rgba(12,12,12,0.74); --hatch:rgba(244,242,237,0.18);
     --hatch-strong:rgba(244,242,237,0.28); --shadow-print:rgba(0,0,0,0.55);
     --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
   }
 }
 :root[data-theme="dark"]{
-    --surface:#212428; --surface-raised:#2A2E33; --surface-sunken:#191C20;
+    --surface:#2E2E2E; --surface-raised:#383838; --surface-sunken:#242424;
   --surface-inverse:#F4F2ED; --text-primary:#F4F2ED; --text-secondary:#B4B0A8;
-  --text-inverse:#212428; --text-inverse-secondary:#4A4F55;
-  --border-default:#767B82; --border-strong:#F4F2ED; --hairline:#3D4247;
-  --focus-ring:#F4F2ED; --focus-halo:#212428;
-  --overlay:rgba(10,11,13,0.74); --hatch:rgba(244,242,237,0.18);
+  --text-inverse:#2E2E2E; --text-inverse-secondary:#4F4F4F;
+  --border-default:#7A7A7A; --border-strong:#F4F2ED; --hairline:#434343;
+  --focus-ring:#F4F2ED; --focus-halo:#2E2E2E;
+  --overlay:rgba(12,12,12,0.74); --hatch:rgba(244,242,237,0.18);
   --hatch-strong:rgba(244,242,237,0.28); --shadow-print:rgba(0,0,0,0.55);
   --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
 }
@@ -147,10 +147,20 @@ svg{ display:block; width:20px; height:20px; flex:none; }
 body.shell-staff .appbar{ background:var(--surface-inverse); color:var(--text-inverse); border-bottom-color:var(--border-strong); }
 .appbar__slot{ display:flex; align-items:center; min-height:var(--appbar-h); }
 .appbar__slot--end{ justify-content:flex-end; }
+/* Three controls on the right cannot coexist with a centred wordmark at 360px:
+   the side columns are only (360-118)/2 wide, and three 44px targets are not.
+   With the account controls present the brand goes left, which is the ordinary
+   app bar arrangement anyway. */
+.appbar--ends{ grid-template-columns:auto 1fr auto; }
+.appbar--ends #bar-mid{ justify-self:start; }
 .wordmark{ display:flex; align-items:center; gap:8px; min-height:var(--tap-min); font-size:13px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; line-height:1.1; }
 .appbar .clock{ font-size:var(--fs-label); font-weight:600; letter-spacing:.02em; }
-.iconbtn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:var(--tap-min); min-height:var(--tap-min); padding:0 var(--s2); border:1px solid var(--border-default); border-radius:var(--r-btn); font-size:var(--fs-eyebrow); font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
+.iconbtn{ display:inline-flex; flex:none; align-items:center; justify-content:center; gap:6px; min-width:var(--tap-min); min-height:var(--tap-min); padding:0 var(--s2); border:1px solid var(--border-default); border-radius:var(--r-btn); font-size:var(--fs-eyebrow); font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
 .iconbtn--demo{ border-style:dashed; }
+/* Borderless, so the two account controls do not compete with the Demo button. */
+.iconbtn--bare{ border-color:transparent; padding:0; min-width:var(--tap-min); }
+.iconbtn--bare svg{ width:22px; height:22px; }
+.appbar__slot--end{ gap:2px; }
 .textbtn{ display:inline-flex; align-items:center; gap:6px; min-height:var(--tap-min); padding-right:var(--s2); font-size:var(--fs-label); font-weight:600; }
 .textbtn svg{ width:18px; height:18px; }
 
@@ -537,28 +547,66 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
   background:var(--surface-inverse); color:var(--text-inverse); border-color:var(--surface-inverse); transform:scale(.985);
 }
 .duocard:active .per, .duocard.is-on .per{ color:var(--text-inverse-secondary); }
-.hero .duocard{ background:rgba(244,242,237,.34); border-color:rgba(244,242,237,.5); color:#F4F2ED; backdrop-filter:blur(10px); }
-.hero .duocard .per{ color:#D6D3CC; }
-.hero .duocard:hover, .hero .duocard:focus-visible{ background:rgba(244,242,237,.5); }
-.hero .duocard:active, .hero .duocard.is-on{ background:#F4F2ED; color:#22262B; border-color:#F4F2ED; }
-.hero .duocard:active .per, .hero .duocard.is-on .per{ color:#565C63; }
+/* The two cards are told apart by fill, not by hue: a dark gray plate for the court
+   and an off white plate for Open Play. Both sit at 80% so the photograph stays
+   legible underneath, and both go fully opaque on hover and focus. */
+.hero .duocard{ opacity:.8; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  transition:opacity var(--dur-fast) var(--ease); }
+.hero .duocard:hover, .hero .duocard:focus-visible{ opacity:1; }
+@media (prefers-reduced-motion:reduce){ .hero .duocard{ transition:none; } }
+@media (prefers-contrast:more){ .hero .duocard{ opacity:1; } }
+
+.hero .duo .duocard:nth-child(1){ background:rgba(46,46,46,.74); border-color:rgba(244,242,237,.42); color:#F4F2ED; }
+.hero .duo .duocard:nth-child(1) .per{ color:#D6D3CC; }
+.hero .duo .duocard:nth-child(1):active, .hero .duo .duocard:nth-child(1).is-on{
+  background:#2E2E2E; border-color:#F4F2ED; }
+
+.hero .duo .duocard:nth-child(2){ background:rgba(244,242,237,.86); border-color:rgba(244,242,237,.7); color:#2E2E2E; }
+/* Not the usual secondary grey: at 80% over a photograph that lands near 3.6:1.
+   The line stays secondary through size and weight instead of through colour. */
+.hero .duo .duocard:nth-child(2) .per{ color:#2E2E2E; }
+.hero .duo .duocard:nth-child(2):active, .hero .duo .duocard:nth-child(2).is-on{
+  background:#F4F2ED; border-color:#F4F2ED; }
+
+/* ---------- back to top ----------
+   Ghosted on purpose: it is a convenience, not a decision, so it must never read
+   as loud as a real action. Sits clear of the dock and the tab bar. */
+.totop{
+  position:fixed; right:var(--gutter); z-index:35;
+  bottom:calc(var(--dock-h) + var(--tabbar-h) + var(--s4) + env(safe-area-inset-bottom));
+  width:52px; height:52px; border-radius:50%;
+  display:grid; place-items:center;
+  background:color-mix(in srgb, var(--surface-raised) 55%, transparent);
+  border:1px solid color-mix(in srgb, var(--border-default) 45%, transparent);
+  color:var(--text-primary); opacity:.55;
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  transition:opacity var(--dur-fast) var(--ease);
+}
+body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-area-inset-bottom)); }
+.totop svg{ width:24px; height:24px; }
+.totop:hover, .totop:focus-visible{ opacity:1; }
+.totop[hidden]{ display:none; }
+@media (prefers-reduced-motion:reduce){ .totop{ transition:none; } }
+@media (prefers-contrast:more){ .totop{ opacity:1; background:var(--surface-raised); border-color:var(--border-strong); } }
 
 /* ---------- hero ---------- */
 .hero{
   position:relative; isolation:isolate; margin-inline:calc(-1 * var(--gutter));
   margin-top:calc(-1 * var(--s5)); padding:20px var(--gutter) 24px;
   min-height:70svh; display:flex; flex-direction:column; justify-content:flex-end;
-  background:#141618; color:#F4F2ED; border-radius:0 0 var(--r-sheet) var(--r-sheet); overflow:hidden;
+  background:#1C1C1C; color:#F4F2ED; border-radius:0 0 var(--r-sheet) var(--r-sheet); overflow:hidden;
 }
 .hero::before{ content:""; position:absolute; inset:0; z-index:-2; background:var(--img-hero) center 28%/cover no-repeat; filter:grayscale(1) contrast(1.08); }
 .hero::after{ content:""; position:absolute; inset:0; z-index:-1;
-  background:linear-gradient(180deg, rgba(20,22,24,.78) 0%, rgba(20,22,24,.24) 32%, rgba(20,22,24,.55) 60%, rgba(20,22,24,.95) 100%); }
+  background:linear-gradient(180deg, rgba(26,26,26,.78) 0%, rgba(26,26,26,.24) 32%, rgba(26,26,26,.55) 60%, rgba(26,26,26,.95) 100%); }
 /* In normal flow, not absolute. Absolute put the mark in a band the content column
    was free to grow into, and on a short viewport the headline rose straight through
    it. margin-bottom:auto pins it to the top while the rest stays bottom aligned, and
    the box is 18px taller than the logo it paints, so the gap survives with no slack. */
-.hero__mark{ flex:none; width:150px; height:52px;
-  background:var(--img-logo) left top/150px 34px no-repeat; filter:invert(1); margin-bottom:auto; }
+/* Height locked, width auto, so the mark can never be stretched off its 1.9:1.
+   The box is 18px taller than the paint, which is the clearance under it. */
+.hero__mark{ flex:none; width:100px; height:62px;
+  background:var(--img-logo) left top/auto 44px no-repeat; filter:invert(1); margin-bottom:auto; }
 .hero h1{ font-size:clamp(38px,12vw,54px); line-height:1.02; letter-spacing:-.035em; font-weight:800; }
 .hero h1 span{ display:block; }
 .hero p.sub{ margin-top:12px; font-size:18px; line-height:26px; color:#DAD7D0; max-width:24ch; }
@@ -576,7 +624,7 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
 .photo__img--op{ background-image:var(--img-op); }
 .photo__img--paddle{ background-image:var(--img-paddle); }
 .photo__cap{ position:absolute; left:0; right:0; bottom:0; padding:16px; color:#F4F2ED; font-weight:800; font-size:19px;
-  background:linear-gradient(180deg, rgba(20,22,24,0) 0%, rgba(20,22,24,.88) 72%); }
+  background:linear-gradient(180deg, rgba(26,26,26,0) 0%, rgba(26,26,26,.88) 72%); }
 
 /* ---------- proof row ---------- */
 .proof{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center; }
@@ -654,7 +702,7 @@ body.shell-staff .wordmark__img{ filter:invert(1); }
   padding:36px var(--gutter) 40px; background:#000; color:#EDEBE6; border:0; border-radius:0;
 }
 .footgrid{ display:grid; grid-template-columns:1fr; gap:26px; max-width:var(--content-max); margin-inline:auto; }
-@media (min-width:600px){ .footgrid{ grid-template-columns:1.2fr 1fr 1.1fr; gap:20px; } }
+@media (min-width:600px){ .footgrid{ grid-template-columns:1.2fr 1.1fr; gap:20px; } }
 .footcol h3{ font-family:var(--mono); font-size:15px; line-height:20px; font-weight:700; letter-spacing:.02em; color:#FFF; margin-bottom:14px; }
 .footcol a, .footcol p{ display:block; font-family:var(--mono); font-size:14px; line-height:20px; color:#B9B6B0; text-decoration:none; }
 .footcol a{ min-height:var(--tap-min); display:flex; align-items:center; gap:8px; }
@@ -710,6 +758,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <symbol id="i-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></symbol>
 <symbol id="i-chev-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></symbol>
 <symbol id="i-chev-d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 9 7 7 7-7"/></symbol>
+<symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
 <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
@@ -734,6 +783,9 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   <main id="app" tabindex="-1"></main>
   <div id="dockhost"></div>
   <nav id="tabhost" aria-label="Main"></nav>
+  <button id="totop" class="totop" data-action="totop" aria-label="Back to top" hidden>
+    <svg aria-hidden="true" focusable="false"><use href="#i-arrow-up"></use></svg>
+  </button>
 </div>
 <p id="announcer" class="vh" role="status" aria-live="polite"></p>
 <p id="alerter" class="vh" role="alert" aria-live="assertive"></p>
@@ -1209,7 +1261,16 @@ function render(){
   } else {
     mid.innerHTML = '<button class="wordmark" data-action="home"><i class="wordmark__img" aria-hidden="true"></i><span class="vh">The Fit Club Courts, home</span></button>';
   }
-  end.innerHTML = '<button class="iconbtn iconbtn--demo" data-action="demo" aria-haspopup="dialog">' + icon("flask") + "Demo</button>";
+  /* Find My Booking and Sign in live here, on the public browse shells only. Icon
+     only, because three labelled controls plus the wordmark do not fit 360px. */
+  let endHtml = "";
+  if (view.shell === "browse"){
+    endHtml += '<button class="iconbtn iconbtn--bare" data-action="nav" data-to="/find" aria-label="Find My Booking">' + icon("search") + "</button>";
+    endHtml += '<button class="iconbtn iconbtn--bare" data-action="nav" data-to="/signin" aria-label="Sign in">' + icon("person") + "</button>";
+  }
+  endHtml += '<button class="iconbtn iconbtn--demo" data-action="demo" aria-haspopup="dialog">' + icon("flask") + "Demo</button>";
+  end.innerHTML = endHtml;
+  document.querySelector(".appbar").classList.toggle("appbar--ends", view.shell === "browse");
 
   /* bands */
   let bands = "";
@@ -1431,12 +1492,6 @@ function footerBlock(){
         '<div class="footmark" role="img" aria-label="The Fit Club Courts"></div>' +
         '<p class="dim">Premium pickleball courts,<br>booking and check in.</p>' +
       "</div>" +
-      '<div class="footcol"><h3>Go to</h3>' +
-        '<a href="#/court">Reserve a court</a>' +
-        '<a href="#/openplay">Join Open Play</a>' +
-        '<a href="#/rates">Rates and how it works</a>' +
-        '<a href="#/find">Find my booking</a>' +
-      "</div>" +
       '<div class="footcol"><h3>Visit</h3>' +
         '<a href="' + MAPS_URL + '" target="_blank" rel="noopener">' + icon("pin") + esc(VENUE.area) + "</a>" +
         '<a href="tel:+639991953170">' + icon("phone") + esc(VENUE.phone) + "</a>" +
@@ -1510,16 +1565,25 @@ function scrLanding(){
     html += '<div class="section"><h2 class="sec">Pick your way in</h2>' + duoCTA() + "</div>";
   }
 
-  html += '<div class="section"><h2 class="sec">Other things you can do</h2><div class="btn-stack">' +
-    navBtn("/rates","Rates &amp; How It Works") +
-    navBtn("/find","Find My Booking") +
-    navBtn("/visit","Visit / Contact") +
-    navBtn("/signin","Sign in") +
-    "</div></div>";
+  /* How it works is a section, not a link out. Find My Booking and Sign in are in
+     the app bar, and Visit repeats the footer, so none of them are rows any more. */
+  html += '<div class="section"><h2 class="sec">How it works</h2><ol class="rows">' +
+    HOW_IT_WORKS.map(function(t,i){
+      return '<li class="row"><span class="txn" style="width:28px">' + (i+1) + '</span>' +
+        '<span class="row__main"><span class="row__title" style="font-weight:400;font-size:var(--fs-body)">' + esc(t) + "</span></span></li>";
+    }).join("") + "</ol>" +
+    '<p style="margin-top:var(--s4)">' + navBtn("/rates","See the full rates and policies") + "</p></div>";
 
   html += footerBlock();
   return { id:"pub-landing", shell:"browse", title:"Fit Club Courts", html:html, dock:null };
 }
+/* One list, printed on the landing and on the rates screen, so they cannot drift. */
+const HOW_IT_WORKS = [
+  "Choose your time. Availability and the full price come first.",
+  "Hold it. Your selection is held until a stated time while you pay.",
+  "Pay through Maya Checkout.",
+  "Show a pass at the door. Every player gets their own."
+];
 function navBtn(to, label){
   return '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="' + esc(to) + '"><span>' + label + "</span>" + icon("chev-r") + "</button>";
 }
@@ -1538,10 +1602,7 @@ function scrRates(){
   html += "</div></div>";
 
   html += '<div class="section"><h2 class="sec">How a booking works</h2><ol class="rows">' +
-    ["Choose your time. Availability and the full price come first.",
-     "Hold it. Your selection is held until a stated time while you pay.",
-     "Pay through Maya Checkout.",
-     "Check in at the venue with your booking code."].map(function(t,i){
+    HOW_IT_WORKS.map(function(t,i){
       return '<li class="row"><span class="txn" style="width:28px">' + (i+1) + '</span><span class="row__main"><span class="row__title" style="font-weight:400;font-size:var(--fs-body)">' + esc(t) + "</span></span></li>";
     }).join("") + "</ol>" + truthRule() + "</div>";
 
@@ -3584,6 +3645,12 @@ const ACTIONS = {
   toggletimeline: function(el){ S.timeline = !S.timeline; rerenderFrom(el); },
 
   startcourt: function(){ S.draft.product = "court"; go(S.connectivity === "maintenance" ? "/sys/interruption" : "/court"); },
+  totop: function(){
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top:0, behavior: reduce ? "auto" : "smooth" });
+    const h1 = document.querySelector("#app h1");
+    if (h1) h1.focus({ preventScroll:true });
+  },
   arrival: function(){ S.arrivalOpen = !S.arrivalOpen; S.inPlace = true; render(); },
   passscan: function(el){
     const o = S.orders[el.getAttribute("data-id")];
@@ -3998,6 +4065,26 @@ if (window.visualViewport){
 /* ============================================================
    BOOT
    ============================================================ */
+/* Back to top appears only once there is a screenful to come back from, so it is
+   never sitting on a screen that does not scroll. */
+(function(){
+  const btn = document.getElementById("totop");
+  if (!btn) return;
+  let queued = false;
+  function sync(){
+    queued = false;
+    btn.hidden = window.scrollY < window.innerHeight * 0.6;
+  }
+  window.addEventListener("scroll", function(){
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(sync);
+  }, { passive:true });
+  window.addEventListener("resize", sync, { passive:true });
+  window.addEventListener("hashchange", function(){ requestAnimationFrame(sync); });
+  sync();
+})();
+
 window.addEventListener("hashchange", render);
 if (!location.hash) location.hash = "/";
 render();
