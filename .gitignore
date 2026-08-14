@@ -1,0 +1,6 @@
+.claude/
+scratchpad/
+*.log
+_devframe.html
+Thumbs.db
+desktop.ini
