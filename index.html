@@ -1255,6 +1255,9 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .btn--secondary:hover{ background:rgba(var(--ghost-fill),.20); border-color:rgba(var(--ghost-edge),.65); }
   .btn--ghost:hover{ background:rgba(var(--ghost-fill),.15); border-color:rgba(var(--ghost-edge),.55); }
   .btn:hover svg:last-child{ transform:translateX(3px); }
+  /* A backward control leads with its chevron, so the nudge has to lead with it too.
+     Same specificity as the rule above and later in source, which is what wins it. */
+  .btn--back:hover svg:last-child{ transform:translateX(-3px); }
   .btn[disabled]:hover{ transform:none; background:rgba(var(--ghost-fill),.04); border-color:rgba(var(--ghost-edge),.35); }
   .btn:active{ transform:translateY(0) scale(.985); }
 
@@ -2961,8 +2964,16 @@ const HOW_IT_WORKS = [
   ["Pay securely",     "Complete payment through Maya Checkout."],
   ["Show your pass",   "Every player receives an individual entry pass."]
 ];
+/* The two directions of travel, and the only two button shapes a screen navigates with.
+   Forward puts the chevron after the label, backward puts it before, which is the same
+   pairing the task-screen back control in renderChrome already uses. An in-place action
+   (retry, copy, cancel, sign out) takes neither: it does not move the reader anywhere,
+   and on the landing page Retry is the button that establishes that. */
 function navBtn(to, label){
   return '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="' + esc(to) + '"><span>' + label + "</span>" + icon("chev-r") + "</button>";
+}
+function backBtn(to, label){
+  return '<button class="btn btn--secondary btn--sm btn--back" data-action="nav" data-to="' + esc(to) + '">' + icon("chev-l") + "<span>" + label + "</span></button>";
 }
 
 /* ---------- SCR pub-rates ---------- */
@@ -2996,7 +3007,7 @@ function scrRates(){
     "<p>Cancellation policy: To be confirmed. Contact the venue.</p>" +
     '<span class="unapproved">Unapproved copy, for review</span>' +
     '<p class="legal" style="margin-top:var(--s3)">Cancellation, reschedule, refund, no-show, and late-arrival rules are not approved yet, so this build states none of them.</p></div>' +
-    '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/policies">Read the policy page</button></p></div>';
+    '<p style="margin-top:var(--s3)">' + navBtn("/policies","Read the policy page") + "</p></div>";
 
   html += footerBlock();
   return { id:"pub-rates", shell:"browse", title:"Rates & How It Works", html:html,
@@ -3352,7 +3363,7 @@ function scrCourtReview(){
     html += '<div class="banner" style="margin-top:var(--s4)">' + icon("alert") +
       "<div><p><strong>That time was just taken. Choose another available time.</strong></p>" +
       '<p class="legal">Nothing was charged and nothing is held. Your details below were kept.</p>' +
-      '<p style="margin-top:var(--s2)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/court">Back to available times</button></p></div></div>';
+      '<p style="margin-top:var(--s2)">' + backBtn("/court","Back to available times") + "</p></div></div>";
   }
 
   html += '<div class="section"><div class="card"><dl class="dl">' +
@@ -3361,7 +3372,7 @@ function scrCourtReview(){
     "<div><dt>Duration</dt><dd>" + d.duration + " " + esc(plural(d.duration,"hour","hours")) + "</dd></div>" +
     "<div><dt>Rate</dt><dd>" + esc(peso(RATE_COURT)) + " per hour</dd></div>" +
     '<div class="total"><dt>Total</dt><dd>' + esc(peso(total)) + "</dd></div></dl>" +
-    '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/court">Change date, time, or duration</button></p>' +
+    '<p style="margin-top:var(--s3)">' + backBtn("/court","Change date, time, or duration") + "</p>" +
     '<p class="legal" style="margin-top:var(--s3)">₱350 x ' + d.duration + " " + esc(plural(d.duration,"hour","hours")) + " = " + esc(peso(total)) + ". No fees or taxes are added to this total.</p>" +
     '<p class="legal">A court is assigned automatically when your hold is created. You do not choose a court number.</p></div></div>';
 
@@ -3725,7 +3736,7 @@ function scrBooking(params){
       "<p>" + n + " unique QR " + plural(n,"pass","passes") + ", one per participant. Scanning one admits that participant only.</p>" +
       '<div class="btn-col" style="margin-top:var(--s4)">' +
       '<button class="btn btn--primary" data-action="openqr" data-id="' + esc(o.id) + '">' + icon("qr") + esc(passesLabel(o)) + "</button>" +
-      '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="/booking/' + esc(encodeURIComponent(o.bookingCode)) + '/passes">Send a pass to a player</button>' +
+      navBtn("/booking/" + encodeURIComponent(o.bookingCode) + "/passes","Send a pass to a player") +
       "</div>" +
       '<p class="legal" style="margin-top:var(--s3)">We will send your confirmation to the contact details you provided.</p></div>';
   } else {
@@ -3764,7 +3775,7 @@ function scrBooking(params){
   if ((o.orderStatus === "confirmed" || o.orderStatus === "checked_in") && !S.account){
     html += '<div class="section"><div class="card card--sunken"><h2 class="sec">Save your details?</h2>' +
       '<p class="legal" style="margin-top:var(--s2)">Faster checkout next time. Declining changes nothing about this booking.</p>' +
-      '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/save/' + esc(o.id) + '">Save my details</button></p></div></div>';
+      '<p style="margin-top:var(--s3)">' + navBtn("/save/" + o.id,"Save my details") + "</p></div></div>";
   }
   html += '<div class="section"><button class="btn btn--ghost" data-action="nav" data-to="/visit">Directions and contact</button></div>';
 
@@ -4132,7 +4143,7 @@ function scrPass(params){
           '<p class="code" style="margin-top:var(--s3);font-size:var(--fs-label);word-break:break-all">' + esc(passLink(p)) + "</p>" +
           '<div class="btn-stack" style="margin-top:var(--s3)">' +
           '<button class="btn btn--secondary btn--sm" data-action="copy" data-value="' + esc(passLink(p)) + '">Copy the link</button>' +
-          '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="/t/pass/' + esc(p.share) + '">Open it here</button>' +
+          navBtn("/t/pass/" + p.share,"Open it here") +
           "</div>" +
           '<p class="legal" style="margin-top:var(--s3)">' + icon("flask") +
           " <strong>Nothing is sent from this prototype.</strong> Copy the link and open it yourself to see what the player sees. " +
@@ -4615,7 +4626,7 @@ function scrOpPlayers(params){
     "<div><dt>Time</dt><dd>" + esc(w.start + " to " + w.end) + "</dd></div>" +
     "<div><dt>Admissions</dt><dd>" + qty + "</dd></div>" +
     '<div class="total"><dt>Total</dt><dd>' + esc(peso(total)) + "</dd></div></dl>" +
-    '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay/' + esc(w.id) + '">Change window or quantity</button></p>' +
+    '<p style="margin-top:var(--s3)">' + backBtn("/openplay/" + w.id,"Change window or quantity") + "</p>" +
     '<p class="legal" style="margin-top:var(--s3)">₱150 x ' + qty + " " + esc(plural(qty,"admission","admissions")) + " = " + esc(peso(total)) + ". No fees or taxes are added to this total.</p></div></div>";
 
   html += '<form class="form section" id="opform" novalidate>' + errSummary() +
@@ -4692,7 +4703,7 @@ function scrEventStatus(params){
     }).join("") + "</ul>" +
     '<p class="legal" style="margin-top:var(--s3)">No response time is promised here, because none is approved.</p></div>';
   if (inq.state === "Quoted"){
-    html += '<div class="section"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/t/quote/' + esc(inq.ref) + '">Open the quote</button></div>';
+    html += '<div class="section">' + navBtn("/t/quote/" + inq.ref,"Open the quote") + "</div>";
   }
   html += '<div class="section"><button class="btn btn--ghost" data-action="startcourt">Reserve a court in the meantime</button></div>';
   return { id:"pub-event-status", shell:"task", title:"Private Event request status", html:html,
@@ -4724,7 +4735,7 @@ function scrSave(params){
       return '<li class="row"><span class="row__main"><span class="row__title" style="font-size:var(--fs-body);font-weight:400">' + esc(t) + "</span></span></li>";
     }).join("") + "</ul></div>";
   html += '<div class="section form"><div class="check check--detached"><input type="checkbox" id="marketing2"><label for="marketing2"><span>Send me news about Open Play schedules. Optional, and separate from your booking messages.</span></label></div></div>';
-  html += '<div class="section"><button class="btn btn--secondary" data-action="declinesave" data-id="' + esc(o.id) + '">No thanks</button>' +
+  html += '<div class="section"><button class="btn btn--secondary btn--sm" data-action="declinesave" data-id="' + esc(o.id) + '">No thanks</button>' +
     '<p class="legal" style="margin-top:var(--s2)">Declining changes nothing about this booking.</p></div>';
   return { id:"pub-save-details", shell:"task", title:"Save your details", html:html,
     back:{ label:"Back to booking", to:"/booking/" + encodeURIComponent(o.bookingCode) },
@@ -4878,7 +4889,7 @@ function scrSignIn(){
       "</form>";
     html += '<p class="legal section">Verification channel: To be confirmed. On this staging build the code is simulated.</p>';
     html += '<div class="section"><div class="btn-stack">' +
-      '<button class="btn btn--secondary" data-action="nav" data-to="/">Continue as guest</button></div>' +
+      navBtn("/","Continue as guest") + "</div>" +
       '<p class="legal" style="margin-top:var(--s2)">Guest checkout is first class. You can book, pay, and check in without ever signing in.</p></div>';
     html += '<p class="legal section">Bookings are never linked because two records share a name. Only a verified contact channel links anything.</p>';
     return { id:"ply-signin", shell:"task", title:"Sign in", html:html,
@@ -4939,8 +4950,7 @@ function bookingEntry(o, bucket){
     h += '<span class="chip chip--quiet">' + icon(st.key === "expired" ? "clock-slash" : "alert") +
       "<span>" + esc(st.key === "expired" ? "Hold expired, nothing charged" : st.phrase) + "</span></span>";
   }
-  h += '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="/booking/' +
-    esc(encodeURIComponent(o.bookingCode)) + '">Open booking</button>';
+  h += navBtn("/booking/" + encodeURIComponent(o.bookingCode),"Open booking");
   h += "</div>";
 
   if (!paid && bucket === "upcoming" && st.key !== "held"){
@@ -4980,10 +4990,12 @@ function scrMe(){
   }
   html += "</div>";
 
-  html += '<div class="section"><h2 class="sec">Book again</h2><div class="btn-stack">' +
-    '<button class="btn btn--secondary btn--sm" data-action="startcourt"><span>Reserve a Court<small>₱350 per hour</small></span></button>' +
-    '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay"><span>Join Open Play<small>₱150 per player</small></span></button>' +
-    "</div>" +
+  /* The same two front doors the landing page offers, in the same component and the
+     same in-page arrangement it uses under "Pick your way in". The pair here was a
+     price on a <small> inside a button, which is a second way of saying what the duo
+     card already says with a number, in a smaller type size, on the one screen whose
+     reader has certainly met that card before. */
+  html += '<div class="section"><h2 class="sec">Book again</h2>' + duoCTA(true) +
     '<p class="legal" style="margin-top:var(--s3)">Suggestions only. Price and availability are rechecked every time.</p></div>';
 
   html += '<div class="section"><div class="btn-stack">' +
@@ -5012,7 +5024,7 @@ function scrHistory(){
     }).join("") + "</ul>";
   }
   html += "</div>";
-  html += '<div class="section"><button class="btn btn--secondary" data-action="startcourt">Book similar</button>' +
+  html += '<div class="section"><button class="btn btn--secondary btn--sm" data-action="startcourt">Book similar</button>' +
     '<p class="legal" style="margin-top:var(--s2)">Book similar copies your duration preference only. Date, price, and availability are always rechecked.</p></div>';
   return { id:"ply-history", shell:"browse", title:"History", html:html, dock:null };
 }
@@ -5027,7 +5039,7 @@ function scrGroups(){
     }).join("") + "</ul>" +
     '<p class="legal" style="margin-top:var(--s3)">Members are display names only until they add their own contact details.</p>' +
     '<p class="legal">Using a group never registers, invites, charges, or messages anyone.</p></div></div>';
-  html += '<div class="section"><button class="btn btn--secondary">Create a group</button></div>';
+  html += '<div class="section"><button class="btn btn--secondary btn--sm">Create a group</button></div>';
   return { id:"ply-groups", shell:"browse", title:"Saved groups", html:html, dock:null };
 }
 
@@ -5047,7 +5059,7 @@ function scrProfile(){
     '<div class="check check--detached"><input type="checkbox" id="mk2"><label for="mk2"><span>Open Play schedule news, by email.</span></label></div>' +
     "</div>" +
     '<p class="legal" style="margin-top:var(--s3)">Marketing is separate from booking messages, unchecked by default, and can be switched off at any time.</p></div>';
-  html += '<div class="section"><button class="btn btn--secondary" data-action="signout">Sign out</button>' +
+  html += '<div class="section"><button class="btn btn--secondary btn--sm" data-action="signout">Sign out</button>' +
     '<p class="legal" style="margin-top:var(--s2)">Useful on a shared phone. Signing out does not affect a booking you opened with a code.</p></div>';
   html += '<p class="legal section">Not collected on this product: Date of birth, sex, photo, identity document, any upload, any password.</p>';
   return { id:"ply-profile", shell:"browse", title:"Profile and preferences", html:html,
@@ -5128,7 +5140,7 @@ function scrToday(){
   html += '<div class="section"><h2 class="sec">Open Play tonight</h2><div class="card">' +
     "<p><strong>" + esc(windowTitle(OP_WINDOWS.w1)) + ", " + esc(OP_WINDOWS.w1.start + " to " + OP_WINDOWS.w1.end) + "</strong></p>" +
     '<p class="legal" style="margin-top:var(--s2)">One venue operation window across all ' + VENUE.courts + " courts.</p>" +
-    '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/staff/openplay/w1">Open the window</button></p></div></div>';
+    '<p style="margin-top:var(--s3)">' + navBtn("/staff/openplay/w1","Open the window") + "</p></div></div>";
 
   html += '<div class="section"><h2 class="sec">Arrivals</h2><ul class="rows">' +
     ["Mika R.","Jem A."].map(function(n,i){
