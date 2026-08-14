@@ -693,10 +693,56 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
   background:linear-gradient(180deg, rgba(26,26,26,0) 0%, rgba(26,26,26,.88) 72%); }
 
 /* ---------- proof row ---------- */
-.proof{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center; }
-.proof div{ padding:16px 6px; border:1.5px solid var(--hairline); border-radius:var(--r-card); background:var(--surface-raised); }
-.proof b{ display:block; font-size:26px; line-height:30px; font-weight:800; letter-spacing:-.02em; }
-.proof span{ display:block; margin-top:2px; font-size:13px; line-height:17px; color:var(--text-secondary); font-weight:600; }
+/* ---------- editorial: schedule, facts, steps ----------
+   Typography, rules, and alignment instead of boxes. Nothing here draws a card, a
+   pill, or an outline: the only strokes are hairline rules between things. */
+.sched{ border-top:1px solid var(--hairline); }
+.sched > li{ border-bottom:1px solid var(--hairline); }
+.sched__row{
+  display:flex; align-items:center; gap:14px; width:100%;
+  min-height:var(--tap-decision); padding:var(--s3) 0;
+  background:none; border:0; text-align:left; color:inherit; font:inherit;
+}
+.sched__row > svg:first-child{ width:24px; height:24px; flex:none; color:var(--text-secondary); }
+.sched__main{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+.sched__t{ font-size:17px; line-height:22px; font-weight:700; }
+.sched__s{ font-size:14px; line-height:18px; color:var(--text-secondary); }
+.sched__chev{ width:18px; height:18px; flex:none; color:var(--text-secondary); }
+
+.stat{ display:inline-flex; align-items:center; gap:8px; flex:none; font-size:14px; line-height:18px; font-weight:700; }
+.dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+.dot--on{ background:var(--text-primary); }
+.dot--half{ background:linear-gradient(90deg, var(--text-primary) 0 50%, transparent 50% 100%); box-shadow:inset 0 0 0 1.5px var(--text-primary); }
+.dot--off{ box-shadow:inset 0 0 0 1.5px var(--border-default); }
+
+.facts{ display:flex; align-items:stretch; }
+.facts li{ flex:1 1 0; min-width:0; text-align:center; padding:0 var(--s2); }
+.facts li + li{ border-left:1px solid var(--hairline); }
+.facts b{ display:block; font-size:24px; line-height:28px; font-weight:800; letter-spacing:-.02em; }
+.facts span{ display:block; margin-top:2px; font-size:13px; line-height:17px; color:var(--text-secondary); font-weight:600; }
+
+/* The spine is the content column's left edge, so it connects every step without
+   ever running through the numbers. */
+.steps{ counter-reset:none; }
+.steps > li{ display:grid; grid-template-columns:auto 1fr; gap:var(--s4); align-items:start; }
+.steps__n{
+  width:34px; font-size:24px; line-height:1.05; font-weight:800; letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums; color:var(--text-secondary);
+}
+.steps__b{ border-left:1px solid var(--hairline); padding:0 0 var(--s6) var(--s4); }
+.steps > li:last-child .steps__b{ padding-bottom:0; }
+.steps__b h3{ font-size:18px; line-height:23px; font-weight:800; }
+.steps__b p{ margin-top:var(--s2); font-size:16px; line-height:23px; color:var(--text-secondary); }
+
+.tlink{
+  display:inline-flex; align-items:center; gap:8px; min-height:var(--tap-min);
+  background:none; border:0; padding:0; color:inherit; font:inherit;
+  font-size:16px; font-weight:700;
+  text-decoration:underline; text-underline-offset:5px;
+  text-decoration-color:var(--border-default);
+}
+.tlink svg{ width:17px; height:17px; }
+.tlink:hover, .tlink:focus-visible{ text-decoration-color:currentColor; }
 
 /* ---------- cards and rows, softer and roomier ---------- */
 .card{ border-width:1.5px; }
@@ -1601,22 +1647,24 @@ function scrLanding(){
     html += '<div class="card"><p><strong>No Open Play is scheduled yet.</strong></p>' +
       '<p class="legal" style="margin-top:var(--s2)">This is normal between published schedules. Reserve a private court instead.</p></div>';
   } else {
-    html += '<ul class="rows">' +
-      '<li class="row">' + icon("court") + '<span class="row__main"><span class="row__title">Courts today</span>' +
-        '<span class="row__sub">Venue time, Asia/Manila</span></span>' + chip("available") + "</li>" +
-      '<li><button class="row" data-action="nav" data-to="/openplay">' + icon("users") +
-        '<span class="row__main"><span class="row__title">' + esc(windowTitle(OP_WINDOWS.w1)) + '</span>' +
-        '<span class="row__sub">' + esc(OP_WINDOWS.w1.start + " to " + OP_WINDOWS.w1.end) + "</span></span>" +
-        chip(S.capacityDial === "full" ? "full" : S.capacityDial === "almost" ? "almost" : "places") + "</button></li>" +
+    const cap = S.capacityDial === "full" ? "full" : S.capacityDial === "almost" ? "almost" : "places";
+    html += '<ul class="sched">' +
+      '<li><div class="sched__row">' + icon("court") +
+        '<span class="sched__main"><span class="sched__t">Courts today</span>' +
+        '<span class="sched__s">Venue time, Asia/Manila</span></span>' + statusDot("available") + "</div></li>" +
+      '<li><button class="sched__row" data-action="nav" data-to="/openplay">' + icon("users") +
+        '<span class="sched__main"><span class="sched__t">' + esc(windowTitle(OP_WINDOWS.w1)) + "</span>" +
+        '<span class="sched__s">' + esc(OP_WINDOWS.w1.start + " to " + OP_WINDOWS.w1.end) + "</span></span>" +
+        statusDot(cap) + icon("chev-r", "sched__chev") + "</button></li>" +
       "</ul>";
   }
   html += "</div>";
 
-  html += '<div class="section"><div class="proof">' +
-    "<div><b>4</b><span>Courts</span></div>" +
-    "<div><b>7</b><span>Days a week</span></div>" +
-    "<div><b>Indoor</b><span>Rain or shine</span></div>" +
-    "</div></div>";
+  html += '<div class="section"><ul class="facts">' +
+    "<li><b>4</b><span>Courts</span></li>" +
+    "<li><b>7</b><span>Days a week</span></li>" +
+    "<li><b>Indoor</b><span>Rain or shine</span></li>" +
+    "</ul></div>";
 
   html += '<div class="section">' + communityMarquee() +
     '<p class="lede" style="margin-top:var(--s4)">Open Play is one admission. You rotate in with everyone else. No group needed.</p>' +
@@ -1632,12 +1680,14 @@ function scrLanding(){
 
   /* How it works is a section, not a link out. Find My Booking and Sign in are in
      the app bar, and Visit repeats the footer, so none of them are rows any more. */
-  html += '<div class="section"><h2 class="sec">How it works</h2><ol class="rows">' +
-    HOW_IT_WORKS.map(function(t,i){
-      return '<li class="row"><span class="txn" style="width:28px">' + (i+1) + '</span>' +
-        '<span class="row__main"><span class="row__title" style="font-weight:400;font-size:var(--fs-body)">' + esc(t) + "</span></span></li>";
+  html += '<div class="section"><h2 class="sec">How it works</h2><ol class="steps">' +
+    HOW_IT_WORKS.map(function(s,i){
+      return "<li>" +
+        '<span class="steps__n" aria-hidden="true">' + ("0" + (i+1)) + "</span>" +
+        '<div class="steps__b"><h3>' + esc(s[0]) + "</h3><p>" + esc(s[1]) + "</p></div></li>";
     }).join("") + "</ol>" +
-    '<p style="margin-top:var(--s4)">' + navBtn("/rates","See the full rates and policies") + "</p></div>";
+    '<p style="margin-top:var(--s5)"><button class="tlink" data-action="nav" data-to="/rates">' +
+    "See the full rates and policies" + icon("chev-r") + "</button></p></div>";
 
   html += footerBlock();
   return { id:"pub-landing", shell:"browse", title:"Fit Club Courts", html:html,
@@ -1648,6 +1698,22 @@ function scrLanding(){
    as base64 would put this file past 5MB, so they are fetched from ./carousel.
    That is the one network request the build makes, and it is why the file is no
    longer strictly self-contained. */
+/* A dot plus the word, with no capsule around either. The dot is tonal rather than
+   hued: this build carries no third colour anywhere, and status is never allowed to
+   rest on colour alone, so fill level does the work and the word is always present.
+   Filled means open, half filled means nearly gone, hollow means closed. */
+const DOTS = {
+  available:   ["on",   "Available"],
+  places:      ["on",   "Places available"],
+  almost:      ["half", "Almost full"],
+  full:        ["off",  "Full"],
+  unavailable: ["off",  "Unavailable"]
+};
+function statusDot(key){
+  const d = DOTS[key] || DOTS.available;
+  return '<span class="stat"><i class="dot dot--' + d[0] + '" aria-hidden="true"></i>' + esc(d[1]) + "</span>";
+}
+
 const CAROUSEL = ["c1","c2","c3","c4","c5","c6","c7","c8","c9","c10",
                   "c11","c12","c13","c14","c15","c16","c17","c18"];
 function marqueeSeq(){
@@ -1689,12 +1755,14 @@ function mountMarquee(){
   });
 }
 
-/* One list, printed on the landing and on the rates screen, so they cannot drift. */
+/* One list, printed on the landing and on the rates screen, so they cannot drift.
+   Title and sentence are separate fields rather than one dashed string, which is what
+   the timeline needs anyway. */
 const HOW_IT_WORKS = [
-  "Choose your time. Availability and the full price come first.",
-  "Hold it. Your selection is held until a stated time while you pay.",
-  "Pay through Maya Checkout.",
-  "Show a pass at the door. Every player gets their own."
+  ["Choose your time", "See availability and the full price upfront."],
+  ["Hold your place",  "Your selection stays reserved while you pay."],
+  ["Pay securely",     "Complete payment through Maya Checkout."],
+  ["Show your pass",   "Every player receives an individual entry pass."]
 ];
 function navBtn(to, label){
   return '<button class="btn btn--secondary btn--sm" data-action="nav" data-to="' + esc(to) + '"><span>' + label + "</span>" + icon("chev-r") + "</button>";
@@ -1713,9 +1781,11 @@ function scrRates(){
   html += '<p class="legal">Your total is the rate multiplied by your hours or admissions. Nothing else is added.</p>';
   html += "</div></div>";
 
-  html += '<div class="section"><h2 class="sec">How a booking works</h2><ol class="rows">' +
-    HOW_IT_WORKS.map(function(t,i){
-      return '<li class="row"><span class="txn" style="width:28px">' + (i+1) + '</span><span class="row__main"><span class="row__title" style="font-weight:400;font-size:var(--fs-body)">' + esc(t) + "</span></span></li>";
+  html += '<div class="section"><h2 class="sec">How a booking works</h2><ol class="steps">' +
+    HOW_IT_WORKS.map(function(s,i){
+      return "<li>" +
+        '<span class="steps__n" aria-hidden="true">' + ("0" + (i+1)) + "</span>" +
+        '<div class="steps__b"><h3>' + esc(s[0]) + "</h3><p>" + esc(s[1]) + "</p></div></li>";
     }).join("") + "</ol>" + truthRule() + "</div>";
 
   html += '<div class="section"><h2 class="sec">Open Play capacity</h2>' +
