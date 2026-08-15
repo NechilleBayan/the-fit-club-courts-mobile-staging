@@ -2311,6 +2311,401 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .marquee__copy p{ font-size:15px; line-height:22px; }
 }
 
+
+/* ============================================================
+   CLAUDE VERSION LAYER
+   Everything CLAUDE-APP-PLAN.md adds, and nothing it removes. Three design
+   system deltas, the two menu surfaces, the shared calendar, the staff shell
+   and its modules, and the text size control.
+   This layer is last on purpose. It has to win over the responsive layer above
+   it for the four tokens both of them touch, and losing that fight silently is
+   how a 128 percent text setting stops working at 1024px.
+   ============================================================ */
+
+/* ---------- 2.1 A CRITICAL RED, RATIONED ----------
+   One pair per theme. Red text on the page surface and page text on the red wash
+   both clear 4.5:1, which is why the dark theme lightens rather than reusing the
+   light theme's value. Red never carries a state on its own: every rule below
+   that paints with it also changes a border, a fill, or an icon, and the word is
+   always written out. */
+:root{
+  --critical:#B3261E;
+  --critical-surface:rgba(179,38,30,0.08);
+  --critical-edge:rgba(179,38,30,0.45);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --critical:#F2857D;
+    --critical-surface:rgba(242,133,125,0.12);
+    --critical-edge:rgba(242,133,125,0.50);
+  }
+}
+:root[data-theme="dark"]{
+  --critical:#F2857D;
+  --critical-surface:rgba(242,133,125,0.12);
+  --critical-edge:rgba(242,133,125,0.50);
+}
+
+/* The confirming button of a two-step destructive action, and nothing else.
+   The first step stays monochrome, so the red appears only once the reader has
+   already said what they want to do. */
+.btn--critical{
+  color:var(--critical);
+  background:var(--critical-surface);
+  border:2px solid var(--critical-edge);
+}
+.btn--critical svg{ color:var(--critical); }
+
+/* A failure or an attention item. The left bar and the icon are the state; the
+   red is the volume. Read in grayscale this is still a bar, an icon, and a word. */
+.crit{
+  position:relative;
+  border:1.5px solid var(--critical-edge);
+  border-left:var(--bar-w) solid var(--critical);
+  border-radius:var(--r-card);
+  background:var(--critical-surface);
+  padding:var(--s3) var(--s4);
+}
+.crit__head{ display:flex; align-items:center; gap:var(--s2); color:var(--critical); font-weight:700; }
+.crit__head svg{ width:20px; height:20px; flex:none; }
+.crit__body{ margin-top:var(--s1); font-size:var(--fs-label); line-height:var(--lh-label); }
+.chip--critical{ color:var(--critical); border:2px solid var(--critical-edge); background:var(--critical-surface); font-weight:700; }
+.row--critical{ border:1.5px solid var(--critical-edge); border-left:var(--bar-w) solid var(--critical); background:var(--critical-surface); }
+.row--critical .row__title{ color:var(--critical); }
+.txt-critical{ color:var(--critical); font-weight:700; }
+
+/* ---------- 2.2 DISABLED GRAY, MADE EXPLICIT ----------
+   Payment controls are still removed from the DOM rather than disabled. These
+   are the operations controls that are temporarily unavailable but not
+   untruthful. Every one of them owes the reader a sentence, which is what
+   .whynot carries; a disabled control with no .whynot beside it is a defect and
+   the verification sweep looks for exactly that. */
+[aria-disabled="true"]{
+  color:var(--text-secondary);
+  background:none;
+  border-style:dashed;
+  cursor:not-allowed;
+}
+[aria-disabled="true"] svg{ color:var(--text-secondary); }
+.whynot{
+  display:flex; gap:6px; align-items:flex-start;
+  margin-top:var(--s1);
+  font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary);
+}
+.whynot svg{ width:16px; height:16px; flex:none; margin-top:4px; }
+
+/* ---------- 2.3 MOTION SPEC, ADDITIVE ONLY ----------
+   Nothing bounces, nothing loops, nothing runs past 200ms, and no animation
+   gates the control it decorates: every rule here animates paint, never
+   pointer-events or visibility. */
+:root{ --dur-menu:160ms; --dur-cal:120ms; --dur-slide:160ms; --dur-row:180ms; --dur-flip:200ms; }
+@media (prefers-reduced-motion: reduce){
+  :root{ --dur-menu:0.01ms; --dur-cal:0.01ms; --dur-slide:0.01ms; --dur-row:0.01ms; --dur-flip:0.01ms; }
+}
+@media (prefers-reduced-motion: no-preference){
+  dialog[open] .sheet{ animation:sheet-in var(--dur-sheet) var(--ease) both; }
+  dialog[open]::backdrop{ animation:fade-in var(--dur-sheet) var(--ease) both; }
+  .menupop[data-open="1"]{ animation:pop-in var(--dur-menu) var(--ease) both; }
+  .cal[data-anim="fade"] .cal__grid{ animation:fade-in var(--dur-cal) var(--ease) both; }
+  .cal[data-anim="next"] .cal__grid{ animation:slide-next var(--dur-slide) var(--ease) both; }
+  .cal[data-anim="prev"] .cal__grid{ animation:slide-prev var(--dur-slide) var(--ease) both; }
+  .flip{ animation:sweep var(--dur-flip) var(--ease) both; }
+  .disclose__body[data-open="1"]{ animation:reveal var(--dur-row) var(--ease) both; }
+}
+@keyframes sheet-in{ from{ transform:translateY(12px); opacity:0; } to{ transform:none; opacity:1; } }
+/* Was a 2 percent nudge, which read as a plain fade. At .7 the panel starts at
+   about the size of the button it is anchored to, so what the reader sees is the
+   button opening rather than a card arriving. */
+@keyframes pop-in{ from{ transform:scale(.7) translateY(-10px); opacity:0; } to{ transform:none; opacity:1; } }
+@keyframes fade-in{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes slide-next{ from{ transform:translateX(16px); opacity:0; } to{ transform:none; opacity:1; } }
+@keyframes slide-prev{ from{ transform:translateX(-16px); opacity:0; } to{ transform:none; opacity:1; } }
+@keyframes sweep{ from{ background-size:0 100%; } to{ background-size:100% 100%; } }
+@keyframes reveal{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
+
+/* ---------- 4. THE MENU, DESKTOP FORM ----------
+   Below 1024px the menu is the existing bottom sheet. From 1024px it is this:
+   an anchored popover under the button, so a fine pointer does not travel the
+   height of the screen for a list of five links. Two components, not one that
+   morphs, which is why crossing the breakpoint with it open closes it. */
+.menuwrap{ position:relative; }
+.menupop{
+  position:absolute; right:0; top:calc(100% + 6px); z-index:70;
+  /* dvw, not vw: a viewport unit counts the scrollbar, so a panel clamped with vw
+     is a scrollbar wider than the space it actually has. */
+  width:min(20rem, calc(100dvw - (2 * var(--gutter))));
+  max-width:calc(100dvw - (2 * var(--gutter)));
+  background:var(--surface-raised);
+  border:1px solid var(--border-strong);
+  border-radius:var(--r-card);
+  box-shadow:0 20px 46px var(--shadow-print), 0 4px 12px var(--shadow-card);
+  padding:var(--s2) var(--s4);
+  color:var(--text-primary);
+  /* Its right edge is the button's right edge, so the growth starts roughly under
+     the button's centre rather than out at the corner of the panel. */
+  transform-origin:calc(100% - 22px) 0;
+}
+.menupop[hidden]{ display:none; }
+.menupop .menurow{ min-height:48px; }
+.menupop .menurow:last-child{ border-bottom:0; }
+/* The popover is a desktop control and the sheet is a phone control, and neither
+   is allowed to appear at the other's width. */
+@media (max-width:1023px){ .menupop{ display:none!important; } }
+/* The responsive layer hides the button from 1024px up, on the reasoning that
+   it was a phone control. It is not one any more: Visit, Policies, and the two
+   build controls have no other desktop home, and a destination that exists on
+   one width and not another is the defect section 4 exists to fix. */
+@media (min-width:1024px){
+  .barmenu{ display:inline-flex!important; }
+  .menuwrap{ display:inline-flex; }
+}
+/* The plus in the staff bar is a button, not a link, because it opens a sheet
+   rather than going anywhere. It has to look like the four things beside it. */
+.tabbar button{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  min-height:var(--tabbar-h); padding:6px 2px; width:100%;
+  font-size:var(--fs-tab); line-height:var(--lh-tab); font-weight:600; text-align:center;
+  color:inherit;
+}
+.tabbar button svg{ width:22px; height:22px; }
+.tabbar button .tabpill{ display:grid; place-items:center; width:38px; height:26px; border-radius:var(--r-pill); }
+
+/* ---------- 6.1 THE SHARED CALENDAR, COMMON FRAME ----------
+   One component, two configurations. Everything in this block is the frame both
+   surfaces share: the header row, the view switch, the grid, and the states.
+   What a cell answers is the configuration's business, not the frame's. */
+.cal{ display:grid; gap:var(--s3); }
+.cal__bar{ display:grid; gap:var(--s3); }
+.cal__nav{ display:flex; align-items:center; gap:var(--s2); }
+.cal__nav button{
+  min-width:var(--tap-min); min-height:var(--tap-min);
+  display:grid; place-items:center;
+  border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-btn);
+  background:rgba(var(--ghost-fill),.07);
+}
+.cal__label{
+  flex:1 1 auto; min-width:0; text-align:center;
+  font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.cal__today{ min-height:var(--tap-min); padding:0 var(--s4); border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-btn); background:rgba(var(--ghost-fill),.07); font-size:var(--fs-label); font-weight:600; }
+.cal__views{ display:flex; gap:var(--s2); }
+.cal__views button{ flex:1 1 0; min-height:var(--tap-min); border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-btn); background:rgba(var(--ghost-fill),.07); font-size:var(--fs-label); font-weight:600; text-align:center; }
+.cal__views button[aria-pressed="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:2px solid var(--border-strong); font-weight:700; }
+@media (min-width:768px){
+  .cal__bar{ grid-template-columns:1fr auto auto; align-items:center; }
+  .cal__views{ justify-self:end; }
+}
+
+/* The grid itself. No inner scroll box on the vertical axis: the page scrolls,
+   never a box inside a box. The horizontal axis is the one exception, and only
+   on the staff day view, where four courts cannot be narrowed further and still
+   be read. */
+.cal__grid{ display:grid; gap:var(--s1); }
+.cal__grid:focus{ outline:none; }
+.cal__week{ display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:var(--s1); }
+.cal__dow{ font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700; letter-spacing:.08em; text-transform:uppercase; text-align:center; color:var(--text-secondary); padding-bottom:var(--s1); }
+.cal__cell{
+  min-height:64px; padding:6px 4px;
+  display:grid; align-content:start; justify-items:center; gap:2px;
+  border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-input);
+  background:rgba(var(--ghost-fill),.05);
+  font-size:var(--fs-legal); line-height:1.25; text-align:center;
+}
+.cal__cell b{ font-size:var(--fs-label); font-weight:700; font-variant-numeric:tabular-nums; }
+.cal__cell small{ font-size:11px; line-height:14px; font-weight:600; }
+.cal__cell[aria-selected="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:2px solid var(--border-strong); }
+.cal__cell[data-state="closed"]{ background:var(--surface-sunken); border-style:dashed; background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+.cal__cell[data-state="full"]{ border:2px solid var(--border-strong); }
+.cal__cell[data-out="1"]{ opacity:.45; }
+.cal__cell:focus-visible{ outline:3px solid var(--focus-ring); outline-offset:2px; box-shadow:0 0 0 5px var(--focus-halo); }
+
+/* Week view, player configuration: seven columns of open and closed hours. */
+.cal__hours{ display:grid; gap:2px; width:100%; }
+.cal__hour{ min-height:32px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(var(--ghost-edge),.22); border-radius:6px; background:rgba(var(--ghost-fill),.05); font-size:12px; font-weight:600; }
+.cal__hour[data-state="unavailable"]{ background:var(--surface-sunken); border-style:dashed; background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); color:var(--text-secondary); }
+.cal__hour[data-state="limited"]{ border:2px solid var(--border-strong); }
+
+/* The next-available shortcut. Two rows, above the grid, each one tap from a
+   selection. This is the route to a booking that never touches a grid at all. */
+.nextopen{ display:grid; gap:var(--s2); }
+.nextopen__row{ display:flex; align-items:center; gap:var(--s3); width:100%; min-height:var(--tap-decision); padding:var(--s3) var(--s4); border:2px solid var(--border-strong); border-radius:var(--r-card); background:rgba(var(--ghost-fill),.07); }
+.nextopen__row .row__main{ flex:1 1 auto; }
+
+/* ---------- 6.3 STAFF DAY VIEW ----------
+   Courts as columns, hours as rows. The only horizontally scrolling region in
+   the build, and it says so with a hint rather than leaving the fourth court to
+   be discovered. */
+.board{ overflow-x:auto; padding-bottom:var(--s2); }
+.board__grid{ display:grid; gap:2px; min-width:560px; }
+.board__head{ display:grid; gap:2px; position:sticky; top:0; z-index:2; background:var(--surface); padding-bottom:2px; }
+.board__h{ font-size:var(--fs-legal); font-weight:700; text-align:center; padding:6px 2px; border-bottom:2px solid var(--border-strong); }
+.board__row{ display:grid; gap:2px; }
+.board__time{ font-size:var(--fs-legal); font-weight:600; font-variant-numeric:tabular-nums; display:flex; align-items:center; padding-right:var(--s2); color:var(--text-secondary); }
+.board__slot{
+  min-height:52px; padding:6px 8px; width:100%;
+  border:1px solid rgba(var(--ghost-edge),.22); border-radius:8px;
+  background:rgba(var(--ghost-fill),.05);
+  font-size:12px; line-height:15px; text-align:left;
+  display:grid; align-content:center; gap:2px;
+}
+.board__slot b{ font-size:13px; font-weight:700; display:block; }
+.board__slot[data-k="booked"]{ background:var(--surface-inverse); color:var(--text-inverse); border:1px solid var(--border-strong); }
+.board__slot[data-k="held"]{ border:3px double var(--border-strong); }
+.board__slot[data-k="blocked"]{ background:var(--surface-sunken); border-style:dashed; background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+.board__slot[data-k="openplay"]{ border:2px solid var(--border-strong); background:rgba(var(--ghost-fill),.14); }
+.board__slot[data-k="attention"]{ border:1.5px solid var(--critical-edge); border-left:var(--bar-w) solid var(--critical); background:var(--critical-surface); color:var(--critical); }
+.board__slot[data-past="1"]{ opacity:.5; }
+.board__slot[data-drag="1"]{ outline:3px dashed var(--border-strong); outline-offset:-3px; }
+.board__slot:focus-visible{ outline:3px solid var(--focus-ring); outline-offset:2px; box-shadow:0 0 0 5px var(--focus-halo); }
+.board__hint{ font-size:var(--fs-legal); color:var(--text-secondary); }
+
+/* Filters. A filter that is on is stated in a chip row that can remove it, so
+   an empty board is never mistaken for an empty day. */
+.filters{ display:flex; flex-wrap:wrap; gap:var(--s2); align-items:center; }
+.filters__chip{ display:inline-flex; align-items:center; gap:6px; min-height:36px; padding:0 var(--s3); border:2px solid var(--border-strong); border-radius:var(--r-chip); background:rgba(var(--ghost-fill),.07); font-size:var(--fs-label); font-weight:600; }
+.filters__chip svg{ width:16px; height:16px; }
+
+/* ---------- 8.1 THE LIVE COURT BOARD ----------
+   Sized to read from several feet away in its normal form, and larger again in
+   the wall display variant, which strips every action rather than disabling it. */
+.courtboard{ display:grid; gap:var(--s3); }
+@media (min-width:600px){ .courtboard{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (min-width:1024px){ .courtboard{ grid-template-columns:repeat(4,minmax(0,1fr)); } }
+.courtcard{ border:1.5px solid rgba(var(--ghost-edge),.45); border-radius:var(--r-card); padding:var(--s4); display:grid; gap:var(--s2); align-content:start; background:rgba(var(--ghost-fill),.07); }
+.courtcard h3{ font-size:var(--fs-h2); line-height:var(--lh-h2); font-weight:700; }
+.courtcard__state{ font-size:var(--fs-txn); line-height:var(--lh-txn); font-weight:700; }
+.courtcard__meta{ font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
+.courtcard__acts{ display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:var(--s1); }
+.courtcard__acts button{ min-height:44px; padding:0 var(--s3); border:1px solid rgba(var(--ghost-edge),.35); border-radius:var(--r-btn); background:rgba(var(--ghost-fill),.07); font-size:var(--fs-label); font-weight:600; }
+.courtcard[data-k="blocked"]{ border-color:var(--critical-edge); border-left:var(--bar-w) solid var(--critical); background:var(--critical-surface); }
+.courtcard[data-k="blocked"] .courtcard__state{ color:var(--critical); }
+.courtcard[data-k="inuse"]{ background:var(--surface-inverse); color:var(--text-inverse); }
+.courtcard[data-k="inuse"] .courtcard__meta{ color:var(--text-inverse-secondary); }
+
+/* The wall display. Same markup, no actions, type stepped up so the front desk
+   can read it across the room. */
+body.wallboard .courtcard__acts{ display:none; }
+body.wallboard .courtcard h3{ font-size:calc(var(--fs-h1) * 1.2); line-height:1.1; }
+body.wallboard .courtcard__state{ font-size:calc(var(--fs-amount) * 1.1); line-height:1.15; }
+body.wallboard .courtcard__meta{ font-size:var(--fs-h3); line-height:var(--lh-h3); }
+body.wallboard .pagefoot, body.wallboard .cal__views{ display:none; }
+
+/* ---------- STAFF SHELL ----------
+   Bottom bar on a phone, sidebar from 1024px, both from one array. The + is a
+   sheet, not a screen, so it is a button in the bar rather than a route. */
+.staffside{ display:none; }
+@media (min-width:1024px){
+  body.shell-staff .staffwrap{ display:grid; grid-template-columns:15rem minmax(0,1fr); gap:var(--s7); align-items:start; }
+  .staffside{ display:grid; gap:var(--s1); position:sticky; top:calc(var(--header-h) + var(--s4)); }
+  .staffside a, .staffside button{
+    display:flex; align-items:center; gap:var(--s3);
+    min-height:var(--tap-row); padding:0 var(--s3);
+    border-radius:var(--r-btn); font-size:var(--fs-label); font-weight:600; text-decoration:none;
+  }
+  .staffside a[aria-current="page"]{ background:var(--surface-inverse); color:var(--text-inverse); }
+  .staffside svg{ width:20px; height:20px; color:inherit; }
+}
+.tabbar button.tabplus span.tabpill{ border:2px solid var(--border-strong); }
+
+/* The + action sheet, four actions, each landing in the shortest possible form. */
+.plusgrid{ display:grid; gap:var(--s2); }
+.plusgrid button{ display:flex; align-items:center; gap:var(--s3); min-height:var(--tap-decision); padding:var(--s3) var(--s4); border:1px solid rgba(var(--ghost-edge),.35); border-radius:var(--r-card); background:rgba(var(--ghost-fill),.07); font-size:var(--fs-h3); font-weight:600; }
+
+/* ---------- STAFF MODULES, SHARED FURNITURE ---------- */
+.modgrid{ display:grid; gap:var(--s3); }
+@media (min-width:600px){ .modgrid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.mod{ display:flex; align-items:center; gap:var(--s3); min-height:var(--tap-decision); padding:var(--s3) var(--s4); border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-card); background:rgba(var(--ghost-fill),.07); width:100%; }
+.mod svg{ width:20px; height:20px; color:var(--text-secondary); }
+.mod__main{ flex:1 1 auto; min-width:0; }
+.mod__title{ display:block; font-size:var(--fs-h3); font-weight:600; }
+.mod__sub{ display:block; font-size:var(--fs-legal); color:var(--text-secondary); }
+
+/* A readable table, used by Reports, Payments, Pricing, and the log. It scrolls
+   sideways when it must and says so; it never nests a vertical scroll. */
+.dtable{ overflow-x:auto; }
+.dtable table{ border-collapse:collapse; width:100%; min-width:420px; font-size:var(--fs-label); }
+.dtable th, .dtable td{ border-bottom:1px solid var(--hairline); padding:10px var(--s2); text-align:left; vertical-align:top; }
+.dtable th{ font-weight:700; border-bottom:2px solid var(--border-strong); white-space:nowrap; }
+.dtable td.num, .dtable th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.dtable tr[data-k="attention"] td{ background:var(--critical-surface); }
+.dtable tr[data-k="attention"] td:first-child{ border-left:var(--bar-w) solid var(--critical); }
+
+/* The activity log is sentences, not fields. */
+.loglist{ display:grid; gap:var(--s2); }
+.logline{ display:flex; gap:var(--s3); padding:var(--s3) 0; border-bottom:1px solid var(--hairline); font-size:var(--fs-label); line-height:var(--lh-label); }
+.logline time{ flex:none; width:5.5rem; color:var(--text-secondary); font-variant-numeric:tabular-nums; }
+
+/* A row that expands in place. The height animates, the content fades, and the
+   control it belongs to is never gated on the animation finishing. */
+.disclose__body[hidden]{ display:none; }
+.disclose__body{ padding-top:var(--s3); display:grid; gap:var(--s3); }
+
+/* ---------- 7.3 TEXT SIZE CONTROL ----------
+   Root type at 100, 112, and 128 percent. The build's type tokens are absolute
+   pixels, so a root font-size would move nothing; the scale multiplies the
+   tokens themselves instead. Declared here, after the responsive layer, because
+   that layer resets --fs-h1 and --fs-h2 at 1024px and the last declaration is
+   the one that survives. */
+:root{ --tscale:1; }
+:root[data-textsize="112"]{ --tscale:1.12; }
+:root[data-textsize="128"]{ --tscale:1.28; }
+:root{
+  --fs-display:calc(34px * var(--tscale)); --lh-display:calc(38px * var(--tscale));
+  --fs-h1:calc(30px * var(--tscale));  --lh-h1:calc(34px * var(--tscale));
+  --fs-h2:calc(22px * var(--tscale));  --lh-h2:calc(28px * var(--tscale));
+  --fs-h3:calc(18px * var(--tscale));  --lh-h3:calc(25px * var(--tscale));
+  --fs-body:calc(18px * var(--tscale));--lh-body:calc(27px * var(--tscale));
+  --fs-txn:calc(22px * var(--tscale)); --lh-txn:calc(28px * var(--tscale));
+  --fs-amount:calc(34px * var(--tscale)); --lh-amount:calc(38px * var(--tscale));
+  --fs-code:calc(26px * var(--tscale)); --lh-code:calc(32px * var(--tscale));
+  --fs-label:calc(16px * var(--tscale)); --lh-label:calc(22px * var(--tscale));
+  --fs-legal:calc(15px * var(--tscale)); --lh-legal:calc(23px * var(--tscale));
+  --fs-eyebrow:calc(13px * var(--tscale)); --lh-eyebrow:calc(17px * var(--tscale));
+  --fs-tab:calc(12px * var(--tscale)); --lh-tab:calc(14px * var(--tscale));
+}
+@media (min-width:1024px){
+  :root{
+    --fs-h1:calc(38px * var(--tscale)); --lh-h1:calc(44px * var(--tscale));
+    --fs-h2:calc(28px * var(--tscale)); --lh-h2:calc(34px * var(--tscale));
+  }
+}
+/* At 128 percent a fixed-height bar clips its own labels, so the two bars and
+   the rows inside them grow with the setting rather than holding a pixel. */
+:root[data-textsize="128"]{ --appbar-h:64px; --tabbar-h:72px; --tap-row:56px; }
+@media (min-width:1024px){ :root[data-textsize="128"]{ --appbar-h:76px; } }
+
+/* The A and A+ control, in the menu beside the theme. */
+.sizerow{ display:flex; align-items:center; gap:var(--s2); padding:var(--s2) 0; border-bottom:1px solid var(--hairline); }
+.sizerow > span{ flex:1 1 auto; font-size:var(--fs-label); font-weight:600; }
+.sizerow button{ min-width:44px; min-height:44px; display:grid; place-items:center; border:1px solid var(--border-default); border-radius:var(--r-btn); font-weight:700; }
+.sizerow button[aria-pressed="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:2px solid var(--border-strong); }
+.sizerow button:nth-of-type(1){ font-size:14px; }
+.sizerow button:nth-of-type(2){ font-size:17px; }
+.sizerow button:nth-of-type(3){ font-size:20px; }
+
+/* ---------- NO EYEBROW TEXT ----------
+   The uppercase letterspaced label above a card's content was an eyebrow, and
+   the brief bans them. Each one is a heading now, which is what it was already
+   doing. The sizing rule existed only for h3, so h2 gets it here rather than
+   the labels growing to section size inside a card. */
+h2.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; text-wrap:balance; }
+
+/* ---------- 3. LANDING, TARGETED ONLY ----------
+   The hero and the film strip are untouched. This is the Next sessions list the
+   section under the strip gains, and nothing else moves. */
+.nextsessions{ display:grid; gap:var(--s2); }
+.nextsessions button{ display:flex; align-items:center; gap:var(--s3); width:100%; min-height:var(--tap-decision); padding:var(--s3) var(--s4); border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-card); background:rgba(var(--ghost-fill),.07); }
+.nextsessions .row__main{ flex:1 1 auto; min-width:0; }
+
+/* ---------- MONEY PREVIEW ----------
+   A cancellation always shows the money before the red confirm. Two steps, and
+   the numbers are placeholders marked to be confirmed until the owner answers. */
+.money{ border:2px solid var(--border-strong); border-radius:var(--r-card); padding:var(--s4); display:grid; gap:var(--s2); }
+.money__line{ display:flex; justify-content:space-between; gap:var(--s3); font-size:var(--fs-body); }
+.money__line b{ font-variant-numeric:tabular-nums; }
+.money__out{ border-top:2px solid var(--border-strong); padding-top:var(--s2); font-weight:700; }
+
 </style>
 
 </head>
@@ -2860,7 +3255,13 @@ function resolve(path){
   return null;
 }
 function go(path){ if (location.hash.slice(1) === path) render(); else location.hash = path; }
-function currentPath(){ const h = location.hash.slice(1); return h && h[0] === "/" ? h : "/"; }
+/* A query string is a variant of a route, not a route of its own. The wall
+   display is /staff/today?board: the same screen with its actions stripped and
+   its type enlarged, and registering it as a second pattern would mean two
+   screens to keep in step. Splitting the query off here is what lets one
+   pattern answer for both, and no route in this build has ever used a '?' in a
+   path segment, so nothing else changes. */
+function currentPath(){ const h = location.hash.slice(1).split("?")[0]; return h && h[0] === "/" ? h : "/"; }
 
 /* ---------- CUSTOMER DESTINATIONS ----------
    One list, and one navigation built from it. There used to be two: a five item bar
@@ -2882,6 +3283,14 @@ function currentPath(){ const h = location.hash.slice(1); return h && h[0] === "
    dyn:       resolves against the account, so signed out it lands on Find My
               Booking rather than on a sign-in wall with no explanation. */
 const PUBLIC_NAV = [
+  /* SECTION 5.1: Book joins the destinations.
+     The old list left Book out on the reasoning that it was a conversion action
+     the hero already owned, and that was right while the only thing behind it
+     was a funnel. /book is a calendar now, which is a place rather than an
+     action, so it belongs in the navigation at every width. The hero's two
+     cards and the bar's scrolled Book Court still go straight to the funnel;
+     this goes to the availability view. */
+  { to:"/book",     label:"Book",        aria:"Book, the shared calendar", glyph:"cal", match:["/book"] },
   { to:"/rates",    label:"Rates",       aria:"Rates & How It Works",   glyph:"tag",    match:["/rates"] },
   { to:"/visit",    label:"Visit",       aria:"Visit / Contact",        glyph:"pin",    match:["/visit"], menuOnly:true },
   { to:null,        label:"My Bookings", aria:"My Bookings",            glyph:"person", match:["/find","/me","/signin"], dyn:true, authHide:true }
@@ -2930,7 +3339,13 @@ function render(){
   /* has-tabbar reserves the bottom of the page for a bar, and only the staff shell
      still has one. A customer route that kept the class would reserve 62px for a
      bar that is no longer rendered. */
-  document.body.className = "shell-" + view.shell + (view.shell === "staff" ? " has-tabbar" : "") + (view.wide ? " wide" : "");
+  /* view.bodyClass is the Claude version's one addition here. The wall display
+     variant of Today needs a class on body, because what it changes is the type
+     scale of a whole screen, and stripping its actions in the screen function
+     while leaving the sizing to a wrapper would put the two halves of one
+     decision in two places. */
+  document.body.className = "shell-" + view.shell + (view.shell === "staff" ? " has-tabbar" : "") +
+    (view.wide ? " wide" : "") + (view.bodyClass ? " " + view.bodyClass : "");
   document.title = view.title + " | Fit Club Courts Staging";
 
   /* app bar */
@@ -2971,8 +3386,16 @@ function render(){
     endHtml += '<div class="navswap">' + bookCtaHtml() +
       (S.account ? accountMenuHtml() : loginButtonHtml()) + "</div>";
   }
-  endHtml += '<button class="iconbtn iconbtn--bare barmenu" data-action="appmenu"' +
-    ' aria-haspopup="dialog" aria-label="Menu">' + icon("menu") + "</button>";
+  /* SECTION 4: The menu button is on every width now.
+     It used to disappear at 1024px while Visit, Policies, and the theme control
+     had no desktop home except the footer, which meant a destination was
+     reachable on one width and not on another. It stays, and from 1024px up its
+     surface is a popover anchored here rather than a sheet at the bottom of the
+     screen. The accessible name is "Menu" in both states: a name that changes
+     with state is read as a different control every time it is pressed. */
+  endHtml += '<div class="menuwrap"><button class="iconbtn iconbtn--bare barmenu" data-action="appmenu"' +
+    ' aria-haspopup="menu" aria-expanded="false" aria-label="Menu">' + icon("menu") + "</button>" +
+    '<div class="menupop" id="menupop" hidden></div></div>';
   end.innerHTML = endHtml;
   document.querySelector(".appbar").classList.toggle("appbar--ends", view.shell === "browse");
 
@@ -3018,16 +3441,28 @@ function render(){
   const tabhost = document.getElementById("tabhost");
   const topnav = document.getElementById("bar-nav");
   if (view.shell === "staff"){
-    const items = STAFF_TABS.map(function(t){
-      return { href: tabHref(t), cur: t.match.indexOf(path) >= 0, t: t };
-    });
+    /* SECTION 5.2: Five slots, one array, and the third is an action rather
+       than a destination. The plus opens a four-action sheet, so it is written
+       as a button and not as a link to a route that does not exist. Role gating
+       removes a module from the DOM rather than graying it: Front Desk cannot
+       tab to something it is not allowed to open, because it is not there. */
+    const items = (typeof STAFF_NAV !== "undefined" ? STAFF_NAV : STAFF_TABS)
+      .filter(function(t){ return typeof staffCan !== "function" || staffCan(t.mod || "today"); })
+      .map(function(t){ return { t:t, cur: t.match && t.match.indexOf(path) >= 0 }; });
     tabhost.className = "tabbar";
     tabhost.innerHTML = items.map(function(it){
-      return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
+      if (!it.t.to){
+        return '<button class="tabplus" data-action="' + esc(it.t.action) + '" aria-label="' + esc(it.t.aria) + '">' +
+          '<span class="tabpill">' + icon(it.t.glyph) + "</span><span>" + esc(it.t.label) + "</span></button>";
+      }
+      return '<a href="#' + esc(it.t.to) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
         '<span class="tabpill">' + icon(it.t.glyph) + "</span><span>" + esc(it.t.label) + "</span></a>";
     }).join("");
-    topnav.innerHTML = items.map(function(it){
-      return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
+    /* The sidebar from 1024px is rendered inside the screen, next to the
+       content it navigates, so the header strip up here stays the four
+       destinations that fit in a bar. */
+    topnav.innerHTML = items.filter(function(it){ return !!it.t.to; }).map(function(it){
+      return '<a href="#' + esc(it.t.to) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
         esc(it.t.label) + "</a>";
     }).join("");
   } else if (view.shell === "browse"){
@@ -3196,7 +3631,7 @@ function itemisation(o){
     '<p class="legal" style="margin-top:var(--s3)">No fees or taxes are added to this total.</p></div>';
 }
 function codeBox(o, label){
-  return '<div class="codebox"><span class="codebox__val"><small class="eyebrow muted">' + esc(label || "Booking code") + " " + sampleMark("Sample") +
+  return '<div class="codebox"><span class="codebox__val"><small class="legal">' + esc(label || "Booking code") + " " + sampleMark("Sample") +
     '</small><span class="code">' + esc(o.bookingCode) + '</span></span>' +
     '<button class="iconbtn" data-action="copy" data-value="' + esc(o.bookingCode) + '">' + icon("copy") + "Copy</button></div>";
 }
@@ -3308,6 +3743,13 @@ function footerBlock(){
            to be confirmed on this build and the Directions control is disabled. */
         '<a href="#/visit">' + icon("info") + "Hours, contact, and checking in</a>" +
       "</div>" +
+      /* SECTION 3.4: Visit and Contact come before Policies, because directions
+         are asked for more often than terms. The column above is Visit and
+         Contact; this one is the terms, and it is second. */
+      '<div class="footcol"><h3>Policies</h3>' +
+        '<a href="#/policies">' + icon("info") + "Booking, cancellation, and waiver</a>" +
+        '<a href="#/rates">' + icon("tag") + "Rates and how it works</a>" +
+      "</div>" +
     "</div>" +
     '<p class="footnote">Staging prototype. Every booking, hold, payment, and message on this build is simulated in memory and is lost on refresh.</p>' +
     "</footer>";
@@ -3351,11 +3793,16 @@ function scrLanding(){
     html += '<div class="card"><p><strong>No Open Play is scheduled yet.</strong></p>' +
       '<p class="legal" style="margin-top:var(--s2)">This is normal between published schedules. Reserve a private court instead.</p></div>';
   } else {
+    /* SECTION 3.2: Open right now is tappable.
+       The strip already knew today's status and did nothing with it. Each row
+       now goes straight into the matching booking flow with the date already
+       chosen, which is one tap from the fold to a time rail. */
     const cap = S.capacityDial === "full" ? "full" : S.capacityDial === "almost" ? "almost" : "places";
     html += '<ul class="sched">' +
-      '<li><div class="sched__row">' + icon("court") +
+      '<li><button class="sched__row" data-action="bookopenday" data-v="0" aria-label="Courts today. Open the time rail for today.">' + icon("court") +
         '<span class="sched__main"><span class="sched__t">Courts today</span>' +
-        '<span class="sched__s">Venue time, Asia/Manila</span></span>' + statusDot("available") + "</div></li>" +
+        '<span class="sched__s">Venue time, Asia/Manila</span></span>' + statusDot("available") +
+        icon("chev-r", "sched__chev") + "</button></li>" +
       '<li><button class="sched__row" data-action="nav" data-to="/openplay">' + icon("users") +
         '<span class="sched__main"><span class="sched__t">' + esc(windowTitle(OP_WINDOWS.w1)) + "</span>" +
         '<span class="sched__s">' + esc(OP_WINDOWS.w1.start + " to " + OP_WINDOWS.w1.end) + "</span></span>" +
@@ -3372,8 +3819,35 @@ function scrLanding(){
 
   /* The film strip carries the headline and nothing else. What Open Play actually
      is now belongs to the Open Play choice itself, further down. */
-  html += '<div class="section">' + communityMarquee() +
-    '<p style="margin-top:var(--s5)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay">See Open Play times' + icon("chev-r") + "</button></p></div>";
+  html += '<div class="section">' + communityMarquee();
+
+  /* SECTION 3.3: Open Play discovery.
+     This app does not manage sessions. It lists the ones that exist so a reader
+     can see a date, a time, a skill level where one is known, a price, and how
+     full it is in words, and then leads to the window screen that already
+     handles the booking. One line explains the model, and it is the only new
+     sentence on this page. */
+  const upcoming = Object.keys(OP_WINDOWS)
+    .map(function(k){ return OP_WINDOWS[k]; })
+    .filter(function(w){ return w.state === "published" && w.dayOffset >= 0; })
+    .sort(function(a,b){ return a.dayOffset - b.dayOffset; });
+  if (!availOff && upcoming.length){
+    html += '<h2 class="sec" style="margin-top:var(--s7)">Next sessions</h2>' +
+      '<p class="legal">Court time is blocked for the session; one admission gets you into the rotation.</p>' +
+      '<ul class="nextsessions">' + upcoming.map(function(w){
+        const capState = windowCapacityState(w.id);
+        const word = capState === "full" ? "Full" : capState === "almost" ? "Almost full" : "Places available";
+        return "<li><button data-action=\"nav\" data-to=\"/openplay/" + esc(w.id) + '" aria-label="' +
+          esc(windowTitle(w) + ", " + w.start + " to " + w.end + ", " + peso(RATE_OPENPLAY) + " per player, " + word) + '">' +
+          icon("users") +
+          '<span class="row__main"><span class="row__title">' + esc(windowTitle(w)) + "</span>" +
+          '<span class="row__sub">' + esc(w.start + " to " + w.end + ". All levels. " + peso(RATE_OPENPLAY) + " per player") + "</span></span>" +
+          chip(capState === "full" ? "full" : capState === "almost" ? "almost" : "places") +
+          icon("chev-r") + "</button></li>";
+      }).join("") + "</ul>";
+  }
+
+  html += '<p style="margin-top:var(--s5)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay">See Open Play times' + icon("chev-r") + "</button></p></div>";
 
   html += '<div class="section"><div class="promo">' +
     '<div class="promo__t"><h2 class="sec">Rent the whole place</h2>' +
@@ -3489,10 +3963,10 @@ function backBtn(to, label){
 function scrRates(){
   let html = '<h1 class="screen">Rates &amp; How It Works</h1>';
   html += '<div class="section"><div class="stack-sm">';
-  html += '<div class="card card--strong"><p class="eyebrow">Reserve a Court</p><p class="amount">₱350</p>' +
+  html += '<div class="card card--strong"><h2 class="sub">Reserve a Court</h2><p class="amount">₱350</p>' +
     '<p class="legal">Per court-hour.</p>' +
     '<p style="margin-top:var(--s3)">A private court reservation for your own group.</p></div>';
-  html += '<div class="card card--strong"><p class="eyebrow">Open Play</p><p class="amount">₱150</p>' +
+  html += '<div class="card card--strong"><h2 class="sub">Open Play</h2><p class="amount">₱150</p>' +
     '<p class="legal">Per player admission.</p>' +
     '<p style="margin-top:var(--s3)">An individual admission where you join and rotate with other attendees. You do not reserve a whole court.</p></div>';
   html += '<p class="legal">Your total is the rate multiplied by your hours or admissions. Nothing else is added.</p>';
@@ -3522,13 +3996,13 @@ function scrRates(){
 /* ---------- SCR pub-visit ---------- */
 function scrVisit(){
   let html = '<h1 class="screen">Visit / Contact</h1>';
-  html += '<div class="section"><div class="card"><p class="eyebrow muted">Where we are</p>' +
+  html += '<div class="section"><div class="card"><h2 class="sub">Where we are</h2>' +
     "<p class=\"txn\" style=\"margin-top:var(--s2)\">" + esc(VENUE.area) + "</p>" +
     '<p class="legal" style="margin-top:var(--s2)">Exact street address and pin: To be confirmed.</p></div></div>';
-  html += '<div class="section"><div class="card"><p class="eyebrow muted">Hours</p>' +
+  html += '<div class="section"><div class="card"><h2 class="sub">Hours</h2>' +
     '<p class="txn" style="margin-top:var(--s2)">Hours: 6AM to 11PM ' + sampleMark("Sample") + "</p>" +
     '<p class="legal" style="margin-top:var(--s2)">Bookable hours appear in the court time list. They are sample values on this build.</p></div></div>';
-  html += '<div class="section"><div class="card"><p class="eyebrow muted">Contact</p>' +
+  html += '<div class="section"><div class="card"><h2 class="sub">Contact</h2>' +
     '<p style="margin-top:var(--s2)">' + esc(VENUE.phone) + "<br>" + esc(VENUE.email) + "</p>" +
     '<p class="legal" style="margin-top:var(--s2)">Have your booking code ready for faster help at the front desk.</p></div></div>';
   html += '<div class="section"><h2 class="sec">The venue</h2><div class="courts" aria-hidden="true">' +
@@ -3557,7 +4031,7 @@ function scrPolicies(){
    ["No-show","To be confirmed."],
    ["Late arrival","To be confirmed."],
    ["Waiver","To be confirmed. No waiver step is collected on this build."]].forEach(function(p){
-    html += '<div class="card"><p class="eyebrow muted">' + esc(p[0]) + '</p><p style="margin-top:var(--s2)">' + esc(p[1]) + '</p><span class="unapproved">Unapproved copy, for review</span></div>';
+    html += '<div class="card"><h3 class="sub">' + esc(p[0]) + '</h3><p style="margin-top:var(--s2)">' + esc(p[1]) + '</p><span class="unapproved">Unapproved copy, for review</span></div>';
   });
   html += "</div>";
   html += '<p class="legal" style="margin-top:var(--s5)">These slots are deliberately empty. Inventing a cancellation window or a refund percentage before the owner approves one would put wrong terms in front of a paying customer.</p>';
@@ -5138,8 +5612,12 @@ function scrOpWindow(params){
   html += '<p style="margin-top:var(--s3)">' + chip(full ? "full" : closed ? "regclosed" : cap === "almost" ? "almost" : "places") + "</p>";
   html += '<p class="lede" style="margin-top:var(--s4)">₱150 per player.</p>';
 
+  /* SECTION 7.2: The explanation is inline, on the screen where the decision is
+     made, rather than a link to a page about it. Two lines: what the admission
+     is, and what the price includes. */
   html += '<div class="section"><div class="card"><h2 class="sec">What you are buying</h2>' +
     '<p style="margin-top:var(--s2)">This is an individual admission, not a court rental. Players rotate with other attendees.</p>' +
+    '<p style="margin-top:var(--s2)">Included: Court time for the whole window, a place in the rotation, and a pass at the door. All levels.</p>' +
     '<p class="legal" style="margin-top:var(--s3)">Arrival information: To be confirmed.</p></div></div>';
 
   if (full){
@@ -5260,7 +5738,7 @@ function scrEventStatus(params){
   html += '<div class="section">' + plate("inquiry",{ phrase: inq.state,
     truth:["No date is reserved and no price is set."],
     meta:["A member of our team will review your request and reply with availability and a quote."] }) + "</div>";
-  html += '<div class="section"><div class="codebox"><span class="codebox__val"><small class="eyebrow muted">Inquiry reference ' + sampleMark("Sample") +
+  html += '<div class="section"><div class="codebox"><span class="codebox__val"><small class="legal">Inquiry reference ' + sampleMark("Sample") +
     '</small><span class="code">' + esc(inq.ref) + '</span></span><button class="iconbtn" data-action="copy" data-value="' + esc(inq.ref) + '">' + icon("copy") + "Copy</button></div></div>";
   html += '<div class="section"><h2 class="sec">What happens next</h2><ul class="rows">' +
     ["We review the schedule across all 4 courts.","We reply with availability and a quote.","The event is confirmed only after the required payment is verified."].map(function(t,i){
@@ -5498,6 +5976,13 @@ function bookingEntry(o, bucket){
   h += '<p class="bk__head"><span>' + esc(bookingTypeLabel(o)) + "</span>" +
     '<span class="bk__code">' + esc(o.bookingCode) + "</span></p>";
   h += '<p class="bk__when">' + esc(o.meta.when) + "</p>";
+  /* SECTION 7.1: A countdown in words, not a ticking figure.
+     "In 3 days" is what someone wants from a list; a live minute counter on a
+     booking a week away is noise, and a number of hours is arithmetic the
+     reader should not have to do. */
+  if (bucket === "upcoming" && o.startsAt){
+    h += '<p class="bk__meta">' + esc(countdownWords(o.startsAt)) + "</p>";
+  }
   h += '<p class="bk__meta">' + esc(VENUE.name) + " &middot; " + people + " " + esc(plural(people,"player","players")) +
     " &middot; " + esc(paymentLabel(o)) + "</p>";
 
@@ -5515,6 +6000,14 @@ function bookingEntry(o, bucket){
       "<span>" + esc(st.key === "expired" ? "Hold expired, nothing charged" : st.phrase) + "</span></span>";
   }
   h += navBtn("/booking/" + encodeURIComponent(o.bookingCode),"Open booking");
+  /* SECTION 7.1: Rebook on a past entry.
+     It reopens the booking front door with the same product, duration, and
+     party size already set, which is the whole of what someone repeating a
+     weekly game has to retype otherwise. */
+  if (bucket === "past"){
+    h += '<button class="btn btn--secondary btn--sm" data-action="rebook" data-id="' + esc(o.id) + '">' +
+      icon("refresh") + "Rebook</button>";
+  }
   h += "</div>";
 
   if (!paid && bucket === "upcoming" && st.key !== "held"){
@@ -5753,9 +6246,9 @@ function scrStaffBooking(params){
     (S.reveal["c" + o.id] ? "Hide contact details" : "Reveal contact details") + "</button></p></div></div>";
 
   html += '<div class="section"><h2 class="sec">Payment</h2><div class="card">' +
-    '<p class="eyebrow muted">Online</p><p style="margin-top:var(--s2)">' + esc(o.paymentStatus === "paid" ? "Paid " + peso(o.paidAmount) + " through Maya Checkout" : "No verified online payment") + "</p>" +
+    '<h3 class="sub">Online</h3><p style="margin-top:var(--s2)">' + esc(o.paymentStatus === "paid" ? "Paid " + peso(o.paidAmount) + " through Maya Checkout" : "No verified online payment") + "</p>" +
     '<hr class="rule" style="margin:var(--s4) 0">' +
-    '<p class="eyebrow muted">In person</p><p style="margin-top:var(--s2)">' + esc(o.manualMethod ? o.manualMethod + " recorded " + peso(orderTotal(o)) : "None recorded") + "</p>" +
+    '<h3 class="sub">In person</h3><p style="margin-top:var(--s2)">' + esc(o.manualMethod ? o.manualMethod + " recorded " + peso(orderTotal(o)) : "None recorded") + "</p>" +
     '<p class="legal" style="margin-top:var(--s3)">Online and in-person payment are kept structurally separate. No staff action here can produce an online Paid.</p>' +
     (o.paymentStatus === "manual_pending"
       ? (isOps
@@ -5972,6 +6465,1244 @@ function scrExceptions(){
   return { id:"stf-exceptions", shell:"staff", title:"Exception queue", html:html, dock:null };
 }
 </script>
+<script>
+"use strict";
+/* ============================================================
+   CLAUDE VERSION, PART ONE
+   The data model additions, the shared calendar, the player front door at
+   /book, and every staff module. Loaded before the screen block that follows
+   it so its route registrations win: ROUTES is matched in order, first hit
+   wins, and the routes below deliberately shadow the older staff screens
+   while leaving them registered as the forwarding targets they now are.
+   Everything here is in memory, seeded by the harness, and lost on refresh.
+   ============================================================ */
+
+/* ---------- 11. DATA MODEL ADDITIONS ---------- */
+S.role = "frontdesk";              /* frontdesk | opsmanager | owner */
+S.courts = [];
+S.customers = [];
+S.payments = [];
+S.rates = [];
+S.staffAccounts = [];
+S.log = [];
+S.programs = [];
+S.memberships = [];
+S.sched = [];                      /* staff-side booking blocks for the admin calendar */
+S.opsSeeded = false;
+S.cal  = { view:"day", day:0, product:"court", anim:"" };     /* player configuration */
+S.scal = { view:"day", day:0, anim:"", freeAt:"" };            /* staff configuration */
+S.filters = { court:"all", status:"all", product:"all", source:"all" };
+S.textSize = "100";
+S.confirming = null;               /* the id of the destructive action awaiting its second press */
+S.customerQuery = "";
+S.openRow = {};                    /* which disclosure rows are expanded */
+S.board = false;                   /* wall display variant of Today */
+
+/* ---------- ROLES ----------
+   Owner and Operations Manager see everything. Front Desk sees Today,
+   Bookings, the plus sheet, Courts, and inside More only Customers and
+   Payments. A hidden module is absent from the DOM rather than grayed, and
+   the server denies it as well; hiding a control is not the boundary. */
+const STAFF_ROLES = [
+  { key:"frontdesk",  label:"Front Desk" },
+  { key:"opsmanager", label:"Operations Manager" },
+  { key:"owner",      label:"Owner" }
+];
+function staffRole(){
+  if (S.surface === "owner") return "owner";
+  if (S.surface === "opsmanager") return "opsmanager";
+  return "frontdesk";
+}
+function roleLabel(){
+  const r = staffRole();
+  for (let i=0;i<STAFF_ROLES.length;i++) if (STAFF_ROLES[i].key === r) return STAFF_ROLES[i].label;
+  return "Front Desk";
+}
+const FRONTDESK_MODULES = { today:1, bookings:1, courts:1, customers:1, payments:1, scan:1, walkin:1 };
+function staffCan(mod){
+  if (staffRole() !== "frontdesk") return true;
+  return !!FRONTDESK_MODULES[mod];
+}
+
+/* ---------- 5.2 STAFF NAVIGATION, ONE ARRAY ----------
+   Bottom bar on a phone, sidebar from 1024px, both built from this. The plus
+   is an action sheet rather than a destination, which is why it carries no
+   route and is filtered out of the sidebar's current-page test. */
+const STAFF_NAV = [
+  { to:"/staff/today",    label:"Today",    aria:"Today, check in and live board", glyph:"cal",   mod:"today",    match:["/staff/today"] },
+  { to:"/staff/bookings", label:"Bookings", aria:"Bookings calendar",              glyph:"list-pos", mod:"bookings", match:["/staff/bookings"] },
+  { to:null, action:"plussheet", label:"New", aria:"New booking, walk-in, block a court, or record a payment", glyph:"plus", mod:"today", match:[] },
+  { to:"/staff/courts",   label:"Courts",   aria:"Courts",                          glyph:"court", mod:"courts",   match:["/staff/courts"] },
+  { to:"/staff/more",     label:"More",     aria:"More modules",                    glyph:"dots",  mod:"today",    match:["/staff/more"] }
+];
+const STAFF_MORE = [
+  { to:"/staff/customers",   label:"Customers",         sub:"Search, profiles, memberships, notes",        glyph:"person", mod:"customers" },
+  { to:"/staff/payments",    label:"Payments",          sub:"Unpaid and failed first, record, refund, export", glyph:"tag", mod:"payments" },
+  { to:"/staff/pricing",     label:"Pricing",           sub:"The rate table, one row per schedule window",  glyph:"tag",    mod:"pricing" },
+  { to:"/staff/programs",    label:"Programs",          sub:"Lessons, clinics, and events",                 glyph:"users",  mod:"programs" },
+  { to:"/staff/memberships", label:"Memberships",       sub:"Plans and members",                            glyph:"ticket", mod:"memberships" },
+  { to:"/staff/reports",     label:"Reports",           sub:"Plain summaries first, one table behind each", glyph:"list-pos", mod:"reports" },
+  { to:"/staff/staff",       label:"Staff",             sub:"Accounts and roles",                           glyph:"person", mod:"staff" },
+  { to:"/staff/hours",       label:"Hours and closures",sub:"Facility hours, holidays, private events",     glyph:"clock",  mod:"hours" },
+  { to:"/staff/log",         label:"Activity log",      sub:"Who did what, in sentences",                   glyph:"draft",  mod:"log" },
+  { to:"/staff/scan",        label:"Scan a pass",       sub:"The door, unchanged",                          glyph:"scan",   mod:"scan" }
+];
+
+/* ---------- THE LOG ----------
+   Every staff action routes through one named function, and every one of
+   those functions ends here, so an action cannot quietly skip the record. */
+function logIt(sentence, ref){
+  S.log.unshift({ at: now(), actor: roleLabel(), sentence: String(sentence), ref: ref || null });
+  if (S.log.length > 200) S.log.length = 200;
+}
+function logLine(e){
+  return '<p class="logline"><time>' + esc(clockTime(e.at)) + "</time><span>" + esc(e.actor) + ". " + esc(e.sentence) + "</span></p>";
+}
+
+/* ---------- HOURS ----------
+   The facility runs 6 AM to 11 PM, so the board's rows are the seventeen
+   hours a court can be sold, and no more. */
+const OPEN_HOUR = 6, CLOSE_HOUR = 23;
+const BOARD_HOURS = (function(){ const a = []; for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) a.push(h); return a; })();
+function hourText(h){
+  const ap = h >= 12 ? "PM" : "AM";
+  const hh = h % 12 === 0 ? 12 : h % 12;
+  return hh + ":00 " + ap;
+}
+function hourShort(h){
+  const ap = h >= 12 ? "PM" : "AM";
+  const hh = h % 12 === 0 ? 12 : h % 12;
+  return hh + " " + ap;
+}
+function todayHour(){ return new Date(now()).getHours(); }
+
+/* ---------- 9.2 THE SEEDED OPERATIONS DAY ----------
+   One dataset, and every staff screen demos against it: a dozen bookings
+   across four courts with mixed payment states, one blocked court, two
+   arrivals due, one overdue unpaid booking, one walk-in, and two Open Play
+   sessions at different fill levels. Everything below is SAMPLE. */
+function seedOps(force){
+  if (S.opsSeeded && !force) return;
+  S.opsSeeded = true;
+
+  S.courts = [
+    { id:"c1", name:"Court 1", indoor:true,  status:"open",    rules:"Non-marking shoes only.", block:null, photo:false },
+    { id:"c2", name:"Court 2", indoor:true,  status:"open",    rules:"Non-marking shoes only.", block:null, photo:false },
+    { id:"c3", name:"Court 3", indoor:true,  status:"open",    rules:"Nearest the entrance. Used for lessons.", block:null, photo:false },
+    { id:"c4", name:"Court 4", indoor:false, status:"blocked", rules:"Outdoor. Play stops in rain.",
+      block:{ reason:"Net post repair", until:"6:00 PM" }, photo:false }
+  ];
+
+  S.rates = [
+    { id:"r1", window:"Weekday, 6 AM to 4 PM", price:250, note:"Off-peak court hour" },
+    { id:"r2", window:"Weekday, 4 PM to 11 PM", price:350, note:"Peak court hour" },
+    { id:"r3", window:"Weekend, all day", price:350, note:"Peak court hour" },
+    { id:"r4", window:"Member, any court hour", price:300, note:"Requires an active membership" },
+    { id:"r5", window:"Open Play admission", price:150, note:"One player, one session" }
+  ];
+
+  const names = ["Maria S.","Jomar T.","Kaye L.","Ruel P.","Anna V.","Dexter M.","Ivy R.","Noel B.","Grace D.","Ferdie C.","Liza Q.","Arman G."];
+  const pays  = ["paid","paid","unpaid","paid","partial","paid","failed","paid","paid","unpaid","paid","refunded"];
+  const srcs  = ["web","web","admin","walkin","web","web","web","admin","web","web","walkin","web"];
+  const hrs   = [7,8,9,10,13,14,15,16,17,18,11,12];
+  const crts  = ["c1","c2","c1","c3","c2","c1","c3","c2","c1","c3","c2","c3"];
+  S.sched = names.map(function(n, i){
+    return {
+      id:"b" + (i+1), court:crts[i], day:0, hour:hrs[i], hours:1,
+      name:n, pax:4, pay:pays[i], source:srcs[i], product:"court",
+      code:"SAMPLE-" + (1840 + i), note:"", checkedIn:false, cancelled:false
+    };
+  });
+  /* The overdue unpaid booking. Its window has already passed, which is what
+     puts it in Needs attention rather than merely in the unpaid list. */
+  S.sched[2].overdue = true;
+  /* Two arrivals due inside the next hour, so Today always has something to
+     check in against whatever the simulated clock says. */
+  const h = todayHour();
+  S.sched[0].hour = Math.max(OPEN_HOUR, Math.min(CLOSE_HOUR - 2, h));
+  S.sched[1].hour = Math.max(OPEN_HOUR, Math.min(CLOSE_HOUR - 2, h));
+  S.sched[1].court = "c2";
+  S.sched[10].source = "walkin";
+
+  S.customers = [
+    { id:"cu1", name:"Maria Santos", mobile:"0917 555 0101", email:"maria@example.com",
+      member:"Active", expires:"31 December", bookings:14, last:"Last week", balance:0, flags:[], notes:"Prefers Court 1.", suspended:false },
+    { id:"cu2", name:"Jomar Tan", mobile:"0917 555 0102", email:"jomar@example.com",
+      member:"None", expires:null, bookings:3, last:"Yesterday", balance:350, flags:["Unpaid balance"], notes:"", suspended:false },
+    { id:"cu3", name:"Kaye Lim", mobile:"0917 555 0103", email:"kaye@example.com",
+      member:"Expired", expires:"30 June", bookings:22, last:"Two months ago", balance:0, flags:[], notes:"Coaches a junior group.", suspended:false },
+    { id:"cu4", name:"Ruel Pineda", mobile:"0917 555 0104", email:"ruel@example.com",
+      member:"Active", expires:"14 November", bookings:9, last:"Today", balance:0, flags:[], notes:"", suspended:false }
+  ];
+
+  S.payments = S.sched.map(function(b, i){
+    return { id:"p" + (i+1), booking:b.id, method: b.source === "walkin" ? "Cash" : "Maya", amount: 350 * b.hours,
+             state: b.pay, refunded: b.pay === "refunded" ? 350 : 0, reason:"" };
+  });
+
+  S.staffAccounts = [
+    { id:"s1", name:"Thor", role:"Owner", active:true },
+    { id:"s2", name:"Jamie", role:"Operations Manager", active:true },
+    { id:"s3", name:"Bea", role:"Front Desk", active:true },
+    { id:"s4", name:"Coach Rey", role:"Coach", active:true },
+    { id:"s5", name:"Paolo", role:"Scorekeeper", active:false }
+  ];
+
+  S.programs = [
+    { id:"pg1", name:"Beginner clinic", when:"Saturday, 9:00 AM", court:"c3", capacity:12, registered:8 },
+    { id:"pg2", name:"Junior lessons",  when:"Weekdays, 4:00 PM", court:"c3", capacity:8,  registered:8 },
+    { id:"pg3", name:"Club night",      when:"Friday, 7:00 PM",   court:"c1", capacity:24, registered:11 }
+  ];
+
+  S.memberships = [
+    { id:"m1", plan:"Monthly", price:1200, members:18, note:"Court hour at the member rate" },
+    { id:"m2", plan:"Quarterly", price:3200, members:6, note:"Court hour at the member rate" }
+  ];
+
+  S.log = [];
+  logIt("Seeded the sample operations day. Twelve bookings, one blocked court, two Open Play sessions.", null);
+}
+
+/* Open Play sessions on the staff side are read only here. This app shows the
+   schedule, the capacity, and the registrations that came from its own
+   bookings. Running the session on the night is not this application's job. */
+function opsSessions(){
+  return [
+    { id:"w1", title:"Tonight", start:"7:00 PM", end:"11:00 PM", capacity:OP_CAPACITY, registered:31, level:"All levels" },
+    { id:"w2", title:"Tomorrow", start:"7:00 PM", end:"11:00 PM", capacity:OP_CAPACITY, registered:47, level:"Intermediate" }
+  ];
+}
+function fillWord(reg, cap){
+  const left = cap - reg;
+  if (left <= 0) return "Full";
+  if (left <= cap * 0.15) return "Almost full";
+  return "Places available";
+}
+/* 7.1 A countdown in words. Days, then hours, then a plain Starting soon.
+   Nothing here ticks: a booking six days out does not need a second hand, and
+   a minute counter on a list is a thing that moves for no reader's benefit. */
+function countdownWords(startsAt){
+  const ms = startsAt - now();
+  if (ms <= 0) return "Started";
+  const days = Math.floor(ms / DAY_MS);
+  if (days >= 1) return "In " + days + " " + plural(days,"day","days");
+  const hours = Math.floor(ms / 3600000);
+  if (hours >= 1) return "In " + hours + " " + plural(hours,"hour","hours");
+  return "Starting soon";
+}
+function courtById(id){ for (let i=0;i<S.courts.length;i++) if (S.courts[i].id === id) return S.courts[i]; return null; }
+function bookingById(id){ for (let i=0;i<S.sched.length;i++) if (S.sched[i].id === id) return S.sched[i]; return null; }
+function customerById(id){ for (let i=0;i<S.customers.length;i++) if (S.customers[i].id === id) return S.customers[i]; return null; }
+function payFor(bid){ for (let i=0;i<S.payments.length;i++) if (S.payments[i].booking === bid) return S.payments[i]; return null; }
+const PAY_WORD = { paid:"Paid", unpaid:"Unpaid", partial:"Partial", refunded:"Refunded", failed:"Payment failed" };
+const SOURCE_WORD = { web:"Website", admin:"Admin", walkin:"Walk-in" };
+const SOURCE_GLYPH = { web:"court", admin:"wrench", walkin:"person" };
+function needsAttention(b){
+  if (b.cancelled) return false;
+  const p = payFor(b.id);
+  if (p && p.state === "failed") return true;
+  return !!b.overdue;
+}
+
+/* ---------- OPERATIONS ACTIONS, ONE NAMED FUNCTION EACH ---------- */
+const OPS = {
+  move: function(b, court, hour){
+    const from = courtById(b.court), to = courtById(court);
+    b.court = court; b.hour = hour;
+    logIt("Moved booking " + b.code + " from " + (from ? from.name : "a court") + " to " + (to ? to.name : "a court") + " at " + hourText(hour) + ".", b.id);
+  },
+  extend: function(b){
+    const clash = S.sched.some(function(x){
+      return !x.cancelled && x.id !== b.id && x.court === b.court && x.day === b.day && x.hour === b.hour + b.hours;
+    });
+    if (clash){
+      logIt("Refused to extend booking " + b.code + ". The next booking on that court starts at " + hourText(b.hour + b.hours) + ".", b.id);
+      return false;
+    }
+    b.hours += 1;
+    logIt("Extended booking " + b.code + " to " + b.hours + " hours.", b.id);
+    return true;
+  },
+  cancel: function(b){
+    b.cancelled = true;
+    const p = payFor(b.id);
+    if (p && p.state === "paid"){ p.state = "refunded"; p.refunded = p.amount; }
+    logIt("Cancelled booking " + b.code + " and started a refund of " + peso(p ? p.amount : 0) + ".", b.id);
+  },
+  checkIn: function(b){
+    b.checkedIn = true;
+    logIt("Checked in " + b.name + " on booking " + b.code + ".", b.id);
+  },
+  recordPayment: function(b, method){
+    const p = payFor(b.id);
+    if (p){ p.state = "paid"; p.method = method; }
+    b.pay = "paid"; b.overdue = false;
+    logIt("Recorded a " + method.toLowerCase() + " payment of " + peso(p ? p.amount : 0) + " on booking " + b.code + ".", b.id);
+  },
+  refund: function(b){
+    const p = payFor(b.id);
+    if (p){ p.state = "refunded"; p.refunded = p.amount; }
+    b.pay = "refunded";
+    logIt("Refunded " + peso(p ? p.amount : 0) + " on booking " + b.code + ".", b.id);
+  },
+  blockCourt: function(c, reason, until){
+    c.status = "blocked"; c.block = { reason:reason, until:until };
+    logIt("Blocked " + c.name + " until " + until + ". Reason: " + reason + ".", c.id);
+  },
+  reopenCourt: function(c){
+    c.status = "open"; c.block = null;
+    logIt("Reopened " + c.name + ".", c.id);
+  },
+  createBooking: function(court, hour, name, source){
+    const id = "b" + (S.sched.length + 1) + "x" + S.seq;
+    const b = { id:id, court:court, day:S.scal.day, hour:hour, hours:1, name:name || "Walk-in",
+                pax:4, pay:"unpaid", source:source || "admin", product:"court",
+                code:"SAMPLE-" + (1900 + S.sched.length), note:"", checkedIn:false, cancelled:false };
+    S.sched.push(b);
+    S.payments.push({ id:"p" + id, booking:id, method:"None", amount:350, state:"unpaid", refunded:0, reason:"" });
+    const c = courtById(court);
+    logIt("Created booking " + b.code + " on " + (c ? c.name : "a court") + " at " + hourText(hour) + ".", id);
+    return b;
+  },
+  suspend: function(cu){
+    cu.suspended = !cu.suspended;
+    logIt((cu.suspended ? "Suspended " : "Reinstated ") + cu.name + ". Existing bookings are untouched.", cu.id);
+  },
+  setRate: function(r, price){
+    const was = r.price; r.price = price;
+    logIt("Changed the rate for " + r.window + " from " + peso(was) + " to " + peso(price) + ".", r.id);
+  },
+  setStaffRole: function(a, role){
+    const was = a.role; a.role = role;
+    logIt("Changed " + a.name + " from " + was + " to " + role + ".", a.id);
+  },
+  disableStaff: function(a){
+    a.active = !a.active;
+    logIt((a.active ? "Enabled " : "Disabled ") + a.name + ".", a.id);
+  },
+  closeFacility: function(label){
+    logIt("Recorded a facility closure: " + label + ". Every court is unavailable for that period.", null);
+  },
+  notify: function(who, what){
+    logIt("Queued a message to " + who + ": " + what + ". Nothing was sent on this staging build.", null);
+  }
+};
+
+/* ============================================================
+   6.1 THE SHARED CALENDAR, COMMON FRAME
+   One component, two configurations. The header row, the view switch, the
+   keyboard model, and the state vocabulary are the same on both surfaces.
+   What a cell answers is the configuration's business.
+   ============================================================ */
+function calLabel(st){
+  const base = baseDay(st.day);
+  if (st.view === "day") return dayLabel(base);
+  if (st.view === "week"){
+    const d = new Date(base); const dow = d.getDay();
+    const from = base - dow * DAY_MS, to = from + 6 * DAY_MS;
+    return MSHORT.format(new Date(from)) + " " + DNUM.format(new Date(from)) + " to " +
+           MSHORT.format(new Date(to)) + " " + DNUM.format(new Date(to));
+  }
+  return new Intl.DateTimeFormat("en-PH",{ month:"long", year:"numeric", timeZone:TZ }).format(new Date(base));
+}
+/* The frame. `ns` is the action namespace, which is the only thing that
+   differs between the player's grid and the staff's. */
+function calFrame(st, ns, gridHtml, extra){
+  const views = [["day","Day"],["week","Week"],["month","Month"]];
+  let h = '<div class="cal" data-anim="' + esc(st.anim || "") + '" data-ns="' + esc(ns) + '">';
+  h += '<div class="cal__bar">';
+  h += '<div class="cal__nav">' +
+    '<button data-action="' + ns + 'step" data-v="-1" aria-label="Previous ' + st.view + '">' + icon("chev-l") + "</button>" +
+    '<span class="cal__label" aria-live="polite">' + esc(calLabel(st)) + "</span>" +
+    '<button data-action="' + ns + 'step" data-v="1" aria-label="Next ' + st.view + '">' + icon("chev-r") + "</button>" +
+    "</div>";
+  h += '<button class="cal__today" data-action="' + ns + 'today">Today</button>';
+  h += '<div class="cal__views" role="group" aria-label="Calendar view">' +
+    views.map(function(v){
+      return '<button data-action="' + ns + 'view" data-v="' + v[0] + '" aria-pressed="' + (st.view === v[0]) + '">' + v[1] + "</button>";
+    }).join("") + "</div>";
+  h += "</div>";
+  if (extra) h += extra;
+  h += gridHtml;
+  h += "</div>";
+  return h;
+}
+/* Month view is a density map on both surfaces, never a workspace. A month of
+   slots is unreadable at any width, so a day carries one word and a tap drops
+   into Day view. */
+function calMonth(st, ns, wordFor){
+  const base = baseDay(st.day);
+  const first = new Date(base); first.setDate(1);
+  const lead = first.getDay();
+  const monthN = first.getMonth();
+  const days = new Date(first.getFullYear(), monthN + 1, 0).getDate();
+  const todayN = parseInt(DNUM.format(new Date(now())),10);
+  const selN = parseInt(DNUM.format(new Date(base)),10);
+  let cells = "";
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(function(d){
+    cells += '<span class="cal__dow" aria-hidden="true">' + d[0] + "</span>";
+  });
+  for (let i=0;i<lead;i++) cells += '<span class="cal__cell" data-out="1" aria-hidden="true"></span>';
+  for (let d=1; d<=days; d++){
+    const offset = st.day + (d - selN);
+    const w = wordFor(offset);
+    cells += '<button class="cal__cell" role="gridcell" data-cal-cell="1" data-state="' + esc(w.state) + '"' +
+      ' data-action="' + ns + 'pick" data-v="' + offset + '"' +
+      (d === selN ? ' aria-selected="true"' : ' aria-selected="false"') +
+      ' aria-label="' + esc(MSHORT.format(first) + " " + d + ", " + w.word) + '">' +
+      "<b>" + d + "</b><small>" + esc(w.word) + "</small>" +
+      (d === todayN ? '<small class="vh">Today</small>' : "") + "</button>";
+  }
+  return '<div class="cal__grid" role="grid" aria-label="Month, one word per day" tabindex="0">' +
+    '<div class="cal__week">' + cells + "</div></div>";
+}
+
+/* ============================================================
+   6.2 PLAYER CONFIGURATION: FIND A TIME FAST
+   /book is the availability-first front door. It adds no step to the funnel:
+   the rail, the review, the hold, the payment, the verification, and the
+   passes are all unchanged behind it. The calendar only shortens the way in.
+   ============================================================ */
+function dayOpenCount(offset){
+  /* Sample availability, derived from the same COURT_TIMES table the rail
+     already reads, so the calendar and the rail cannot disagree. */
+  if (offset < 0) return { state:"closed", word:"Past", n:0 };
+  const open = COURT_TIMES.filter(function(t, i){
+    return t.state !== "unavailable" && (i + offset) % 7 !== 5;
+  }).length;
+  if (open === 0) return { state:"closed", word:"Closed", n:0 };
+  if (open <= 2) return { state:"full", word:"Full", n:open };
+  if (open <= 5) return { state:"busy", word:"Busy", n:open };
+  return { state:"open", word:"Open", n:open };
+}
+function sessionsOn(offset){
+  const out = [];
+  Object.keys(OP_WINDOWS).forEach(function(k){
+    const w = OP_WINDOWS[k];
+    if (w.dayOffset === offset && w.state === "published") out.push(w);
+  });
+  return out;
+}
+function nextOpenCourt(){
+  for (let d=0; d<7; d++){
+    const list = COURT_TIMES.filter(function(t){ return t.state !== "unavailable"; });
+    if (!list.length) continue;
+    const t = list[0];
+    return { day:d, time:t.t, label:(d === 0 ? "Today" : d === 1 ? "Tomorrow" : DSHORT.format(new Date(baseDay(d)))) + " " + t.t };
+  }
+  return null;
+}
+function nextOpenSession(){
+  const keys = Object.keys(OP_WINDOWS).filter(function(k){
+    const w = OP_WINDOWS[k];
+    return w.state === "published" && w.dayOffset >= 0 && windowCapacityState(w.id) !== "full";
+  }).sort(function(a,b){ return OP_WINDOWS[a].dayOffset - OP_WINDOWS[b].dayOffset; });
+  if (!keys.length) return null;
+  const w = OP_WINDOWS[keys[0]];
+  const d = w.dayOffset;
+  return { id:w.id, label:(d === 0 ? "Today" : d === 1 ? "Tomorrow" : DSHORT.format(new Date(baseDay(d)))) + " " + w.start };
+}
+
+function scrBook(){
+  const st = S.cal;
+  const isCourt = st.product === "court";
+  let html = '<h1 class="screen">Book</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Courts and Open Play, one calendar. Pick a day, then pick a time.</p>';
+
+  /* Product first, one toggle, restating the one-line difference. The copy is
+     the same constant the two front-door cards print, so the two cannot drift. */
+  html += '<div class="section"><div class="seg" role="group" aria-label="What you are booking">' +
+    '<button data-action="bookprod" data-v="court" aria-pressed="' + isCourt + '">Court rental</button>' +
+    '<button data-action="bookprod" data-v="openplay" aria-pressed="' + (!isCourt) + '">Open Play</button></div>' +
+    '<p class="legal">' + esc(isCourt ? COURT_NOTE : OPENPLAY_NOTE) + "</p>";
+
+  /* The next-available shortcut, above the grid. One tap from here to a
+     selection, so nobody has to read a grid to make a booking. */
+  const nc = nextOpenCourt(), ns2 = nextOpenSession();
+  html += '<div class="nextopen">';
+  if (isCourt && nc){
+    html += '<button class="nextopen__row" data-action="booknext" data-v="court">' + icon("court") +
+      '<span class="row__main"><span class="row__title">Next open court</span>' +
+      '<span class="row__sub">' + esc(nc.label) + "</span></span>" + icon("chev-r") + "</button>";
+  }
+  if (!isCourt && ns2){
+    html += '<button class="nextopen__row" data-action="booknext" data-v="openplay">' + icon("users") +
+      '<span class="row__main"><span class="row__title">Next Open Play</span>' +
+      '<span class="row__sub">' + esc(ns2.label) + "</span></span>" + icon("chev-r") + "</button>";
+  }
+  if (!isCourt && !ns2){
+    html += '<p class="card">No Open Play session has places left this week. Reserve a private court instead.</p>';
+  }
+  html += "</div></div>";
+
+  html += '<div class="section">' + calFrame(st, "book", bookGrid(st, isCourt)) + "</div>";
+  html += '<p class="legal section">' + sampleMark("Sample") +
+    " Availability on this build is sample data. Nothing here is a real reservation.</p>";
+  html += footerBlock();
+  return { id:"pub-book", shell:"browse", title:"Book", html:html, wide:true, dock:null };
+}
+function bookGrid(st, isCourt){
+  if (st.view === "month"){
+    return calMonth(st, "book", function(offset){
+      if (!isCourt){
+        const s = sessionsOn(offset);
+        if (!s.length) return { state:"closed", word:"None" };
+        const cap = windowCapacityState(s[0].id);
+        return { state: cap === "full" ? "full" : "open", word: cap === "full" ? "Full" : cap === "almost" ? "Almost" : "Open" };
+      }
+      return dayOpenCount(offset);
+    });
+  }
+  if (st.view === "week"){
+    const base = baseDay(st.day);
+    const dow = new Date(base).getDay();
+    let cells = "";
+    for (let i=0;i<7;i++){
+      const offset = st.day - dow + i;
+      const ms = baseDay(offset);
+      cells += '<span class="cal__dow" aria-hidden="true">' + DSHORT.format(new Date(ms)) + "</span>";
+    }
+    for (let i=0;i<7;i++){
+      const offset = st.day - dow + i;
+      const ms = baseDay(offset);
+      let inner = "";
+      if (isCourt){
+        inner = '<span class="cal__hours">' + COURT_TIMES.map(function(t){
+          const state = offset < 0 ? "unavailable" : t.state;
+          return '<button class="cal__hour" data-state="' + state + '" data-action="bookhour" data-v="' + offset + '" data-t="' + esc(t.t) + '"' +
+            (state === "unavailable" ? ' aria-disabled="true"' : "") +
+            ' aria-label="' + esc(DSHORT.format(new Date(ms)) + " " + t.t + ", " + (state === "unavailable" ? "not available" : state === "limited" ? "limited" : "open")) + '">' +
+            esc(t.t.replace(":00","")) + "</button>";
+        }).join("") + "</span>";
+      } else {
+        const s = sessionsOn(offset);
+        inner = s.length
+          ? '<span class="cal__hours">' + s.map(function(w){
+              const cap = windowCapacityState(w.id);
+              return '<button class="cal__hour" data-state="' + (cap === "full" ? "unavailable" : cap === "almost" ? "limited" : "open") + '"' +
+                ' data-action="nav" data-to="/openplay/' + esc(w.id) + '">' + esc(w.start.replace(":00","")) + "</button>";
+            }).join("") + "</span>"
+          : '<small class="muted">None</small>';
+      }
+      cells += '<div class="cal__cell" role="gridcell" data-cal-cell="1" data-out="' + (offset < 0 ? 1 : 0) + '">' +
+        "<b>" + esc(DNUM.format(new Date(ms))) + "</b>" + inner + "</div>";
+    }
+    return '<div class="cal__grid" role="grid" aria-label="Week, open hours per day" tabindex="0">' +
+      '<div class="cal__week">' + cells + "</div></div>" +
+      '<p class="cal__hint legal">Tap any open hour to drop into that day with the hour already picked.</p>';
+  }
+  /* Day view. For a court this is the drag rail that already works, fed by the
+     calendar header rather than by its own date strip. For Open Play it is the
+     existing window cards. Selection happens in the rail, never in the grid. */
+  if (isCourt){
+    return '<div class="cal__grid"><p class="legal">Pick a start time. Drag the end of the block to add hours.</p>' +
+      '<p style="margin-top:var(--s3)"><button class="btn btn--primary" data-action="bookopenday" data-v="' + st.day + '">Open the time rail for ' +
+      esc(dayLabel(baseDay(st.day))) + "</button></p></div>";
+  }
+  const s = sessionsOn(st.day);
+  if (!s.length){
+    return '<div class="cal__grid"><div class="card"><p><strong>No Open Play on this day.</strong></p>' +
+      '<p class="legal" style="margin-top:var(--s2)">Use Week view to find the next session, or reserve a private court.</p></div></div>';
+  }
+  return '<div class="cal__grid"><ul class="rows">' + s.map(function(w){
+    const cap = windowCapacityState(w.id);
+    const word = cap === "full" ? "Full" : cap === "almost" ? "Almost full" : "Places available";
+    return '<li><button class="row" style="width:100%" data-action="nav" data-to="/openplay/' + esc(w.id) + '">' + icon("users") +
+      '<span class="row__main"><span class="row__title">' + esc(w.start + " to " + w.end) + "</span>" +
+      '<span class="row__sub">' + esc(peso(RATE_OPENPLAY) + " per player. " + word) + "</span></span>" + icon("chev-r") + "</button></li>";
+  }).join("") + "</ul></div>";
+}
+
+/* ============================================================
+   6.3 STAFF CONFIGURATION: THE OPERATIONS VIEW
+   ============================================================ */
+function staffShell(view){
+  /* The sidebar is rendered inside the screen rather than in the shell, so a
+     customer route can never inherit it and the two navigations stay built
+     from the one array. */
+  const path = currentPath();
+  const side = STAFF_NAV.concat(STAFF_MORE).filter(function(t){ return t.to && staffCan(t.mod); }).map(function(t){
+    const cur = t.to === path || (t.match && t.match.indexOf(path) >= 0);
+    return '<a href="#' + esc(t.to) + '"' + (cur ? ' aria-current="page"' : "") + ">" + icon(t.glyph) + "<span>" + esc(t.label) + "</span></a>";
+  }).join("");
+  return '<div class="staffwrap"><nav class="staffside" aria-label="Staff modules">' + side + "</nav><div>" + view + "</div></div>";
+}
+function staffScreen(id, title, html, opts){
+  opts = opts || {};
+  return {
+    id:id, shell:"staff", title:title, wide:true,
+    html: staffShell(html),
+    bodyClass: opts.bodyClass || "",
+    back: opts.back || null,
+    dock: opts.dock || null,
+    mount: opts.mount || null
+  };
+}
+function denied(what){
+  return staffScreen("stf-denied","Not available",
+    '<h1 class="screen">Not available</h1>' +
+    '<p class="lede" style="margin-top:var(--s3)">' + esc(what) + " is not part of the Front Desk role, so it is not rendered here.</p>" +
+    '<p class="legal section">The server denies it as well. Hiding a control is not the security boundary.</p>' +
+    '<p class="section">' + navBtn("/staff/today","Back to Today") + "</p>");
+}
+
+function slotFor(court, day, hour){
+  for (let i=0;i<S.sched.length;i++){
+    const b = S.sched[i];
+    if (b.cancelled) continue;
+    if (b.court === court && b.day === day && hour >= b.hour && hour < b.hour + b.hours) return b;
+  }
+  return null;
+}
+function passesFilter(b){
+  const f = S.filters, p = payFor(b.id);
+  if (f.court !== "all" && b.court !== f.court) return false;
+  if (f.product !== "all" && b.product !== f.product) return false;
+  if (f.source !== "all" && b.source !== f.source) return false;
+  if (f.status === "confirmed" && !(p && p.state === "paid")) return false;
+  if (f.status === "pending" && !(p && (p.state === "unpaid" || p.state === "partial"))) return false;
+  if (f.status === "cancelled" && !b.cancelled) return false;
+  return true;
+}
+function activeFilters(){
+  const out = [];
+  if (S.filters.court !== "all"){ const c = courtById(S.filters.court); out.push(["court", c ? c.name : "Court"]); }
+  if (S.filters.status !== "all") out.push(["status", { confirmed:"Confirmed", pending:"Payment pending", cancelled:"Cancelled" }[S.filters.status]]);
+  if (S.filters.product !== "all") out.push(["product", S.filters.product === "court" ? "Court rental" : "Open Play"]);
+  if (S.filters.source !== "all") out.push(["source", SOURCE_WORD[S.filters.source]]);
+  return out;
+}
+
+function scrStaffBookings(){
+  seedOps();
+  const st = S.scal;
+  let html = '<h1 class="screen">Bookings</h1>';
+
+  /* Filters are stated in a removable chip row. A filtered board that looks
+     empty must never be mistaken for an empty day. */
+  const act = activeFilters();
+  let extra = '<div class="filters">' +
+    '<button class="cal__today" data-action="sfilters">Filters' + (act.length ? " (" + act.length + ")" : "") + "</button>" +
+    act.map(function(f){
+      return '<button class="filters__chip" data-action="sclearfilter" data-v="' + f[0] + '" aria-label="Remove the ' + esc(f[1]) + ' filter">' +
+        esc(f[1]) + icon("x") + "</button>";
+    }).join("") +
+    '<button class="cal__today" data-action="sfreeat">Free at</button>' +
+    "</div>";
+  if (S.scal.freeAt){
+    const hour = parseInt(S.scal.freeAt,10);
+    const open = S.courts.filter(function(c){ return c.status === "open" && !slotFor(c.id, st.day, hour); });
+    extra += '<div class="card"><p><strong>Free at ' + esc(hourText(hour)) + "</strong></p>" +
+      '<p style="margin-top:var(--s2)">' + (open.length ? esc(open.map(function(c){ return c.name; }).join(", ")) : "No court is free at that hour.") + "</p>" +
+      '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="sfreeclear">Clear</button></p></div>';
+  }
+
+  html += '<div class="section">' + calFrame(st, "s", staffGrid(st), extra) + "</div>";
+  html += '<p class="legal section">' + sampleMark("Sample") +
+    " Every booking on this board is simulated. Past hours are dimmed rather than hidden.</p>";
+  return staffScreen("stf-bookings","Bookings", html, {
+    dock:{ action:{ label:"New booking", action:"plussheet" } }
+  });
+}
+function staffGrid(st){
+  if (st.view === "month"){
+    return calMonth(st, "s", function(offset){
+      if (offset !== 0) return { state:"open", word:"Open" };
+      const n = S.sched.filter(function(b){ return !b.cancelled && b.day === 0; }).length;
+      if (n >= 12) return { state:"full", word:"Full" };
+      return { state:"busy", word:"Busy" };
+    });
+  }
+  if (st.view === "week"){
+    /* Week view answers utilization per court per day, which is a planning
+       question, not a booking one. */
+    let rows = '<div class="dtable"><table><caption class="vh">Utilization per court per day</caption><thead><tr><th>Court</th>';
+    const base = baseDay(st.day), dow = new Date(base).getDay();
+    for (let i=0;i<7;i++){
+      rows += '<th class="num">' + esc(DSHORT.format(new Date(baseDay(st.day - dow + i)))) + "</th>";
+    }
+    rows += "</tr></thead><tbody>";
+    S.courts.forEach(function(c){
+      rows += "<tr><th>" + esc(c.name) + "</th>";
+      for (let i=0;i<7;i++){
+        const offset = st.day - dow + i;
+        const used = S.sched.filter(function(b){ return !b.cancelled && b.court === c.id && b.day === offset; }).length;
+        const pct = Math.round(used / BOARD_HOURS.length * 100);
+        rows += '<td class="num">' + (offset === 0 ? pct + "%" : c.status === "blocked" ? "Blocked" : "0%") + "</td>";
+      }
+      rows += "</tr>";
+    });
+    rows += "</tbody></table></div>";
+    return '<div class="cal__grid">' + rows + '<p class="legal">Utilization is hours sold against hours open. Tap Day for the workspace.</p></div>';
+  }
+
+  /* Day view is the workspace: courts as columns, hours as rows. */
+  const cols = S.courts.length;
+  const tpl = "grid-template-columns:4.5rem repeat(" + cols + ",minmax(110px,1fr))";
+  let h = '<div class="cal__grid"><div class="board" role="region" aria-label="Day board, four courts, scrolls sideways" tabindex="0">' +
+    '<div class="board__grid" style="' + tpl + '">';
+  h += '<span class="board__h"></span>';
+  S.courts.forEach(function(c){
+    h += '<span class="board__h">' + esc(c.name) + (c.status === "blocked" ? " " + icon("ban") : "") + "</span>";
+  });
+  const nowH = todayHour();
+  BOARD_HOURS.forEach(function(hr){
+    h += '<span class="board__time">' + esc(hourShort(hr)) + "</span>";
+    S.courts.forEach(function(c){
+      const b = slotFor(c.id, st.day, hr);
+      const past = st.day === 0 && hr < nowH;
+      if (c.status === "blocked" && c.block){
+        h += '<span class="board__slot" data-k="blocked" data-past="' + (past?1:0) + '">' +
+          "<b>Blocked</b>" + esc(c.block.reason) + "</span>";
+        return;
+      }
+      if (b && b.hour === hr && passesFilter(b)){
+        const p = payFor(b.id);
+        const k = needsAttention(b) ? "attention" : (p && p.state === "unpaid") ? "held" : "booked";
+        h += '<button class="board__slot" data-k="' + k + '" data-past="' + (past?1:0) + '"' +
+          ' data-action="sopen" data-v="' + esc(b.id) + '" data-drag-id="' + esc(b.id) + '" draggable="true"' +
+          ' aria-label="' + esc(b.name + ", " + c.name + ", " + hourText(hr) + ", " + b.pax + " players, " + (PAY_WORD[p ? p.state : "unpaid"])) + '">' +
+          "<b>" + esc(b.name) + "</b>" +
+          '<span>' + esc(b.pax + " players. " + PAY_WORD[p ? p.state : "unpaid"]) + "</span>" +
+          '<span title="' + esc(SOURCE_WORD[b.source]) + '">' + esc(SOURCE_WORD[b.source]) + "</span></button>";
+        return;
+      }
+      if (b && passesFilter(b)){ h += '<span class="board__slot" data-k="booked" data-past="' + (past?1:0) + '"></span>'; return; }
+      if (b){ h += '<span class="board__slot" data-past="' + (past?1:0) + '"></span>'; return; }
+      h += '<button class="board__slot" data-past="' + (past?1:0) + '" data-action="sslot" data-c="' + esc(c.id) + '" data-h="' + hr + '"' +
+        ' data-drop="1" aria-label="' + esc("Open, " + c.name + ", " + hourText(hr) + ". Start a booking here.") + '">Open</button>';
+    });
+  });
+  h += "</div></div>";
+  h += '<p class="board__hint">Drag a booking to another court or hour, or use Move on the booking itself. Double booking is refused at selection.</p>';
+  h += "</div>";
+  return h;
+}
+
+/* ---------- BOOKING DETAIL, SECTION 8.2 ---------- */
+function scrStaffBookingDetail(params){
+  seedOps();
+  const b = bookingById(params.id);
+  if (!b) return scrLink({});
+  const c = courtById(b.court), p = payFor(b.id);
+  const confirming = S.confirming === "cancel:" + b.id;
+  let html = '<h1 class="screen">' + esc(b.code) + "</h1>";
+  html += '<p class="legal" style="margin-top:var(--s2)">' + sampleMark("Sample") + " Simulated booking record.</p>";
+
+  html += '<div class="section"><h2 class="sec">Schedule</h2><div class="card"><dl class="dl">' +
+    "<div><dt>When</dt><dd>" + esc(dayLabel(baseDay(b.day)) + ", " + hourText(b.hour) + " to " + hourText(b.hour + b.hours)) + "</dd></div>" +
+    "<div><dt>Court</dt><dd>" + esc(c ? c.name : "Unassigned") + "</dd></div>" +
+    "<div><dt>Organizer</dt><dd>" + esc(b.name) + "</dd></div>" +
+    "<div><dt>Players</dt><dd>" + b.pax + "</dd></div>" +
+    "<div><dt>Source</dt><dd>" + esc(SOURCE_WORD[b.source]) + "</dd></div>" +
+    "<div><dt>Payment</dt><dd>" + esc(PAY_WORD[p ? p.state : "unpaid"]) + "</dd></div>" +
+    "</dl></div></div>";
+
+  if (needsAttention(b)){
+    html += '<div class="section"><div class="crit"><p class="crit__head">' + icon("alert") + "<span>Needs attention</span></p>" +
+      '<p class="crit__body">' + (p && p.state === "failed"
+        ? "The payment failed and no booking is held. Record a payment or cancel."
+        : "This booking is unpaid and its window has passed.") + "</p></div></div>";
+  }
+
+  html += '<div class="section"><h2 class="sec">Actions</h2><div class="btn-col">';
+  html += '<button class="btn btn--secondary btn--sm" data-action="smove" data-v="' + esc(b.id) + '">Move' + icon("chev-r") + "</button>";
+  html += '<button class="btn btn--secondary btn--sm" data-action="sextend" data-v="' + esc(b.id) + '">Extend by an hour</button>';
+  if (b.checkedIn){
+    html += '<p class="legal">' + icon("check") + " Checked in.</p>";
+  } else if (b.day !== 0){
+    html += '<button class="btn btn--secondary btn--sm" aria-disabled="true" data-action="noop">Check in</button>' +
+      '<p class="whynot">' + icon("info") + "<span>Check in opens on the day of the booking.</span></p>";
+  } else {
+    html += '<button class="btn btn--primary" data-action="scheckin" data-v="' + esc(b.id) + '">Check in ' + esc(b.name) + "</button>";
+  }
+  if (p && p.state !== "paid" && p.state !== "refunded"){
+    html += '<button class="btn btn--secondary btn--sm" data-action="srecord" data-v="' + esc(b.id) + '">Record payment</button>';
+  }
+  html += '<button class="btn btn--secondary btn--sm" data-action="snote" data-v="' + esc(b.id) + '">Add an internal note</button>';
+  html += "</div></div>";
+
+  /* Cancellation always previews the money before the red confirm. The policy
+     numbers stay to-be-confirmed until the owner answers question five. */
+  html += '<div class="section"><h2 class="sec">Cancel</h2>';
+  if (!confirming){
+    html += '<button class="btn btn--secondary btn--sm" data-action="sconfirm" data-v="cancel:' + esc(b.id) + '">Cancel this booking</button>';
+  } else {
+    html += '<div class="money"><p class="money__line"><span>Paid</span><b>' + esc(peso(p ? p.amount : 0)) + "</b></p>" +
+      '<p class="money__line"><span>Cancellation fee</span><b>' + tbd("To be confirmed") + "</b></p>" +
+      '<p class="money__line money__out"><span>Customer receives</span><b>' + esc(peso(p ? p.amount : 0)) + " less the fee</b></p></div>";
+    html += '<p class="legal">The fee is a placeholder until the cancellation policy is approved.</p>';
+    html += '<div class="btn-col" style="margin-top:var(--s3)">' +
+      '<button class="btn btn--secondary" data-action="sconfirm" data-v="">Keep booking</button>' +
+      '<button class="btn btn--critical" data-action="scancel" data-v="' + esc(b.id) + '">' + icon("alert") + "Cancel and refund</button></div>";
+  }
+  html += "</div>";
+
+  html += '<div class="section"><h2 class="sec">This booking in the log</h2><div class="loglist">' +
+    (S.log.filter(function(e){ return e.ref === b.id; }).map(logLine).join("") || '<p class="legal">Nothing recorded yet.</p>') + "</div></div>";
+
+  return staffScreen("stf-booking-detail", b.code, html, { back:{ label:"Bookings", to:"/staff/bookings" } });
+}
+
+/* ---------- 8.1 TODAY: CHECK IN AND LIVE BOARD ---------- */
+function scrStaffToday(){
+  seedOps();
+  const wall = /[?&]board/.test(location.hash);
+  const attention = S.sched.filter(needsAttention);
+  const blocked = S.courts.filter(function(c){ return c.status === "blocked"; });
+  const nowH = todayHour();
+  const arriving = S.sched.filter(function(b){
+    return !b.cancelled && b.day === 0 && !b.checkedIn && b.hour >= nowH && b.hour <= nowH + 1;
+  });
+
+  let html = '<h1 class="screen">Today</h1>';
+  html += '<p class="legal" style="margin-top:var(--s2)">Venue time ' + esc(clockTime(now())) + ", Asia/Manila.</p>";
+
+  if (!wall && (attention.length || blocked.length)){
+    html += '<div class="section"><h2 class="sec">Needs attention</h2><ul class="rows">';
+    attention.forEach(function(b){
+      const p = payFor(b.id);
+      html += '<li><button class="row row--critical" style="width:100%" data-action="nav" data-to="/staff/bookings/' + esc(b.id) + '">' + icon("alert") +
+        '<span class="row__main"><span class="row__title">' + esc(p && p.state === "failed" ? "Payment failed" : "Unpaid past its window") + "</span>" +
+        '<span class="row__sub">' + esc(b.code + ". " + b.name + ", " + hourText(b.hour)) + "</span></span>" + icon("chev-r") + "</button></li>";
+    });
+    blocked.forEach(function(c){
+      html += '<li><button class="row row--critical" style="width:100%" data-action="nav" data-to="/staff/courts/' + esc(c.id) + '">' + icon("ban") +
+        '<span class="row__main"><span class="row__title">' + esc(c.name) + " blocked</span>" +
+        '<span class="row__sub">' + esc(c.block.reason + ". Until " + c.block.until) + "</span></span>" + icon("chev-r") + "</button></li>";
+    });
+    html += "</ul></div>";
+  }
+
+  if (!wall){
+    html += '<div class="section"><h2 class="sec">Arriving now</h2>';
+    if (!arriving.length){
+      html += '<p class="card">Nobody is due in the next hour. Advance the simulated clock to bring an arrival forward.</p>';
+    } else {
+      html += '<ul class="rows">' + arriving.map(function(b){
+        const c = courtById(b.court), p = payFor(b.id);
+        return '<li class="row"><span class="row__main"><span class="row__title">' + esc(hourText(b.hour) + ". " + b.name) + "</span>" +
+          '<span class="row__sub">' + esc((c ? c.name : "Court") + ". " + b.pax + " players. " + PAY_WORD[p ? p.state : "unpaid"]) + "</span></span>" +
+          '<button class="btn btn--primary" style="width:auto;padding:0 var(--s4)" data-action="scheckin" data-v="' + esc(b.id) + '">Check in</button></li>';
+      }).join("") + "</ul>";
+      html += '<p class="legal">Check in accepts a scan, a booking code, or a name.</p>';
+      html += '<div class="btn-col" style="margin-top:var(--s3)">' +
+        navBtn("/staff/scan","Scan a pass") +
+        '<button class="btn btn--secondary btn--sm" data-action="scheckcode">Check in by code or name</button></div>';
+      html += '<p class="whynot">' + icon("info") + "<span>No-show is available only after the grace period, whose length is " + tbd("to be confirmed") + ".</span></p>";
+    }
+    html += "</div>";
+  }
+
+  html += '<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;gap:var(--s3)">' +
+    '<h2 class="sec">Live court board</h2>' +
+    (wall ? "" : '<button class="cal__today" data-action="nav" data-to="/staff/today?board">Wall display</button>') + "</div>";
+  html += '<div class="courtboard">' + S.courts.map(function(c){
+    const b = slotFor(c.id, 0, nowH);
+    const nextB = S.sched.filter(function(x){ return !x.cancelled && x.court === c.id && x.day === 0 && x.hour > nowH; })
+                         .sort(function(a,z){ return a.hour - z.hour; })[0];
+    let k = "open", state = "Available", meta = nextB ? "Reserved at " + hourText(nextB.hour) : "Nothing booked after this";
+    if (c.status === "blocked"){ k = "blocked"; state = "Blocked"; meta = c.block.reason + ". Until " + c.block.until; }
+    else if (b){ k = "inuse"; state = "In use"; meta = b.name + ". Ends " + hourText(b.hour + b.hours); }
+    let card = '<div class="courtcard" data-k="' + k + '"><h3>' + esc(c.name) + "</h3>" +
+      '<p class="courtcard__state">' + (k === "blocked" ? icon("ban") : k === "inuse" ? icon("check-double") : icon("circle")) + esc(state) + "</p>" +
+      '<p class="courtcard__meta">' + esc(meta) + "</p>";
+    if (!wall){
+      card += '<p class="courtcard__acts">';
+      if (c.status === "blocked"){
+        card += '<button data-action="sreopen" data-v="' + esc(c.id) + '">Reopen</button>';
+      } else if (b){
+        card += '<button data-action="send" data-v="' + esc(b.id) + '">End</button>' +
+          '<button data-action="sextend" data-v="' + esc(b.id) + '">Extend</button>' +
+          '<button data-action="sblock" data-v="' + esc(c.id) + '">Block</button>';
+      } else {
+        card += '<button data-action="sstart" data-v="' + esc(c.id) + '">Start</button>' +
+          '<button data-action="sblock" data-v="' + esc(c.id) + '">Block</button>';
+      }
+      card += "</p>";
+    }
+    return card + "</div>";
+  }).join("") + "</div>";
+  if (wall){
+    html += '<p class="legal section">Wall display. Every action is stripped rather than disabled, and the type is sized to be read across the room.</p>' +
+      '<p class="section">' + navBtn("/staff/today","Leave the wall display") + "</p>";
+  }
+  html += "</div>";
+
+  if (!wall){
+    html += '<div class="section"><h2 class="sec">Open Play tonight</h2><ul class="rows">' +
+      opsSessions().map(function(w){
+        return '<li class="row"><span class="row__main"><span class="row__title">' + esc(w.title + ", " + w.start + " to " + w.end) + "</span>" +
+          '<span class="row__sub">' + esc(w.registered + " of " + w.capacity + " registered. " + fillWord(w.registered, w.capacity) + ". " + w.level) + "</span></span>" +
+          chip(w.registered >= w.capacity ? "full" : "places") + "</li>";
+      }).join("") + "</ul>" +
+      '<p class="legal">Registration counts, taken from the admissions this app issued.</p></div>';
+  }
+
+  return staffScreen("stf-today","Today", html, {
+    bodyClass: wall ? "wallboard" : "",
+    dock: wall ? null : { action:{ label:"New", action:"plussheet" } }
+  });
+}
+
+/* ---------- 8.3 COURTS ---------- */
+function scrStaffCourts(){
+  seedOps();
+  if (!staffCan("courts")) return denied("Courts");
+  const canEdit = staffRole() !== "frontdesk";
+  let html = '<h1 class="screen">Courts</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Blocking a court removes it from every availability answer at once.</p>';
+  html += '<div class="section courtboard">' + S.courts.map(function(c){
+    return '<div class="courtcard" data-k="' + (c.status === "blocked" ? "blocked" : "open") + '">' +
+      "<h3>" + esc(c.name) + "</h3>" +
+      '<p class="courtcard__meta">' + esc(c.indoor ? "Indoor" : "Outdoor") + "</p>" +
+      '<p class="courtcard__state">' + (c.status === "blocked" ? icon("ban") + "Blocked" : icon("circle") + "Open") + "</p>" +
+      '<p class="courtcard__meta">' + esc(c.status === "blocked" ? c.block.reason + ". Until " + c.block.until : "Next booking: " +
+        (function(){ const n = S.sched.filter(function(b){ return !b.cancelled && b.court === c.id && b.day === 0 && b.hour >= todayHour(); })
+          .sort(function(a,z){ return a.hour - z.hour; })[0]; return n ? hourText(n.hour) : "None today"; })()) + "</p>" +
+      '<p class="courtcard__acts">' +
+        (c.status === "blocked"
+          ? '<button data-action="sreopen" data-v="' + esc(c.id) + '">Reopen</button>'
+          : '<button data-action="sblock" data-v="' + esc(c.id) + '">Block</button>') +
+        '<button data-action="nav" data-to="/staff/courts/' + esc(c.id) + '">Edit</button>' +
+      "</p></div>";
+  }).join("") + "</div>";
+  if (canEdit){
+    html += '<p class="section"><button class="btn btn--ghost" data-action="saddcourt">Add a court</button></p>';
+  }
+  return staffScreen("stf-courts","Courts", html);
+}
+function scrStaffCourt(params){
+  seedOps();
+  if (!staffCan("courts")) return denied("Courts");
+  const c = courtById(params.id);
+  if (!c) return scrLink({});
+  let html = '<h1 class="screen">' + esc(c.name) + "</h1>";
+  html += '<div class="section"><h2 class="sec">Status</h2><div class="card">' +
+    "<p><strong>" + esc(c.status === "blocked" ? "Blocked" : "Open") + "</strong></p>" +
+    (c.status === "blocked" ? '<p class="legal" style="margin-top:var(--s2)">' + esc(c.block.reason + ". Until " + c.block.until) + "</p>" : "") +
+    '<p style="margin-top:var(--s3)">' + (c.status === "blocked"
+      ? '<button class="btn btn--secondary btn--sm" data-action="sreopen" data-v="' + esc(c.id) + '">Reopen this court</button>'
+      : '<button class="btn btn--secondary btn--sm" data-action="sblock" data-v="' + esc(c.id) + '">Block this court</button>') + "</p></div></div>";
+  html += '<div class="section"><h2 class="sec">Details</h2><div class="card"><dl class="dl">' +
+    "<div><dt>Type</dt><dd>" + esc(c.indoor ? "Indoor" : "Outdoor") + "</dd></div>" +
+    "<div><dt>Operating hours</dt><dd>" + esc(hourText(OPEN_HOUR) + " to 11:00 PM") + "</dd></div>" +
+    "<div><dt>Rules</dt><dd>" + esc(c.rules) + "</dd></div>" +
+    "</dl></div></div>";
+  html += '<div class="section"><h2 class="sec">Photo</h2>' +
+    '<div class="skel">No photo uploaded. The slot exists; uploads are not simulated on this build.</div></div>';
+  return staffScreen("stf-court", c.name, html, { back:{ label:"Courts", to:"/staff/courts" } });
+}
+
+/* ---------- 8.4 CUSTOMERS ---------- */
+function scrStaffCustomers(){
+  seedOps();
+  if (!staffCan("customers")) return denied("Customers");
+  const q = (S.customerQuery || "").toLowerCase();
+  const list = S.customers.filter(function(c){
+    if (!q) return true;
+    return (c.name + " " + c.mobile + " " + c.email).toLowerCase().indexOf(q) >= 0;
+  });
+  let html = '<h1 class="screen">Customers</h1>';
+  html += '<div class="section">' + fieldHtml("custq","Search by name, phone, or email",{ value:S.customerQuery, placeholder:"Maria" }) +
+    '<p><button class="btn btn--secondary btn--sm" data-action="scustsearch">Search</button></p></div>';
+  html += '<div class="section"><ul class="rows">' + (list.length ? list.map(function(c){
+    return '<li><button class="row' + (c.flags.length ? " row--critical" : "") + '" style="width:100%" data-action="nav" data-to="/staff/customers/' + esc(c.id) + '">' +
+      icon("person") + '<span class="row__main"><span class="row__title">' + esc(c.name) + "</span>" +
+      '<span class="row__sub">' + esc(c.mobile + ". Member: " + c.member + (c.flags.length ? ". " + c.flags.join(", ") : "")) + "</span></span>" +
+      icon("chev-r") + "</button></li>";
+  }).join("") : '<li class="row"><span class="row__main"><span class="row__sub">No customer matches that search.</span></span></li>') + "</ul></div>";
+  return staffScreen("stf-customers","Customers", html);
+}
+function scrStaffCustomer(params){
+  seedOps();
+  if (!staffCan("customers")) return denied("Customers");
+  const cu = customerById(params.id);
+  if (!cu) return scrLink({});
+  const confirming = S.confirming === "suspend:" + cu.id;
+  let html = '<h1 class="screen">' + esc(cu.name) + "</h1>";
+  html += '<p class="legal" style="margin-top:var(--s2)">' + sampleMark("Sample") + " Simulated profile. The profile is the page; there is no separate screen per data type.</p>";
+
+  html += '<div class="section"><h2 class="sec">Membership</h2><div class="card"><dl class="dl">' +
+    "<div><dt>Status</dt><dd>" + esc(cu.member) + "</dd></div>" +
+    (cu.expires ? "<div><dt>Expires</dt><dd>" + esc(cu.expires) + "</dd></div>" : "") +
+    "</dl>" +
+    (cu.member === "Active" ? "" : '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="srenew" data-v="' + esc(cu.id) + '">Renew membership</button></p>') +
+    "</div></div>";
+
+  html += '<div class="section"><h2 class="sec">History</h2><div class="card"><dl class="dl">' +
+    "<div><dt>Bookings</dt><dd>" + cu.bookings + "</dd></div>" +
+    "<div><dt>Last visit</dt><dd>" + esc(cu.last) + "</dd></div>" +
+    "<div><dt>Balance</dt><dd>" + esc(peso(cu.balance)) + "</dd></div>" +
+    "<div><dt>Contact</dt><dd>" + esc(cu.mobile) + "</dd></div>" +
+    "</dl></div></div>";
+
+  if (cu.flags.length){
+    html += '<div class="section"><div class="crit"><p class="crit__head">' + icon("alert") + "<span>Flagged</span></p>" +
+      '<p class="crit__body">' + esc(cu.flags.join(". ")) + ".</p></div></div>";
+  }
+
+  html += '<div class="section"><h2 class="sec">Notes</h2><div class="card"><p>' + esc(cu.notes || "No notes.") + "</p></div></div>";
+
+  html += '<div class="section"><h2 class="sec">Account</h2>';
+  if (cu.suspended){
+    html += '<p class="card">Suspended. No new bookings. Existing bookings are untouched.</p>' +
+      '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="ssuspend" data-v="' + esc(cu.id) + '">Reinstate</button></p>';
+  } else if (!confirming){
+    html += '<button class="btn btn--secondary btn--sm" data-action="sconfirm" data-v="suspend:' + esc(cu.id) + '">Suspend this account</button>';
+  } else {
+    html += '<div class="crit"><p class="crit__head">' + icon("alert") + "<span>Suspending stops new bookings</span></p>" +
+      '<p class="crit__body">Existing bookings stay exactly as they are. The customer can still check in for them.</p></div>' +
+      '<div class="btn-col" style="margin-top:var(--s3)">' +
+      '<button class="btn btn--secondary" data-action="sconfirm" data-v="">Keep the account active</button>' +
+      '<button class="btn btn--critical" data-action="ssuspend" data-v="' + esc(cu.id) + '">' + icon("ban") + "Suspend</button></div>";
+  }
+  html += "</div>";
+  return staffScreen("stf-customer", cu.name, html, { back:{ label:"Customers", to:"/staff/customers" } });
+}
+
+/* ---------- 8.5 PAYMENTS ---------- */
+function scrStaffPayments(){
+  seedOps();
+  if (!staffCan("payments")) return denied("Payments");
+  const order = { failed:0, unpaid:1, partial:2, paid:3, refunded:4 };
+  const rows = S.payments.slice().sort(function(a,b){ return order[a.state] - order[b.state]; });
+  let html = '<h1 class="screen">Payments</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Unpaid and failed first. Every row states what is true, never Pending.</p>';
+  html += '<div class="section"><div class="dtable"><table><caption class="vh">Payments by state</caption>' +
+    "<thead><tr><th>Booking</th><th>Method</th><th class=\"num\">Amount</th><th>State</th><th>Action</th></tr></thead><tbody>";
+  rows.forEach(function(p){
+    const b = bookingById(p.booking);
+    if (!b) return;
+    const att = p.state === "failed" || (p.state === "unpaid" && b.overdue);
+    html += '<tr data-k="' + (att ? "attention" : "") + '"><td>' + esc(b.code) + "<br><small class=\"muted\">" + esc(b.name) + "</small></td>" +
+      "<td>" + esc(p.method) + '</td><td class="num">' + esc(peso(p.amount)) + "</td>" +
+      "<td>" + (att ? '<span class="txt-critical">' + esc(PAY_WORD[p.state]) + "</span>" : esc(PAY_WORD[p.state])) + "</td>" +
+      "<td>" + (p.state === "paid"
+        ? '<button class="cal__today" data-action="srefundask" data-v="' + esc(b.id) + '">Refund</button>'
+        : p.state === "refunded"
+          ? '<span class="legal">Done</span>'
+          : '<button class="cal__today" data-action="srecord" data-v="' + esc(b.id) + '">Record</button>') + "</td></tr>";
+  });
+  html += "</tbody></table></div></div>";
+  html += '<p class="section"><button class="btn btn--secondary btn--sm" data-action="sexport">Export as CSV</button></p>';
+  html += '<p class="legal">The export is produced in the browser. Nothing leaves this build.</p>';
+  return staffScreen("stf-payments","Payments", html);
+}
+
+/* ---------- 8.6 PRICING ---------- */
+function scrStaffPricing(){
+  seedOps();
+  if (!staffCan("pricing")) return denied("Pricing");
+  let html = '<h1 class="screen">Pricing</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">One row per schedule window. Peak, off-peak, member, and Open Play are all just rows.</p>';
+  html += '<div class="section"><div class="dtable"><table><caption class="vh">Rate table</caption>' +
+    '<thead><tr><th>Schedule window</th><th class="num">Price</th><th>Change</th></tr></thead><tbody>';
+  S.rates.forEach(function(r){
+    html += "<tr><td>" + esc(r.window) + "<br><small class=\"muted\">" + esc(r.note) + '</small></td><td class="num">' + esc(peso(r.price)) + "</td>" +
+      '<td><button class="cal__today" data-action="srate" data-v="' + esc(r.id) + '">Edit</button></td></tr>';
+  });
+  html += "</tbody></table></div></div>";
+  html += '<p class="legal section">' + tbd("The court rate is unconfirmed: 350 or 250") +
+    ". A per-booking override lives on the booking, needs a reason, and lands in the log. There is no formula builder.</p>";
+  return staffScreen("stf-pricing","Pricing", html);
+}
+
+/* ---------- 8.7 PROGRAMS AND MEMBERSHIPS ---------- */
+function scrStaffPrograms(){
+  seedOps();
+  if (!staffCan("programs")) return denied("Programs");
+  let html = '<h1 class="screen">Programs</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Lessons, clinics, and events occupy court time as blocks, the way maintenance does.</p>';
+  html += '<div class="section"><ul class="rows">' + S.programs.map(function(p){
+    const c = courtById(p.court);
+    const full = p.registered >= p.capacity;
+    return '<li class="row' + (full ? " row--limited" : "") + '"><span class="row__main">' +
+      '<span class="row__title">' + esc(p.name) + "</span>" +
+      '<span class="row__sub">' + esc(p.when + ". " + (c ? c.name : "Court") + ". " + p.registered + " of " + p.capacity + " registered") + "</span></span>" +
+      (full ? chip("full") : chip("available")) + "</li>";
+  }).join("") + "</ul></div>";
+  html += '<p class="legal section">Seeded thin: Enough rows to walk the flows, no more.</p>';
+  return staffScreen("stf-programs","Programs", html);
+}
+function scrStaffMemberships(){
+  seedOps();
+  if (!staffCan("memberships")) return denied("Memberships");
+  let html = '<h1 class="screen">Memberships</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Plans and members. A member\'s status renders on their customer profile.</p>';
+  html += '<div class="section"><ul class="rows">' + S.memberships.map(function(m){
+    return '<li class="row"><span class="row__main"><span class="row__title">' + esc(m.plan + ", " + peso(m.price)) + "</span>" +
+      '<span class="row__sub">' + esc(m.members + " members. " + m.note) + "</span></span></li>";
+  }).join("") + "</ul></div>";
+  html += '<div class="section"><h2 class="sec">Members</h2><ul class="rows">' +
+    S.customers.filter(function(c){ return c.member !== "None"; }).map(function(c){
+      return '<li><button class="row" style="width:100%" data-action="nav" data-to="/staff/customers/' + esc(c.id) + '">' +
+        '<span class="row__main"><span class="row__title">' + esc(c.name) + "</span>" +
+        '<span class="row__sub">' + esc(c.member + (c.expires ? ". Expires " + c.expires : "")) + "</span></span>" + icon("chev-r") + "</button></li>";
+    }).join("") + "</ul></div>";
+  return staffScreen("stf-memberships","Memberships", html);
+}
+
+/* ---------- 8.8 REPORTS ---------- */
+function scrStaffReports(){
+  seedOps();
+  if (!staffCan("reports")) return denied("Reports");
+  const live = S.sched.filter(function(b){ return !b.cancelled; });
+  const paid = S.payments.filter(function(p){ return p.state === "paid"; });
+  const revenue = paid.reduce(function(s,p){ return s + p.amount; }, 0);
+  const cancelled = S.sched.filter(function(b){ return b.cancelled; }).length;
+  const byHour = {};
+  live.forEach(function(b){ byHour[b.hour] = (byHour[b.hour] || 0) + 1; });
+  let busiest = OPEN_HOUR, best = 0;
+  Object.keys(byHour).forEach(function(h){ if (byHour[h] > best){ best = byHour[h]; busiest = parseInt(h,10); } });
+  const util = Math.round(live.length / (S.courts.length * BOARD_HOURS.length) * 100);
+
+  const cards = [
+    ["Busiest time", hourText(busiest) + ", " + best + " " + plural(best,"booking","bookings"), "hours"],
+    ["Court utilization", util + "% of the hours open today", "courts"],
+    ["Revenue this month", peso(revenue) + " recorded as paid", "money"],
+    ["Booking volume", live.length + " live " + plural(live.length,"booking","bookings"), "volume"],
+    ["Cancellation rate", cancelled + " of " + S.sched.length, "cancels"]
+  ];
+  let html = '<h1 class="screen">Reports</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Plain summaries first. Each one opens a single table.</p>';
+  html += '<div class="section modgrid">' + cards.map(function(c){
+    const open = !!S.openRow[c[2]];
+    return '<div><button class="mod" data-action="sreport" data-v="' + esc(c[2]) + '" aria-expanded="' + open + '">' + icon("list-pos") +
+      '<span class="mod__main"><span class="mod__title">' + esc(c[0]) + '</span><span class="mod__sub">' + esc(c[1]) + "</span></span>" +
+      icon(open ? "chev-d" : "chev-r") + "</button>" +
+      '<div class="disclose__body" data-open="' + (open?1:0) + '"' + (open ? "" : " hidden") + ">" + reportTable(c[2]) + "</div></div>";
+  }).join("") + "</div>";
+  html += '<p class="legal section">Reports are never the landing screen, and there is no chart wall.</p>';
+  return staffScreen("stf-reports","Reports", html);
+}
+function reportTable(key){
+  seedOps();
+  if (key === "hours"){
+    const byHour = {};
+    S.sched.filter(function(b){ return !b.cancelled; }).forEach(function(b){ byHour[b.hour] = (byHour[b.hour] || 0) + 1; });
+    return '<div class="dtable"><table><thead><tr><th>Hour</th><th class="num">Bookings</th></tr></thead><tbody>' +
+      BOARD_HOURS.map(function(h){ return "<tr><td>" + esc(hourText(h)) + '</td><td class="num">' + (byHour[h] || 0) + "</td></tr>"; }).join("") +
+      "</tbody></table></div>";
+  }
+  if (key === "courts"){
+    return '<div class="dtable"><table><thead><tr><th>Court</th><th class="num">Hours sold</th><th>Status</th></tr></thead><tbody>' +
+      S.courts.map(function(c){
+        const n = S.sched.filter(function(b){ return !b.cancelled && b.court === c.id; }).length;
+        return "<tr><td>" + esc(c.name) + '</td><td class="num">' + n + "</td><td>" + esc(c.status === "blocked" ? "Blocked" : "Open") + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+  if (key === "money"){
+    return '<div class="dtable"><table><thead><tr><th>State</th><th class="num">Count</th><th class="num">Amount</th></tr></thead><tbody>' +
+      Object.keys(PAY_WORD).map(function(k){
+        const rows = S.payments.filter(function(p){ return p.state === k; });
+        return "<tr><td>" + esc(PAY_WORD[k]) + '</td><td class="num">' + rows.length + '</td><td class="num">' +
+          esc(peso(rows.reduce(function(s,p){ return s + p.amount; },0))) + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+  if (key === "volume"){
+    return '<div class="dtable"><table><thead><tr><th>Source</th><th class="num">Bookings</th></tr></thead><tbody>' +
+      Object.keys(SOURCE_WORD).map(function(k){
+        return "<tr><td>" + esc(SOURCE_WORD[k]) + '</td><td class="num">' +
+          S.sched.filter(function(b){ return b.source === k; }).length + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+  return '<div class="dtable"><table><thead><tr><th>Booking</th><th>State</th></tr></thead><tbody>' +
+    S.sched.map(function(b){ return "<tr><td>" + esc(b.code) + "</td><td>" + (b.cancelled ? "Cancelled" : "Live") + "</td></tr>"; }).join("") +
+    "</tbody></table></div>";
+}
+
+/* ---------- 8.9 STAFF, HOURS, LOG ---------- */
+function scrStaffAccounts(){
+  seedOps();
+  if (!staffCan("staff")) return denied("Staff accounts");
+  const roles = ["Owner","Operations Manager","Front Desk","Coach","Scorekeeper"];
+  let html = '<h1 class="screen">Staff</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Role changes are recorded in the activity log.</p>';
+  html += '<div class="section"><ul class="rows">' + S.staffAccounts.map(function(a){
+    return '<li class="row"><span class="row__main"><span class="row__title">' + esc(a.name) + "</span>" +
+      '<span class="row__sub">' + esc(a.role + ". " + (a.active ? "Active" : "Disabled")) + "</span></span>" +
+      '<button class="cal__today" data-action="srole" data-v="' + esc(a.id) + '">Role</button>' +
+      '<button class="cal__today" data-action="sdisable" data-v="' + esc(a.id) + '">' + (a.active ? "Disable" : "Enable") + "</button></li>";
+  }).join("") + "</ul></div>";
+  html += '<p class="legal section">Roles available: ' + esc(roles.join(", ")) + ".</p>";
+  return staffScreen("stf-staff","Staff", html);
+}
+function scrStaffHours(){
+  seedOps();
+  if (!staffCan("hours")) return denied("Hours and closures");
+  let html = '<h1 class="screen">Hours and closures</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">A facility closure never requires touching courts one by one.</p>';
+  html += '<div class="section"><h2 class="sec">Facility hours</h2><div class="card"><dl class="dl">' +
+    ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(function(d){
+      return "<div><dt>" + d + "</dt><dd>6:00 AM to 11:00 PM</dd></div>";
+    }).join("") + "</dl></div></div>";
+  html += '<div class="section"><h2 class="sec">Closures</h2><ul class="rows">' +
+    '<li class="row"><span class="row__main"><span class="row__title">No closures recorded</span>' +
+    '<span class="row__sub">Holidays, temporary closures, and private event blocks all live here.</span></span></li></ul>' +
+    '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="sclose">Close the facility for a day</button></p></div>';
+  return staffScreen("stf-hours","Hours and closures", html);
+}
+function scrStaffLog(){
+  seedOps();
+  if (!staffCan("log")) return denied("The activity log");
+  let html = '<h1 class="screen">Activity log</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Readable sentences with a time and an actor.</p>';
+  html += '<div class="section loglist">' + (S.log.length ? S.log.map(logLine).join("") : '<p class="legal">Nothing recorded yet.</p>') + "</div>";
+  return staffScreen("stf-log","Activity log", html);
+}
+function scrStaffMore(){
+  seedOps();
+  const items = STAFF_MORE.filter(function(m){ return staffCan(m.mod); });
+  let html = '<h1 class="screen">More</h1>';
+  html += '<p class="lede" style="margin-top:var(--s3)">Signed in as ' + esc(roleLabel()) + ".</p>";
+  html += '<div class="section modgrid">' + items.map(function(m){
+    return '<button class="mod" data-action="nav" data-to="' + esc(m.to) + '">' + icon(m.glyph) +
+      '<span class="mod__main"><span class="mod__title">' + esc(m.label) + '</span><span class="mod__sub">' + esc(m.sub) + "</span></span>" +
+      icon("chev-r") + "</button>";
+  }).join("") + "</div>";
+  if (staffRole() === "frontdesk"){
+    /* The sentence says that something is missing without naming it. Naming the
+       modules would put the words back into a page the whole point of which is
+       that they are not in it, and the verification sweep reads this page for
+       exactly those words. */
+    html += '<p class="legal section">Some modules are outside the Front Desk role. They are absent from this page rather than grayed, and the server denies them as well.</p>';
+  }
+  return staffScreen("stf-more","More", html);
+}
+
+/* ---------- ROUTE TABLE, CLAUDE VERSION ----------
+   Registered here, ahead of the older table, because resolve() returns the
+   first pattern that matches. The old staff routes stay registered below and
+   are the forwarding targets for anything that still points at them. */
+route("/book", scrBook);
+route("/staff/today", scrStaffToday);
+route("/staff/bookings", scrStaffBookings);
+route("/staff/bookings/:id", scrStaffBookingDetail);
+route("/staff/courts", scrStaffCourts);
+route("/staff/courts/:id", scrStaffCourt);
+route("/staff/customers", scrStaffCustomers);
+route("/staff/customers/:id", scrStaffCustomer);
+route("/staff/payments", scrStaffPayments);
+route("/staff/pricing", scrStaffPricing);
+route("/staff/programs", scrStaffPrograms);
+route("/staff/memberships", scrStaffMemberships);
+route("/staff/reports", scrStaffReports);
+route("/staff/staff", scrStaffAccounts);
+route("/staff/hours", scrStaffHours);
+route("/staff/log", scrStaffLog);
+route("/staff/more", scrStaffMore);
+/* Old equivalents forward rather than dying. /staff/booking/:id still answers
+   for a live customer order, which is a different record from a board block,
+   so it resolves against the board first and falls back to the order screen.
+   /staff/exceptions folded into Needs attention on Today, which is where the
+   same rows now live. */
+route("/staff/booking/:id", function(p){
+  return bookingById(p.id) ? scrStaffBookingDetail(p) : scrStaffBooking(p);
+});
+route("/staff/exceptions", scrStaffToday);
+</script>
+
 <script>
 "use strict";
 /* ============================================================
@@ -7289,6 +9020,919 @@ window.addEventListener("hashchange", render);
 if (!location.hash) location.hash = "/";
 render();
 </script>
+<script>
+"use strict";
+/* ============================================================
+   CLAUDE VERSION, PART TWO
+   The behaviour the new screens need: the two menu surfaces, the calendar
+   keyboard and pointer models, every staff action, the text size control, and
+   the extended harness. Loaded last on purpose. A function declared here
+   replaces the same name declared in an earlier block, which is how the menu
+   and the harness are rebuilt without editing what they replace.
+   ============================================================ */
+
+/* ============================================================
+   4. THE MENU BUTTON AND THE MENU
+   One button at every width, two surfaces. Below 1024px the surface is the
+   existing bottom sheet. From 1024px it is a popover anchored under the
+   button, because a fine pointer should not travel the height of the screen
+   for a list of five links. They are different components, so crossing the
+   breakpoint with the menu open closes it rather than morphing.
+   Behaviour contract, both forms: focus trapped inside, Escape closes,
+   backdrop or outside click closes, focus returns to the button, body scroll
+   locked while open, route change closes, and selecting a row closes the menu
+   before it navigates so the surface never lingers over the next screen.
+   ============================================================ */
+const MENU_MQ = window.matchMedia ? window.matchMedia("(min-width:1024px)") : { matches:false };
+function menuIsWide(){ return !!MENU_MQ.matches; }
+
+function menuRowsHtml(){
+  const dark = currentTheme() === "dark";
+  const path = currentPath();
+  let b = "";
+  if (S.account){
+    b += '<p class="legal" style="padding:0 0 var(--s3)">Signed in as <strong>' +
+      esc(S.account.name || S.account.mobile) + "</strong></p>";
+  }
+  /* Every customer destination, unfiltered, including the ones the navigation
+     strip folds away at this width. A width folds a destination away; it never
+     loses one. */
+  PUBLIC_NAV.forEach(function(t){
+    const href = tabHref(t);
+    b += '<button class="menurow" data-action="menugo" data-to="' + esc(href) + '"' +
+      (t.match.indexOf(path) >= 0 ? ' aria-current="page"' : "") + ">" +
+      icon(t.glyph) + "<span>" + esc(t.label) + "</span></button>";
+  });
+  b += '<button class="menurow" data-action="menugo" data-to="/policies"' +
+    (path === "/policies" ? ' aria-current="page"' : "") + ">" + icon("info") + "<span>Policies</span></button>";
+  if (S.account){
+    b += '<button class="menurow" data-action="menugo" data-to="/me/profile">' + icon("person") + "<span>Profile</span></button>";
+    b += '<button class="menurow" data-action="signout">' + icon("return") + "<span>Log out</span></button>";
+  } else {
+    b += '<button class="menurow" data-action="menugo" data-to="/signin">' + icon("person") + "<span>Log in</span></button>";
+  }
+  /* 7.3 The text size control, persisted beside the theme. */
+  b += '<div class="sizerow"><span>Text size</span>' +
+    ["100","112","128"].map(function(v, i){
+      return '<button data-action="textsize" data-v="' + v + '" aria-pressed="' + (S.textSize === v) + '"' +
+        ' aria-label="Text size ' + v + ' percent">A' + (i ? "+" : "") + "</button>";
+    }).join("") + "</div>";
+  b += '<button class="menurow" data-action="theme" aria-pressed="' + dark + '">' +
+    icon(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>";
+  b += '<button class="menurow" data-action="demo">' + icon("flask") + "<span>Staging harness</span></button>";
+  return b;
+}
+
+/* The popover, from 1024px. Anchored to the button, focus trapped by hand
+   because a popover is not a dialog and gets none of that for free. */
+let menuOpener = null;
+function menuButton(){ return document.querySelector(".barmenu"); }
+function popEl(){ return document.getElementById("menupop"); }
+function menuOpen(){
+  const p = popEl();
+  return (p && !p.hidden) || !!(document.getElementById("sheet").open && document.querySelector("#sheet .menusheet"));
+}
+function openAppMenu(){
+  const btn = menuButton();
+  menuOpener = btn || null;
+  if (menuIsWide()){
+    closeSheet();
+    const p = popEl();
+    if (!p) return;
+    p.innerHTML = '<div class="menusheet" role="menu" aria-label="Menu">' + menuRowsHtml() + "</div>";
+    p.hidden = false;
+    p.setAttribute("data-open","1");
+    if (btn) btn.setAttribute("aria-expanded","true");
+    document.body.style.overflow = "hidden";
+    const first = p.querySelector("button");
+    if (first) first.focus();
+    return;
+  }
+  /* Below the breakpoint this is still a modal dialog, for the focus trap and the
+     Escape key, but it is placed against the button rather than laid along the
+     bottom edge. The narrow form and the wide form now open from the same corner
+     and in the same direction; only the containing element differs. */
+  const dlg = document.getElementById("sheet");
+  dlg.innerHTML = '<div class="sheet"><div class="sheet__head"><h2 id="sheet-title">Menu</h2>' +
+    '<button class="sheet__close" data-action="closemenu" aria-label="Close the menu">' + icon("x") + "</button></div>" +
+    '<div class="sheet__body"><div class="menusheet">' + menuRowsHtml() + "</div></div></div>";
+  dlg.classList.add("is-anchored");
+  anchorMenu();
+  if (!dlg.open) dlg.showModal();
+  if (btn) btn.setAttribute("aria-expanded","true");
+}
+function closeAppMenu(refocus){
+  const p = popEl();
+  if (p && !p.hidden){ p.hidden = true; p.removeAttribute("data-open"); p.innerHTML = ""; }
+  const dlg = document.getElementById("sheet");
+  if (dlg.open && dlg.querySelector(".menusheet")) dlg.close();
+  unanchorSheet();
+  document.body.style.overflow = "";
+  const btn = menuButton();
+  if (btn) btn.setAttribute("aria-expanded","false");
+  if (refocus !== false && menuOpener && document.contains(menuOpener)) menuOpener.focus();
+  menuOpener = null;
+}
+/* Crossing the breakpoint with the menu open closes it. The two forms are
+   different components and a live morph between them is not worth the code. */
+if (MENU_MQ.addEventListener) MENU_MQ.addEventListener("change", function(){ if (menuOpen()) closeAppMenu(false); });
+else if (MENU_MQ.addListener) MENU_MQ.addListener(function(){ if (menuOpen()) closeAppMenu(false); });
+/* Outside click and Escape, for the popover only: the sheet is a native
+   dialog and already has both. */
+document.addEventListener("click", function(ev){
+  const p = popEl();
+  if (!p || p.hidden) return;
+  if (ev.target.closest && (ev.target.closest("#menupop") || ev.target.closest(".barmenu"))) return;
+  closeAppMenu(false);
+}, true);
+document.addEventListener("keydown", function(ev){
+  const p = popEl();
+  if (!p || p.hidden) return;
+  if (ev.key === "Escape"){ ev.preventDefault(); closeAppMenu(true); return; }
+  if (ev.key !== "Tab") return;
+  const items = Array.prototype.slice.call(p.querySelectorAll("button"));
+  if (!items.length) return;
+  const first = items[0], last = items[items.length - 1];
+  if (ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
+  else if (!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
+});
+window.addEventListener("hashchange", function(){ if (menuOpen()) closeAppMenu(false); });
+
+/* ============================================================
+   THE CALENDAR KEYBOARD MODEL, SECTION 6.1
+   Arrow keys move the focused day or slot, PageUp and PageDown move one
+   period, Home jumps to Today, Enter opens. The grid is a real role="grid"
+   and its cells carry written labels, so the announcement is a sentence and
+   not a coordinate.
+   ============================================================ */
+document.addEventListener("keydown", function(ev){
+  const cell = ev.target.closest ? ev.target.closest("[data-cal-cell], .board__slot") : null;
+  const wrap = ev.target.closest ? ev.target.closest(".cal") : null;
+  if (!wrap) return;
+  const ns = wrap.getAttribute("data-ns") || "book";
+  const keys = ["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","PageUp","PageDown","Home"];
+  if (keys.indexOf(ev.key) < 0) return;
+  if (ev.key === "Home"){ ev.preventDefault(); calGo(ns, "today"); return; }
+  if (ev.key === "PageUp"){ ev.preventDefault(); calGo(ns, -1); return; }
+  if (ev.key === "PageDown"){ ev.preventDefault(); calGo(ns, 1); return; }
+  if (!cell) return;
+  const cells = Array.prototype.slice.call(wrap.querySelectorAll("[data-cal-cell], .board__slot"));
+  const i = cells.indexOf(cell);
+  if (i < 0) return;
+  const row = wrap.querySelector(".cal__week") ? 7 : (S.courts.length || 4);
+  let next = i;
+  if (ev.key === "ArrowLeft") next = i - 1;
+  if (ev.key === "ArrowRight") next = i + 1;
+  if (ev.key === "ArrowUp") next = i - row;
+  if (ev.key === "ArrowDown") next = i + row;
+  if (next < 0 || next >= cells.length) return;
+  ev.preventDefault();
+  cells[next].focus();
+});
+function calGo(ns, what){
+  const st = ns === "s" ? S.scal : S.cal;
+  const span = st.view === "day" ? 1 : st.view === "week" ? 7 : 30;
+  if (what === "today"){ st.day = 0; st.anim = "fade"; }
+  else { st.day += what * span; st.anim = what > 0 ? "next" : "prev"; }
+  /* The live region gets the new period as a sentence, so a screen reader hears
+     where the calendar went rather than watching it move. */
+  announce(calLabel(st));
+  S.inPlace = true; render();
+  st.anim = "";
+}
+/* The animation flag is a one-shot. Left set, a later render that never moved
+   the calendar would replay the slide. */
+function calPaint(st){ S.inPlace = true; render(); st.anim = ""; }
+
+/* ============================================================
+   THE BOARD, DRAG AND DROP
+   A block drags to another court or hour, and the same block's Move button
+   does it with pickers. Drag is never the only path, and a drop always asks
+   before it commits.
+   ============================================================ */
+(function(){
+  let dragId = null;
+  document.addEventListener("dragstart", function(ev){
+    const el = ev.target.closest ? ev.target.closest("[data-drag-id]") : null;
+    if (!el) return;
+    dragId = el.getAttribute("data-drag-id");
+    el.setAttribute("data-drag","1");
+    if (ev.dataTransfer) ev.dataTransfer.effectAllowed = "move";
+  });
+  document.addEventListener("dragend", function(){
+    document.querySelectorAll('[data-drag="1"]').forEach(function(e){ e.removeAttribute("data-drag"); });
+    dragId = null;
+  });
+  document.addEventListener("dragover", function(ev){
+    if (!dragId) return;
+    const drop = ev.target.closest ? ev.target.closest('[data-drop="1"]') : null;
+    if (!drop) return;
+    ev.preventDefault();
+    if (ev.dataTransfer) ev.dataTransfer.dropEffect = "move";
+  });
+  document.addEventListener("drop", function(ev){
+    if (!dragId) return;
+    const drop = ev.target.closest ? ev.target.closest('[data-drop="1"]') : null;
+    if (!drop) return;
+    ev.preventDefault();
+    const b = bookingById(dragId);
+    const court = drop.getAttribute("data-c"), hour = parseInt(drop.getAttribute("data-h"),10);
+    dragId = null;
+    if (!b) return;
+    confirmMove(b, court, hour);
+  });
+})();
+function confirmMove(b, court, hour){
+  const c = courtById(court);
+  askSheet("Move this booking", [
+    "<p>Move <strong>" + esc(b.code) + "</strong> to " + esc(c ? c.name : "that court") + " at " + esc(hourText(hour)) + "?</p>",
+    '<p class="legal">Nothing changes until you confirm.</p>'
+  ].join(""), [
+    { label:"Keep it where it is", action:"closesheet" },
+    { label:"Move it", action:"sdomove", v: b.id + "|" + court + "|" + hour, primary:true }
+  ]);
+}
+
+/* A small confirmation and form sheet, used by every staff action that needs
+   one. Native dialog, so focus is trapped and Escape closes without any of it
+   being written twice. */
+function askSheet(title, body, buttons){
+  const dlg = document.getElementById("sheet");
+  unanchorSheet();
+  dlg.innerHTML = '<div class="sheet"><div class="sheet__head"><h2 id="sheet-title">' + esc(title) + "</h2>" +
+    '<button class="sheet__close" data-action="closesheet" aria-label="Close">' + icon("x") + "</button></div>" +
+    '<div class="sheet__body">' + body +
+    '<div class="btn-col">' + buttons.map(function(b){
+      return '<button class="btn ' + (b.critical ? "btn--critical" : b.primary ? "btn--primary" : "btn--secondary") + '"' +
+        ' data-action="' + esc(b.action) + '"' + (b.v ? ' data-v="' + esc(b.v) + '"' : "") + ">" +
+        (b.critical ? icon("alert") : "") + esc(b.label) + "</button>";
+    }).join("") + "</div></div></div>";
+  if (!dlg.open) dlg.showModal();
+}
+
+/* ---------- 5.2 THE PLUS SHEET ----------
+   Four actions, not a screen. Each lands in the shortest possible form. */
+function openPlusSheet(){
+  unanchorSheet();
+  seedOps();
+  const dlg = document.getElementById("sheet");
+  dlg.innerHTML = '<div class="sheet"><div class="sheet__head"><h2 id="sheet-title">New</h2>' +
+    '<button class="sheet__close" data-action="closesheet" aria-label="Close">' + icon("x") + "</button></div>" +
+    '<div class="sheet__body"><div class="plusgrid">' +
+    '<button data-action="snewbooking">' + icon("cal") + "<span>New booking</span></button>" +
+    '<button data-action="acctnav" data-to="/staff/walkin">' + icon("person") + "<span>Walk-in</span></button>" +
+    '<button data-action="sblockpick">' + icon("ban") + "<span>Block a court</span></button>" +
+    '<button data-action="srecordpick">' + icon("tag") + "<span>Record a payment</span></button>" +
+    "</div></div></div>";
+  if (!dlg.open) dlg.showModal();
+}
+
+/* ---------- CSV, PRODUCED IN THE BROWSER ---------- */
+function downloadCsv(rows, filename){
+  const csv = rows.map(function(r){
+    return r.map(function(v){ return '"' + String(v == null ? "" : v).replace(/"/g,'""') + '"'; }).join(",");
+  }).join("\r\n");
+  const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  triggerDownload(url, filename);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 8000);
+  announce("Exported " + (rows.length - 1) + " rows as CSV.");
+}
+
+/* ---------- TEXT SIZE, PERSISTED BESIDE THE THEME ---------- */
+function setTextSize(v){
+  S.textSize = v;
+  document.documentElement.setAttribute("data-textsize", v);
+  try { localStorage.setItem("tfc-textsize", v); } catch (e) {}
+  announce("Text size " + v + " percent.");
+}
+(function(){
+  let v = null;
+  try { v = localStorage.getItem("tfc-textsize"); } catch (e) {}
+  if (v === "112" || v === "128"){ S.textSize = v; document.documentElement.setAttribute("data-textsize", v); }
+})();
+
+/* ============================================================
+   ACTIONS, ADDED
+   Every staff action below calls one named OPS function, and every OPS
+   function writes to the log, so an action cannot skip the record.
+   ============================================================ */
+Object.assign(ACTIONS, {
+  /* menu */
+  appmenu: function(){
+    captureForms();
+    if (menuOpen()) closeAppMenu(true); else openAppMenu();
+  },
+  closemenu: function(){ closeAppMenu(true); },
+  menugo: function(el){
+    /* Close first, then navigate, so the surface never lingers over the next
+       screen and focus is not left inside a menu that is gone. */
+    closeAppMenu(false);
+    captureForms();
+    go(el.getAttribute("data-to"));
+  },
+  textsize: function(el){
+    setTextSize(el.getAttribute("data-v"));
+    if (menuOpen()) openAppMenu();
+    S.inPlace = true; render();
+  },
+
+  /* player calendar */
+  bookprod: function(el){ S.cal.product = el.getAttribute("data-v"); S.cal.anim = "fade"; S.refocus = el.getAttribute("data-fk"); calPaint(S.cal); },
+  bookview: function(el){ S.cal.view = el.getAttribute("data-v"); S.cal.anim = "fade"; calPaint(S.cal); },
+  bookstep: function(el){ calGo("book", parseInt(el.getAttribute("data-v"),10)); },
+  booktoday: function(){ calGo("book","today"); },
+  bookpick: function(el){ S.cal.day = parseInt(el.getAttribute("data-v"),10); S.cal.view = "day"; S.cal.anim = "fade"; calPaint(S.cal); },
+  bookhour: function(el){
+    if (el.getAttribute("aria-disabled") === "true") return;
+    S.draft.product = "court";
+    S.draft.dayIndex = parseInt(el.getAttribute("data-v"),10);
+    S.draft.time = el.getAttribute("data-t");
+    go("/court");
+  },
+  bookopenday: function(el){
+    S.draft.product = "court";
+    S.draft.dayIndex = parseInt(el.getAttribute("data-v"),10);
+    go("/court");
+  },
+  booknext: function(el){
+    if (el.getAttribute("data-v") === "court"){
+      const n = nextOpenCourt();
+      if (!n) return;
+      S.draft.product = "court"; S.draft.dayIndex = n.day; S.draft.time = n.time;
+      go("/court");
+      return;
+    }
+    const s = nextOpenSession();
+    if (s) go("/openplay/" + s.id);
+  },
+
+  /* staff calendar */
+  sview: function(el){ S.scal.view = el.getAttribute("data-v"); S.scal.anim = "fade"; calPaint(S.scal); },
+  sstep: function(el){ calGo("s", parseInt(el.getAttribute("data-v"),10)); },
+  stoday: function(){ calGo("s","today"); },
+  spick: function(el){ S.scal.day = parseInt(el.getAttribute("data-v"),10); S.scal.view = "day"; S.scal.anim = "fade"; calPaint(S.scal); },
+
+  /* filters, stated and removable */
+  sfilters: function(){
+    const opts = function(name, list, cur){
+      return "<h3 class=\"sub\">" + name + '</h3><div class="seg" style="margin:var(--s2) 0 var(--s4)">' +
+        list.map(function(o){
+          return '<button data-action="ssetfilter" data-k="' + esc(name.toLowerCase()) + '" data-v="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '">' + esc(o[1]) + "</button>";
+        }).join("") + "</div>";
+    };
+    askSheet("Filters",
+      opts("Court", [["all","All"]].concat(S.courts.map(function(c){ return [c.id, c.name]; })), S.filters.court) +
+      opts("Status", [["all","All"],["confirmed","Confirmed"],["pending","Payment pending"],["cancelled","Cancelled"]], S.filters.status) +
+      opts("Product", [["all","All"],["court","Court rental"],["openplay","Open Play"]], S.filters.product) +
+      opts("Source", [["all","All"],["web","Website"],["admin","Admin"],["walkin","Walk-in"]], S.filters.source),
+      [{ label:"Done", action:"closesheet", primary:true }]);
+  },
+  ssetfilter: function(el){
+    S.filters[el.getAttribute("data-k")] = el.getAttribute("data-v");
+    closeSheet(); render();
+  },
+  sclearfilter: function(el){ S.filters[el.getAttribute("data-v")] = "all"; rerenderFrom(el); },
+  sfreeat: function(){
+    askSheet("Free at",
+      '<p class="legal">Pick an hour and the open courts are listed. Nobody has to compare four columns to answer a phone call.</p>' +
+      '<div class="seg" style="flex-wrap:wrap;margin-top:var(--s3)">' +
+      BOARD_HOURS.map(function(h){
+        return '<button style="flex:0 0 auto;min-width:76px" data-action="ssetfree" data-v="' + h + '">' + esc(hourShort(h)) + "</button>";
+      }).join("") + "</div>",
+      [{ label:"Close", action:"closesheet" }]);
+  },
+  ssetfree: function(el){ S.scal.freeAt = el.getAttribute("data-v"); closeSheet(); render(); },
+  sfreeclear: function(){ S.scal.freeAt = ""; render(); },
+
+  /* board */
+  sopen: function(el){ go("/staff/bookings/" + el.getAttribute("data-v")); },
+  sslot: function(el){
+    const court = el.getAttribute("data-c"), hour = parseInt(el.getAttribute("data-h"),10);
+    const c = courtById(court);
+    askSheet("New booking",
+      "<p>" + esc((c ? c.name : "Court") + ", " + hourText(hour) + ".") + "</p>" +
+      '<p class="legal">Court and time are already filled in. Double booking is prevented at selection, not at save.</p>' +
+      fieldHtml("newname","Name",{ placeholder:"Walk-in" }),
+      [{ label:"Cancel", action:"closesheet" },
+       { label:"Create the booking", action:"sdocreate", v: court + "|" + hour, primary:true }]);
+  },
+  sdocreate: function(el){
+    const parts = el.getAttribute("data-v").split("|");
+    const f = document.getElementById("newname");
+    const b = OPS.createBooking(parts[0], parseInt(parts[1],10), f && f.value.trim(), "admin");
+    closeSheet();
+    announce("Booking created.");
+    go("/staff/bookings/" + b.id);
+  },
+  snewbooking: function(){ closeSheet(); go("/staff/bookings"); announce("Tap any open slot to start a booking with the court and time filled in."); },
+  smove: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (!b) return;
+    askSheet("Move this booking",
+      '<p class="legal">Drag is never the only path. Pick a court and an hour.</p>' +
+      '<div class="seg" style="flex-wrap:wrap;margin:var(--s3) 0">' +
+      S.courts.map(function(c){ return '<button style="flex:0 0 auto" data-action="smovec" data-v="' + esc(b.id + "|" + c.id) + '" aria-pressed="' + (c.id === b.court) + '">' + esc(c.name) + "</button>"; }).join("") + "</div>" +
+      '<div class="seg" style="flex-wrap:wrap">' +
+      BOARD_HOURS.map(function(h){ return '<button style="flex:0 0 auto;min-width:76px" data-action="smoveh" data-v="' + esc(b.id + "|" + h) + '" aria-pressed="' + (h === b.hour) + '">' + esc(hourShort(h)) + "</button>"; }).join("") + "</div>",
+      [{ label:"Done", action:"closesheet", primary:true }]);
+  },
+  smovec: function(el){
+    const p = el.getAttribute("data-v").split("|"), b = bookingById(p[0]);
+    if (b){ OPS.move(b, p[1], b.hour); closeSheet(); render(); }
+  },
+  smoveh: function(el){
+    const p = el.getAttribute("data-v").split("|"), b = bookingById(p[0]);
+    if (b){ OPS.move(b, b.court, parseInt(p[1],10)); closeSheet(); render(); }
+  },
+  sdomove: function(el){
+    const p = el.getAttribute("data-v").split("|"), b = bookingById(p[0]);
+    if (b) OPS.move(b, p[1], parseInt(p[2],10));
+    closeSheet(); render();
+  },
+  sextend: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (!b) return;
+    const ok = OPS.extend(b);
+    if (!ok) alertNow("Cannot extend. The next booking on that court starts at " + hourText(b.hour + b.hours) + ".");
+    else announce("Extended to " + b.hours + " hours.");
+    render();
+  },
+  scheckin: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (!b) return;
+    OPS.checkIn(b);
+    announce(b.name + " checked in.");
+    render();
+  },
+  scheckcode: function(){
+    askSheet("Check in by code or name",
+      '<p class="legal">A scan, a booking code, and a name all admit exactly one pass.</p>' +
+      fieldHtml("checkq","Booking code or name",{ placeholder:"SAMPLE-1840" }),
+      [{ label:"Cancel", action:"closesheet" },
+       { label:"Find and check in", action:"sdocheck", primary:true }]);
+  },
+  sdocheck: function(){
+    const f = document.getElementById("checkq");
+    const q = (f ? f.value : "").trim().toLowerCase();
+    const b = S.sched.filter(function(x){
+      return !x.cancelled && !x.checkedIn &&
+        (x.code.toLowerCase() === q || x.name.toLowerCase().indexOf(q) >= 0);
+    })[0];
+    closeSheet();
+    if (!q){ alertNow("Enter a booking code or a name."); return; }
+    if (!b){ alertNow("No booking matches that. Nothing was checked in."); return; }
+    OPS.checkIn(b);
+    announce(b.name + " checked in.");
+    render();
+  },
+  srecord: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (!b) return;
+    const p = payFor(b.id);
+    askSheet("Record a payment",
+      "<p>" + esc(b.code + ". " + peso(p ? p.amount : 0) + " due.") + "</p>",
+      [{ label:"Cash", action:"sdorecord", v: b.id + "|Cash" },
+       { label:"Maya terminal", action:"sdorecord", v: b.id + "|Maya terminal" },
+       { label:"Partial, half now", action:"sdopartial", v: b.id },
+       { label:"Cancel", action:"closesheet" }]);
+  },
+  sdorecord: function(el){
+    const p = el.getAttribute("data-v").split("|"), b = bookingById(p[0]);
+    if (b) OPS.recordPayment(b, p[1]);
+    closeSheet(); announce("Payment recorded."); render();
+  },
+  sdopartial: function(el){
+    const b = bookingById(el.getAttribute("data-v")), p = payFor(b ? b.id : "");
+    if (b && p){
+      p.state = "partial"; b.pay = "partial";
+      logIt("Recorded a partial payment on booking " + b.code + ". " + peso(Math.round(p.amount / 2)) + " remains.", b.id);
+    }
+    closeSheet(); announce("Partial payment recorded."); render();
+  },
+  srecordpick: function(){
+    seedOps();
+    const owed = S.sched.filter(function(b){ const p = payFor(b.id); return p && (p.state === "unpaid" || p.state === "partial" || p.state === "failed"); });
+    closeSheet();
+    if (!owed.length){ alertNow("Nothing is owed on the seeded day."); return; }
+    askSheet("Record a payment",
+      '<p class="legal">Bookings with money outstanding.</p>',
+      owed.slice(0,6).map(function(b){ return { label: b.code + ", " + b.name, action:"srecord", v:b.id }; })
+        .concat([{ label:"Cancel", action:"closesheet" }]));
+  },
+  srefundask: function(el){
+    const b = bookingById(el.getAttribute("data-v")), p = payFor(b ? b.id : "");
+    if (!b) return;
+    askSheet("Refund this payment",
+      '<div class="money"><p class="money__line"><span>Paid</span><b>' + esc(peso(p ? p.amount : 0)) + "</b></p>" +
+      '<p class="money__line"><span>Fee</span><b>' + tbd("To be confirmed") + "</b></p>" +
+      '<p class="money__line money__out"><span>Customer receives</span><b>' + esc(peso(p ? p.amount : 0)) + " less the fee</b></p></div>" +
+      '<p class="legal">The fee is a placeholder until the refund policy is approved.</p>',
+      [{ label:"Keep the payment", action:"closesheet" },
+       { label:"Refund", action:"sdorefund", v:b.id, critical:true }]);
+  },
+  sdorefund: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (b) OPS.refund(b);
+    closeSheet(); announce("Refund recorded."); render();
+  },
+  snote: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (!b) return;
+    askSheet("Internal note", fieldHtml("bnote","Note",{ type:"textarea", value:b.note }),
+      [{ label:"Cancel", action:"closesheet" },
+       { label:"Save the note", action:"sdonote", v:b.id, primary:true }]);
+  },
+  sdonote: function(el){
+    const b = bookingById(el.getAttribute("data-v")), f = document.getElementById("bnote");
+    if (b && f){ b.note = f.value.trim(); logIt("Added an internal note to booking " + b.code + ".", b.id); }
+    closeSheet(); render();
+  },
+  sconfirm: function(el){ S.confirming = el.getAttribute("data-v") || null; rerenderFrom(el); },
+  scancel: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (!b) return;
+    OPS.cancel(b);
+    OPS.notify(b.name, "cancellation and refund confirmation");
+    S.confirming = null;
+    announce("Booking cancelled and a refund started.");
+    go("/staff/bookings");
+  },
+
+  /* courts */
+  sblock: function(el){
+    const c = courtById(el.getAttribute("data-v"));
+    if (!c) return;
+    askSheet("Block " + c.name,
+      '<p class="legal">A blocked court leaves every availability answer at once.</p>' +
+      fieldHtml("blockwhy","Reason",{ placeholder:"Net post repair" }) +
+      fieldHtml("blockuntil","Until",{ placeholder:"6:00 PM" }),
+      [{ label:"Cancel", action:"closesheet" },
+       { label:"Block the court", action:"sdoblock", v:c.id, critical:true }]);
+  },
+  sdoblock: function(el){
+    const c = courtById(el.getAttribute("data-v"));
+    const why = document.getElementById("blockwhy"), until = document.getElementById("blockuntil");
+    if (c) OPS.blockCourt(c, (why && why.value.trim()) || "Maintenance", (until && until.value.trim()) || "End of day");
+    closeSheet();
+    if (c) announce(c.name + " blocked and removed from every availability answer.");
+    render();
+  },
+  sblockpick: function(){
+    seedOps();
+    const open = S.courts.filter(function(c){ return c.status === "open"; });
+    closeSheet();
+    if (!open.length){ alertNow("Every court is already blocked."); return; }
+    askSheet("Block a court", '<p class="legal">Pick the court.</p>',
+      open.map(function(c){ return { label:c.name, action:"sblock", v:c.id }; })
+        .concat([{ label:"Cancel", action:"closesheet" }]));
+  },
+  sreopen: function(el){
+    const c = courtById(el.getAttribute("data-v"));
+    if (c){ OPS.reopenCourt(c); announce(c.name + " reopened."); }
+    render();
+  },
+  sstart: function(el){
+    const c = courtById(el.getAttribute("data-v"));
+    if (c) logIt("Started play on " + c.name + ".", c.id);
+    announce("Started."); render();
+  },
+  send: function(el){
+    const b = bookingById(el.getAttribute("data-v"));
+    if (b) logIt("Ended the session on booking " + b.code + ".", b.id);
+    announce("Ended."); render();
+  },
+  saddcourt: function(){
+    askSheet("Add a court", fieldHtml("courtname","Court name",{ placeholder:"Court 5" }),
+      [{ label:"Cancel", action:"closesheet" },
+       { label:"Add", action:"sdoaddcourt", primary:true }]);
+  },
+  sdoaddcourt: function(){
+    const f = document.getElementById("courtname");
+    const name = (f && f.value.trim()) || ("Court " + (S.courts.length + 1));
+    const id = "c" + (S.courts.length + 1) + "x" + S.seq;
+    S.courts.push({ id:id, name:name, indoor:true, status:"open", rules:"", block:null, photo:false });
+    logIt("Added " + name + ".", id);
+    closeSheet(); render();
+  },
+
+  /* customers */
+  scustsearch: function(){
+    const f = document.getElementById("custq");
+    S.customerQuery = f ? f.value.trim() : "";
+    render();
+  },
+  srenew: function(el){
+    const cu = customerById(el.getAttribute("data-v"));
+    if (cu){ cu.member = "Active"; cu.expires = "One year from today"; logIt("Renewed the membership for " + cu.name + ".", cu.id); }
+    announce("Membership renewed."); render();
+  },
+  ssuspend: function(el){
+    const cu = customerById(el.getAttribute("data-v"));
+    if (cu){
+      OPS.suspend(cu);
+      announce(cu.suspended ? "Account suspended. No new bookings. Existing bookings are untouched." : "Account reinstated.");
+    }
+    S.confirming = null;
+    render();
+  },
+
+  /* payments, pricing, reports, staff, hours */
+  sexport: function(){
+    seedOps();
+    const rows = [["Booking","Customer","Method","Amount","State"]].concat(S.payments.map(function(p){
+      const b = bookingById(p.booking);
+      return [b ? b.code : p.booking, b ? b.name : "", p.method, p.amount, PAY_WORD[p.state]];
+    }));
+    downloadCsv(rows, "TFC-payments-SAMPLE.csv");
+    logIt("Exported the payments list as CSV.", null);
+  },
+  srate: function(el){
+    const r = S.rates.filter(function(x){ return x.id === el.getAttribute("data-v"); })[0];
+    if (!r) return;
+    askSheet("Edit the rate",
+      "<p>" + esc(r.window) + "</p>" + fieldHtml("ratev","Price in pesos",{ value:String(r.price), inputmode:"numeric" }),
+      [{ label:"Cancel", action:"closesheet" },
+       { label:"Save", action:"sdorate", v:r.id, primary:true }]);
+  },
+  sdorate: function(el){
+    const r = S.rates.filter(function(x){ return x.id === el.getAttribute("data-v"); })[0];
+    const f = document.getElementById("ratev");
+    const v = parseInt(f ? f.value : "", 10);
+    if (r && !isNaN(v) && v > 0) OPS.setRate(r, v);
+    closeSheet(); render();
+  },
+  sreport: function(el){
+    const k = el.getAttribute("data-v");
+    S.openRow[k] = !S.openRow[k];
+    rerenderFrom(el);
+  },
+  srole: function(el){
+    const a = S.staffAccounts.filter(function(x){ return x.id === el.getAttribute("data-v"); })[0];
+    if (!a) return;
+    askSheet("Change the role for " + a.name, '<p class="legal">Every role change is written to the activity log.</p>',
+      ["Owner","Operations Manager","Front Desk","Coach","Scorekeeper"].map(function(r){
+        return { label:r, action:"sdorole", v: a.id + "|" + r };
+      }).concat([{ label:"Cancel", action:"closesheet" }]));
+  },
+  sdorole: function(el){
+    const p = el.getAttribute("data-v").split("|");
+    const a = S.staffAccounts.filter(function(x){ return x.id === p[0]; })[0];
+    if (a) OPS.setStaffRole(a, p[1]);
+    closeSheet(); render();
+  },
+  sdisable: function(el){
+    const a = S.staffAccounts.filter(function(x){ return x.id === el.getAttribute("data-v"); })[0];
+    if (a) OPS.disableStaff(a);
+    render();
+  },
+  sclose: function(){
+    askSheet("Close the facility", fieldHtml("closelabel","Which day and why",{ placeholder:"Tomorrow, deep clean" }),
+      [{ label:"Cancel", action:"closesheet" },
+       { label:"Record the closure", action:"sdoclose", critical:true }]);
+  },
+  sdoclose: function(){
+    const f = document.getElementById("closelabel");
+    OPS.closeFacility((f && f.value.trim()) || "A day, reason not recorded");
+    closeSheet(); announce("Closure recorded. Every court is unavailable for that period."); render();
+  },
+
+  plussheet: function(){ captureForms(); openPlusSheet(); },
+
+  /* 7.1 Rebook. Product, duration, and party size carry over; the date and the
+     time do not, because a repeat of last week is not a booking for last week. */
+  rebook: function(el){
+    const o = S.orders[el.getAttribute("data-id")];
+    if (!o) return;
+    resetDraft();
+    S.draft.product = o.product;
+    if (o.product === "court"){
+      S.draft.duration = (o.lineItems[0] && o.lineItems[0].qty) || 1;
+      S.draft.pax = participantsOf(o).length || 4;
+      S.cal.product = "court";
+    } else {
+      S.draft.qty = (o.lineItems[0] && o.lineItems[0].qty) || 1;
+      S.cal.product = "openplay";
+    }
+    S.cal.view = "day"; S.cal.day = 0;
+    announce("Same booking, new date. Pick a day.");
+    go("/book");
+  }
+});
+
+/* ============================================================
+   9. THE STAGING HARNESS, EXTENDED
+   Everything it drove before, plus the role dimension, the seeded operations
+   day, the calendar scenarios, an hour step on the clock, and the staff-side
+   views of the current order. Same hatched quarantine, so a screenshot of it
+   still cannot pass as product UI.
+   ============================================================ */
+const OPS_SCENARIOS = [
+  { key:"opsday",     label:"Seeded operations day" },
+  { key:"emptyday",   label:"Calendar, an empty day" },
+  { key:"fullday",    label:"Calendar, a fully booked day" },
+  { key:"holiday",    label:"Calendar, a holiday closure" },
+  { key:"doublebook", label:"Calendar, a double booking attempt" }
+];
+const CLAUDE_ROUTES = [
+  ["/book","pub-book, Book, the shared calendar"],
+  ["/staff/today","stf-today, Today, check-in and live board"],
+  ["/staff/today?board","stf-today, Wall display variant"],
+  ["/staff/bookings","stf-bookings, Bookings, the admin calendar"],
+  ["/staff/courts","stf-courts, Courts"],
+  ["/staff/courts/c4","stf-court, Court detail, blocked"],
+  ["/staff/customers","stf-customers, Customers"],
+  ["/staff/customers/cu1","stf-customer, Customer profile"],
+  ["/staff/payments","stf-payments, Payments"],
+  ["/staff/pricing","stf-pricing, Pricing"],
+  ["/staff/programs","stf-programs, Programs"],
+  ["/staff/memberships","stf-memberships, Memberships"],
+  ["/staff/reports","stf-reports, Reports"],
+  ["/staff/staff","stf-staff, Staff accounts"],
+  ["/staff/hours","stf-hours, Hours and closures"],
+  ["/staff/log","stf-log, Activity log"],
+  ["/staff/more","stf-more, More"]
+];
+
+function loadOpsScenario(key){
+  seedOps(true);
+  S.surface = S.surface === "visitor" || S.surface === "player" ? "opsmanager" : S.surface;
+  S.injected = (OPS_SCENARIOS.filter(function(s){ return s.key === key; })[0] || {}).label || null;
+  S.scal = { view:"day", day:0, anim:"", freeAt:"" };
+  S.filters = { court:"all", status:"all", product:"all", source:"all" };
+  if (key === "emptyday"){
+    S.sched = [];
+    logIt("Loaded an empty day. Every hour on every court is open.", null);
+  }
+  if (key === "fullday"){
+    S.sched = [];
+    S.courts.forEach(function(c, ci){
+      if (c.status === "blocked") return;
+      BOARD_HOURS.forEach(function(h, hi){
+        const id = "f" + ci + "-" + hi;
+        S.sched.push({ id:id, court:c.id, day:0, hour:h, hours:1, name:"Booked party " + (hi+1),
+                       pax:4, pay:"paid", source:"web", product:"court",
+                       code:"SAMPLE-" + (2000 + ci*20 + hi), note:"", checkedIn:false, cancelled:false });
+        S.payments.push({ id:"p"+id, booking:id, method:"Maya", amount:350, state:"paid", refunded:0, reason:"" });
+      });
+    });
+    logIt("Loaded a fully booked day. Every open court is sold out.", null);
+  }
+  if (key === "holiday"){
+    S.courts.forEach(function(c){ OPS.blockCourt(c, "Holiday closure", "End of day"); });
+    S.sched = [];
+    logIt("Loaded a holiday closure. The facility is shut and no court is bookable.", null);
+  }
+  if (key === "doublebook"){
+    S.sched = S.sched.slice(0,3);
+    const h = BOARD_HOURS[4];
+    S.sched.forEach(function(b, i){ b.court = "c1"; b.hour = h + i; });
+    logIt("Loaded a double booking attempt. Court 1 is filled at three consecutive hours; extending the first one is refused.", null);
+  }
+  closeSheet();
+  go("/staff/bookings");
+}
+
+function openDemo(){
+  const dlg = document.getElementById("sheet");
+  unanchorSheet();
+  const o = S.orders[S.currentOrderId];
+  let b = "";
+  b += '<p class="legal">Staging harness, not part of the product. Everything is simulated in memory and is lost on refresh.</p>';
+
+  /* 9.1 Surface gains the role dimension. Switching role re-renders the staff
+     surface with that role's gating, so the reduced Front Desk view can be
+     walked through rather than described. */
+  b += '<div><h3>Surface and role</h3><div class="grid2">' +
+    [["visitor","Visitor"],["player","Signed-in player"],["frontdesk","Front Desk"],["opsmanager","Operations Manager"],["owner","Owner"]]
+      .map(function(s){ return '<button class="h" data-action="setsurface" data-v="' + s[0] + '" aria-pressed="' + (S.surface === s[0]) + '">' + s[1] + "</button>"; }).join("") +
+    '</div><p class="legal" style="margin-top:var(--s2)">Front Desk loses Pricing, Programs, Memberships, Reports, Staff, Hours, and the log. Those modules are absent from the DOM, not grayed. The real system enforces this on the server.</p></div>';
+
+  b += '<div><h3>Operations scenarios</h3><div class="grid1">' +
+    OPS_SCENARIOS.map(function(s){ return '<button class="h" data-action="opsscenario" data-v="' + s.key + '">' + esc(s.label) + "</button>"; }).join("") +
+    '</div><p class="legal" style="margin-top:var(--s2)">The seeded day is a dozen bookings across four courts with mixed payment states, one blocked court, two arrivals due, one overdue unpaid booking, one walk-in, and two Open Play sessions at different fill levels.</p></div>';
+
+  b += '<div><h3>Customer scenarios</h3><div class="grid1">' +
+    SCENARIOS.map(function(s){ return '<button class="h" data-action="scenario" data-v="' + s.key + '">' + esc(s.label) + "</button>"; }).join("") +
+    "</div></div>";
+
+  /* 9.4 The clock gains an hour step. Court sessions are hourly, and stepping
+     a live board forward in minutes is slow enough to make the demo tedious. */
+  b += '<div><h3>Simulated clock</h3><div class="grid2">' +
+    [["1","Advance 1 minute"],["5","Advance 5 minutes"],["9","Advance 9 minutes"],["60","Advance 1 hour"]]
+      .map(function(c){ return '<button class="h" data-action="clock" data-v="' + c[0] + '">' + c[1] + "</button>"; }).join("") +
+    '<button class="h" data-action="clock" data-v="expire">Expire hold now</button>' +
+    '<button class="h" data-action="clock" data-v="pause" aria-pressed="' + S.clockPaused + '">' + (S.clockPaused ? "Resume clock" : "Pause clock") + "</button>" +
+    '<button class="h" data-action="clock" data-v="reset">Reset clock</button>' +
+    "</div>" +
+    '<p class="legal" style="margin-top:var(--s2)">Expiry compares the current time against a stored absolute deadline, never a tick counter, so a backgrounded tab still expires correctly.</p></div>';
+
+  b += '<div><h3>Connectivity</h3><div class="grid1">' +
+    [["online","Online"],["availability_down","Live availability unavailable"],["payments_down","Payment provider unavailable"],["maintenance","Full maintenance"]]
+      .map(function(c){ return '<button class="h" data-action="setconn" data-v="' + c[0] + '" aria-pressed="' + (S.connectivity === c[0]) + '">' + c[1] + "</button>"; }).join("") +
+    "</div></div>";
+
+  b += '<div><h3>Open Play capacity</h3><div class="grid1">' +
+    [["available","Places available"],["almost","Almost full"],["full","Full"]]
+      .map(function(c){ return '<button class="h" data-action="setcap" data-v="' + c[0] + '" aria-pressed="' + (S.capacityDial === c[0]) + '">' + c[1] + "</button>"; }).join("") +
+    '</div><p class="legal" style="margin-top:var(--s2)">Setting Full removes the checkout control from the DOM on both Open Play screens. There is no disabled buy button to find.</p></div>';
+
+  b += '<div><h3>Text size</h3><div class="grid1">' +
+    ["100","112","128"].map(function(v){ return '<button class="h" data-action="textsize" data-v="' + v + '" aria-pressed="' + (S.textSize === v) + '">' + v + " percent</button>"; }).join("") +
+    '</div><p class="legal" style="margin-top:var(--s2)">Every layout in the verification list is checked at 128 percent.</p></div>';
+
+  b += '<div><h3>Order controls</h3><div class="grid1">' +
+    (o ? '<button class="h" data-action="reopen" data-v="' + esc(o.id) + '">Reopen payment link for ' + esc(o.bookingCode) + "</button>" : '<span class="legal">Create a booking first.</span>') +
+    (o ? '<button class="h" data-action="forcereview" data-v="' + esc(o.id) + '">Force needs staff review</button>' : "") +
+    "</div>" +
+    '<p class="legal" style="margin-top:var(--s2)">Prototype control. In the real system a payment link is a stored order resumed from the server. Reopening creates no second hold and no second booking code.</p></div>';
+
+  const hlink = function(href, label){
+    return '<a class="h" style="display:block;text-align:center;text-decoration:none" href="#' + esc(href) + '" data-action="closesheet">' + esc(label) + "</a>";
+  };
+  b += '<div><h3>This order\'s screens</h3><div class="grid1">';
+  if (o){
+    const paid = displayStatus(o).key === "confirmed" || displayStatus(o).key === "checked_in";
+    const codeSeg = encodeURIComponent(o.bookingCode);
+    b += hlink("/hold/" + o.id, "Hold and payment") +
+      hlink("/pay/" + o.id, "Simulated Maya Checkout") +
+      hlink("/status/" + o.id, "Payment status") +
+      hlink("/save/" + o.id, "Save your details");
+    if (paid){
+      b += hlink("/booking/" + codeSeg, "Booking detail") +
+        hlink("/booking/" + codeSeg + "/passes", "Pass list, all passes") +
+        hlink("/booking/" + codeSeg + "/pass/1", "Pass 1, organizer's view") +
+        hlink("/t/pass/" + passesOf(o)[0].share, "Pass 1, as the player sees it");
+    } else {
+      b += '<span class="legal">The booking detail and the passes appear here once this order is confirmed.</span>';
+    }
+    /* 9.5 The staff side of the same order: the block on the admin calendar,
+       the booking record, and the check-in row on Today. */
+    b += hlink("/staff/booking/" + o.id, "Booking detail, staff view") +
+      hlink("/staff/bookings", "This order's block on the admin calendar") +
+      hlink("/staff/today", "The check-in row on Today");
+  } else {
+    b += '<span class="legal">Create a booking first. These routes need a live order.</span>';
+  }
+  b += '</div><p class="legal" style="margin-top:var(--s2)">Currently pointing at ' +
+    (o ? esc(o.bookingCode || o.id) : "no order") + ". Passes are dormant until the arrival window is open, which is the control on the pass screens themselves.</p></div>";
+
+  b += '<div><h3>Token links</h3><div class="grid1">' +
+    (o && o.product === "openplay" ? hlink("/t/name/" + o.id, "Player name invite, valid") : "") +
+    hlink("/t/name/expired", "Player name invite, expired") +
+    hlink("/t/pass/expired", "Shared pass link, expired") +
+    hlink("/sys/link", "Invalid or revoked link") +
+    '</div><p class="legal" style="margin-top:var(--s2)">A shared pass link opens one pass and nothing else: No pass list, no other players, no organizer details, and no route to the booking.</p></div>';
+
+  b += '<div><h3>Every screen</h3><div class="routelist">' +
+    ALL_ROUTES.concat(CLAUDE_ROUTES).map(function(r){
+      const parts = r[1].split(", ");
+      return '<a href="#' + esc(r[0]) + '" data-action="closesheet">' + esc(parts[1]) + "<code>" + esc(r[0]) + " &middot; " + esc(parts[0]) + "</code></a>";
+    }).join("") + '</div><p class="legal" style="margin-top:var(--s2)">Every route that needs no live order. The rest are under This order\'s screens above.</p></div>';
+
+  b += '<div><button class="h" style="width:100%" data-action="resetall">Reset all state</button></div>';
+
+  dlg.innerHTML = '<div class="sheet harness"><div class="sheet__head"><h2 id="sheet-title">Staging harness</h2>' +
+    '<button class="sheet__close" data-action="closesheet" aria-label="Close the staging harness">' + icon("x") + "</button></div>" +
+    '<div class="sheet__body">' + b + "</div></div>";
+  if (!dlg.open) dlg.showModal();
+}
+
+Object.assign(ACTIONS, {
+  opsscenario: function(el){ loadOpsScenario(el.getAttribute("data-v")); },
+  setsurface: function(el){
+    const v = el.getAttribute("data-v");
+    S.surface = v;
+    if (v === "player" && !S.account) S.account = { name:"Sample Player", mobile:"0917 555 0100", email:"" };
+    if (v === "visitor") S.account = null;
+    if (v === "frontdesk" || v === "opsmanager" || v === "owner") seedOps();
+    closeSheet();
+    go(v === "player" ? "/me" : v === "visitor" ? "/" : "/staff/today");
+  },
+  resetall: function(){
+    S.clockOffsetMs = 0; S.clockPaused = false; S.connectivity = "online"; S.surface = "visitor";
+    S.capacityDial = "available"; S.injected = null; S.orders = {}; S.currentOrderId = null;
+    S.arrivalOpen = false; S.offers = {}; S.inquiries = {}; S.account = null; S.reveal = {}; S.formErrors = {};
+    S.forms = {}; S.skipCapture = true;
+    S.findStage = "entry"; S.signinStage = "identify"; S.saveStage = "offer"; S.timeline = false;
+    S.draft = { product:null, dayIndex:0, time:null, duration:1, pax:4, windowId:"w1", qty:1, name:"", mobile:"", email:"", policy:false, marketing:false, players:[] };
+    S.opsSeeded = false; S.sched = []; S.payments = []; S.log = []; S.confirming = null;
+    S.cal = { view:"day", day:0, product:"court", anim:"" };
+    S.scal = { view:"day", day:0, anim:"", freeAt:"" };
+    S.filters = { court:"all", status:"all", product:"all", source:"all" };
+    S.customerQuery = ""; S.openRow = {};
+    closeSheet(); go("/");
+  }
+});
+
+/* A two-step destructive confirmation does not survive a route change. Landing
+   on a screen with its red button already showing would mean the confirmation
+   was asked for somewhere else. */
+window.addEventListener("hashchange", function(){ S.confirming = null; });
+
+render();
+</script>
+
 
 
 </body>
