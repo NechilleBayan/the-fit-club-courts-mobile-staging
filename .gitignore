@@ -4,3 +4,8 @@ scratchpad/
 _devframe.html
 Thumbs.db
 desktop.ini
+
+# Local working copies, kept out of the repo on purpose. Both still live in the
+# working directory; they are simply never part of a commit.
+claude-version-index.html
+CLAUDE-APP-PLAN.md

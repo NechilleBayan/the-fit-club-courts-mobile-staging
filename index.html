@@ -1712,6 +1712,9 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
      actually asked for. visibility keeps its zero duration either way. */
   .nav-book-cta, :root.nav-cta .nav-book-cta,
   .navswap .headeraccount, :root.nav-cta .navswap .headeraccount{ transform:none; }
+  /* --dur-ui is already 0.01ms at this setting, so the width change is effectively
+     instant. Named here anyway so the intent survives a change to that token. */
+  .navcta{ transition:none; }
 }
 
 /* ---------- DESKTOP HEADER NAVIGATION ----------
@@ -1868,7 +1871,10 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .topnav{ display:flex; align-items:center; gap:var(--s6); margin-left:auto; }
   .topnav:empty{ display:none; }
   .topnav:empty + .appbar__slot--end{ margin-left:auto; }
-  .appbar__slot--end{ gap:var(--s3); margin-left:var(--s7); }
+  /* 20px, not 32. The destinations and the account control are one cluster at the
+     end of the bar, and a gap wider than the 24px between the destinations
+     themselves read as two groups that happened to end up next to each other. */
+  .appbar__slot--end{ gap:var(--s3); margin-left:var(--s5); }
   .appbar__slot--end:empty{ margin-left:0; }
   .iconbtn--bare svg{ width:23px; height:23px; }
 
@@ -1878,12 +1884,51 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .barmenu{ display:none; }
 
   /* There is room for both, so the swap slot stops being a swap and becomes a row:
-     the booking action, then the account. The hidden action still holds its width
-     and the row still holds its gap, which is what keeps the navigation to its left
-     from sliding when the action arrives. */
-  .navswap{ display:flex; align-items:center; gap:var(--s3); }
+     the booking action, then the account.
+     The action takes no width at all until it arrives. It used to reserve its width
+     from the first frame so that nothing moved when it appeared, which meant the
+     bar carried a permanent hole the size of a button nobody could see. Now the
+     navigation is right up against the account control while the reader is at the
+     top of the page, and slides left out of the way as the action grows in beside
+     it. One movement, on the same 200ms as everything else in the header.
+     0fr to 1fr on a one-column grid is what makes that a slide rather than a jump:
+     the track is sized from the button, so the width never has to be written down
+     here and cannot drift from the button's own padding or its label.
+     The gap travels with it. A gap left behind while the action is collapsed would
+     be the same hole in a smaller size. */
+  .navswap{ display:flex; align-items:center; gap:0; }
   .navswap > *{ grid-area:auto; }
   :root.nav-cta .navswap .headeraccount{ opacity:1; visibility:visible; transform:none; pointer-events:auto; }
+  .navcta{
+    display:grid; grid-template-columns:0fr; margin-right:0;
+    /* min-width:0 on both, and it is load bearing on both. The wrapper is a flex
+       item and the button is a grid item, and each of them defaults to a minimum of
+       its own min-content, which for a bordered button with 20px of padding is 41
+       pixels of nothing. Either one left at auto floors the collapse at that. */
+    min-width:0;
+    transition:grid-template-columns var(--dur-ui) var(--ease), margin-right var(--dur-ui) var(--ease);
+  }
+  /* The padding and the edge collapse with the track. min-width:0 takes the label
+     out of the track's minimum but not the button's own 20px either side and its
+     border, which together are 41 pixels: a hole in the bar that is smaller than
+     the button and just as empty. All three shrink on the same duration, so the
+     control grows out of nothing rather than out of a gap already held for it. */
+  .navcta > .nav-book-cta{
+    min-width:0; overflow:hidden;
+    padding-inline:0; border-inline-width:0;
+    transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+               background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease),
+               padding var(--dur-ui) var(--ease), border-width var(--dur-ui) var(--ease),
+               visibility 0s linear var(--dur-ui);
+  }
+  :root.nav-cta .navcta{ grid-template-columns:1fr; margin-right:var(--s3); }
+  :root.nav-cta .navcta > .nav-book-cta{
+    padding-inline:var(--s5); border-inline-width:1px;
+    transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+               background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease),
+               padding var(--dur-ui) var(--ease), border-width var(--dur-ui) var(--ease),
+               visibility 0s;
+  }
 
   /* the bottom bar is gone, not hidden behind the content */
   #tabhost.tabbar{ display:none; }
@@ -6854,8 +6899,11 @@ function demoButton(){
    has scrolled away, offers the way back into booking and lets the flow ask which.
    startcourt rather than a plain nav, so the maintenance interruption is handled by
    the same guard the hero card goes through and there is no second booking route. */
+/* Wrapped, because the width is the animation. The wrapper is a one-column grid
+   that runs from 0fr to 1fr, which is the only way to transition a control from no
+   width to its own width without naming that width in the stylesheet. */
 function bookCtaHtml(){
-  return '<button class="nav-book-cta" data-action="startcourt">Book Court</button>';
+  return '<span class="navcta"><button class="nav-book-cta" data-action="startcourt">Book Court</button></span>';
 }
 function loginButtonHtml(){
   return '<div class="headeraccount">' +
