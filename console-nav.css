@@ -298,10 +298,10 @@
   .sidenav[data-collapsed="true"] .sidenav__row:has(.countpill)::after{
     content:""; position:absolute; top:8px; right:14px;
     width:9px; height:9px; border-radius:999px;
-    background:var(--critical); border:2px solid var(--surface-raised);
+    background:var(--caution); border:2px solid var(--surface-raised);
   }
-  /* A quiet count keeps its quiet when it becomes a dot. Red here would be the
-     rail inventing an urgency the expanded row does not claim. */
+  /* A quiet count keeps its quiet when it becomes a dot. The caution ochre here
+     would be the rail inventing an urgency the expanded row does not claim. */
   .sidenav[data-collapsed="true"] .sidenav__row:has(.countpill--quiet)::after{
     background:var(--text-secondary);
   }

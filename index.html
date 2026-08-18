@@ -762,11 +762,37 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; }
 .chip--full{ background:var(--surface-sunken); border:2px dashed var(--border-strong); font-weight:700; background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
 .chip--quiet{ background:var(--surface); border:1px solid var(--hairline); color:var(--text-secondary); font-weight:400; }
 .chip--closed{ background:var(--surface-sunken); border:1px solid var(--border-default); color:var(--text-secondary); }
+
+/* THE CAPACITY SCALE.  Available -> Almost full -> Full -> Closed.
+
+   Each step is separated three ways at once, because a reader who cannot tell
+   the ochre from the ink still has to be able to put them in order:
+
+     Available    .chip                  plain pill, filled dot glyph
+     Almost full  .chip--almost          ochre edge and wash, half-filled square
+     Full         .chip--atcapacity      the ink plate: solid, settled, deliberate
+     Closed       .chip--closed          sunken paper under a lock, inert
+
+   Full used to be drawn with .chip--full, which is the hatched dashed treatment
+   this build gives to things that are GONE: cancelled, blocked, hold expired.
+   A session that sold every seat has not gone anywhere, and drawing it as void
+   left Full and Closed reading as one state on the one screen whose job is
+   telling them apart. .chip--full keeps its meaning and its four other users;
+   Full takes the ink plate, which is already how this build says a thing is
+   settled and which costs no colour.
+
+   Almost full is the only new colour in the scale and it is --caution, not a
+   third family: a session with two seats left needs attention and has lost
+   nothing, which is the sentence that decides the family. */
+.chip--almost{ border:2px solid var(--caution-edge); background:var(--caution-surface); color:var(--caution); font-weight:700; }
+.chip--almost .chip__sfx{ border-left-color:var(--caution-edge); }
+.chip--atcapacity{ background:var(--surface-inverse); color:var(--text-inverse); border:2px solid var(--border-strong); font-weight:700; }
 /* The chip is a full pill, so the bar has to be clipped to that shape the way the
    plate clips its own. Without the clip a square 6px slab is painted over the
    rounded left cap and reads as a detached mark sitting outside the chip. */
 .chip--bar{ position:relative; padding-left:16px; overflow:hidden; }
 .chip--bar::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:var(--bar-w); background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); border-right:1px solid var(--border-default); }
+.chip--almost.chip--bar::before{ border-right-color:var(--caution-edge); }
 .chip--barsolid::before{ background:var(--border-strong); background-image:none; }
 .chip__sfx{ font-size:var(--fs-eyebrow); font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding-left:6px; border-left:1px solid var(--border-default); }
 
@@ -1558,24 +1584,59 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
    it paints always carries its sentence underneath, so the meaning survives being
    read in grayscale or by a screen reader. */
 :root{
-  --critical:#B3261E;
-  --critical-surface:rgba(179,38,30,0.08);
-  --critical-edge:rgba(179,38,30,0.55);
-  --critical-glow:rgba(179,38,30,0.28);
+  /* Was #B3261E. Moved toward the dark theme's muted coral as far as the 4.5:1
+     this palette owes small type on cream will allow: the coral itself is 1.6:1
+     there. The console re-tuned the same token in the same step, and a semantic
+     colour that means one thing has to look like one thing across both halves of
+     the product, so the value moved here too rather than only there.
+     --critical-on is the type colour on a solid --critical fill. It is declared
+     here because the console declares it, and console-nav.css draws a badge from
+     whichever document is under it. */
+  --critical:#C0392B;
+  --critical-on:#FFFFFF;
+  --critical-surface:rgba(192,57,43,0.10);
+  --critical-edge:rgba(192,57,43,0.55);
+  --critical-glow:rgba(192,57,43,0.28);
+
+  /* --caution is the second semantic family: SOMETHING NEEDS ATTENTION, where
+     --critical means SOMETHING IS WRONG OR LOST. Nothing in the customer build
+     is critical that is not also a form error, so what this document spends it
+     on is capacity: a session that is filling up needs attention and has lost
+     nothing. See admin/admin.css for the full argument, including why the ochre
+     is not the terracotta that was tried first. */
+  --caution:#856110;
+  --caution-on:#FFFFFF;
+  --caution-surface:rgba(133,97,16,0.10);
+  --caution-edge:rgba(133,97,16,0.55);
+  --caution-glow:rgba(133,97,16,0.28);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --critical:#F2857D;
+    --critical-on:#171717;
     --critical-surface:rgba(242,133,125,0.12);
     --critical-edge:rgba(242,133,125,0.60);
     --critical-glow:rgba(242,133,125,0.30);
+
+    --caution:#E0A94A;
+    --caution-on:#171717;
+    --caution-surface:rgba(224,169,74,0.14);
+    --caution-edge:rgba(224,169,74,0.60);
+    --caution-glow:rgba(224,169,74,0.30);
   }
 }
 :root[data-theme="dark"]{
   --critical:#F2857D;
+  --critical-on:#171717;
   --critical-surface:rgba(242,133,125,0.12);
   --critical-edge:rgba(242,133,125,0.60);
   --critical-glow:rgba(242,133,125,0.30);
+
+  --caution:#E0A94A;
+  --caution-on:#171717;
+  --caution-surface:rgba(224,169,74,0.14);
+  --caution-edge:rgba(224,169,74,0.60);
+  --caution-glow:rgba(224,169,74,0.30);
 }
 
 /* A field that has to be corrected before this step can continue. The box itself
@@ -2763,8 +2824,8 @@ const CHIPS = {
   limited:        { phrase:"Limited availability",glyph:"square-half",  cls:"chip chip--strong" },
   unavailable:    { phrase:"Unavailable",         glyph:"circle-slash", cls:"chip chip--full" },
   places:         { phrase:"Places available",    glyph:"circle-dot",   cls:"chip" },
-  almost:         { phrase:"Almost full",         glyph:"square-half",  cls:"chip chip--strong chip--bar" },
-  full:           { phrase:"Full",                glyph:"circle-slash", cls:"chip chip--full" },
+  almost:         { phrase:"Almost full",         glyph:"square-half",  cls:"chip chip--almost chip--bar" },
+  full:           { phrase:"Full",                glyph:"circle-slash", cls:"chip chip--atcapacity" },
   closed:         { phrase:"Closed",              glyph:"lock",         cls:"chip chip--closed" },
   regclosed:      { phrase:"Registration closed", glyph:"lock",         cls:"chip chip--closed" },
   cancelled:      { phrase:"Cancelled",           glyph:"circle-slash", cls:"chip chip--full" },

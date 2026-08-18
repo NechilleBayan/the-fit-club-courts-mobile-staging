@@ -87,19 +87,28 @@
      washes on cream paper, and the console paints cream type on ink cards over
      a near white page. The two colours are unchanged, only which one carries
      the surface and which one carries the type. */
-  --surface:#FAF9F2;
-  --surface-raised:#FFFEF8;
-  --surface-sunken:#EDEBDE;
+  --surface:#F8F7F2;
+  --surface-raised:#F2EEDD;
+  --surface-sunken:#E4E0CE;
   --surface-inverse:#171717;
   --text-primary:#171717;
-  --text-secondary:#57574E;
+  --text-secondary:#605B52;
   --text-inverse:#F5F3DC;
   --text-inverse-secondary:#B0AE97;
-  --border-default:#A8A695;
+  /* The two outlines carry two different jobs and the review's single "warm soft
+     gray" cannot do both. --hairline is a rule: it separates a card from the page
+     and a row from its neighbour, and it is allowed to be soft because nothing
+     depends on finding it. --border-default identifies a CONTROL, so it owes 3:1
+     against everything it is drawn on, and the review's #C9C2AE manages 1.5:1 on
+     a cream card. So the review's value went to the hairline, where it is right,
+     and --border-default was warmed at its own weight instead: #8E8878 reads
+     warmer than the #A8A695 it replaces and reaches 3.04:1 on the card and
+     3.29:1 on the page, where the old value reached 2.33:1 and failed. */
+  --border-default:#8E8878;
   --border-strong:#171717;
-  --hairline:#E2DFCE;
+  --hairline:#C9C2AE;
   --focus-ring:#171717;
-  --focus-halo:#FAF9F2;
+  --focus-halo:#F8F7F2;
 
   /* The two surfaces that are always ink, whatever the theme is doing.
      --chrome-surface is the app bar and the tab bar; --card-surface is every
@@ -118,15 +127,47 @@
   --shadow-lift:rgba(23,23,23,0.26);
   --shadow-press:rgba(23,23,23,0.14);
 
-  /* The only red in the product, and it is spent carefully. It marks the unread
-     notification badge and states that cost the club money or close a court:
-     overdue payment, booking conflict, overdue task. It is never the sole
-     carrier of a status, only the amplifier on one that is already spelled out. */
-  --critical:#B3261E;
+  /* TWO SEMANTIC FAMILIES, AND THE SENTENCE THAT SEPARATES THEM.
+
+     --critical means SOMETHING IS WRONG OR LOST: money not collected, a booking
+     that cannot stand, a job whose deadline has passed, an action that destroys
+     a record. --caution means SOMETHING NEEDS ATTENTION: a gap in cover, a
+     message nobody has answered, a session filling up, a count of things still
+     to do. The test is whether the club has already lost something. If it has
+     not, it is caution.
+
+     The split exists because one red was carrying both, and the louder half was
+     drowning the smaller: on the staff screen an unfilled evening shift painted
+     a full-bleed red plate while the day's single overdue task got an eleven
+     pixel pill, which is the reverse of the order a manager needs to read them in.
+
+     --critical was #B3261E, a destructive-error red doing operational work. It
+     is now #C0392B, which is as far toward the dark theme's muted coral as the
+     4.5:1 this palette owes small type on cream will go: the coral itself is
+     1.6:1 there and would have to stop being type to be used. 4.67:1 on the
+     card, 5.07:1 on the page.
+
+     --caution is an ochre rather than the terracotta the review asked for, and
+     the terracotta is worth naming because it was tried first. At the luminance
+     4.5:1 on cream demands, a muted terracotta lands within about ten degrees of
+     hue of --critical: two reds of the same weight, which is a second red rather
+     than a second family, and it would have left Shift Unfilled exactly as loud
+     as the thing it needs to be quieter than. The ochre costs a third hue in a
+     two-colour build; what it buys is a distinction a reader can make without
+     reading the word first, which is the only reason to add a family at all.
+     Neither family is ever the sole carrier of a state: every use below also
+     carries a word, an icon, and a drawn treatment. */
+  --critical:#C0392B;
   --critical-on:#FFFFFF;
-  --critical-surface:rgba(179,38,30,0.08);
-  --critical-edge:rgba(179,38,30,0.55);
-  --critical-glow:rgba(179,38,30,0.28);
+  --critical-surface:rgba(192,57,43,0.10);
+  --critical-edge:rgba(192,57,43,0.55);
+  --critical-glow:rgba(192,57,43,0.28);
+
+  --caution:#856110;
+  --caution-on:#FFFFFF;
+  --caution-surface:rgba(133,97,16,0.10);
+  --caution-edge:rgba(133,97,16,0.55);
+  --caution-glow:rgba(133,97,16,0.28);
 }
 
 /* ---------- DARK tokens. Near black, warm cream on top of it. ----------
@@ -150,6 +191,15 @@
     --critical-surface:rgba(242,133,125,0.12);
     --critical-edge:rgba(242,133,125,0.60);
     --critical-glow:rgba(242,133,125,0.30);
+
+    /* The dark reading of the caution family. Lighter and warmer than the light
+       value, the same flip --critical already makes, so ochre type on the page
+       and page type on an ochre fill both stay readable. 7.80:1 on a card. */
+    --caution:#E0A94A;
+    --caution-on:#171717;
+    --caution-surface:rgba(224,169,74,0.14);
+    --caution-edge:rgba(224,169,74,0.60);
+    --caution-glow:rgba(224,169,74,0.30);
   }
 }
 :root[data-theme="dark"]{
@@ -169,6 +219,15 @@
   --critical-surface:rgba(242,133,125,0.12);
   --critical-edge:rgba(242,133,125,0.60);
   --critical-glow:rgba(242,133,125,0.30);
+
+  /* The dark reading of the caution family. Lighter and warmer than the light
+     value, the same flip --critical already makes, so ochre type on the page
+     and page type on an ochre fill both stay readable. 7.80:1 on a card. */
+  --caution:#E0A94A;
+  --caution-on:#171717;
+  --caution-surface:rgba(224,169,74,0.14);
+  --caution-edge:rgba(224,169,74,0.60);
+  --caution-glow:rgba(224,169,74,0.30);
 }
 
 /* ---------- TYPE, SPACE, SHAPE ---------- */
@@ -357,28 +416,43 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
 /* ---------- NOTIFICATION BADGE ----------
    Two forms from one class. Bare, it is a dot for "something is unread"; with a
    number inside it counts. It is never the only signal: the control it sits on
-   always has an accessible name that says how many, so the red is an accent on
-   a fact that is already stated. */
+   always has an accessible name that says how many, so the colour is an accent
+   on a fact that is already stated.
+
+   It is --caution, not --critical. An unread notification is a thing that needs
+   reading; whether what it says is a disaster is decided on the screen it leads
+   to, and three of the four unread items there are already drawn in red when you
+   arrive. A permanent red dot on the bell said "something is wrong" every hour
+   of every day, which is the fastest way to teach a manager to stop seeing it. */
 .hasbadge{ position:relative; }
 .badge{
   position:absolute; top:5px; right:5px; z-index:1;
   min-width:9px; height:9px; border-radius:999px;
-  background:var(--critical); border:1.5px solid var(--surface-inverse);
+  background:var(--caution); border:1.5px solid var(--surface-inverse);
 }
 .badge--count{
   min-width:19px; height:19px; top:2px; right:0;
   display:grid; place-items:center; padding:0 4px;
-  color:var(--critical-on); font-size:11px; line-height:1; font-weight:700; font-variant-numeric:tabular-nums;
+  color:var(--caution-on); font-size:11px; line-height:1; font-weight:700; font-variant-numeric:tabular-nums;
 }
 /* On a page surface rather than on the inverse app bar the ring has to match the
    page, or the badge carries a dark halo on cream. */
 .badge--onpage{ border-color:var(--surface); }
-/* Inline count beside a label, for the drawer rows and the task headings. */
+/* Inline count beside a label, for the drawer rows and the task headings.
+
+   The solid pill is --caution. Counted across the console it is nearly always a
+   queue rather than a casualty: six still to check in, five pending tasks, four
+   unread, three maintenance jobs open, two unanswered messages. Two of them
+   really are counting loss, and those take --countpill--critical explicitly:
+   a player's payment issues, and the share of a staff member's tasks that is
+   already overdue. The default follows the common case and the exception says
+   so, rather than every queue in the building shouting. */
 .countpill{
   display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px;
-  border-radius:999px; background:var(--critical); color:var(--critical-on);
+  border-radius:999px; background:var(--caution); color:var(--caution-on);
   font-size:11px; line-height:1; font-weight:700; font-variant-numeric:tabular-nums;
 }
+.countpill--critical{ background:var(--critical); color:var(--critical-on); }
 .countpill--quiet{ background:rgba(var(--ghost-fill),.14); color:var(--text-primary); border:1px solid rgba(var(--ghost-edge),.30); }
 
 /* ---------- DRAWER ----------
@@ -701,9 +775,17 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; text-
 .sumcard__note{ font-size:12px; line-height:16px; font-weight:600; color:var(--text-secondary); }
 .sumcard:active{ background:rgba(var(--ghost-fill),.24); border-color:rgba(var(--ghost-edge),.70); transform:scale(.985); box-shadow:0 1px 2px var(--shadow-press); }
 @media (hover:hover) and (pointer:fine){ .sumcard:hover{ background:rgba(var(--ghost-fill),.16); border-color:rgba(var(--ghost-edge),.50); } }
-/* A tile whose number is a problem gets the red edge on top of its own word. */
+/* A tile whose number is a problem gets the edge of the family it belongs to on
+   top of its own word. --alert is the red one and is for a number that counts
+   things already lost; --caution is the ochre one and is for a number that counts
+   things still to do. The two dashboard tiles that used --alert both count the
+   second kind: "4 pending payments, 1 overdue by 3 days" is four things waiting
+   and one thing wrong, and painting the four in the colour of the one is how the
+   overdue item stopped being findable. */
 .sumcard--alert{ border-color:var(--critical-edge); background:var(--critical-surface); }
 .sumcard--alert .sumcard__num{ color:var(--critical); }
+.sumcard--caution{ border-color:var(--caution-edge); background:var(--caution-surface); }
+.sumcard--caution .sumcard__num{ color:var(--caution); }
 
 /* ---------- QUICK ACTIONS ----------
    Four squat tiles, two up, all verbs. */
@@ -813,7 +895,31 @@ a.row:active, button.row:active{ background:rgba(var(--ghost-fill),.22); border-
    it appears: a pressed filter, a selected day, a current tab. Medium and Low
    stay as quiet chips, because a priority that is not high does not need to
    announce itself three times on one screen. */
-.st--prio{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); }
+.st--prio,
+/* Full is not an error and not a void. See the capacity scale below. */
+.st--atcapacity{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); }
+
+/* THE CAPACITY SCALE.  Available -> Almost full -> Full -> Closed.
+
+   Each step is separated three ways at once, because a reader who cannot tell
+   the ochre from the ink still has to be able to put them in order:
+
+     Available    .st--hold      dashed edge, the word Open
+     Almost full  .st--caution   ochre edge and wash, the word and a count
+     Full         .st--atcapacity  the ink plate: solid, settled, deliberate
+     Closed       .st--off       sunken paper under a hatch, inert
+
+   Full used to be drawn with .st--off, which is the treatment this build gives
+   to things that are GONE: a closed day, a cancelled row, a court out of
+   service. A session that sold every seat has not gone anywhere, and drawing it
+   as void left Full and Closed reading as one state on a screen whose whole job
+   is telling them apart. It takes the ink plate instead, which is already how
+   this build says a thing is settled, and which costs no colour.
+
+   Almost full is the only new colour in the scale and it is --caution, not a
+   third family: a session with two seats left needs attention and has lost
+   nothing, which is the sentence that decides the family. */
+.st--caution{ border:1.5px solid var(--caution-edge); background:var(--caution-surface); color:var(--caution); }
 
 /* ---------- STATUS PLATE ----------
    One fact, stated large. Used for the alert list and for the standing status at
@@ -830,12 +936,19 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .plate__bar{ position:absolute; left:0; top:0; bottom:0; width:var(--bar-w); background:var(--border-strong); }
 .plate__bar--hatched{ background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); border-right:1px solid var(--border-default); }
 .plate__bar--crit{ background:var(--critical); }
+.plate__bar--caution{ background:var(--caution); }
 .plate__head{ display:flex; align-items:center; gap:var(--s2); font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700; letter-spacing:.10em; text-transform:uppercase; }
 .plate__head svg{ width:16px; height:16px; flex:none; }
 .plate__phrase{ margin-top:5px; font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:700; font-variant-numeric:tabular-nums; }
 .plate__meta{ margin-top:3px; font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
 .plate--crit{ border-color:var(--critical-edge); background:var(--critical-surface); }
 .plate--crit .plate__head{ color:var(--critical); }
+/* The same plate at the step below. Shift Unfilled is the case it was added for:
+   a gap in tonight's cover is the largest OPERATIONAL fact on the staff screen
+   and it was being drawn in the colour reserved for a booking that cannot stand,
+   which made it louder than the one genuinely overdue task beside it. */
+.plate--caution{ border-color:var(--caution-edge); background:var(--caution-surface); }
+.plate--caution .plate__head{ color:var(--caution); }
 .plate--work{ border:3px double var(--border-strong); }
 .plate--off{ border:1.5px dashed var(--border-default); background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
 /* The moving hazard band on a court that is in play right now. It is the only
@@ -1023,6 +1136,10 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 }
 .meter__fill{ height:100%; background:var(--border-strong); border-radius:999px 0 0 999px; }
 .meter__fill--crit{ background:var(--critical); }
+/* The same fill at the step below. A bar that is nearly full is reporting a
+   fact about the next hour, not a failure, so it takes the caution ochre and
+   leaves the red for a bar that is measuring something already lost. */
+.meter__fill--caution{ background:var(--caution); }
 
 /* A row of small figures under a heading, for the reports page. */
 .figs{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
