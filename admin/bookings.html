@@ -40,15 +40,23 @@
 
   <!-- The week rail. Redundant with the arrows on purpose: the arrows are for a
        neighbouring day and the rail is for reading the week's shape at once. A
-       day the club is closed is hatched and dashed, never just greyed. -->
+       day the club is closed is hatched and dashed, never just greyed.
+
+       The third line used to read "14 bk", which was the only abbreviation in
+       the build and not one a new staff member would arrive knowing. It is a
+       count pill now: the shape says "how many" everywhere else in this
+       console, so it needs no noun, and it leaves the closed day its whole word
+       in the same slot. Each button also states itself in full for a screen
+       reader, because three stacked fragments read aloud in order are not a
+       sentence. -->
   <div class="datestrip" role="group" aria-label="Pick a day" data-toggle="single" style="margin-top:12px;">
-    <button class="daybtn" type="button" aria-pressed="false"><small>Thu</small><strong>13</strong><i>14 bk</i></button>
-    <button class="daybtn" type="button" aria-pressed="false"><small>Fri</small><strong>14</strong><i>17 bk</i></button>
-    <button class="daybtn" type="button" aria-pressed="true"><small>Sat</small><strong>15</strong><i data-daycount="list">0 bk</i></button>
-    <button class="daybtn" type="button" aria-pressed="false"><small>Sun</small><strong>16</strong><i>21 bk</i></button>
-    <button class="daybtn" type="button" aria-pressed="false" data-state="closed"><small>Mon</small><strong>17</strong><i>Closed</i></button>
-    <button class="daybtn" type="button" aria-pressed="false"><small>Tue</small><strong>18</strong><i>9 bk</i></button>
-    <button class="daybtn" type="button" aria-pressed="false"><small>Wed</small><strong>19</strong><i>12 bk</i></button>
+    <button class="daybtn" type="button" aria-pressed="false" aria-label="Thursday 13 August, 14 on the schedule"><small>Thu</small><strong>13</strong><span class="countpill countpill--quiet tnum">14</span></button>
+    <button class="daybtn" type="button" aria-pressed="false" aria-label="Friday 14 August, 17 on the schedule"><small>Fri</small><strong>14</strong><span class="countpill countpill--quiet tnum">17</span></button>
+    <button class="daybtn" type="button" aria-pressed="true" data-daylabel="Saturday 15 August, today"><small>Sat</small><strong>15</strong><span class="countpill countpill--quiet tnum" data-daycount="list">0</span></button>
+    <button class="daybtn" type="button" aria-pressed="false" aria-label="Sunday 16 August, 21 on the schedule"><small>Sun</small><strong>16</strong><span class="countpill countpill--quiet tnum">21</span></button>
+    <button class="daybtn" type="button" aria-pressed="false" data-state="closed" aria-label="Monday 17 August, the club is closed"><small>Mon</small><strong>17</strong><i>Closed</i></button>
+    <button class="daybtn" type="button" aria-pressed="false" aria-label="Tuesday 18 August, 9 on the schedule"><small>Tue</small><strong>18</strong><span class="countpill countpill--quiet tnum">9</span></button>
+    <button class="daybtn" type="button" aria-pressed="false" aria-label="Wednesday 19 August, 12 on the schedule"><small>Wed</small><strong>19</strong><span class="countpill countpill--quiet tnum">12</span></button>
   </div>
 
   <!-- ---------- WHAT KIND ----------

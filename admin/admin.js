@@ -566,8 +566,15 @@
       Array.prototype.forEach.call(rows, function(r){ if (matches(r, el.getAttribute("data-count"))) n++; });
       el.textContent = n;
     });
+    /* The day rail's figure for the day on screen, and the sentence a screen
+       reader gets for that button, out of the same count. The other six days
+       keep their sample figures, because there is no list behind them. */
     var day = document.querySelector('[data-daycount="' + name + '"]');
-    if (day) day.textContent = rows.length + " bk";
+    if (day){
+      day.textContent = rows.length;
+      var btn = day.closest("[data-daylabel]");
+      if (btn) btn.setAttribute("aria-label", btn.getAttribute("data-daylabel") + ", " + rows.length + " on the schedule");
+    }
 
     var empty = document.querySelector('[data-empty="' + name + '"]');
     if (empty) empty.hidden = shown > 0;

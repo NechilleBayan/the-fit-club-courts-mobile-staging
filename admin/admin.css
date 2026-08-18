@@ -870,8 +870,17 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .daybtn strong{ font-size:var(--fs-txn); font-weight:800; font-variant-numeric:tabular-nums; }
 .daybtn i{ font-style:normal; font-size:11px; line-height:13px; font-weight:600; color:var(--text-secondary); }
 .daybtn[data-state="closed"]{ background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); border-style:dashed; }
+.daybtn .countpill{ font-size:11px; min-width:22px; height:18px; }
 .daybtn[aria-pressed="true"]{ background:var(--surface-inverse); background-image:none; color:var(--text-inverse); border:2px solid var(--border-strong); }
 .daybtn[aria-pressed="true"] i{ color:var(--text-inverse-secondary); }
+/* The pressed day inverts to a cream plate, and the count pill inside it draws
+   its wash and its hairline from --ghost-fill and --ghost-edge, which up to
+   here point at cream. Left alone that is a cream pill on a cream plate with
+   cream type. The tokens are flipped locally rather than the pill being given
+   its own colours, which is the same move the surface inversion block at the
+   foot of this file makes, one level further in. */
+.daybtn[aria-pressed="true"]{ --ghost-fill:23,23,23; --ghost-edge:23,23,23; }
+.daybtn[aria-pressed="true"] .countpill--quiet{ color:var(--text-inverse); }
 
 /* ---------- SEARCH AND FILTERS ---------- */
 .search{ position:relative; display:flex; align-items:center; }
