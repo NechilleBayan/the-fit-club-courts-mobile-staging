@@ -13,6 +13,7 @@
 <script src="../staging-state.js" data-default-theme="system"></script>
 <script src="../console-nav.js"></script>
 <script src="../club.js"></script>
+<script src="../scenarios.js"></script>
 <link rel="stylesheet" href="admin.css">
 <!-- The desktop rail, shared with the customer build. After admin.css, so the
      component's own rules win over the generic ones it happens to share a class
@@ -44,7 +45,7 @@
 
   <section class="section" aria-labelledby="s-now">
     <h2 class="sec" id="s-now">Next Up</h2>
-    <div class="rows">
+    <div class="rows" data-scn-slot="rows">
 
       <div class="row row--two row--timed row--bar row--barcrit row--crit">
         <div class="row__line">

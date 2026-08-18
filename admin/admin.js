@@ -117,7 +117,12 @@
     arrowR:    '<path d="M4 12h15M13 6l6 6-6 6"/>',
     refresh:   '<path d="M20 11a8 8 0 1 0-.6 4"/><path d="M20 4.5V11h-6"/>',
     key:       '<circle cx="8" cy="14" r="4.5"/><path d="M11.4 11.2 20 3.5M16.5 7l2.5 2.5M14.2 9.2l2.2 2.2"/>',
-    download:  '<path d="M12 3.5v11M7.5 10.5l4.5 4.5 4.5-4.5M4 20.5h16"/>'
+    download:  '<path d="M12 3.5v11M7.5 10.5l4.5 4.5 4.5-4.5M4 20.5h16"/>',
+    /* The staging flask, carried over from the customer build's sprite so the
+       forced-state marker wears the same glyph on both sides of the boundary. It
+       was the one icon the marker needed and the one this sprite did not have,
+       which showed up as a hole in the band rather than as an error. */
+    flask:     '<path d="M9 3h6M10 3v6L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9V3"/><path d="M7.4 15h9.2"/>'
   };
 
   function svg(name, cls){
@@ -480,12 +485,125 @@
   function bridge(){
     if (!window.STAGING) return;
     STAGING.subscribe(function(state, changed){
-      if (changed.indexOf("theme") < 0) return;
-      STAGING.applyTheme("system");
+      if (changed.indexOf("theme") >= 0) STAGING.applyTheme("system");
+      if (changed.indexOf("scenario") >= 0) applyScenario();
     });
   }
 
+  /* ---------- SCENARIO HYDRATION ----------
+     The harness in the customer build arms a scenario; this console draws its own
+     sample for it. What crosses is a key, never an order: see staging-state.js
+     for why. What each scenario means here is data on the scenario itself, in
+     scenarios.js, so the console does not carry a second opinion about what
+     "Amount mismatch" looks like.
+
+     Light on purpose. These are static screens and they stay static screens; the
+     hydration does three things and no more. It sets the text of a handful of
+     marked spans, it injects marked rows into one list per screen, and it puts a
+     hatched marker under the app bar saying which state is forced. There is no
+     template system here and there should not be: twenty-six screens of sample
+     markup is what makes this console reviewable, and turning it into a renderer
+     would trade that for a data model nobody asked for.
+
+     THE HONEST PART.
+     A scenario that means nothing on the screen being viewed says so. It does
+     not leave the sample data standing as though it were the answer, and it does
+     not quietly render nothing. "This scenario has no consequence on this screen"
+     is a true statement about the product and is more useful to a reviewer than
+     silence, which is indistinguishable from a bug.
+
+     Re-appliable. Originals are stashed on first write so a scenario changed in
+     another tab can be applied over a clean slate rather than over the last
+     one. */
+  var scnMark = null;
+
+  function clearScenario(){
+    if (scnMark && scnMark.parentNode) scnMark.parentNode.removeChild(scnMark);
+    scnMark = null;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-scn-row]"), function(el){
+      el.parentNode.removeChild(el);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-scn][data-scn-was]"), function(el){
+      el.textContent = el.getAttribute("data-scn-was");
+      el.removeAttribute("data-scn-was");
+    });
+  }
+
+  function applyScenario(){
+    clearScenario();
+    if (!window.STAGING || !window.SCENARIO_BY_KEY) return;
+
+    var key = STAGING.getScenario();
+    if (!key) return;
+    var scn = SCENARIO_BY_KEY[key];
+    if (!scn) return;
+    /* The happy path is not a forced state, so it wears no marker on either side
+       of the boundary. Anything else does, even where the marker's only content
+       is that the scenario means nothing here. */
+    if (scn.natural) return;
+
+    /* The filename is the page identity. data-nav cannot be: Settings and Tasks
+       both declare data-nav="more", and a scenario has different things to say
+       about each. */
+    var page = (location.pathname.split("/").pop() || "index").replace(/\.html$/, "");
+    var admin = scn.admin || {};
+    var here = (admin.pages || {})[page];
+
+    var says = here && here.says
+      ? here.says
+      : "No consequence on this screen. The sample data below is unchanged and still true.";
+    var line = admin.headline ? admin.headline + " " + says : says;
+
+    var mark = document.createElement("p");
+    mark.className = "injected";
+    mark.innerHTML = svg("flask") +
+      "<span><b>" + scn.label + ".</b> " + line + "</span>";
+    /* First child of main, not a sibling between the app bar and it. The desktop
+       layout pins the app bar to row 1 and main to row 2 of a two row grid, so a
+       third element between them would land on top of one of them. Inside main
+       it rides the content column and pulls itself out to the gutters, which is
+       how the customer build's own marker sits under its app bar. */
+    var main = document.getElementById("main");
+    main.insertBefore(mark, main.firstChild);
+    scnMark = mark;
+
+    /* A second marker for the screens where the whole page is stale rather than
+       one row of it. Only two scenarios carry one, and both are about the
+       availability service rather than about a booking. */
+    if (admin.banner && here){
+      var band = document.createElement("p");
+      band.className = "injected injected--band";
+      band.innerHTML = svg("alert") + "<span>" + admin.banner + "</span>";
+      main.insertBefore(band, mark.nextSibling);
+      band.setAttribute("data-scn-row", "");
+    }
+
+    if (!here) return;
+
+    if (here.set){
+      Object.keys(here.set).forEach(function(id){
+        var el = document.querySelector('[data-scn="' + id + '"]');
+        if (!el) return;
+        el.setAttribute("data-scn-was", el.textContent);
+        el.textContent = here.set[id];
+      });
+    }
+
+    if (here.inject){
+      var slot = document.querySelector('[data-scn-slot="' + here.inject.slot + '"]');
+      if (slot){
+        var wrap = document.createElement("div");
+        wrap.innerHTML = here.inject.html;
+        var node = wrap.firstElementChild;
+        if (node){
+          slot.insertBefore(node, slot.firstChild);
+          hydrateIcons(node);
+        }
+      }
+    }
+  }
+
   if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", function(){ build(); bridge(); scrollcue(); });
-  } else { build(); bridge(); scrollcue(); }
+    document.addEventListener("DOMContentLoaded", function(){ build(); bridge(); applyScenario(); scrollcue(); });
+  } else { build(); bridge(); applyScenario(); scrollcue(); }
 })();

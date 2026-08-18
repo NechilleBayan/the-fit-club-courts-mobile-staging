@@ -13,6 +13,7 @@
 <script src="../staging-state.js" data-default-theme="system"></script>
 <script src="../console-nav.js"></script>
 <script src="../club.js"></script>
+<script src="../scenarios.js"></script>
 <link rel="stylesheet" href="admin.css">
 <!-- The desktop rail, shared with the customer build. After admin.css, so the
      component's own rules win over the generic ones it happens to share a class
@@ -48,15 +49,15 @@
       <a class="sumcard" href="open-play.html">
         <span data-icon="play"></span>
         <span class="sumcard__label">Open Play Sessions</span>
-        <span class="sumcard__num tnum">3</span>
-        <span class="sumcard__note">2 nearly full</span>
+        <span class="sumcard__num tnum" data-scn="openplay-num">3</span>
+        <span class="sumcard__note" data-scn="openplay-note">2 nearly full</span>
       </a>
 
       <a class="sumcard sumcard--alert" href="payments.html">
         <span data-icon="card"></span>
         <span class="sumcard__label">Pending Payments</span>
-        <span class="sumcard__num tnum">4</span>
-        <span class="sumcard__note">1 overdue by 3 days</span>
+        <span class="sumcard__num tnum" data-scn="pending-payments">4</span>
+        <span class="sumcard__note" data-scn="pending-payments-note">1 overdue by 3 days</span>
       </a>
 
       <a class="sumcard" href="staff.html">
@@ -195,7 +196,7 @@
       <a class="textbtn" href="notifications.html">All <span data-icon="arrowR"></span></a>
     </div>
 
-    <div class="rows">
+    <div class="rows" data-scn-slot="alerts">
 
       <a class="plate plate--crit" href="payments.html">
         <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>

@@ -13,6 +13,7 @@
 <script src="../staging-state.js" data-default-theme="system"></script>
 <script src="../console-nav.js"></script>
 <script src="../club.js"></script>
+<script src="../scenarios.js"></script>
 <link rel="stylesheet" href="admin.css">
 <!-- The desktop rail, shared with the customer build. After admin.css, so the
      component's own rules win over the generic ones it happens to share a class
@@ -43,7 +44,7 @@
        wherever it appears in the console. -->
   <section class="section" aria-labelledby="s-threads">
     <h2 class="sec" id="s-threads">Conversations</h2>
-    <div class="rows">
+    <div class="rows" data-scn-slot="rows">
 
       <button class="row row--two row--bar row--strong" type="button" data-stub="Open the conversation with Andrea Lim.">
         <span class="row__line">

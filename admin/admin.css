@@ -1166,3 +1166,34 @@ a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface));
   body.has-dock main{ padding-bottom:calc(var(--dock-h) + var(--s8)); }
   .dock{ left:var(--sidenav-w); bottom:0; transition:left var(--dur-ui) var(--ease); }
 }
+
+/* ---------- FORCED STATE MARKER ----------
+   The hatched band under the app bar, saying that what is below has been put
+   there by the staging harness rather than by the club. Same device and same
+   hatching as the customer build's, in this console's tokens, because a reviewer
+   moving between the two should not have to learn the marker twice.
+
+   It is the sandbox-honesty rule at page scale: A screen showing forced state
+   says so, once, at the top, and a screen where the armed scenario means nothing
+   says that instead. Silence would be indistinguishable from a bug. */
+.injected{
+  display:flex; gap:var(--s2); align-items:flex-start;
+  /* Pulled out to the gutters and up under the app bar, so a band about the
+     whole screen reads as part of the chrome rather than as the first card. */
+  margin:calc(-1 * var(--pad-top)) calc(-1 * var(--gutter)) var(--s5);
+  padding:var(--s3) var(--gutter);
+  border-bottom:1px solid var(--border-strong);
+  background:var(--surface-sunken);
+  background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px);
+  font-size:var(--fs-legal); line-height:var(--lh-legal); font-weight:600;
+}
+.injected svg{ flex:none; width:18px; height:18px; margin-top:1px; }
+.injected b{ font-weight:800; }
+/* The second band, for the two scenarios where the whole screen is stale rather
+   than one row of it. Quieter than the first, because it is a qualifier on the
+   marker above rather than a second announcement. */
+.injected--band{
+  margin-top:calc(-1 * var(--s5));
+  background-image:none; background:var(--surface-sunken);
+  border-bottom:1px solid var(--hairline); font-weight:500;
+}

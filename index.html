@@ -26,6 +26,11 @@
      builds. See club.js for which build won which argument. -->
 <script src="club.js"></script>
 
+<!-- The eleven scenarios, shared with the console. Each one carries its own
+     seed and its own description of what the console should show, so the
+     harness applies a recipe rather than branching on a key. -->
+<script src="scenarios.js"></script>
+
 <!-- The desktop rail. Same component, same stylesheet, both builds. It names no
      colours: every value is a token, and this document declares all of them, which
      is what lets one sheet serve two palettes that are inverses of each other.
@@ -2568,6 +2573,10 @@ const OP_CAPACITY = 50;              // default confirmed admissions per window
    the control refuses at the number the session itself runs out at, rather than at
    a smaller per-order figure the reader has no way to see the reason for. */
 const DEMO_QTY_CAP = OP_CAPACITY;
+/* How far short the mismatch scenario's payment lands. Small enough to look
+   like a fat-fingered transfer rather than a different order entirely, which
+   is the case staff actually have to judge. */
+const MISMATCH_SHORTFALL = 50;
 const TZ = "Asia/Manila";
 /* The club's own details now live in club.js, which the admin console reads too.
    VENUE stays as the name this file has always used them by, so the two hundred
@@ -2582,7 +2591,8 @@ const S = {
   connectivity: "online",           // online | availability_down | payments_down | maintenance
   surface: "visitor",               // visitor | player | frontdesk | opsmanager
   capacityDial: "available",        // available | almost | full
-  injected: null,
+  injected: null,                   // the armed scenario's label, for the banner
+  scenario: null,                   // the armed scenario's key, for branching on
   route: "/",
   lastRoute: "/",
   seq: 1,
@@ -3609,7 +3619,7 @@ function scrLanding(){
     html += '<div class="banner">' + icon("alert") + "<div><p><strong>Live availability could not be loaded.</strong></p>" +
       '<p class="legal">Prices and contact details below are still correct.</p>' +
       '<p style="margin-top:var(--s2)"><button class="btn btn--secondary btn--sm" data-action="retry">Retry</button></p></div></div>';
-  } else if (S.injected === "No Open Play scheduled"){
+  } else if (S.scenario === "empty"){
     html += '<div class="card"><p><strong>No Open Play is scheduled yet.</strong></p>' +
       '<p class="legal" style="margin-top:var(--s2)">This is normal between published schedules. Reserve a private court instead.</p></div>';
   } else {
@@ -4001,7 +4011,7 @@ function scrCourtWhen(){
       '<p class="legal" style="margin-top:var(--s2)">Nearest dates with availability:</p>' +
       '<div class="seg" style="margin-top:var(--s3)"><button data-action="pickday" data-i="2">' + esc(DSHORT.format(new Date(baseDay(2))) + " " + DNUM.format(new Date(baseDay(2)))) + "</button>" +
       '<button data-action="pickday" data-i="4">' + esc(DSHORT.format(new Date(baseDay(4))) + " " + DNUM.format(new Date(baseDay(4)))) + "</button></div></div>";
-  } else if (S.injected === "Loading availability"){
+  } else if (S.scenario === "loading"){
     html += '<ul class="rows">' + [1,2,3,4].map(function(){ return '<li class="skel">Loading available times</li>'; }).join("") + "</ul>";
   } else {
     html += '<div class="railwrap">' +
@@ -4171,7 +4181,7 @@ function scrCourtReview(){
       dock:{ action:{ label:"Choose a court time", action:"nav", to:"/court" } } };
   }
   const total = RATE_COURT * d.duration;
-  const conflict = S.injected === "Inventory conflict";
+  const conflict = S.scenario === "conflict";
   let html = stepRail(2,4,"Your details");
   html += '<h1 class="screen">Review and hold</h1>';
 
@@ -5348,7 +5358,7 @@ function scrOpenPlay(){
   html += '<h1 class="screen" style="margin-top:var(--s5)">Open Play</h1>';
   html += '<p class="lede" style="margin-top:var(--s3)">An individual admission where you join and rotate with other attendees. You do not reserve a whole court. ₱150 per player.</p>';
 
-  if (S.injected === "No Open Play scheduled"){
+  if (S.scenario === "empty"){
     html += '<div class="section"><div class="card"><p><strong>No Open Play is scheduled yet.</strong></p>' +
       '<p class="legal" style="margin-top:var(--s2)">This is normal between published schedules. Check again later, or reserve a private court now.</p>' +
       '<p style="margin-top:var(--s3)"><button class="btn btn--secondary btn--sm" data-action="startcourt">Reserve a Court instead</button></p></div></div>';
@@ -6241,19 +6251,10 @@ function scrExceptions(){
    Visually quarantined so a screenshot of it can never pass as
    product UI.
    ============================================================ */
-const SCENARIOS = [
-  { key:"happy",    label:"Happy court booking" },
-  { key:"expiry",   label:"Hold about to expire" },
-  { key:"failure",  label:"Payment failure" },
-  { key:"late",     label:"Late payment after release" },
-  { key:"mismatch", label:"Amount mismatch, needs review" },
-  { key:"full",     label:"Open Play window full" },
-  { key:"names",    label:"Names outstanding" },
-  { key:"event",    label:"Private event lifecycle" },
-  { key:"offline",  label:"Offline and stale" },
-  { key:"empty",    label:"No Open Play scheduled" },
-  { key:"loading",  label:"Loading availability" }
-];
+/* The eleven scenarios now live in scenarios.js, because the admin console reads
+   the same table. Kept under the old name so the harness below and the /demo
+   screen read as they did. */
+const SCENARIOS = window.SCENARIOS;
 const ALL_ROUTES = [
   ["/", "pub-landing, Landing"], ["/rates","pub-rates, Rates & How It Works"], ["/visit","pub-visit, Visit / Contact"],
   ["/court","pub-court-when, Reserve a Court"], ["/court/review","pub-court-review, Court review and details"],
@@ -6328,10 +6329,19 @@ function openDemo(){
        'Bookings are not: An order, its hold deadline, and its passes live in memory only and are gone the moment you reload. ' +
        'Reset all state, at the foot of this sheet, clears the remembered half.</p>';
 
+  /* ADMIN IS NOT A FIFTH SURFACE.
+     It sets opsmanager and then leaves for the console, which is why it carries
+     no pressed state: the four above are states this document can be in, and this
+     one is a door. Treating Admin as a role of its own would have meant inventing
+     a fifth set of permissions for the same person Rea Salvador already is on the
+     Operations Manager surface, and then keeping the two in step forever. The
+     console is what an Operations Manager gets on a laptop, not somebody else. */
   b += '<div><h3>Surface</h3><div class="grid2">' +
     [["visitor","Visitor"],["player","Signed-in player"],["frontdesk","Front Desk"],["opsmanager","Operations Manager"]]
       .map(function(s){ return '<button class="h" data-action="setsurface" data-v="' + s[0] + '" aria-pressed="' + (S.surface === s[0]) + '">' + s[1] + "</button>"; }).join("") +
-    '</div><p class="legal" style="margin-top:var(--s2)">Simulated role. The real system enforces this on the server; hiding a control is not the security boundary.</p></div>';
+    '<button class="h" style="grid-column:1/-1" data-action="setsurface" data-v="admin">Admin / Club Manager, opens the console</button>' +
+    '</div><p class="legal" style="margin-top:var(--s2)">Simulated role. The real system enforces this on the server; hiding a control is not the security boundary.</p>' +
+    '<p class="legal" style="margin-top:var(--s2)">Admin is the Operations Manager&rsquo;s console view, not a fifth role. It sets the Operations Manager surface and opens admin/dashboard.html, carrying the armed scenario and the theme across.</p></div>';
 
   /* The armed scenario is shown as a pressed state rather than left to memory,
      because it is now the one dial whose effect is not on this screen: it
@@ -6459,7 +6469,7 @@ function scrDemo(){
       return '<li class="row"><span class="row__main"><span class="row__title">' + esc(r[0]) + '</span><span class="row__sub">' + esc(r[1]) + "</span></span></li>";
     }).join("") + "</ul></div>";
   html += '<div class="section"><h2 class="sec">What the harness controls</h2><ul class="rows">' +
-    [["Surface","Visitor, signed-in player, Front Desk, or Operations Manager."],
+    [["Surface","Visitor, signed-in player, Front Desk, or Operations Manager, plus a door into the admin console. Admin is the Operations Manager's console view rather than a fifth role."],
      [SCENARIOS.length + " scenarios","One-tap seeded states, including hold expiry, payment failure, late payment, amount mismatch, and a full window."],
      ["Simulated clock","Advance time or expire a hold now, so you do not wait ten minutes to see the escalation."],
      ["Connectivity","Live availability down, payment provider down, or full maintenance."],
@@ -6674,7 +6684,7 @@ function syncDials(){
    it. */
 function resetRuntime(){
   S.clockOffsetMs = 0; S.clockPaused = false; S.connectivity = "online"; S.surface = "visitor";
-  S.capacityDial = "available"; S.injected = null; S.orders = {}; S.currentOrderId = null;
+  S.capacityDial = "available"; S.injected = null; S.scenario = null; S.orders = {}; S.currentOrderId = null;
   S.arrivalOpen = false; S.offers = {}; S.inquiries = {}; S.account = null; S.reveal = {}; S.formErrors = {};
   S.forms = {}; S.skipCapture = true;
   S.findStage = "entry"; S.signinStage = "identify"; S.saveStage = "offer"; S.timeline = false;
@@ -7092,6 +7102,16 @@ const ACTIONS = {
   /* harness */
   setsurface: function(el){
     const v = el.getAttribute("data-v");
+    /* Admin is the console view of the Operations Manager surface. It sets that
+       surface and leaves this document; the dials are written first so the
+       console reads the right ones on arrival. */
+    if (v === "admin"){
+      S.surface = "opsmanager";
+      syncDials();
+      closeSheet();
+      location.href = "admin/dashboard.html";
+      return;
+    }
     S.surface = v;
     if (v === "player" && !S.account) S.account = { name:"Sample Player", mobile:"0917 555 0100", email:"" };
     if (v === "visitor") S.account = null;
@@ -7147,48 +7167,80 @@ function resolveOutcome(o){
   announce("Status updated: " + st.phrase);
 }
 
-/* Loading a scenario resets the runtime and seeds it, and separately records
-   which scenario is armed. The record is what the admin console reads: it gets a
-   key and renders its own sample for it, because the order graph this function
-   builds is full of absolute deadlines and generated identifiers and does not
-   cross a document boundary. Within this document the record is display only,
-   which the harness copy now says: a reload restores the dials, not the seeded
-   order, so the scenario is not silently replayed under a URL that still points
-   at the order the previous run created. */
+/* Loading a scenario resets the runtime, applies the scenario's seed, and
+   separately records which scenario is armed. The record is what the admin
+   console reads: it gets a key and renders its own sample for it, because the
+   order graph this function builds is full of absolute deadlines and generated
+   identifiers and does not cross a document boundary. Within this document the
+   record is display only, which the harness copy now says: a reload restores the
+   dials, not the seeded order, so the scenario is not silently replayed under a
+   URL that still points at the order the previous run created.
+
+   The thirty-line switch is gone. What each scenario does is now data on the
+   scenario itself, and the four functions below are the only things that know
+   how to carry it out. Adding a twelfth scenario is a row in scenarios.js, not
+   a case here, and the seed can be read without reading the code that applies
+   it. The observable result is unchanged: every one of the eleven lands on the
+   same route, with the same order in the same state, as it did before. */
+function settleOrder(o, how){
+  if (!how) return;
+  if (how === "paid")     verifyPayment(o, { eventId:"seed", amount: orderTotal(o) });
+  else if (how === "short") verifyPayment(o, { eventId:"seed", amount: orderTotal(o) - MISMATCH_SHORTFALL });
+  else if (how === "failed") o.paymentStatus = "failed";
+  else if (how === "late"){ expireOrder(o); verifyPayment(o, { eventId:"seed", amount: orderTotal(o) }); }
+  /* Ninety seconds is short enough that the escalation is visible without the
+     simulated clock and long enough to read the screen first. */
+  else if (how === "expiring") o.holdDeadline = now() + 90000;
+}
+/* A route in a seed is written the way a reader would say it: /status/:id,
+   /booking/:code. The three placeholders are the three identifiers a seeded
+   order can be addressed by, and an inquiry has the fourth. */
+function seedRoute(pattern, o, inquiry){
+  return pattern
+    .replace(":code", o ? encodeURIComponent(o.bookingCode) : "")
+    .replace(":id",   o ? o.id : "")
+    .replace(":ref",  inquiry ? encodeURIComponent(inquiry.ref) : "");
+}
+
 function loadScenario(key){
+  const scn = SCENARIO_BY_KEY[key];
+  if (!scn) return;
+  const seed = scn.seed || {};
+
   resetRuntime();
-  S.injected = key === "happy" ? null : (SCENARIOS.filter(function(s){ return s.key === key; })[0] || {}).label || null;
+  /* The banner names the forced state. The happy path is not a forced state, so
+     it is the one scenario that renders no marker. */
+  S.injected = scn.natural ? null : scn.label;
+  /* The key, not the label. Three screens used to branch on the label string,
+     which made rewording a label a silent behaviour change. */
+  S.scenario = key;
+
   seedOrganizer();
   S.draft.time = "7:00 PM"; S.draft.duration = 2;
-  let o;
-  switch(key){
-    case "happy":
-      o = makeCourtOrder(); verifyPayment(o, { eventId:"seed", amount: orderTotal(o) });
-      go("/booking/" + encodeURIComponent(o.bookingCode)); break;
-    case "expiry":
-      o = makeCourtOrder(); o.holdDeadline = now() + 90000; go("/hold/" + o.id); break;
-    case "failure":
-      o = makeCourtOrder(); o.paymentStatus = "failed"; go("/status/" + o.id); break;
-    case "late":
-      o = makeCourtOrder(); expireOrder(o); verifyPayment(o, { eventId:"seed", amount: orderTotal(o) }); go("/status/" + o.id); break;
-    case "mismatch":
-      o = makeCourtOrder(); verifyPayment(o, { eventId:"seed", amount: orderTotal(o) - 50 }); go("/status/" + o.id); break;
-    case "full":
-      S.capacityDial = "full"; go("/openplay"); break;
-    case "names":
-      S.draft.qty = 4; S.draft.players = ["Mika","",""," "];
-      o = makeOpOrder("w1"); verifyPayment(o, { eventId:"seed", amount: orderTotal(o) });
-      go("/booking/" + encodeURIComponent(o.bookingCode)); break;
-    case "event":
-      S.inquiries["EV 4210"] = { ref:"EV 4210", state:"Quoted", name:S.draft.name, date:"To be confirmed", time:"To be confirmed" };
-      go("/event/" + encodeURIComponent("EV 4210")); break;
-    case "offline":
-      S.connectivity = "availability_down"; go("/court"); break;
-    case "empty":
-      go("/openplay"); break;
-    case "loading":
-      go("/court"); break;
+
+  if (seed.dials){
+    if (seed.dials.connectivity) S.connectivity = seed.dials.connectivity;
+    if (seed.dials.capacity)     S.capacityDial = seed.dials.capacity;
   }
+  if (seed.draft){
+    if (seed.draft.qty !== undefined)     S.draft.qty = seed.draft.qty;
+    if (seed.draft.players !== undefined) S.draft.players = seed.draft.players.slice();
+  }
+
+  let o = null;
+  if (seed.order === "court")         o = makeCourtOrder();
+  else if (seed.order === "openplay") o = makeOpOrder(seed.window || "w1");
+  if (o) settleOrder(o, seed.settle);
+
+  let inquiry = null;
+  if (seed.inquiry){
+    inquiry = { ref: seed.inquiry.ref, state: seed.inquiry.state, name: S.draft.name,
+                date: seed.inquiry.date, time: seed.inquiry.time };
+    S.inquiries[inquiry.ref] = inquiry;
+  }
+
+  if (seed.route) go(seedRoute(seed.route, o, inquiry));
+
   syncDials();
   STAGING.setScenario(key);
   closeSheet();
