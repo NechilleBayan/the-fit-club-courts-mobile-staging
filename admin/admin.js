@@ -131,6 +131,12 @@
     refresh:   '<path d="M20 11a8 8 0 1 0-.6 4"/><path d="M20 4.5V11h-6"/>',
     key:       '<circle cx="8" cy="14" r="4.5"/><path d="M11.4 11.2 20 3.5M16.5 7l2.5 2.5M14.2 9.2l2.2 2.2"/>',
     download:  '<path d="M12 3.5v11M7.5 10.5l4.5 4.5 4.5-4.5M4 20.5h16"/>',
+    /* Day and night, for the utility strip's toggle. Carried over from the
+       customer build's sprite for the same reason the flask below it was: the
+       strip is one component and its glyph should not change shape depending on
+       which half of the product is drawing it. */
+    sun:       '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"/>',
+    moon:      '<path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z"/>',
     /* The staging flask, carried over from the customer build's sprite so the
        forced-state marker wears the same glyph on both sides of the boundary. It
        was the one icon the marker needed and the one this sprite did not have,
@@ -199,6 +205,12 @@
     var shell = document.getElementById("shell");
     shell.insertBefore(bar, shell.firstChild);
 
+    /* The utility strip, above the app bar and therefore inserted before it.
+       Built at every width and hidden below 1024 by console-nav.css, exactly as
+       the sidebar is: a breakpoint in script would have to be re-evaluated on
+       resize and would race the first paint. */
+    buildUtilbar(shell);
+
     /* The tab bar, appended last so it is the final thing in the tab order
        before the page ends. */
     var tabs = document.createElement("nav");
@@ -215,12 +227,103 @@
 
     if (!back) buildDrawer(shell);
     buildSidebar(shell, nav);
+    buildStaging(shell);
     buildToast();
     buildLive();
     liftToast();
     paintWorkload();
     hydrateIcons(document);
     wire();
+  }
+
+  /* ---------- THE UTILITY STRIP ----------
+     Markup from console-nav.js, which the customer build renders too. This side
+     passes its own icon function and wires its own two actions; see the model
+     there for why the click is not wired in the shared file. */
+  function buildUtilbar(shell){
+    if (!window.CONSOLE_NAV) return;
+    var el = document.createElement("div");
+    el.className = "utilbar";
+    el.id = "utilbar";
+    el.innerHTML = '<div class="utilbar__inner" id="bar-util"></div>';
+    shell.insertBefore(el, shell.firstChild);
+    paintUtilbar();
+  }
+
+  function paintUtilbar(){
+    var slot = document.getElementById("bar-util");
+    if (!slot || !window.CONSOLE_NAV) return;
+    slot.innerHTML = CONSOLE_NAV.utilbar({ icon: svg, theme: currentTheme() });
+  }
+
+  /* The resolved theme rather than the stored preference: "system" is a real
+     stored value and the toggle has to know which way the system went before it
+     can offer the other one. */
+  function currentTheme(){
+    var set = document.documentElement.getAttribute("data-theme");
+    if (set === "dark" || set === "light") return set;
+    return (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  }
+
+  /* Announcing is this document's job, painting is the subscriber's. A theme can
+     also arrive from the customer build in another tab, and both routes have to
+     end in one repaint rather than two copies of it. */
+  function toggleTheme(){
+    var next = currentTheme() === "dark" ? "light" : "dark";
+    if (window.STAGING) STAGING.setTheme(next);
+    toast(next === "dark" ? "Night theme." : "Day theme.");
+  }
+
+  /* ---------- THE STAGING NOTICE ----------
+     What the Demo control opens, and the same dialog the console will show once
+     per session. One real <dialog>: showModal traps focus and gives Escape for
+     free, a click on the element itself is a click on the backdrop because the
+     panel does not fill the box, and the close event puts focus back where it
+     came from.
+
+     It says the three things a reader arriving at a staging build needs and
+     nothing else. The per-page .sandbox note stays: it is a different job, said
+     once per screen about that screen, and a dialog that appears on every route
+     would be the banner the note's own comment argues against. */
+  var stagingReturn = null;
+  function buildStaging(shell){
+    var d = document.createElement("dialog");
+    d.className = "sheet staging";
+    d.id = "staging";
+    d.setAttribute("aria-labelledby", "staging-title");
+    d.innerHTML =
+      '<div class="sheet__panel staging__panel">' +
+        '<div class="sheet__head">' +
+          '<h2 id="staging-title">' + svg("flask") + "<span>Staging build</span></h2>" +
+          '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close">' + svg("close") + "</button>" +
+        "</div>" +
+        '<div class="sheet__body">' +
+          "<p>This is a staging build of the Fit Club Courts console. Everything on " +
+            "it is sample data: the bookings, the players, the payments, and the " +
+            "schedule are made up to show how the screens behave.</p>" +
+          "<p><b>Nothing here is a real reservation</b>, and nothing you do on these " +
+            "screens reaches the club, a customer, or a card.</p>" +
+          '<p class="legal">The flask in the strip at the top of the window opens ' +
+            "this again, and every screen carries a note at its foot saying what is " +
+            "sample about that screen in particular.</p>" +
+          '<div class="btn-col" style="margin-top:var(--s4)">' +
+            '<button class="btn btn--primary" type="button" data-close>Got it</button>' +
+          "</div>" +
+        "</div>" +
+      "</div>";
+    shell.appendChild(d);
+    d.addEventListener("click", function(e){ if (e.target === d) d.close(); });
+    d.addEventListener("close", function(){
+      if (stagingReturn && document.contains(stagingReturn)) stagingReturn.focus();
+      stagingReturn = null;
+    });
+  }
+
+  function openStaging(){
+    var d = document.getElementById("staging");
+    if (!d || d.open) return;
+    stagingReturn = document.activeElement;
+    d.showModal();
   }
 
   /* ---------- THE SIDEBAR ----------
@@ -329,9 +432,38 @@
           '<span class="avatar avatar--lg" aria-hidden="true">' + DATA.admin.initials + '</span>' +
           '<span class="drawer__id"><b>' + DATA.admin.name + '</b><span>' + DATA.admin.role + ' &middot; ' + DATA.club.name + '</span></span>' +
         '</div>' +
-        '<div class="drawer__body">' + rows + '</div>' +
+        '<div class="drawer__body">' + rows + drawerBuildRows() + '</div>' +
       '</div>';
     shell.appendChild(d);
+  }
+
+  /* THE PHONE'S ANSWER TO THE UTILITY STRIP.
+     The strip is desktop only and that is a decision, not an omission: it costs
+     36px of permanent chrome, and this console already spends 118 of a 390x844
+     screen's 844 on its app bar and tab bar. A third strip would take the frame
+     past 18% of the viewport to carry two controls a reader touches at most once
+     a session.
+
+     So they go where a phone already looks for things that are not destinations:
+     the foot of the drawer, under a rule, after every real place the reader can
+     go. That is where the customer build put the same two controls at the same
+     widths, and its comment says why, so this is the console adopting an answer
+     rather than inventing a second one. No width shows two copies of either. */
+  function drawerBuildRows(){
+    var dark = currentTheme() === "dark";
+    return '<div class="drawer__group drawer__group--build"><span>This build</span></div>' +
+      '<button class="navrow" type="button" data-action="theme" id="drawerTheme" aria-pressed="' + dark + '">' +
+        svg(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>" +
+      '<button class="navrow" type="button" data-action="demo" aria-haspopup="dialog">' +
+        svg("flask") + "<span>Staging build</span></button>";
+  }
+
+  function paintDrawerTheme(){
+    var b = document.getElementById("drawerTheme");
+    if (!b) return;
+    var dark = currentTheme() === "dark";
+    b.setAttribute("aria-pressed", dark);
+    b.innerHTML = svg(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span>";
   }
 
   /* ---------- TOAST ----------
@@ -646,6 +778,21 @@
       if (s && e.target === s) s.close();
     });
 
+    /* The utility strip's two controls, and the drawer rows that carry the same
+       two on a phone. One handler for both, so the strip and the drawer can
+       never drift: below 1024 only the drawer rows exist and above it only the
+       strip does, which is the rule that keeps no width showing two copies. */
+    document.addEventListener("click", function(e){
+      var t = e.target.closest('[data-action="theme"]');
+      if (t){ toggleTheme(); return; }
+      var m = e.target.closest('[data-action="demo"]');
+      if (m){
+        var d = document.getElementById("drawer");
+        if (d && d.open) d.close();
+        openStaging();
+      }
+    });
+
     /* Log Out is the one drawer row that is not a destination. In the sandbox it
        says what it would do rather than pretending to do it. */
     document.addEventListener("click", function(e){
@@ -819,7 +966,14 @@
   function bridge(){
     if (!window.STAGING) return;
     STAGING.subscribe(function(state, changed){
-      if (changed.indexOf("theme") >= 0) STAGING.applyTheme("system");
+      if (changed.indexOf("theme") >= 0){
+        STAGING.applyTheme("system");
+        /* The dial the reader can see has to follow the one they cannot. This
+           fires for their own tap and for a theme set in the customer build in
+           another tab, and both end here. */
+        paintUtilbar();
+        paintDrawerTheme();
+      }
       if (changed.indexOf("scenario") >= 0) applyScenario();
     });
   }

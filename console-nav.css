@@ -1,6 +1,6 @@
 
 /* ============================================================
-   THE FIT CLUB COURTS - DESKTOP SIDEBAR
+   THE FIT CLUB COURTS - DESKTOP SHELL: SIDEBAR AND UTILITY STRIP
    Loaded by every page of the admin console and by the customer build.
 
    One component, one stylesheet, two documents. The rail is the same rail on
@@ -13,9 +13,12 @@
 
    This file names no colours. Every value is a token, and both documents already
    declare all of them, which is what makes one stylesheet possible across two
-   builds whose palettes are inverses of each other. The console paints cream
-   type on ink cards over a near white page; the customer build paints the other
-   way round. The rail follows whichever it finds itself in.
+   builds whose palettes differ. It used to say the two were inverses of each
+   other, and they were: the console painted cream type on ink cards over a near
+   white page while the customer build painted the other way round. The console's
+   light theme was reversed, so both now put cream cards on paper and the sentence
+   would be wrong; the rail did not have to change for that, which is the point
+   of naming no colours.
 
    Everything is behind a min-width:1024px query or is inert because .sidenav is
    display:none until that width. Nothing here changes what a phone renders,
@@ -27,6 +30,12 @@
    max-width ones, so there was no competing value to reconcile.
    ============================================================ */
 .sidenav{ display:none; }
+/* Both shell components are desktop only, and both are hidden by the stylesheet
+   rather than by a breakpoint in script. display:none takes them out of the tab
+   order and out of the accessibility tree, so a phone never meets a control it
+   cannot see, and a reader dragging a window across the threshold gets the right
+   answer without anything having to be rebuilt. */
+.utilbar{ display:none; }
 
 @media (min-width:1024px){
   :root{
@@ -319,6 +328,54 @@
    prefers-reduced-motion, so both transitions above resolve to an instant swap
    without a second rule. This one is here for the property that is not on a
    token: The toggle's rotation, which is decorative either way. */
+/* ---------- THE UTILITY STRIP ----------
+   The slim strip of build controls at the very top of the page: the day and
+   night toggle and the way into the staging harness. Two documents render it
+   from the model in console-nav.js; what is here is how it looks, and what is
+   NOT here is where it sits. The customer build centres it on its own shell
+   width and the console hangs it off the rail's column, so each document keeps
+   the padding-inline in its own sheet, exactly as each keeps its own grid.
+
+   No background and no rule of its own. In the customer build the header group's
+   fade is at its darkest up here, which is what separates this strip from the
+   navigation, and a divider would put back the rectangle the fade exists to
+   remove. In the console the page shows through and the app bar's own ink edge
+   below does the separating. */
+@media (min-width:1024px){
+  .utilbar{ display:block; background:none; border:0; }
+  .utilbar__inner{
+    display:flex; align-items:center; justify-content:flex-end; gap:var(--s2);
+    min-height:var(--utilbar-h);
+  }
+  /* Compact: these are not decisions, so they do not get decision-sized targets.
+     The 44px minimum belongs to touch, and this strip only exists at widths
+     where the pointer is the fine one.
+
+     Colour is inherited rather than taken from a token, so the controls follow
+     whatever they are drawn on: cream over the customer build's hero, the
+     theme's own ink or cream everywhere else. They are held back with opacity
+     rather than with a dimmer colour, which is the only way to stay quiet in
+     both places at once. */
+  .utilbar .iconbtn{
+    min-width:0; min-height:26px; padding:0 var(--s2);
+    border-color:transparent; color:inherit; opacity:.72;
+    font-size:12px; letter-spacing:.08em;
+    transition:opacity var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+  }
+  .utilbar .iconbtn--demo{ border-style:solid; border-color:rgba(var(--ghost-edge),.30); border-radius:var(--r-btn); }
+  .utilbar .iconbtn svg{ width:16px; height:16px; }
+  .utilbar .iconbtn--bare{ min-width:26px; }
+  .utilbar .iconbtn--bare svg{ width:17px; height:17px; }
+  @media (hover:hover) and (pointer:fine){
+    .utilbar .iconbtn:hover{ color:inherit; opacity:1; }
+  }
+  /* Quiet is a choice this reader has already declined. */
+  @media (prefers-contrast:more){
+    .utilbar .iconbtn{ opacity:1; }
+    .utilbar .iconbtn--demo{ border-color:var(--border-default); }
+  }
+}
+
 @media (prefers-reduced-motion:reduce){
   .sidenav__toggle{ transition:none; }
 }

@@ -87,6 +87,67 @@
     ] }
   ];
 
+  /* ---------- THE UTILITY STRIP ----------
+     The slim rail of build controls above the app bar: the day and night toggle
+     and the way into the staging harness. It lived in index.html and only there,
+     which made it a control the customer half of the prototype had and the staff
+     half did not, for no reason anybody had decided.
+
+     It is here for the same reason the destination list is: it is one component
+     rendered by two documents, and a second copy is a second place to change it
+     and therefore a place to forget to. Same division of labour as the sidebar
+     above. The model and the markup are here; the icon function comes from the
+     document, because the console keeps its glyphs as path strings and the
+     customer build keeps its as <symbol> elements, and reconciling those two
+     sprites is still a separate question. The actions are the document's too:
+     both emit data-action="theme" and data-action="demo", and each shell already
+     has a delegated handler that is the right place to say what those mean.
+     Demo means something different on each side, which is exactly why the click
+     is not wired here.
+
+     A LIST RATHER THAN TWO HARD CODED BUTTONS. There are two controls and the
+     rendering could have been two lines of string concatenation. It is a model
+     because the strip's whole reason to be shared is that the third build
+     control, whenever it arrives, has one place to be added rather than two.
+
+     WHAT THE PHONE GETS, AND WHY IT IS NOT THIS. Below 1024px the strip does not
+     exist, and that is a decision rather than an omission. It costs 36px of
+     permanent vertical space, and on a 390x844 screen the console already spends
+     118 of 844 on its app bar and tab bar; a third strip would take the chrome
+     past 18% of the viewport to carry two controls a reader touches at most once
+     a session. Both are reachable on a phone from the menu the shell already
+     has: the customer build puts them at the foot of its account sheet, and the
+     console now puts them at the foot of its drawer. No width shows two copies
+     of either, which is the rule the customer build's own comment states and
+     this is the console adopting it rather than inventing a second answer. */
+  var UTIL = [
+    { id: "theme", kind: "toggle" },
+    { id: "demo",  kind: "dialog", icon: "flask", label: "Demo", name: "Staging harness" }
+  ];
+
+  function utilbar(opts) {
+    var icon = opts.icon;
+    var dark = opts.theme === "dark";
+    return UTIL.map(function (c) {
+      if (c.kind === "toggle") {
+        /* aria-pressed rather than role="switch": the control is a button that
+           flips a setting, and its own icon and label already say which way it
+           is pointing. The accessible name changes with the state because the
+           glyph is the only visible label. */
+        return '<button class="iconbtn iconbtn--bare" type="button" data-action="' + c.id + '"' +
+          ' aria-pressed="' + dark + '"' +
+          ' aria-label="' + (dark ? "Switch to the day theme" : "Switch to the night theme") + '">' +
+          icon(dark ? "sun" : "moon") + "</button>";
+      }
+      /* The label is a real word and is hidden by CSS at widths where the strip
+         has to share the line, not dropped from the markup. A button whose only
+         name is a flask is a button nobody can ask for. */
+      return '<button class="iconbtn iconbtn--demo" type="button" data-action="' + c.id + '"' +
+        ' aria-haspopup="dialog" aria-label="' + esc(c.name) + '">' +
+        icon(c.icon) + '<span class="iconbtn__t">' + esc(c.label) + "</span></button>";
+    }).join("");
+  }
+
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -272,6 +333,7 @@
     GROUPS: GROUPS,
     sidebar: sidebar,
     wireSidebar: wireSidebar,
+    utilbar: utilbar,
     /* The groups this surface is allowed to see. The money area is the
        Operations Manager's, and everything else is everyone's.
 

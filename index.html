@@ -437,7 +437,6 @@ svg{ display:block; width:20px; height:20px; flex:none; }
      transparency, which is what a heavier wash or a stronger blur would have cost. */
   text-shadow:0 1px 8px rgba(5,5,5,.62), 0 0 2px rgba(5,5,5,.45);
 }
-.utilbar{ display:none; }
 .appbar{
   display:grid; grid-template-columns:minmax(64px,1fr) auto minmax(64px,1fr);
   align-items:center; gap:var(--s2);
@@ -1810,7 +1809,6 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   :root.nav-cta .nav-book-cta:hover{ background:rgba(var(--ghost-edge),.26); border-color:rgba(var(--ghost-edge),.88); }
   .acct__btn:hover{ background:rgba(var(--ghost-fill),.22); border-color:rgba(var(--ghost-edge),.66); }
   .acct__menu button:hover{ background:color-mix(in srgb, var(--text-primary) 8%, transparent); }
-  .utilbar .iconbtn:hover{ color:inherit; opacity:1; }
   .barmenu:hover{ opacity:.75; }
 }
 /* The focus ring is drawn with a box-shadow halo, and so is the hover lift, so the
@@ -1933,35 +1931,18 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   }
 
   /* ---------- STRIP ONE: utility ----------
-     The slim strip at the very top of the page. It carries the two controls that
-     are about the build rather than about booking anything: the staging harness
-     and the day/night toggle. It is right aligned to the same centred grid the
-     navigation below it uses, so the two strips share both edges. No background and
-     no rule of its own: the group's fade is at its darkest up here, which is what
-     separates this strip from the navigation, and a divider would put back the
-     rectangle the fade exists to remove. */
-  .utilbar{ display:block; background:none; border:0; }
+     The slim strip at the very top of the page carries the two controls that are
+     about the build rather than about booking anything: the staging harness and
+     the day and night toggle. It is a shared shell component now, drawn by
+     console-nav.css and built from the model in console-nav.js, because the
+     console has exactly the same strip and had no way to reach either control.
+
+     What is left here is placement, which is this document's own business: the
+     strip is right aligned to the same centred grid the navigation below it
+     uses, so the two strips share both edges. */
   .utilbar__inner{
-    display:flex; align-items:center; justify-content:flex-end; gap:var(--s2);
-    min-height:var(--utilbar-h);
     padding-inline:calc(max(0px, (100% - var(--shell-max)) / 2) + var(--gutter));
   }
-  /* Compact: these are not decisions, so they do not get decision-sized targets.
-     The 48px minimum belongs to touch, and this strip only exists at widths where
-     the pointer is the fine one. */
-  /* Colour is inherited, not a token, so these follow the header: cream over the hero
-     and the theme's ink elsewhere. They are held back with opacity rather than with a
-     dimmer colour, which is the only way to stay quiet in both places at once. */
-  .utilbar .iconbtn{
-    min-width:0; min-height:26px; padding:0 var(--s2);
-    border-color:transparent; color:inherit; opacity:.72;
-    font-size:12px; letter-spacing:.08em;
-    transition:opacity var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
-  }
-  .utilbar .iconbtn--demo{ border-style:solid; border-color:rgba(var(--ghost-edge),.30); border-radius:var(--r-btn); }
-  .utilbar .iconbtn svg{ width:16px; height:16px; }
-  .utilbar .iconbtn--bare{ min-width:26px; }
-  .utilbar .iconbtn--bare svg{ width:17px; height:17px; }
 
   /* ---------- STRIP TWO: navigation ----------
      logo left, destinations right, the one prominent action at the far right.
@@ -3323,7 +3304,13 @@ function render(){
      Below 1024px the strip is display:none and the same two controls are reached
      through the overflow menu, so a phone never carries them permanently and no
      width shows two copies. */
-  document.getElementById("bar-util").innerHTML = themeButton() + demoButton();
+  /* The strip's markup comes from the shell component both documents share. This
+     document passes its own icon function, because its glyphs are <symbol>
+     elements and the console's are path strings, and wires data-action="theme"
+     and data-action="demo" in its own handler, because demo means a harness
+     sheet here and a staging notice there. */
+  document.getElementById("bar-util").innerHTML =
+    CONSOLE_NAV.utilbar({ icon: icon, theme: currentTheme() });
 
   /* NAVIGATION STRIP, right hand end.
      Two things, in this order: the swap slot and the menu button.
@@ -7440,19 +7427,6 @@ STAGING.subscribe(function(state, changed){
   S.inPlace = true; render();
   if (S.qr) paintQrModal();
 });
-function themeButton(){
-  const dark = currentTheme() === "dark";
-  return '<button class="iconbtn iconbtn--bare" data-action="theme" aria-pressed="' + dark + '"' +
-    ' aria-label="' + (dark ? "Switch to the day theme" : "Switch to the night theme") + '">' +
-    icon(dark ? "sun" : "moon") + "</button>";
-}
-/* The label is dropped below 420px, where the control has to share the app bar
-   with the wordmark. The accessible name is on the button rather than in the text
-   for exactly that reason. */
-function demoButton(){
-  return '<button class="iconbtn iconbtn--demo" data-action="demo" aria-haspopup="dialog" aria-label="Staging harness">' +
-    icon("flask") + '<span class="iconbtn__t">Demo</span></button>';
-}
 
 /* ============================================================
    HEADER ACCOUNT

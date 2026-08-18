@@ -305,7 +305,13 @@
      the foot of every docked screen, which is a layout change no finding in
      this sweep asked for. */
   --toast-lift:0px;
-  --header-h:var(--appbar-h);
+  /* The utility strip's height, zero until the width where the strip exists.
+     Declared here rather than only inside the desktop query so that --header-h
+     is one expression at every width: a token that appears halfway up the scale
+     is a token something below it has to remember not to read. Same shape the
+     customer build already uses. */
+  --utilbar-h:0px;
+  --header-h:calc(var(--utilbar-h) + var(--appbar-h));
 }
 @media (max-width:359px){ :root{ --card-pad:14px; --gutter:14px; } }
 @media (prefers-reduced-motion: reduce){ :root{ --dur-fast:0.01ms; --dur-sheet:0.01ms; --dur-ui:0.01ms; } }
@@ -1302,6 +1308,59 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .empty b{ font-size:var(--fs-label); font-weight:700; }
 .empty span{ font-size:var(--fs-legal); line-height:19px; color:var(--text-secondary); max-width:32ch; }
 
+/* ---------- THE STAGING NOTICE ----------
+   A centred dialog rather than the bottom sheet every other modal in this
+   console uses, and the difference is the point. A sheet slides up from the
+   thumb because it is part of the task the reader is in the middle of; this
+   interrupts to say something about the whole build before any task starts, so
+   it sits in the middle of the window and owns it for the moment it is open.
+
+   Frosted rather than opaque, so the screen it is talking about stays visible
+   behind it. The blur is what makes that legible rather than merely translucent:
+   a sheer panel over a list of bookings is a panel with a list of bookings
+   printed through it. Where the blur is unavailable the mix falls back to a
+   nearly solid panel, which is the safe direction.
+
+   Reduced motion and more contrast both take it to a plain solid plate, for the
+   same reason: the frost is decoration, and a reader who has asked for less of
+   anything has not asked for this. */
+.staging[open]{ justify-content:center; }
+.staging .sheet__panel{
+  margin:auto;
+  width:min(30rem, calc(100% - 2 * var(--gutter)));
+  max-height:min(85svh, 40rem);
+  border-radius:var(--r-sheet);
+  border:1.5px solid var(--border-strong);
+  background:color-mix(in srgb, var(--surface-raised) 86%, transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);
+  backdrop-filter:blur(16px) saturate(1.15);
+  box-shadow:0 12px 40px var(--shadow-lift);
+}
+.staging .sheet__head h2{ display:flex; align-items:center; gap:var(--s2); }
+.staging .sheet__head h2 svg{ width:20px; height:20px; }
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .staging .sheet__panel{ background:var(--surface-raised); }
+}
+@media (prefers-contrast:more){
+  .staging .sheet__panel{
+    background:var(--surface-raised);
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+    border-width:2px;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .staging .sheet__panel{
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+    background:var(--surface-raised);
+  }
+}
+
+/* The two build controls at the foot of the drawer, which is where a phone
+   reaches what the desktop keeps in the utility strip. The rule above the group
+   is heavier than the hairline between destinations, because what follows it is
+   not a destination. */
+.drawer__group--build{ border-top:1px solid var(--border-strong); margin-top:var(--s3); }
+
 /* ---------- SANDBOX MARK ----------
    Every page in this folder is a prototype and says so once, quietly, at the
    bottom. It is not a banner, because a banner that appears on twenty four
@@ -1572,6 +1631,9 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
     --shell-max:none;
     --content-max:44rem;
     --block-gap:24px; --section-gap:36px;
+    /* The strip appears, and --header-h picks it up without being restated,
+       which is what declaring it as a calc at the top buys. */
+    --utilbar-h:36px;
   }
 
   /* The shell stops being a column and becomes two. The sidebar spans both rows
@@ -1583,12 +1645,21 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
   #shell{
     display:grid;
     grid-template-columns:var(--sidenav-w) minmax(0,1fr);
-    grid-template-rows:auto 1fr;
+    grid-template-rows:auto auto 1fr;
     transition:grid-template-columns var(--dur-ui) var(--ease);
   }
   .sidenav{ grid-column:1; grid-row:1 / -1; min-width:0; }
-  .appbar{ grid-column:2; grid-row:1; }
-  #main{ grid-column:2; grid-row:2; }
+  /* The strip is a third row above the app bar rather than a full width band
+     across the top, so the rail still spans everything and still reads as the
+     frame. The customer build makes the opposite choice for the same reason:
+     there the strip IS the top of the page because there is no rail beside it. */
+  .utilbar{ grid-column:2; grid-row:1; }
+  .appbar{ grid-column:2; grid-row:2; }
+  #main{ grid-column:2; grid-row:3; }
+  /* Placement, which console-nav.css deliberately leaves to each shell. The
+     strip lines up with the app bar's own inline padding so the toggle sits
+     directly above the avatar rather than a gutter off it. */
+  .utilbar__inner{ padding-inline:var(--gutter); }
 
   /* Both of the phone's navigations, gone rather than hidden behind the content.
      The hamburger goes with the drawer: A button that opens a dialog nobody
