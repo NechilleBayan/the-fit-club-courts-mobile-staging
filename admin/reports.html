@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reports - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Reports" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Reports</h1>
+  <p class="legal">Six summaries at the top, detail underneath. This page is for
+  seeing whether the week went well, not for analysis.</p>
+
+  <!-- ---------- RANGE ----------
+       Every figure below is scoped to this control, so it sits above all of them
+       and stays visible in the reading order rather than being repeated per
+       card. -->
+  <div class="seg" role="group" aria-label="Date range" data-toggle="single" style="margin-top:16px;">
+    <button type="button" aria-pressed="false">Today</button>
+    <button type="button" aria-pressed="true">7 Days</button>
+    <button type="button" aria-pressed="false">30 Days</button>
+    <button type="button" aria-pressed="false">Custom</button>
+  </div>
+  <p class="legal tnum" style="margin-top:8px;">9 Aug to 15 Aug 2026 &middot; Compared with the previous 7 days</p>
+
+  <!-- ---------- THE SIX ----------
+       Each figure carries its change against the previous period, and the
+       direction is spelled with a word and an arrow rather than a green or red
+       tint, which is the same rule the status chips follow. -->
+  <section class="section" aria-labelledby="s-sum">
+    <h2 class="sec" id="s-sum">Summary</h2>
+    <div class="figs">
+      <div class="fig">
+        <b class="tnum">112</b>
+        <span>Booking volume</span>
+        <i>Up 9 on last week</i>
+      </div>
+      <div class="fig">
+        <b class="tnum">71%</b>
+        <span>Court utilization</span>
+        <i>Up 4 points</i>
+      </div>
+      <div class="fig">
+        <b class="tnum">86.4k</b>
+        <span>Revenue, PHP</span>
+        <i>Up 6.1k</i>
+      </div>
+      <div class="fig">
+        <b class="tnum">148</b>
+        <span>Open play attendance</span>
+        <i>Down 12</i>
+      </div>
+      <div class="fig">
+        <b class="tnum">7</b>
+        <span>Cancellations</span>
+        <i>Down 3</i>
+      </div>
+      <div class="fig">
+        <b class="tnum">4</b>
+        <span>Pending payments</span>
+        <i>PHP 4,850 outstanding</i>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- BOOKINGS BY DAY ----------
+       Seven bars. Drawn in CSS rather than pulled from a chart library, because
+       seven bars and seven labels is not a charting problem and a library would
+       bring its own palette into a build that has two colours. -->
+  <section class="section" aria-labelledby="s-vol">
+    <h2 class="sec" id="s-vol">Bookings By Day</h2>
+    <div class="card">
+      <div class="bars" role="img" aria-label="Bookings by day: Saturday 18, Sunday 21, Monday closed, Tuesday 9, Wednesday 12, Thursday 14, Friday 17">
+        <div><div class="bar bar--on" style="height:78%;"></div><small>Sat</small></div>
+        <div><div class="bar bar--on" style="height:92%;"></div><small>Sun</small></div>
+        <div><div class="bar" style="height:4%;"></div><small>Mon</small></div>
+        <div><div class="bar" style="height:38%;"></div><small>Tue</small></div>
+        <div><div class="bar" style="height:52%;"></div><small>Wed</small></div>
+        <div><div class="bar" style="height:60%;"></div><small>Thu</small></div>
+        <div><div class="bar" style="height:74%;"></div><small>Fri</small></div>
+      </div>
+      <p class="legal" style="margin-top:12px;">Monday is the weekly rest day. Weekend
+      demand is roughly double the midweek average, which is where the two busiest
+      staff shifts sit.</p>
+    </div>
+  </section>
+
+  <!-- ---------- UTILIZATION BY COURT ---------- -->
+  <section class="section" aria-labelledby="s-util">
+    <h2 class="sec" id="s-util">Court Utilization</h2>
+    <div class="card">
+      <div class="stack-sm">
+        <div class="meter">
+          <div class="meter__top"><span>Court 1</span><b class="tnum">84%</b></div>
+          <div class="meter__track" role="img" aria-label="Court 1, 84 percent"><div class="meter__fill" style="width:84%;"></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter__top"><span>Court 2</span><b class="tnum">77%</b></div>
+          <div class="meter__track" role="img" aria-label="Court 2, 77 percent"><div class="meter__fill" style="width:77%;"></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter__top"><span>Court 3</span><b class="tnum">69%</b></div>
+          <div class="meter__track" role="img" aria-label="Court 3, 69 percent"><div class="meter__fill" style="width:69%;"></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter__top"><span>Court 4</span><b class="tnum">54%</b></div>
+          <div class="meter__track" role="img" aria-label="Court 4, 54 percent"><div class="meter__fill" style="width:54%;"></div></div>
+        </div>
+      </div>
+      <p class="legal" style="margin-top:12px;">Court 4 sits lowest because it was out
+      of service for 6 hours this week. Excluding the block it runs at 68%.</p>
+    </div>
+  </section>
+
+  <!-- ---------- REVENUE ---------- -->
+  <section class="section" aria-labelledby="s-rev">
+    <h2 class="sec" id="s-rev">Revenue</h2>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Court rentals</dt><dd class="tnum">PHP 61,200</dd></div>
+        <div><dt>Open play</dt><dd class="tnum">PHP 18,900</dd></div>
+        <div><dt>Coaching</dt><dd class="tnum">PHP 7,200</dd></div>
+        <div><dt>Refunds</dt><dd class="tnum">PHP 900 out</dd></div>
+        <div><dt>Total collected</dt><dd class="tnum"><b>PHP 86,400</b></dd></div>
+        <div><dt>Still outstanding</dt><dd class="tnum">PHP 4,850</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ---------- CANCELLATIONS ---------- -->
+  <section class="section" aria-labelledby="s-canc">
+    <h2 class="sec" id="s-canc">Cancellations</h2>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>By customer</dt><dd class="tnum">5</dd></div>
+        <div><dt>By the club</dt><dd class="tnum">2</dd></div>
+        <div><dt>Refunded</dt><dd class="tnum">PHP 3,400</dd></div>
+        <div><dt>Rate</dt><dd class="tnum">6.3% of bookings</dd></div>
+      </dl>
+      <p class="legal" style="margin-top:12px;">Both club cancellations were Court 4
+      during the net failure.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-exp">
+    <h2 class="vh" id="s-exp">Export</h2>
+    <button class="btn btn--sm btn--ghost" type="button" data-stub="Export this range as a spreadsheet."><span data-icon="download"></span>Export This Range</button>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample figures for one week. Detailed analytics would sit
+    behind these summaries rather than on this screen.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

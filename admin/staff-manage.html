@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Staff Management - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Staff Management" data-nav="staff" data-back="staff.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Staff Management</h1>
+
+  <!-- ---------- WHY THIS IS NOT THE STAFF TAB ----------
+       The Staff tab answers a shift question: who is here and what are they
+       carrying. This screen answers an employment question: who has an account,
+       what can they do with it, and what are they paid. The two are asked by the
+       same person at completely different moments, which is why one is a
+       permanent tab and the other is behind the menu. -->
+  <div class="card card--sunken">
+    <p class="lede">Accounts, roles, and permissions. For today's shift and workload,
+    use the Staff tab.</p>
+    <a class="textbtn" href="staff.html" style="margin-top:8px;">Go to Staff <span data-icon="arrowR"></span></a>
+  </div>
+
+  <label class="search" style="margin-top:16px;">
+    <span class="vh">Search staff</span>
+    <span data-icon="search"></span>
+    <input type="search" placeholder="Name or role" autocomplete="off">
+  </label>
+
+  <section class="section" aria-labelledby="s-acc">
+    <div class="sechead">
+      <h2 class="sec" id="s-acc">8 Accounts</h2>
+      <span class="legal">1 pending invite</span>
+    </div>
+    <div class="rows">
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">RS</span>
+          <span class="row__main">
+            <span class="row__title">Rea Salvador</span>
+            <span class="row__sub">Club Manager &middot; Full access</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--ok"><span data-icon="key"></span>Admin</span>
+          <span class="chip chip--quiet">That is you</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">JM</span>
+          <span class="row__main">
+            <span class="row__title">Joy Mendoza</span>
+            <span class="row__sub">Front Desk &middot; Bookings, check-in, payments</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--hold">Staff</span>
+          <span class="chip chip--quiet">Since Jun 2024</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">PR</span>
+          <span class="row__main">
+            <span class="row__title">Paolo Reyes</span>
+            <span class="row__sub">Maintenance &middot; Courts and tasks only</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--hold">Limited</span>
+          <span class="chip chip--quiet">Since Feb 2024</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">CS</span>
+          <span class="row__main">
+            <span class="row__title">Carlo Santos</span>
+            <span class="row__sub">Coach &middot; Own sessions and rosters</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--hold">Limited</span>
+          <span class="chip chip--quiet">Since Sep 2025</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">MD</span>
+          <span class="row__main">
+            <span class="row__title">Mika Dizon</span>
+            <span class="row__sub">Front Desk &middot; Bookings, check-in, payments</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--hold">Staff</span>
+          <span class="chip chip--quiet">Since Mar 2026</span>
+        </span>
+      </a>
+
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">?</span>
+          <span class="row__main">
+            <span class="row__title">tricia.f@example.com</span>
+            <span class="row__sub">Invited as Front Desk &middot; 11 Aug</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Resend the invitation to tricia.f@example.com." aria-label="Resend invite"><span data-icon="refresh"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="clock"></span>Invite Pending</span>
+        </div>
+      </div>
+
+    </div>
+    <p class="legal" style="text-align:center; padding-top:8px;">3 more accounts</p>
+  </section>
+
+  <!-- ---------- WHAT EACH ROLE CAN DO ----------
+       Stated plainly rather than as a permissions matrix. A club with eight
+       staff does not need a grid; it needs three sentences that a manager can
+       check an assumption against. -->
+  <section class="section" aria-labelledby="s-roles">
+    <h2 class="sec" id="s-roles">Roles</h2>
+    <div class="rows">
+      <div class="card">
+        <div class="card__head">
+          <h3 class="sub">Admin</h3>
+          <span class="st st--ok"><span data-icon="key"></span>2 people</span>
+        </div>
+        <p class="legal" style="margin-top:8px;">Everything, including rates, staff
+        accounts, refunds, and club settings.</p>
+      </div>
+      <div class="card">
+        <div class="card__head">
+          <h3 class="sub">Staff</h3>
+          <span class="st st--hold">3 people</span>
+        </div>
+        <p class="legal" style="margin-top:8px;">Bookings, check-in, open play, taking
+        payments, and their own tasks. Cannot refund or change rates.</p>
+      </div>
+      <div class="card">
+        <div class="card__head">
+          <h3 class="sub">Limited</h3>
+          <span class="st st--hold">3 people</span>
+        </div>
+        <p class="legal" style="margin-top:8px;">Courts, maintenance, and assigned
+        tasks. No access to payments or customer contact details.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="vh" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--primary" type="button" data-stub="Invite a staff member by email and choose their role."><span data-icon="plus"></span>Invite Staff Member</button>
+      <button class="btn btn--sm btn--ghost" type="button" data-stub="Edit what each role is allowed to do."><span data-icon="key"></span>Edit Role Permissions</button>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample accounts and roles.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

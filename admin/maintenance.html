@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maintenance - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Maintenance" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Maintenance</h1>
+  <p class="legal">Court work, inspections, and the log behind them.</p>
+
+  <div class="plate plate--work" style="margin-top:16px;">
+    <span class="plate__bar plate__bar--hatched" aria-hidden="true"></span>
+    <span class="plate__head"><span data-icon="wrench"></span>1 Court Out Of Service</span>
+    <span class="plate__phrase">Court 4 &middot; Net replacement</span>
+    <span class="plate__meta">1:00 PM to 3:00 PM &middot; Paolo Reyes &middot; Parts on site</span>
+  </div>
+
+  <div class="seg" role="group" aria-label="Maintenance status" data-toggle="single" style="margin-top:16px;">
+    <button type="button" aria-pressed="true">Open <span class="countpill tnum">3</span></button>
+    <button type="button" aria-pressed="false">Scheduled <span class="countpill countpill--quiet tnum">2</span></button>
+    <button type="button" aria-pressed="false">Done</button>
+  </div>
+
+  <section class="section" aria-labelledby="s-open">
+    <h2 class="sec" id="s-open">Open Work</h2>
+    <div class="rows">
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Court 4 &middot; Net replacement</span>
+            <span class="row__sub">Paolo Reyes &middot; today, 1:00 PM to 3:00 PM</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--work"><span data-icon="wrench"></span>In Progress</span>
+          <span class="st st--prio">High</span>
+          <span class="chip chip--quiet">Court blocked</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--sm btn--primary" type="button" data-stub="Mark the net replacement complete and return Court 4 to service."><span data-icon="checkc"></span>Mark Done</button>
+          <a class="btn btn--sm btn--ghost" href="court-details.html"><span data-icon="list"></span>Court 4</a>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Court 2 &middot; Line repaint, baseline</span>
+            <span class="row__sub">Unassigned &middot; no date set</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Open</span>
+          <span class="chip chip--quiet">Medium</span>
+          <span class="chip chip--quiet">Court still in use</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Assign the Court 2 line repaint to a staff member."><span data-icon="users"></span>Assign</button>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Schedule the Court 2 line repaint and block the court."><span data-icon="calendar"></span>Schedule</button>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Clubhouse &middot; Water dispenser leaking</span>
+            <span class="row__sub">Reported by Joy Mendoza &middot; 13 Aug</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Open</span>
+          <span class="chip chip--quiet">Low</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Assign the water dispenser repair."><span data-icon="users"></span>Assign</button>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Mark the water dispenser repair complete."><span data-icon="checkc"></span>Mark Done</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-sched">
+    <h2 class="sec" id="s-sched">Scheduled</h2>
+    <div class="rows">
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">All courts &middot; Monthly surface sweep</span>
+            <span class="row__sub">Mon 17 Aug &middot; club closed that day</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="calendar"></span>Scheduled</span>
+        </div>
+      </div>
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Courts 1 and 2 &middot; Light fitting check</span>
+            <span class="row__sub">Tue 1 Sep &middot; 6:00 AM before opening</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="calendar"></span>Scheduled</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-log">
+    <h2 class="sec" id="s-log">Recent Log</h2>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl tl--now">
+          <p class="tl__when">13 Aug, 7:40 AM</p>
+          <p class="tl__what">Court 4 net tension failed inspection</p>
+          <p class="tl__who">Paolo Reyes &middot; Replacement ordered same day</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">9 Aug, 6:20 AM</p>
+          <p class="tl__what">Court 1 surface swept, lines checked</p>
+          <p class="tl__who">Paolo Reyes &middot; Routine, no issues</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">2 Aug, 6:15 AM</p>
+          <p class="tl__what">All courts swept and inspected</p>
+          <p class="tl__who">Paolo Reyes &middot; Court 2 baseline noted as fading</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">18 Jan, 9:00 AM</p>
+          <p class="tl__what">Court 4 resurfaced</p>
+          <p class="tl__who">External contractor &middot; 3 year expected life</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="vh" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--primary" type="button" data-stub="Log maintenance work: Court, description, priority, and whether the court is blocked."><span data-icon="plus"></span>Log Maintenance</button>
+      <a class="btn btn--sm btn--ghost" href="courts.html"><span data-icon="court"></span>Court Status</a>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample maintenance records.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

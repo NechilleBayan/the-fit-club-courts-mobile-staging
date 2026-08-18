@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Payments - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Payments" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Payments</h1>
+
+  <!-- ---------- WHAT IS OUTSTANDING ----------
+       The number that matters is money not yet collected, so it leads at amount
+       size. Collected today sits beside it as the counterweight, because a
+       manager reading only the outstanding figure gets a worse picture of the
+       day than one who reads both. -->
+  <div class="card card--strong">
+    <p class="eyebrow muted">Outstanding</p>
+    <p class="amount">PHP 4,850</p>
+    <p class="legal">Across 4 bookings &middot; 1 overdue by 3 days</p>
+    <hr class="rule" style="margin:14px 0;">
+    <dl class="deflist">
+      <div><dt>Collected today</dt><dd class="tnum">PHP 12,400</dd></div>
+      <div><dt>Refunded today</dt><dd class="tnum">PHP 900</dd></div>
+      <div><dt>Failed attempts</dt><dd class="tnum">1</dd></div>
+    </dl>
+  </div>
+
+  <label class="search" style="margin-top:14px;">
+    <span class="vh">Search payments</span>
+    <span data-icon="search"></span>
+    <input type="search" placeholder="Customer name or booking reference" autocomplete="off">
+  </label>
+
+  <div class="filterbar" role="group" aria-label="Filter payments" data-toggle="single" style="margin-top:10px;">
+    <button class="filter" type="button" aria-pressed="true">All</button>
+    <button class="filter" type="button" aria-pressed="false">Pending</button>
+    <button class="filter" type="button" aria-pressed="false">Paid</button>
+    <button class="filter" type="button" aria-pressed="false">Failed</button>
+    <button class="filter" type="button" aria-pressed="false">Refunded</button>
+  </div>
+
+  <!-- ---------- THE LEDGER ----------
+       Amount on the right of every row and always tabular, so the column of
+       figures lines up down the page and a staff member can total it by eye.
+       Overdue and Failed take the red edge; Pending does not, because a payment
+       that is merely not collected yet is normal. -->
+  <section class="section" aria-labelledby="s-pay">
+    <div class="sechead">
+      <h2 class="sec" id="s-pay">Recent</h2>
+      <span class="legal">Last 7 days</span>
+    </div>
+
+    <div class="rows">
+
+      <div class="row row--two row--bar row--barcrit row--crit">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Andrea Lim</span>
+            <span class="row__sub">BK-2291 &middot; Court 3 &middot; Due 12 Aug</span>
+          </span>
+          <span class="txn">1,200</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="pacts" aria-label="Actions for Andrea Lim payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Overdue</span>
+          <span class="chip chip--quiet">No method on file</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barcrit row--crit">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Dennis Ocampo</span>
+            <span class="row__sub">BK-2310 &middot; Court 1 &middot; 14 Aug</span>
+          </span>
+          <span class="txn">1,800</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="pacts" aria-label="Actions for Dennis Ocampo payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Failed</span>
+          <span class="chip chip--quiet"><span data-icon="card"></span>Card declined</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Jomar Bautista</span>
+            <span class="row__sub">BK-2318 &middot; Court 1 &middot; Due today</span>
+          </span>
+          <span class="txn">1,050</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="pacts" aria-label="Actions for Jomar Bautista payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Pay at desk</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Liza Ramos</span>
+            <span class="row__sub">BK-2322 &middot; Open Play &middot; Due today</span>
+          </span>
+          <span class="txn">800</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="pacts" aria-label="Actions for Liza Ramos payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Pay at desk</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Miguel Tan</span>
+            <span class="row__sub">BK-2305 &middot; Court 1 &middot; Paid 14 Aug</span>
+          </span>
+          <span class="txn">1,600</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="pacts" aria-label="Actions for Miguel Tan payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+          <span class="chip chip--quiet"><span data-icon="card"></span>GCash</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Grace Villanueva</span>
+            <span class="row__sub">BK-2301 &middot; Coaching &middot; Paid 13 Aug</span>
+          </span>
+          <span class="txn">2,400</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="pacts" aria-label="Actions for Grace Villanueva payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+          <span class="chip chip--quiet"><span data-icon="card"></span>Card</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Nathan Cruz</span>
+            <span class="row__sub">BK-2288 &middot; Court 3 &middot; Refunded 15 Aug</span>
+          </span>
+          <span class="txn">900</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="pacts" aria-label="Actions for Nathan Cruz payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="refresh"></span>Refunded</span>
+          <span class="chip chip--quiet">Booking cancelled</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-rec">
+    <h2 class="sec" id="s-rec">Record</h2>
+    <div class="btn-col">
+      <button class="btn btn--secondary" type="button" data-stub="Record a payment taken at the desk against a booking."><span data-icon="peso"></span>Record a Payment</button>
+      <a class="btn btn--sm btn--ghost" href="reports.html"><span data-icon="chart"></span>Revenue Report</a>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample ledger. Amounts are in Philippine pesos.</span>
+  </p>
+
+</main>
+
+<dialog class="sheet" id="pacts" aria-label="Payment actions">
+  <div class="sheet__panel">
+    <div class="sheet__head">
+      <h2>Payment Actions</h2>
+      <button class="sheet__close" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="sheet__body">
+      <div class="actlist">
+        <button type="button" data-stub="Mark this payment collected and issue a receipt."><span data-icon="checkc"></span>Mark Paid</button>
+        <button type="button" data-stub="Record a payment with an amount, a method, and a reference."><span data-icon="peso"></span>Record Payment</button>
+        <a href="booking-details.html"><span data-icon="list"></span>View Booking</a>
+        <button type="button" data-stub="Call, message, or email this customer about the payment."><span data-icon="phone"></span>Contact Customer</button>
+        <button type="button" class="is-danger" data-stub="Refund this payment. The booking stays unless you cancel it separately."><span data-icon="refresh"></span>Refund</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

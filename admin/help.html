@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Help - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Help" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Help and Support</h1>
+
+  <section class="section" aria-labelledby="s-quick">
+    <h2 class="sec" id="s-quick">Common Tasks</h2>
+    <div class="rows">
+      <button class="row" type="button" data-stub="Open the guide: Taking a payment at the desk.">
+        <span data-icon="card"></span>
+        <span class="row__main">
+          <span class="row__title">Taking a payment at the desk</span>
+          <span class="row__sub">Cash, card, and GCash</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </button>
+      <button class="row" type="button" data-stub="Open the guide: Moving or cancelling a booking.">
+        <span data-icon="calendar"></span>
+        <span class="row__main">
+          <span class="row__title">Moving or cancelling a booking</span>
+          <span class="row__sub">Including when to refund</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </button>
+      <button class="row" type="button" data-stub="Open the guide: Blocking a court for maintenance.">
+        <span data-icon="wrench"></span>
+        <span class="row__main">
+          <span class="row__title">Blocking a court for maintenance</span>
+          <span class="row__sub">And what happens to bookings inside the block</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </button>
+      <button class="row" type="button" data-stub="Open the guide: Running an open play session.">
+        <span data-icon="play"></span>
+        <span class="row__main">
+          <span class="row__title">Running an open play session</span>
+          <span class="row__sub">Rosters, waitlists, and no shows</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </button>
+      <button class="row" type="button" data-stub="Open the guide: Assigning tasks to staff.">
+        <span data-icon="tasks"></span>
+        <span class="row__main">
+          <span class="row__title">Assigning tasks to staff</span>
+          <span class="row__sub">Priorities and what overdue means</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ---------- THE STATUS LEGEND ----------
+       Worth a screen of its own. The console never carries a status in colour
+       alone, which means every state has a drawn treatment, and a new staff
+       member has to be able to look those up somewhere. This is that page. -->
+  <section class="section" aria-labelledby="s-legend">
+    <h2 class="sec" id="s-legend">Status Legend</h2>
+    <div class="card">
+      <p class="legal" style="margin-bottom:12px;">Every status is drawn as well as
+      named, so the screen still reads correctly in bright sun, in greyscale, and
+      to anyone who cannot separate the red from the ink.</p>
+      <dl class="deflist">
+        <div><dt><span class="st st--ok"><span data-icon="check"></span>Solid</span></dt><dd>Available, Paid, Completed, Confirmed</dd></div>
+        <div><dt><span class="st st--hold"><span data-icon="clock"></span>Hatched</span></dt><dd>Reserved, Pending, Unpaid, In progress</dd></div>
+        <div><dt><span class="st st--live"><span data-icon="play"></span>Dotted</span></dt><dd>In use, Checked in, Session running</dd></div>
+        <div><dt><span class="st st--off"><span data-icon="ban"></span>Dashed</span></dt><dd>Blocked, Closed, Cancelled, Refunded</dd></div>
+        <div><dt><span class="st st--work"><span data-icon="wrench"></span>Double</span></dt><dd>Maintenance, out of service</dd></div>
+        <div><dt><span class="st st--crit"><span data-icon="alert"></span>Red</span></dt><dd>Overdue, Failed, Conflict</dd></div>
+      </dl>
+      <p class="legal" style="margin-top:14px;">Priority is not a status and does not
+      use any of the six above. A <span class="st st--prio">High</span> task carries
+      the filled chip; Medium and Low stay quiet.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-contact">
+    <h2 class="sec" id="s-contact">Contact Support</h2>
+    <div class="card">
+      <p class="lede">Something broken, or a question the guides do not answer.</p>
+      <div class="btn-col" style="margin-top:14px;">
+        <button class="btn btn--sm btn--primary" type="button" data-stub="Open a support request with a description and a screenshot."><span data-icon="message"></span>Open a Support Request</button>
+        <a class="btn btn--sm btn--ghost" href="mailto:support@thefitclubcourts.ph"><span data-icon="mail"></span>Email Support</a>
+      </div>
+      <dl class="deflist" style="margin-top:14px;">
+        <div><dt>Response time</dt><dd>Within one working day</dd></div>
+        <div><dt>Urgent issues</dt><dd class="tnum">+63 2 8555 0140</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-about">
+    <h2 class="sec" id="s-about">About</h2>
+    <div class="card card--sunken">
+      <dl class="deflist">
+        <div><dt>Build</dt><dd>Version 0.4, sandbox</dd></div>
+        <div><dt>Club</dt><dd>The Fit Club Courts</dd></div>
+        <div><dt>Signed in as</dt><dd>Rea Salvador</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Guides are placeholders. The status legend is real and matches
+    every screen in this build.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Players - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Players" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Players</h1>
+  <p class="legal">Customer records, searchable by name, email, or phone number.</p>
+
+  <!-- ---------- SEARCH FIRST ----------
+       This page is opened with a name already in mind, almost always because
+       somebody is standing at the desk. So the search field is the first thing
+       and the list underneath is a fallback, not the main event. -->
+  <label class="search" style="margin-top:16px;">
+    <span class="vh">Search players by name, email, or phone number</span>
+    <span data-icon="search"></span>
+    <input type="search" placeholder="Name, email, or phone number" autocomplete="off">
+  </label>
+
+  <div class="filterbar" role="group" aria-label="Filter players" data-toggle="single" style="margin-top:10px;">
+    <button class="filter" type="button" aria-pressed="true">All</button>
+    <button class="filter" type="button" aria-pressed="false">Playing Today</button>
+    <button class="filter" type="button" aria-pressed="false">Payment Issues <span class="countpill tnum">2</span></button>
+    <button class="filter" type="button" aria-pressed="false">Members</button>
+    <button class="filter" type="button" aria-pressed="false">Guests</button>
+  </div>
+
+  <section class="section" aria-labelledby="s-today">
+    <h2 class="sec" id="s-today">Playing Today</h2>
+    <div class="rows">
+
+      <a class="row row--two row--bar row--barcrit row--crit" href="player-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">AL</span>
+          <span class="row__main">
+            <span class="row__title">Andrea Lim</span>
+            <span class="row__sub">+63 917 123 4567 &middot; andrea.lim@example.com</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Payment Overdue</span>
+          <span class="chip chip--quiet">Court 3 &middot; 11:00 AM</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="player-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">MT</span>
+          <span class="row__main">
+            <span class="row__title">Miguel Tan</span>
+            <span class="row__sub">+63 918 555 0192 &middot; miguel.tan@example.com</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>On Court</span>
+          <span class="chip chip--quiet">Court 1 &middot; ends 10:30 AM</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="player-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">JB</span>
+          <span class="row__main">
+            <span class="row__title">Jomar Bautista</span>
+            <span class="row__sub">+63 920 447 8811 &middot; jomar.b@example.com</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Unpaid</span>
+          <span class="chip chip--quiet">Court 1 &middot; 12:00 PM</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="player-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">GV</span>
+          <span class="row__main">
+            <span class="row__title">Grace Villanueva</span>
+            <span class="row__sub">+63 916 302 7745 &middot; grace.v@example.com</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+          <span class="chip chip--quiet">Court 2 &middot; 3:00 PM</span>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-all">
+    <div class="sechead">
+      <h2 class="sec" id="s-all">All Players</h2>
+      <span class="legal tnum">312 records</span>
+    </div>
+    <div class="rows">
+
+      <a class="row" href="player-details.html">
+        <span class="avatar avatar--lg" aria-hidden="true">DO</span>
+        <span class="row__main">
+          <span class="row__title">Dennis Ocampo</span>
+          <span class="row__sub">Last played 14 Aug &middot; Payment failed</span>
+        </span>
+        <span class="countpill" aria-label="1 payment issue">1</span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="player-details.html">
+        <span class="avatar avatar--lg" aria-hidden="true">KU</span>
+        <span class="row__main">
+          <span class="row__title">Karen Uy</span>
+          <span class="row__sub">Last played 15 Aug &middot; 41 bookings</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="player-details.html">
+        <span class="avatar avatar--lg" aria-hidden="true">LR</span>
+        <span class="row__main">
+          <span class="row__title">Liza Ramos</span>
+          <span class="row__sub">Open Play regular &middot; 18 sessions</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="player-details.html">
+        <span class="avatar avatar--lg" aria-hidden="true">NC</span>
+        <span class="row__main">
+          <span class="row__title">Nathan Cruz</span>
+          <span class="row__sub">Cancelled today &middot; 7 bookings</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="player-details.html">
+        <span class="avatar avatar--lg" aria-hidden="true">RA</span>
+        <span class="row__main">
+          <span class="row__title">Rico Alvarez</span>
+          <span class="row__sub">New this week &middot; 1 booking</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+    </div>
+    <p class="legal" style="text-align:center; padding-top:8px;">Search to find any of the other 307 records</p>
+  </section>
+
+  <section class="section" aria-labelledby="s-add">
+    <h2 class="vh" id="s-add">Add</h2>
+    <button class="btn btn--secondary" type="button" data-stub="Create a customer record: Name, phone, email, and notes."><span data-icon="plus"></span>Add Player</button>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample records. Contact details are fictional.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

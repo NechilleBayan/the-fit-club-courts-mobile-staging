@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rates - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Rates" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Rates and Promotions</h1>
+  <p class="legal">Pricing for courts, open play, and coaching. Changes apply to new
+  bookings only.</p>
+
+  <!-- A rate change already scheduled is the single most useful thing on this
+       page, because it is the one a manager forgets. It sits above the current
+       prices rather than below them. -->
+  <div class="plate" style="margin-top:16px;">
+    <span class="plate__bar plate__bar--hatched" aria-hidden="true"></span>
+    <span class="plate__head"><span data-icon="calendar"></span>Scheduled Change</span>
+    <span class="plate__phrase">Weekend rate to PHP 800 per hour</span>
+    <span class="plate__meta">From 1 September &middot; Set by Rea Salvador on 14 Aug</span>
+  </div>
+
+  <section class="section" aria-labelledby="s-court">
+    <div class="sechead">
+      <h2 class="sec" id="s-court">Court Rental</h2>
+      <button class="textbtn" type="button" data-stub="Edit court rental rates."><span data-icon="edit"></span>Edit</button>
+    </div>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Weekday, 6 AM to 4 PM</dt><dd class="tnum">PHP 600 / hour</dd></div>
+        <div><dt>Weekday, 4 PM to 10 PM</dt><dd class="tnum">PHP 750 / hour</dd></div>
+        <div><dt>Weekend, all day</dt><dd class="tnum">PHP 750 / hour</dd></div>
+        <div><dt>Member discount</dt><dd class="tnum">10%</dd></div>
+        <div><dt>Guest fee</dt><dd class="tnum">PHP 150 per guest</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-op">
+    <div class="sechead">
+      <h2 class="sec" id="s-op">Open Play</h2>
+      <button class="textbtn" type="button" data-stub="Edit open play rates."><span data-icon="edit"></span>Edit</button>
+    </div>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Standard session</dt><dd class="tnum">PHP 350 / player</dd></div>
+        <div><dt>Beginner clinic</dt><dd class="tnum">PHP 600 / player</dd></div>
+        <div><dt>Ten session pass</dt><dd class="tnum">PHP 3,000</dd></div>
+        <div><dt>Paddle hire</dt><dd class="tnum">PHP 100</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-coach">
+    <div class="sechead">
+      <h2 class="sec" id="s-coach">Coaching</h2>
+      <button class="textbtn" type="button" data-stub="Edit coaching rates."><span data-icon="edit"></span>Edit</button>
+    </div>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>One to one, 60 min</dt><dd class="tnum">PHP 1,200</dd></div>
+        <div><dt>Pair, 60 min</dt><dd class="tnum">PHP 1,800</dd></div>
+        <div><dt>Group of four, 90 min</dt><dd class="tnum">PHP 2,400</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ---------- PROMOTIONS ----------
+       A live promotion carries the solid bar; an expired one is hatched and
+       dashed like every other finished thing in the console. -->
+  <section class="section" aria-labelledby="s-promo">
+    <h2 class="sec" id="s-promo">Promotions</h2>
+    <div class="rows">
+
+      <div class="row row--two row--bar">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Weekday Mornings, 20% off</span>
+            <span class="row__sub">6 AM to 10 AM, Tuesday to Friday &middot; code EARLY20</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the EARLY20 promotion." aria-label="Edit EARLY20"><span data-icon="edit"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>Live</span>
+          <span class="chip chip--quiet">Used 34 times</span>
+          <span class="chip chip--quiet">Ends 30 Sep</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">First Session Free</span>
+            <span class="row__sub">New players, open play only &middot; no code</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the First Session Free promotion." aria-label="Edit First Session Free"><span data-icon="edit"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>Live</span>
+          <span class="chip chip--quiet">Used 12 times</span>
+          <span class="chip chip--quiet">No end date</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Independence Day, 15% off</span>
+            <span class="row__sub">12 June only &middot; code JUNE15</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="ban"></span>Expired</span>
+          <span class="chip chip--quiet">Used 21 times</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="vh" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--primary" type="button" data-stub="Create a promotion: Discount, which bookings it applies to, dates, and a code."><span data-icon="plus"></span>Create Promotion</button>
+      <button class="btn btn--sm btn--ghost" type="button" data-stub="Schedule a rate change for a future date."><span data-icon="calendar"></span>Schedule a Rate Change</button>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample rates in Philippine pesos.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

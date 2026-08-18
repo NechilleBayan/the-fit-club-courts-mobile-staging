@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Dashboard" data-nav="dashboard">
+<div id="shell">
+<main id="main">
+
+  <!-- The one line of orientation on the whole console. A manager opening this
+       at 6am wants to know what day it is and whether the club is open, and
+       nothing else at this size. -->
+  <p class="eyebrow muted">Saturday, 15 August</p>
+  <h1 class="screen" tabindex="-1">Good morning, Rea</h1>
+  <p class="legal">Open 6:00 AM to 10:00 PM &middot; 4 courts in service</p>
+
+  <!-- ---------- SUMMARY ----------
+       Four numbers, and each one is a door. The tile that is a problem carries
+       the red edge and says "overdue" in words, so the colour is an amplifier
+       on a fact rather than the fact itself. -->
+  <section class="section" aria-labelledby="s-sum">
+    <h2 class="vh" id="s-sum">Today at a glance</h2>
+    <div class="sumgrid">
+
+      <a class="sumcard" href="bookings.html">
+        <span data-icon="calendar"></span>
+        <span class="sumcard__label">Today's Bookings</span>
+        <span class="sumcard__num tnum">18</span>
+        <span class="sumcard__note">6 still to check in</span>
+      </a>
+
+      <a class="sumcard" href="open-play.html">
+        <span data-icon="play"></span>
+        <span class="sumcard__label">Open Play Sessions</span>
+        <span class="sumcard__num tnum">3</span>
+        <span class="sumcard__note">2 nearly full</span>
+      </a>
+
+      <a class="sumcard sumcard--alert" href="payments.html">
+        <span data-icon="card"></span>
+        <span class="sumcard__label">Pending Payments</span>
+        <span class="sumcard__num tnum">4</span>
+        <span class="sumcard__note">1 overdue by 3 days</span>
+      </a>
+
+      <a class="sumcard" href="staff.html">
+        <span data-icon="users"></span>
+        <span class="sumcard__label">Staff On Duty</span>
+        <span class="sumcard__num tnum">5</span>
+        <span class="sumcard__note">1 shift unfilled at 6 PM</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ---------- TODAY'S SCHEDULE ----------
+       A preview, not the list. Four rows is enough to answer "what is happening
+       next" and short enough that the quick actions below stay above the fold on
+       a small phone. The full list is one tap away and says so. -->
+  <section class="section" aria-labelledby="s-sched">
+    <div class="sechead">
+      <h2 class="sec" id="s-sched">Today's Schedule</h2>
+      <a class="textbtn" href="bookings.html">See All <span data-icon="arrowR"></span></a>
+    </div>
+
+    <div class="rows">
+
+      <a class="row row--two row--timed row--bar" href="booking-details.html">
+        <span class="row__line">
+          <span class="row__time"><b>9:00</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Court 1</span>
+            <span class="row__sub">Miguel Tan &middot; Private &middot; 4 players</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>In Use</span>
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--timed row--bar row--barhatch" href="booking-details.html">
+        <span class="row__line">
+          <span class="row__time"><b>10:30</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Court 2</span>
+            <span class="row__sub">Morning Social &middot; Open Play &middot; 11 of 16</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Reserved</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--timed row--bar row--barcrit row--crit" href="booking-details.html">
+        <span class="row__line">
+          <span class="row__time"><b>11:00</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Court 3</span>
+            <span class="row__sub">Andrea Lim &middot; Private &middot; 2 players</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Unpaid</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--timed row--bar row--barhatch row--muted" href="court-details.html">
+        <span class="row__line">
+          <span class="row__time"><b>1:00</b><span>PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Court 4</span>
+            <span class="row__sub">Blocked &middot; Net replacement &middot; 2 hours</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--work"><span data-icon="wrench"></span>Maintenance</span>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ---------- QUICK ACTIONS ----------
+       Four verbs. These are the things a staff member does standing at the desk
+       with someone in front of them, so they are on the home screen rather than
+       three taps into the page that owns them. -->
+  <section class="section" aria-labelledby="s-quick">
+    <h2 class="sec" id="s-quick">Quick Actions</h2>
+    <div class="qgrid">
+      <a class="qact" href="bookings.html#new"><span data-icon="plus"></span>New Booking</a>
+      <a class="qact" href="courts.html#block"><span data-icon="lock"></span>Block Court</a>
+      <a class="qact" href="open-play.html#new"><span data-icon="play"></span>Create Open Play</a>
+      <a class="qact" href="tasks.html#assign"><span data-icon="tasks"></span>Assign Task</a>
+    </div>
+  </section>
+
+  <!-- ---------- TASKS OVERVIEW ----------
+       Three counts and a door. Pending carries the red count because it is the
+       only one of the three that is a claim on somebody's next hour. -->
+  <section class="section" aria-labelledby="s-tasks">
+    <div class="sechead">
+      <h2 class="sec" id="s-tasks">Tasks</h2>
+      <a class="textbtn" href="tasks.html">View All Tasks <span data-icon="arrowR"></span></a>
+    </div>
+
+    <div class="card">
+      <div class="figs" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="fig">
+          <b class="tnum">5</b>
+          <span>Pending</span>
+        </div>
+        <div class="fig">
+          <b class="tnum">2</b>
+          <span>In Progress</span>
+        </div>
+        <div class="fig">
+          <b class="tnum">9</b>
+          <span>Completed</span>
+        </div>
+      </div>
+      <p class="legal" style="margin-top:12px;">
+        <span class="countpill">5</span> pending tasks are waiting on 3 staff members.
+      </p>
+    </div>
+  </section>
+
+  <!-- ---------- ALERTS ----------
+       Operational only. This is deliberately not the notification feed: a new
+       booking is news, and news belongs on the Notifications page. What lands
+       here is something that is currently wrong and has an owner. -->
+  <section class="section" aria-labelledby="s-alerts">
+    <div class="sechead">
+      <h2 class="sec" id="s-alerts">Alerts</h2>
+      <a class="textbtn" href="notifications.html">All <span data-icon="arrowR"></span></a>
+    </div>
+
+    <div class="rows">
+
+      <a class="plate plate--crit" href="payments.html">
+        <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>
+        <span class="plate__head"><span data-icon="alert"></span>Payment Overdue</span>
+        <span class="plate__phrase">Andrea Lim &middot; PHP 1,200</span>
+        <span class="plate__meta">Booking BK-2291 &middot; Due 12 August &middot; 3 days late</span>
+      </a>
+
+      <a class="plate plate--crit" href="bookings.html">
+        <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>
+        <span class="plate__head"><span data-icon="ban"></span>Booking Conflict</span>
+        <span class="plate__phrase">Court 2 &middot; 4:00 PM to 5:30 PM</span>
+        <span class="plate__meta">Open Play overlaps a private booking. One has to move.</span>
+      </a>
+
+      <a class="plate plate--work" href="maintenance.html">
+        <span class="plate__bar" aria-hidden="true"></span>
+        <span class="plate__head"><span data-icon="wrench"></span>Court Maintenance</span>
+        <span class="plate__phrase">Court 4 &middot; Net replacement</span>
+        <span class="plate__meta">Blocked 1:00 PM to 3:00 PM &middot; Assigned to Paolo R.</span>
+      </a>
+
+      <a class="plate plate--crit" href="tasks.html">
+        <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>
+        <span class="plate__head"><span data-icon="clock"></span>Staff Task Overdue</span>
+        <span class="plate__phrase">Restock towels &middot; Front desk</span>
+        <span class="plate__meta">Assigned to Joy M. &middot; Was due 8:00 AM</span>
+      </a>
+
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Every figure on this screen is sample data. Actions open a
+    description of what they would do rather than changing anything.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

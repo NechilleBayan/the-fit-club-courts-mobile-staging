@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Courts - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Courts" data-nav="courts">
+<div id="shell">
+<main id="main">
+
+  <h1 class="vh" tabindex="-1">Courts</h1>
+
+  <!-- ---------- UTILIZATION ----------
+       One figure and one bar. This is not the reports page and it is not trying
+       to be: the only reason it is here is that "how full are we" changes what a
+       manager does with the next walk-in, and that decision is made on this
+       screen. -->
+  <div class="card">
+    <div class="meter">
+      <div class="meter__top">
+        <span>Court use today</span>
+        <b class="tnum">68%</b>
+      </div>
+      <div class="meter__track" role="img" aria-label="Court use today, 68 percent">
+        <div class="meter__fill" style="width:68%;"></div>
+      </div>
+    </div>
+    <p class="legal" style="margin-top:10px;">
+      2 courts free now &middot; 1 in use &middot; 1 blocked for maintenance
+    </p>
+  </div>
+
+  <div class="filterbar" role="group" aria-label="Filter courts" data-toggle="single" style="margin-top:14px;">
+    <button class="filter" type="button" aria-pressed="true">All Courts</button>
+    <button class="filter" type="button" aria-pressed="false">Available</button>
+    <button class="filter" type="button" aria-pressed="false">In Use</button>
+    <button class="filter" type="button" aria-pressed="false">Blocked</button>
+    <button class="filter" type="button" aria-pressed="false">Maintenance</button>
+  </div>
+
+  <!-- ---------- THE COURTS ----------
+       One card per court, and the card answers the four questions asked at the
+       desk in the order they are asked: what is it doing now, who has it now,
+       who has it next, and when is it free. The status is stated as a word and
+       drawn as a treatment, never as a colour on its own: solid edge is free,
+       dotted is in play, hatched and dashed is blocked, double rule is a court
+       that is out of service. -->
+  <section class="section" aria-labelledby="s-courts">
+    <div class="sechead">
+      <h2 class="sec" id="s-courts">4 Courts</h2>
+      <span class="legal tnum">Now 9:18 AM</span>
+    </div>
+
+    <div class="rows">
+
+      <!-- IN USE. The moving hazard band along the top is the only self starting
+           animation in the console and it only ever means "live right now". -->
+      <div class="card card--strong">
+        <span class="plate__pole plate__pole--live" aria-hidden="true" style="position:relative; display:block; height:6px; margin:-16px -16px 12px; border-radius:16px 16px 0 0;"></span>
+        <div class="card__head">
+          <h3 class="sub">Court 1</h3>
+          <span class="st st--live"><span data-icon="play"></span>In Use</span>
+        </div>
+        <dl class="deflist" style="margin-top:10px;">
+          <div><dt>Now</dt><dd>Miguel Tan &middot; ends 10:30 AM</dd></div>
+          <div><dt>Next</dt><dd>Jomar Bautista &middot; 12:00 PM</dd></div>
+          <div><dt>Free</dt><dd class="tnum">10:30 AM to 12:00 PM</dd></div>
+        </dl>
+        <div class="btn-row" style="margin-top:12px;">
+          <a class="btn btn--sm btn--secondary" href="court-details.html"><span data-icon="list"></span>Details</a>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Open the full day schedule for Court 1."><span data-icon="calendar"></span>Schedule</button>
+        </div>
+      </div>
+
+      <!-- AVAILABLE -->
+      <div class="card">
+        <div class="card__head">
+          <h3 class="sub">Court 2</h3>
+          <span class="st st--ok"><span data-icon="check"></span>Available</span>
+        </div>
+        <dl class="deflist" style="margin-top:10px;">
+          <div><dt>Now</dt><dd class="muted">Nobody on court</dd></div>
+          <div><dt>Next</dt><dd>Morning Social &middot; 10:30 AM</dd></div>
+          <div><dt>Free</dt><dd class="tnum">Now to 10:30 AM</dd></div>
+        </dl>
+        <div class="btn-row" style="margin-top:12px;">
+          <a class="btn btn--sm btn--secondary" href="court-details.html"><span data-icon="list"></span>Details</a>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Block Court 2 for a period, with a reason."><span data-icon="lock"></span>Block</button>
+        </div>
+      </div>
+
+      <!-- RESERVED. Held but empty, which is a different thing from in use and
+           has to look different: hatched bar, dashed chip. -->
+      <div class="card">
+        <div class="card__head">
+          <h3 class="sub">Court 3</h3>
+          <span class="st st--hold"><span data-icon="clock"></span>Reserved</span>
+        </div>
+        <dl class="deflist" style="margin-top:10px;">
+          <div><dt>Now</dt><dd class="muted">Held for 11:00 AM</dd></div>
+          <div><dt>Next</dt><dd>Andrea Lim &middot; 11:00 AM</dd></div>
+          <div><dt>Free</dt><dd class="tnum">Now to 11:00 AM</dd></div>
+        </dl>
+        <div class="card--sunken" style="margin-top:10px; padding:10px; border-radius:12px;">
+          <p class="legal"><b>Payment overdue on the 11:00 AM booking.</b> Collect at the desk before play.</p>
+        </div>
+        <div class="btn-row" style="margin-top:12px;">
+          <a class="btn btn--sm btn--secondary" href="court-details.html"><span data-icon="list"></span>Details</a>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Block Court 3 for a period, with a reason."><span data-icon="lock"></span>Block</button>
+        </div>
+      </div>
+
+      <!-- MAINTENANCE. Double rule on the chip and a hatched card, so a court
+           that is out of service does not read as merely busy. -->
+      <div class="card" style="border:3px double var(--border-strong); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px);">
+        <div class="card__head">
+          <h3 class="sub">Court 4</h3>
+          <span class="st st--work"><span data-icon="wrench"></span>Maintenance</span>
+        </div>
+        <dl class="deflist" style="margin-top:10px;">
+          <div><dt>Now</dt><dd>Net replacement</dd></div>
+          <div><dt>Blocked</dt><dd class="tnum">1:00 PM to 3:00 PM</dd></div>
+          <div><dt>Next</dt><dd>Free from 3:00 PM</dd></div>
+          <div><dt>Assigned</dt><dd>Paolo Reyes</dd></div>
+        </dl>
+        <div class="card--sunken" style="margin-top:10px; padding:10px; border-radius:12px;">
+          <p class="legal"><b>Maintenance note:</b> Net tension failed inspection on
+          13 Aug. Replacement net delivered, fitting scheduled for this afternoon.</p>
+        </div>
+        <div class="btn-col" style="margin-top:12px;">
+          <button class="btn btn--sm btn--primary" type="button" data-stub="Mark Court 4 available and release the block."><span data-icon="checkc"></span>Mark Available</button>
+          <div class="btn-row">
+            <a class="btn btn--sm btn--secondary" href="court-details.html"><span data-icon="list"></span>Details</a>
+            <button class="btn btn--sm btn--ghost" type="button" data-stub="Open the full day schedule for Court 4."><span data-icon="calendar"></span>Schedule</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ---------- COURT WIDE ACTIONS ---------- -->
+  <section class="section" aria-labelledby="s-all" id="block">
+    <h2 class="sec" id="s-all">All Courts</h2>
+    <div class="btn-col">
+      <button class="btn btn--secondary" type="button" data-stub="Block a period across one or more courts, with a reason."><span data-icon="lock"></span>Block Court Time</button>
+      <button class="btn btn--sm btn--ghost" type="button" data-stub="Log maintenance against a court and take it out of service."><span data-icon="wrench"></span>Mark Maintenance</button>
+      <a class="btn btn--sm btn--ghost" href="closures.html"><span data-icon="calendar"></span>Blocked Dates and Closures</a>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Four sample courts. Status treatments here are the same set
+    used across every screen in the console.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

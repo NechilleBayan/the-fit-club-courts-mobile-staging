@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Staff - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Staff" data-nav="staff">
+<div id="shell">
+<main id="main">
+
+  <h1 class="vh" tabindex="-1">Staff</h1>
+
+  <!-- ---------- WHO IS HERE ----------
+       This tab answers today's question, which is who is on shift and what are
+       they carrying. The longer term questions, roles, pay, and permissions,
+       live in Staff Management behind the drawer, because they are not asked
+       during a shift. -->
+  <div class="sumgrid">
+    <a class="sumcard" href="#s-list">
+      <span data-icon="users"></span>
+      <span class="sumcard__label">On Duty Now</span>
+      <span class="sumcard__num tnum">5</span>
+      <span class="sumcard__note">of 8 staff</span>
+    </a>
+    <a class="sumcard sumcard--alert" href="tasks.html">
+      <span data-icon="tasks"></span>
+      <span class="sumcard__label">Pending Tasks</span>
+      <span class="sumcard__num tnum">5</span>
+      <span class="sumcard__note">1 overdue</span>
+    </a>
+  </div>
+
+  <div class="qgrid" style="margin-top:12px;">
+    <a class="qact" href="tasks.html"><span data-icon="tasks"></span>All Tasks</a>
+    <button class="qact" type="button" data-stub="Open this week's staff roster."><span data-icon="calendar"></span>Schedule</button>
+    <button class="qact" type="button" data-stub="Review who has marked themselves available this week."><span data-icon="checkc"></span>Availability</button>
+    <a class="qact" href="tasks.html#assign"><span data-icon="plus"></span>Assign Task</a>
+  </div>
+
+  <div class="filterbar" role="group" aria-label="Filter staff" data-toggle="single" style="margin-top:14px;">
+    <button class="filter" type="button" aria-pressed="true">All</button>
+    <button class="filter" type="button" aria-pressed="false">On Duty</button>
+    <button class="filter" type="button" aria-pressed="false">Off Duty</button>
+    <button class="filter" type="button" aria-pressed="false">Has Pending Tasks</button>
+  </div>
+
+  <!-- ---------- THE TEAM ----------
+       Workload is stated as a meter as well as a number, because "3 tasks" means
+       nothing on its own and "3 tasks, near capacity" is the thing that decides
+       who gets the next job. A staff member who is off duty is drawn hatched and
+       dashed, so a manager scanning for someone to hand work to skips them
+       without reading. -->
+  <section class="section" aria-labelledby="s-list" id="s-list">
+    <div class="sechead">
+      <h2 class="sec">8 Staff Members</h2>
+      <span class="legal tnum">Sat 15 Aug</span>
+    </div>
+
+    <div class="rows">
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">JM</span>
+          <span class="row__main">
+            <span class="row__title">Joy Mendoza</span>
+            <span class="row__sub">Front Desk &middot; 6:00 AM to 2:00 PM</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
+          <span class="st st--crit"><span data-icon="alert"></span>1 Overdue</span>
+          <span class="chip chip--quiet">3 tasks</span>
+        </span>
+        <span class="meter">
+          <span class="meter__track" role="img" aria-label="Workload, heavy"><span class="meter__fill meter__fill--crit" style="display:block; width:85%;"></span></span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">PR</span>
+          <span class="row__main">
+            <span class="row__title">Paolo Reyes</span>
+            <span class="row__sub">Maintenance &middot; 7:00 AM to 4:00 PM</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
+          <span class="chip chip--quiet">2 tasks</span>
+        </span>
+        <span class="meter">
+          <span class="meter__track" role="img" aria-label="Workload, moderate"><span class="meter__fill" style="display:block; width:55%;"></span></span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">CS</span>
+          <span class="row__main">
+            <span class="row__title">Carlo Santos</span>
+            <span class="row__sub">Coach &middot; 8:00 AM to 5:00 PM</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
+          <span class="chip chip--quiet">1 task</span>
+        </span>
+        <span class="meter">
+          <span class="meter__track" role="img" aria-label="Workload, light"><span class="meter__fill" style="display:block; width:25%;"></span></span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">MD</span>
+          <span class="row__main">
+            <span class="row__title">Mika Dizon</span>
+            <span class="row__sub">Front Desk &middot; 2:00 PM to 10:00 PM</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
+          <span class="chip chip--quiet">No tasks</span>
+        </span>
+        <span class="meter">
+          <span class="meter__track" role="img" aria-label="Workload, none"><span class="meter__fill" style="display:block; width:6%;"></span></span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">RS</span>
+          <span class="row__main">
+            <span class="row__title">Rea Salvador</span>
+            <span class="row__sub">Club Manager &middot; 6:00 AM to 3:00 PM</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
+          <span class="chip chip--quiet">2 tasks</span>
+        </span>
+        <span class="meter">
+          <span class="meter__track" role="img" aria-label="Workload, moderate"><span class="meter__fill" style="display:block; width:45%;"></span></span>
+        </span>
+      </a>
+
+      <a class="row row--two row--muted" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">AT</span>
+          <span class="row__main">
+            <span class="row__title">Aldrin Torres</span>
+            <span class="row__sub">Coach &middot; Rest day</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--off"><span data-icon="ban"></span>Off Duty</span>
+          <span class="chip chip--quiet">Back Sunday</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--muted" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">BL</span>
+          <span class="row__main">
+            <span class="row__title">Bea Lorenzo</span>
+            <span class="row__sub">Front Desk &middot; Starts 6:00 PM</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--off"><span data-icon="clock"></span>Off Duty</span>
+          <span class="chip chip--quiet">1 task queued</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--muted" href="staff-details.html">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">NG</span>
+          <span class="row__main">
+            <span class="row__title">Nico Garcia</span>
+            <span class="row__sub">Maintenance &middot; On leave</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--off"><span data-icon="ban"></span>On Leave</span>
+          <span class="chip chip--quiet">Back 20 Aug</span>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- The one gap in today's cover, stated rather than left for a manager to
+       work out by reading eight shift times. -->
+  <section class="section" aria-labelledby="s-gap">
+    <h2 class="vh" id="s-gap">Cover</h2>
+    <a class="plate plate--crit" href="#s-list">
+      <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>
+      <span class="plate__head"><span data-icon="alert"></span>Shift Unfilled</span>
+      <span class="plate__phrase">6:00 PM to 10:00 PM &middot; Front Desk</span>
+      <span class="plate__meta">Bea Lorenzo covers to 10:00 PM but is alone on the desk during Evening Open Play.</span>
+    </a>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Eight sample staff members. Roles, pay, and permissions live
+    in Staff Management inside the menu.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

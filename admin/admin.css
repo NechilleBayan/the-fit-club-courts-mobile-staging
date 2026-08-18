@@ -1,0 +1,1105 @@
+/* ============================================================
+   THE FIT CLUB COURTS - ADMIN / STAFF CONSOLE
+   Sandbox stylesheet, shared by every page in this folder.
+
+   Everything below the component layer is lifted unchanged from the customer
+   prototype in ../index.html: the two colour palette, the type ramp, the ghost
+   glass surfaces, the button press behaviour, and the hidden scrollbar with its
+   painted cue. The admin console is the same product wearing a work jacket, so
+   the tokens are copied rather than reinterpreted. Where a value here differs
+   from the customer app it is because the console needs something the customer
+   app never had, and the comment says so.
+
+   The one rule that governs everything: two colours, ink and paper, with a
+   single sanctioned red reserved for genuinely critical states. Status is never
+   carried by colour alone. Every state also carries a word, an icon, and a
+   drawn treatment (hatch, dash, dot, double rule, solid bar), so the screen
+   still reads correctly in greyscale and to anyone who cannot separate the red
+   from the ink.
+
+   SIL Open Font License 1.1, both families. See ../fonts/OFL.txt.
+   ============================================================ */
+
+@font-face{
+  font-family:"Archivo Black"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("../fonts/archivo-black-latin-400.woff2") format("woff2");
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family:"Archivo Black"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("../fonts/archivo-black-latin-ext-400.woff2") format("woff2");
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:300; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-300.woff2") format("woff2");
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:300; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-ext-300.woff2") format("woff2");
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-400.woff2") format("woff2");
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-ext-400.woff2") format("woff2");
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:500; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-500.woff2") format("woff2");
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:500; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-ext-500.woff2") format("woff2");
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:600; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-600.woff2") format("woff2");
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:600; font-display:swap;
+  src:url("../fonts/ibm-plex-mono-latin-ext-600.woff2") format("woff2");
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- LIGHT tokens. Ink and paper only. ---------- */
+:root{
+  --ink-900:#171717;
+  --ink-700:#333330;
+  --ink-600:#57574E;
+  --ink-400:#8B8B7F;
+  --ink-200:#C9C7B2;
+  --paper-000:#FAF9EA;
+  --paper-100:#F5F3DC;
+  --paper-200:#E9E6CB;
+
+  /* The page is the lightest thing in the build now, and the components sit on
+     it as solid ink. That is the inversion: the customer app painted sheer ink
+     washes on cream paper, and the console paints cream type on ink cards over
+     a near white page. The two colours are unchanged, only which one carries
+     the surface and which one carries the type. */
+  --surface:#FAF9F2;
+  --surface-raised:#FFFEF8;
+  --surface-sunken:#EDEBDE;
+  --surface-inverse:#171717;
+  --text-primary:#171717;
+  --text-secondary:#57574E;
+  --text-inverse:#F5F3DC;
+  --text-inverse-secondary:#B0AE97;
+  --border-default:#A8A695;
+  --border-strong:#171717;
+  --hairline:#E2DFCE;
+  --focus-ring:#171717;
+  --focus-halo:#FAF9F2;
+
+  /* The two surfaces that are always ink, whatever the theme is doing.
+     --chrome-surface is the app bar and the tab bar; --card-surface is every
+     card, row, and button. They are separate tokens because in the dark theme
+     the chrome has to drop below the page to stay legible as a frame, while a
+     card has to lift above it. */
+  --chrome-surface:#171717;
+  --card-surface:#171717;
+
+  --overlay:rgba(15,15,15,0.66);
+  --hatch:rgba(23,23,23,0.14);
+  --hatch-strong:rgba(23,23,23,0.22);
+  --shadow-print:rgba(23,23,23,0.16);
+  --shadow-dock:rgba(23,23,23,0.10);
+  --shadow-card:rgba(23,23,23,0.06);
+  --shadow-lift:rgba(23,23,23,0.26);
+  --shadow-press:rgba(23,23,23,0.14);
+
+  /* The only red in the product, and it is spent carefully. It marks the unread
+     notification badge and states that cost the club money or close a court:
+     overdue payment, booking conflict, overdue task. It is never the sole
+     carrier of a status, only the amplifier on one that is already spelled out. */
+  --critical:#B3261E;
+  --critical-on:#FFFFFF;
+  --critical-surface:rgba(179,38,30,0.08);
+  --critical-edge:rgba(179,38,30,0.55);
+  --critical-glow:rgba(179,38,30,0.28);
+}
+
+/* ---------- DARK tokens. Near black, warm cream on top of it. ----------
+   Declared twice on purpose: once for the system preference and once for the
+   explicit toggle, because the toggle has to win in both directions. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --surface:#171717; --surface-raised:#1F1F1F; --surface-sunken:#101010;
+    --surface-inverse:#F5F3DC; --text-primary:#F5F3DC; --text-secondary:#A9A794;
+    --text-inverse:#171717; --text-inverse-secondary:#4A4A42;
+    --border-default:#6F6F63; --border-strong:#F5F3DC; --hairline:#2F2F2C;
+    --focus-ring:#F5F3DC; --focus-halo:#171717;
+    --ghost-fill:8,8,8; --ghost-edge:246,244,221;
+    --overlay:rgba(8,8,8,0.80); --hatch:rgba(245,243,220,0.18);
+    --hatch-strong:rgba(245,243,220,0.28); --shadow-print:rgba(0,0,0,0.55);
+    --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
+    --shadow-lift:rgba(0,0,0,0.62); --shadow-press:rgba(0,0,0,0.42);
+    --chrome-surface:#0D0D0D; --card-surface:#1F1F1F;
+    --critical:#F2857D;
+    --critical-on:#171717;
+    --critical-surface:rgba(242,133,125,0.12);
+    --critical-edge:rgba(242,133,125,0.60);
+    --critical-glow:rgba(242,133,125,0.30);
+  }
+}
+:root[data-theme="dark"]{
+  --surface:#171717; --surface-raised:#1F1F1F; --surface-sunken:#101010;
+  --surface-inverse:#F5F3DC; --text-primary:#F5F3DC; --text-secondary:#A9A794;
+  --text-inverse:#171717; --text-inverse-secondary:#4A4A42;
+  --border-default:#6F6F63; --border-strong:#F5F3DC; --hairline:#2F2F2C;
+  --focus-ring:#F5F3DC; --focus-halo:#171717;
+  --ghost-fill:8,8,8; --ghost-edge:246,244,221;
+  --overlay:rgba(8,8,8,0.80); --hatch:rgba(245,243,220,0.18);
+  --hatch-strong:rgba(245,243,220,0.28); --shadow-print:rgba(0,0,0,0.55);
+  --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
+  --shadow-lift:rgba(0,0,0,0.62); --shadow-press:rgba(0,0,0,0.42);
+  --chrome-surface:#0D0D0D; --card-surface:#1F1F1F;
+  --critical:#F2857D;
+  --critical-on:#171717;
+  --critical-surface:rgba(242,133,125,0.12);
+  --critical-edge:rgba(242,133,125,0.60);
+  --critical-glow:rgba(242,133,125,0.30);
+}
+
+/* ---------- TYPE, SPACE, SHAPE ---------- */
+:root{
+  --font-display:"Archivo Black","Archivo",Impact,"Haettenschweiler","Arial Black",sans-serif;
+  --font:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --fw-note:300; --fw-nav:400; --fw-body:500; --fw-med:600;
+  font-synthesis-weight:none;
+
+  /* The console runs one step tighter than the customer app. A staff member is
+     reading a list of forty bookings on a shift, not a landing page, so body
+     drops from 18px to 16px and the row titles come down with it. The ratios
+     between the steps are untouched, so the hierarchy is the same shape. */
+  --fs-display:30px; --lh-display:34px;
+  --fs-h1:26px;  --lh-h1:30px;
+  --fs-h2:20px;  --lh-h2:26px;
+  --fs-h3:17px;  --lh-h3:23px;
+  --fs-body:16px;--lh-body:24px;
+  --fs-txn:20px; --lh-txn:26px;
+  --fs-amount:30px; --lh-amount:34px;
+  --fs-code:22px; --lh-code:28px;
+  --fs-label:15px; --lh-label:21px;
+  --fs-legal:14px; --lh-legal:21px;
+  --fs-eyebrow:12px; --lh-eyebrow:16px;
+  --fs-tab:11px; --lh-tab:13px;
+
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:40px; --s9:56px;
+  --gutter:16px; --card-pad:16px; --block-gap:20px; --section-gap:28px;
+  --pad-top:16px;
+
+  --r-chip:999px; --r-input:12px; --r-card:16px; --r-btn:14px; --r-plate:14px; --r-sheet:20px; --r-pill:999px;
+
+  /* GHOST GLASS. Two tint directions as rgb triples, so the opacity is chosen at
+     each use. --ghost-fill is the wash inside a surface, --ghost-edge is the
+     hairline around it. */
+  --ghost-fill:23,23,23;
+  --ghost-edge:23,23,23;
+  --ghost-blur:1px;
+  --bar-w:6px;
+  --tap-min:44px; --tap-row:48px; --tap-decision:54px;
+  --appbar-h:56px; --tabbar-h:62px;
+  --dock-h:0px;
+  --content-max:34rem;
+  --shell-max:34rem;
+  --measure:34rem;
+  --dur-fast:120ms; --dur-sheet:180ms; --dur-ui:200ms; --ease:cubic-bezier(.2,.7,.3,1);
+  --header-h:var(--appbar-h);
+}
+@media (max-width:359px){ :root{ --card-pad:14px; --gutter:14px; } }
+@media (prefers-reduced-motion: reduce){ :root{ --dur-fast:0.01ms; --dur-sheet:0.01ms; --dur-ui:0.01ms; } }
+
+/* ---------- RESET ---------- */
+*,*::before,*::after{ box-sizing:border-box; }
+:root{ color-scheme:light; accent-color:var(--text-primary); }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ color-scheme:dark; } }
+:root[data-theme="dark"]{ color-scheme:dark; }
+:root[data-theme="light"]{ color-scheme:light; }
+::selection{ background:var(--surface-inverse); color:var(--text-inverse); }
+::-moz-selection{ background:var(--surface-inverse); color:var(--text-inverse); }
+html{ scroll-padding-bottom:calc(var(--tabbar-h) + var(--s6)); scroll-padding-top:calc(var(--header-h) + var(--s4)); }
+body{
+  margin:0; background:var(--surface); color:var(--text-primary);
+  font-family:var(--font); font-size:var(--fs-body); line-height:var(--lh-body);
+  -webkit-text-size-adjust:100%; overflow-x:hidden;
+}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure{ margin:0; }
+ul,ol{ padding:0; list-style:none; }
+button,input,select,textarea{ font:inherit; color:inherit; }
+button{ background:none; border:0; padding:0; cursor:pointer; text-align:left; }
+a{ color:inherit; text-underline-offset:3px; }
+svg{ display:block; width:20px; height:20px; flex:none; }
+#sprite{ width:0!important; height:0!important; position:absolute; }
+:where(a,button,input,select,textarea,summary,[tabindex]:not([tabindex="-1"])):focus-visible{
+  outline:3px solid var(--focus-ring); outline-offset:2px;
+  box-shadow:0 0 0 5px var(--focus-halo); border-radius:2px;
+}
+/* A heading made focusable so a route change announces itself is not a control
+   and must not be painted like one. The focus move stays, the paint goes. */
+:where([tabindex="-1"]):focus,
+:where([tabindex="-1"]):focus-visible{ outline:none; box-shadow:none; }
+.vh{ position:absolute!important; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0; }
+.tnum{ font-variant-numeric:tabular-nums; }
+
+/* ---------- SCROLLBARS ----------
+   No track, no gutter, no permanent bar. A reader gets a short translucent cue
+   that appears while the page is moving and fades once it stops, which is what a
+   phone has always done and a desktop browser still will not do on its own.
+   Desktop bars are removed outright rather than made transparent: a transparent
+   bar still occupies its width, and a bar that comes and goes with the content
+   would reflow the column. A coarse pointer is left alone, because every touch
+   platform already overlays its own indicator. */
+@media (hover:hover) and (pointer:fine){
+  *{ scrollbar-width:none; -ms-overflow-style:none; }
+  ::-webkit-scrollbar{ width:0; height:0; background:transparent; }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner{ background:transparent; }
+}
+.scrollcue{
+  position:fixed; z-index:2147483000; pointer-events:none;
+  border-radius:99px;
+  background:color-mix(in srgb, var(--text-primary) 34%, transparent);
+  opacity:0; transition:opacity 240ms var(--ease);
+}
+.scrollcue[data-on="1"]{ opacity:1; }
+.scrollcue--v{ width:6px; }
+.scrollcue--h{ height:6px; }
+@media (prefers-reduced-motion:reduce){ .scrollcue{ transition:none; } }
+@media (prefers-contrast:more){ .scrollcue{ background:var(--text-primary); } }
+
+/* ---------- PATTERNS ---------- */
+.hatch{ background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+.hatch-strong{ background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); }
+
+/* ---------- SHELL ---------- */
+#shell{ min-height:100svh; display:flex; flex-direction:column; overflow-x:clip; position:relative; z-index:1; }
+main{ flex:1 1 auto; width:100%; max-width:var(--shell-max); margin:0 auto; padding:var(--pad-top) var(--gutter) calc(var(--tabbar-h) + var(--s8)); }
+main:focus{ outline:none; }
+body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--s8)); }
+
+/* ---------- TOP APP BAR ----------
+   The console wears the inverse surface, which is the one decision that tells a
+   staff member at a glance that this is not the customer app. The customer
+   prototype already reserved body.shell-staff for exactly this, so the console
+   inherits the intent rather than inventing a second treatment.
+
+   Three slots. The hamburger owns the left, the page title owns the centre, and
+   the bell and the avatar share the right. Below 340px the avatar is dropped
+   rather than squeezed: two 44px targets and a centred title do not fit beside a
+   third, and a title that truncates to nothing is worse than a missing avatar
+   that is one tap away inside the drawer. */
+.appbar{
+  position:sticky; top:0; z-index:40;
+  background:var(--surface-inverse); color:var(--text-inverse);
+  border-bottom:1px solid var(--border-strong);
+  padding-top:max(0px,env(safe-area-inset-top));
+}
+.appbar__in{
+  width:100%; max-width:var(--shell-max); margin:0 auto;
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:var(--s2);
+  min-height:var(--appbar-h); padding:0 var(--s2);
+}
+.appbar__title{
+  font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase; text-align:center;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.appbar__end{ display:flex; align-items:center; gap:2px; }
+.appbar .iconbtn{ color:var(--text-inverse); border-color:transparent; }
+.appbar .iconbtn:active{ background:rgba(var(--ghost-edge),.18); }
+.appbar .iconbtn:focus-visible{ outline-color:var(--text-inverse); box-shadow:0 0 0 5px var(--surface-inverse); }
+@media (max-width:339px){ .appbar__avatar{ display:none; } }
+
+.iconbtn{
+  display:inline-flex; flex:none; align-items:center; justify-content:center;
+  min-width:var(--tap-min); min-height:var(--tap-min); padding:0 var(--s2);
+  border:1px solid var(--border-default); border-radius:var(--r-btn);
+  font-size:var(--fs-eyebrow); font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.iconbtn--bare{ border-color:transparent; padding:0; }
+.iconbtn svg{ width:22px; height:22px; }
+
+/* The avatar is initials, not a photograph. A club has six staff and a photo at
+   28px is a smudge, whereas two letters at that size are a name. */
+.avatar{
+  display:grid; place-items:center; width:30px; height:30px; flex:none;
+  border-radius:var(--r-pill); border:1.5px solid currentColor;
+  font-size:11px; line-height:1; font-weight:700; letter-spacing:.04em;
+}
+.avatar--lg{ width:44px; height:44px; font-size:15px; }
+
+/* ---------- NOTIFICATION BADGE ----------
+   Two forms from one class. Bare, it is a dot for "something is unread"; with a
+   number inside it counts. It is never the only signal: the control it sits on
+   always has an accessible name that says how many, so the red is an accent on
+   a fact that is already stated. */
+.hasbadge{ position:relative; }
+.badge{
+  position:absolute; top:5px; right:5px; z-index:1;
+  min-width:9px; height:9px; border-radius:999px;
+  background:var(--critical); border:1.5px solid var(--surface-inverse);
+}
+.badge--count{
+  min-width:19px; height:19px; top:2px; right:0;
+  display:grid; place-items:center; padding:0 4px;
+  color:var(--critical-on); font-size:11px; line-height:1; font-weight:700; font-variant-numeric:tabular-nums;
+}
+/* On a page surface rather than on the inverse app bar the ring has to match the
+   page, or the badge carries a dark halo on cream. */
+.badge--onpage{ border-color:var(--surface); }
+/* Inline count beside a label, for the drawer rows and the task headings. */
+.countpill{
+  display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px;
+  border-radius:999px; background:var(--critical); color:var(--critical-on);
+  font-size:11px; line-height:1; font-weight:700; font-variant-numeric:tabular-nums;
+}
+.countpill--quiet{ background:rgba(var(--ghost-fill),.14); color:var(--text-primary); border:1px solid rgba(var(--ghost-edge),.30); }
+
+/* ---------- DRAWER ----------
+   A left edge panel, because the button that opens it is on the left edge. It is
+   a real <dialog>, so the focus trap, the Escape key, and the inert background
+   are the platform's and are worth keeping. Only the geometry is authored. */
+dialog{ padding:0; border:0; background:transparent; max-width:100%; max-height:100%; color:var(--text-primary); }
+dialog::backdrop{ background:var(--overlay); }
+.drawer[open]{
+  display:flex; position:fixed; inset:0; width:auto; height:auto;
+  justify-content:flex-start; align-items:stretch;
+}
+.drawer__panel{
+  width:min(19rem, calc(100% - 48px)); height:100%;
+  display:flex; flex-direction:column;
+  background:var(--surface-raised); border-right:1px solid var(--border-strong);
+  box-shadow:12px 0 40px var(--shadow-print);
+}
+@media (prefers-reduced-motion:no-preference){
+  .drawer[open] .drawer__panel{ animation:drawer-in 200ms var(--ease) both; }
+  .drawer[open]::backdrop{ animation:fade-in 200ms var(--ease) both; }
+}
+@keyframes drawer-in{ from{ transform:translateX(-100%); } to{ transform:translateX(0); } }
+@keyframes fade-in{ from{ opacity:0; } to{ opacity:1; } }
+
+.drawer__head{
+  display:flex; align-items:center; gap:var(--s3);
+  padding:calc(var(--s4) + env(safe-area-inset-top)) var(--s4) var(--s4);
+  background:var(--surface-inverse); color:var(--text-inverse);
+}
+.drawer__id{ min-width:0; flex:1 1 auto; }
+.drawer__id b{ display:block; font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.drawer__id span{ display:block; font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-inverse-secondary); }
+.drawer__head .iconbtn{ color:var(--text-inverse); border-color:transparent; }
+.drawer__body{ flex:1 1 auto; overflow-y:auto; padding:var(--s3) 0 calc(var(--s4) + env(safe-area-inset-bottom)); }
+.drawer__group{ padding:var(--s3) var(--s4) var(--s2); }
+.drawer__group span{ font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-secondary); }
+
+/* Rows separated by a hairline, not boxed. This is a list of destinations, and
+   drawing twelve cards for twelve one line rows would be the heaviest thing on
+   the screen. */
+.navrow{
+  display:flex; align-items:center; gap:var(--s3); width:100%;
+  min-height:var(--tap-row); padding:var(--s2) var(--s4);
+  border-top:1px solid var(--hairline); text-decoration:none;
+  font-size:var(--fs-label); line-height:var(--lh-label); font-weight:600;
+  transition:background var(--dur-ui) var(--ease);
+}
+.navrow:first-of-type{ border-top:0; }
+.navrow span{ flex:1 1 auto; min-width:0; }
+.navrow svg{ width:20px; height:20px; opacity:.9; }
+.navrow:active{ background:rgba(var(--ghost-fill),.10); }
+.navrow[aria-current="page"]{ background:rgba(var(--ghost-fill),.12); font-weight:700; }
+.navrow[aria-current="page"] span::after{ content:""; }
+.navrow--danger{ color:var(--critical); }
+
+/* ---------- BOTTOM TAB BAR ----------
+   Five items, and five is the ceiling. The inverse fill matches the app bar, so
+   the console is framed top and bottom by the same surface. */
+.tabbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:45;
+  background:var(--surface-inverse); color:var(--text-inverse);
+  border-top:1px solid var(--border-strong);
+  padding-bottom:max(0px,env(safe-area-inset-bottom));
+}
+.tabbar__in{
+  width:100%; max-width:var(--shell-max); margin:0 auto;
+  display:grid; grid-auto-flow:column; grid-auto-columns:1fr;
+}
+.tabbar a{
+  position:relative;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  min-height:var(--tabbar-h); padding:6px 2px; text-decoration:none;
+  font-size:var(--fs-tab); line-height:var(--lh-tab); font-weight:600; text-align:center;
+}
+.tabbar a svg{ width:22px; height:22px; }
+.tabbar .tabpill{ display:grid; place-items:center; width:38px; height:26px; border-radius:var(--r-pill); }
+.tabbar a[aria-current="page"] .tabpill{ background:var(--text-inverse); color:var(--surface-inverse); }
+.tabbar a[aria-current="page"]{ font-weight:700; }
+/* The brush stroke over the current tab, carried across from the customer app. */
+.tabbar a[aria-current="page"]::after{
+  content:""; position:absolute; top:4px; left:50%; transform:translateX(-50%);
+  width:38px; height:9px; background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 9'><path d='M0 6 C 11 0, 25 0, 36 2 L 36 5 C 25 3.4, 11 7, 0 9 Z'/></svg>") center/contain no-repeat;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 9'><path d='M0 6 C 11 0, 25 0, 36 2 L 36 5 C 25 3.4, 11 7, 0 9 Z'/></svg>") center/contain no-repeat;
+}
+.tabbar .badge{ border-color:var(--surface-inverse); top:6px; right:calc(50% - 20px); }
+
+/* ---------- DOCK ----------
+   The one action a screen exists to perform, pinned above the tab bar. */
+.dock{
+  position:fixed; left:0; right:0; bottom:var(--tabbar-h); z-index:44;
+  background:var(--surface-raised); border-top:1px solid var(--border-default);
+  box-shadow:0 -8px 24px var(--shadow-dock);
+  padding:var(--s3) var(--gutter);
+  padding-bottom:calc(var(--s3) + max(0px,env(safe-area-inset-bottom)));
+}
+.dock__in{ width:100%; max-width:var(--content-max); margin:0 auto; display:grid; gap:var(--s2); }
+
+/* ---------- BUTTONS ----------
+   Sheer, never opaque. The label and the icon stay at full strength: nothing
+   here uses opacity on the component, only a low alpha on the surface behind it,
+   so a sheer button never means faint type. The primary washes toward the edge
+   colour and the others wash toward the fill colour, and that is the whole
+   distinction. No hue does any of this work. */
+.btn{
+  display:flex; align-items:center; justify-content:center; gap:var(--s2); width:100%;
+  min-height:var(--tap-decision); padding:var(--s3) var(--s4);
+  border-radius:var(--r-btn); border:1px solid rgba(var(--ghost-edge),.35);
+  font-size:var(--fs-h3); font-weight:700; line-height:1.25; text-align:center;
+  color:var(--text-primary); background:rgba(var(--ghost-fill),.08);
+  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease),
+             transform var(--dur-ui) var(--ease), box-shadow var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease);
+}
+.btn small{ display:block; font-size:var(--fs-legal); font-weight:600; opacity:.92; }
+.btn svg{ width:20px; height:20px; flex:none; transition:transform var(--dur-ui) var(--ease); }
+.btn--primary{ background:rgba(var(--ghost-edge),.08); color:var(--text-primary); border-color:rgba(var(--ghost-edge),.42); }
+.btn--secondary{ background:rgba(var(--ghost-fill),.08); color:var(--text-primary); border-color:rgba(var(--ghost-edge),.35); }
+.btn--ghost{ background:rgba(var(--ghost-fill),.05); border-width:1px; border-style:dashed; border-color:rgba(var(--ghost-edge),.32); min-height:var(--tap-min); font-size:var(--fs-label); }
+.btn--sm{ min-height:var(--tap-min); font-size:var(--fs-label); padding:0 var(--s4); }
+/* Destructive actions carry the red edge and nothing else. The word is the
+   warning; the colour only makes it findable in a column of eight buttons. */
+.btn--danger{ border-color:var(--critical-edge); color:var(--critical); background:var(--critical-surface); }
+.btn[disabled]{ cursor:not-allowed; border-style:dashed; background:rgba(var(--ghost-fill),.04); color:var(--text-secondary); }
+/* PRESS, and this is not behind a pointer query, because a touch screen has no
+   hover to lead into it. A press is the only feedback a finger gets: the wash
+   steps up, the edge firms, and the control sits down onto a short shadow. */
+.btn:active{
+  transform:scale(.985);
+  background:rgba(var(--ghost-fill),.30);
+  border-color:rgba(var(--ghost-edge),.80);
+  box-shadow:0 1px 2px var(--shadow-press);
+}
+.btn--primary:active{ background:rgba(var(--ghost-edge),.34); border-color:rgba(var(--ghost-edge),.90); }
+.btn--ghost:active{ background:rgba(var(--ghost-fill),.24); border-color:rgba(var(--ghost-edge),.70); }
+.btn--danger:active{ background:var(--critical-glow); border-color:var(--critical); }
+.btn[disabled]:active{ transform:none; background:rgba(var(--ghost-fill),.04); border-color:rgba(var(--ghost-edge),.35); box-shadow:none; }
+.btn-col{ display:grid; gap:var(--s3); }
+.btn-stack{ display:grid; gap:var(--s2); }
+.btn-row{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
+@media (hover:hover) and (pointer:fine){
+  .btn--primary:hover{ background:rgba(var(--ghost-edge),.28); border-color:rgba(var(--ghost-edge),.88); }
+  .btn--secondary:hover{ background:rgba(var(--ghost-fill),.26); border-color:rgba(var(--ghost-edge),.78); }
+  .btn--ghost:hover{ background:rgba(var(--ghost-fill),.20); border-color:rgba(var(--ghost-edge),.66); }
+  .btn--danger:hover{ background:var(--critical-glow); }
+}
+.textbtn{ display:inline-flex; align-items:center; gap:6px; min-height:var(--tap-min); font-size:var(--fs-label); font-weight:700; }
+.textbtn svg{ width:16px; height:16px; }
+@media (hover:hover) and (pointer:fine){ .textbtn:hover svg:last-child{ transform:translateX(3px); } }
+.textbtn svg{ transition:transform var(--dur-ui) var(--ease); }
+
+/* ---------- TEXT UTILITIES ---------- */
+.eyebrow{ font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+h1.screen{ font-size:var(--fs-h1); line-height:var(--lh-h1); font-weight:700; letter-spacing:-.01em; text-wrap:balance; }
+h1.screen:focus{ outline:none; }
+h2.sec{ font-size:var(--fs-h2); line-height:var(--lh-h2); font-weight:700; text-wrap:balance; }
+h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; text-wrap:balance; }
+.lede{ font-size:var(--fs-body); line-height:var(--lh-body); text-wrap:pretty; }
+.muted{ color:var(--text-secondary); }
+.legal{ font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
+.amount{ font-size:var(--fs-amount); line-height:var(--lh-amount); font-weight:800; font-variant-numeric:tabular-nums; }
+.txn{ font-size:var(--fs-txn); line-height:var(--lh-txn); font-weight:700; font-variant-numeric:tabular-nums; }
+.code{ font-size:var(--fs-code); line-height:var(--lh-code); font-weight:700; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
+.stack{ display:grid; gap:var(--block-gap); }
+.stack-sm{ display:grid; gap:var(--s3); }
+.stack-xs{ display:grid; gap:var(--s2); }
+.section{ display:grid; gap:var(--s3); margin-top:var(--section-gap); }
+.section:first-of-type{ margin-top:var(--s5); }
+.rule{ height:1px; background:var(--hairline); border:0; margin:0; }
+/* A section heading with an action on the far right of the same line. */
+.sechead{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--s3); }
+.sechead h2{ font-size:var(--fs-h2); line-height:var(--lh-h2); font-weight:700; }
+.sechead .textbtn{ flex:none; }
+
+/* ---------- CARD ----------
+   What tells a card from the page is its edge and the type inside it, not a fill
+   you cannot see through. */
+.card{
+  background:rgba(var(--ghost-fill),.07);
+  border:1px solid rgba(var(--ghost-edge),.22);
+  border-radius:var(--r-card); padding:var(--card-pad);
+  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.card--sunken{ background:rgba(var(--ghost-fill),.12); }
+.card--strong{ border:1.5px solid rgba(var(--ghost-edge),.45); }
+.card__head{ display:flex; justify-content:space-between; align-items:flex-start; gap:var(--s3); }
+
+/* ---------- SUMMARY CARDS ----------
+   Four tiles, two up. Each is a link to the page that owns the number, so the
+   dashboard is a set of doors rather than a poster. The number is the loudest
+   thing in the tile because it is the only thing a manager is scanning for. */
+.sumgrid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
+.sumcard{
+  display:flex; flex-direction:column; gap:2px; min-height:104px; padding:var(--s3);
+  border-radius:var(--r-card); border:1px solid rgba(var(--ghost-edge),.22);
+  background:rgba(var(--ghost-fill),.07); color:var(--text-primary); text-decoration:none;
+  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease),
+             transform var(--dur-ui) var(--ease), box-shadow var(--dur-ui) var(--ease);
+}
+.sumcard svg{ width:22px; height:22px; }
+.sumcard__label{ font-size:var(--fs-legal); line-height:18px; font-weight:600; color:var(--text-secondary); }
+.sumcard__num{ margin-top:auto; font-size:28px; line-height:30px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.sumcard__note{ font-size:12px; line-height:16px; font-weight:600; color:var(--text-secondary); }
+.sumcard:active{ background:rgba(var(--ghost-fill),.24); border-color:rgba(var(--ghost-edge),.70); transform:scale(.985); box-shadow:0 1px 2px var(--shadow-press); }
+@media (hover:hover) and (pointer:fine){ .sumcard:hover{ background:rgba(var(--ghost-fill),.16); border-color:rgba(var(--ghost-edge),.50); } }
+/* A tile whose number is a problem gets the red edge on top of its own word. */
+.sumcard--alert{ border-color:var(--critical-edge); background:var(--critical-surface); }
+.sumcard--alert .sumcard__num{ color:var(--critical); }
+
+/* ---------- QUICK ACTIONS ----------
+   Four squat tiles, two up, all verbs. */
+.qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
+.qact{
+  display:flex; align-items:center; gap:var(--s2); min-height:var(--tap-decision); padding:var(--s2) var(--s3);
+  border-radius:var(--r-btn); border:1px dashed rgba(var(--ghost-edge),.32);
+  background:rgba(var(--ghost-fill),.05); color:var(--text-primary); text-decoration:none;
+  font-size:var(--fs-label); line-height:19px; font-weight:700;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
+}
+.qact svg{ width:19px; height:19px; }
+.qact:active{ background:rgba(var(--ghost-fill),.24); border-color:rgba(var(--ghost-edge),.70); transform:scale(.985); }
+
+/* ---------- ROWS ----------
+   The workhorse. Everything that is a list of things a staff member acts on is
+   one of these: a booking, a court, a task, a payment, a person. */
+.rows{ display:grid; gap:var(--s2); }
+.row{
+  display:flex; align-items:center; gap:var(--s3); width:100%;
+  min-height:var(--tap-decision); padding:var(--s3);
+  border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-card);
+  background:rgba(var(--ghost-fill),.07); color:var(--text-primary); text-decoration:none;
+  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
+}
+a.row:active, button.row:active{ background:rgba(var(--ghost-fill),.22); border-color:rgba(var(--ghost-edge),.66); transform:scale(.99); }
+@media (hover:hover) and (pointer:fine){ a.row:hover, button.row:hover{ background:rgba(var(--ghost-fill),.14); } }
+.row__main{ flex:1 1 auto; min-width:0; display:block; }
+.row__title{ display:block; font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; font-variant-numeric:tabular-nums; }
+.row__sub{ display:block; font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
+.row__end{ flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+.row__chev{ flex:none; width:18px; height:18px; opacity:.55; }
+/* The time column on a schedule row. Fixed width so every row in a list lines
+   up, tabular figures so the digits do not shuffle between rows. */
+.row__time{
+  flex:none; width:62px; display:flex; flex-direction:column; align-items:flex-start; gap:1px;
+  padding-right:var(--s3); border-right:1px solid var(--hairline);
+  font-variant-numeric:tabular-nums;
+}
+.row__time b{ font-size:var(--fs-label); line-height:19px; font-weight:700; }
+.row__time span{ font-size:12px; line-height:15px; color:var(--text-secondary); }
+/* The left edge accent. Solid says the thing is settled, hatched says it is
+   held or provisional, and the red variant says it is costing the club now. */
+.row--bar{ position:relative; padding-left:calc(var(--s3) + var(--bar-w)); overflow:hidden; }
+.row--bar::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:var(--bar-w); background:var(--border-strong); }
+.row--barhatch::before{ background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); }
+.row--barcrit::before{ background:var(--critical); }
+.row--muted{ background:var(--surface-sunken); border-style:dashed; border-color:var(--border-default); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+.row--strong{ border:1.5px solid rgba(var(--ghost-edge),.45); }
+.row--crit{ border-color:var(--critical-edge); background:var(--critical-surface); }
+
+/* THE TWO LINE ROW, and it is the default shape for anything with a status.
+   A booking carries a time, a name, a court, a type, and up to two statuses,
+   and at 360px there is no honest way to fit that on one line: a status chip is
+   flex:none and reserves its width, which leaves the title wrapping to three
+   lines against it. Splitting the row puts the identifying line on top at full
+   width and the statuses underneath, where they read as a column of their own
+   and can be scanned straight down the list. */
+.row--two{ flex-direction:column; align-items:stretch; gap:var(--s2); }
+.row__line{ display:flex; align-items:center; gap:var(--s3); width:100%; }
+.row__line .row__main{ text-decoration:none; color:inherit; }
+.row__tags{ display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+/* The tags sit under the time column rather than beside it, so every row in a
+   list starts its statuses on the same left edge. */
+.row--two.row--timed .row__tags{ padding-left:calc(62px + var(--s3)); }
+@media (max-width:379px){ .row--two.row--timed .row__tags{ padding-left:0; } }
+
+/* ---------- CHIPS AND STATUS ----------
+   The status vocabulary for the whole console. Every state pairs a word with a
+   drawn treatment, and only the two critical states add the red. Read this block
+   as the legend for every screen:
+
+     .st--ok        Solid ink edge          Available, Paid, Completed, Confirmed
+     .st--hold      Hatched fill, dashed    Reserved, Pending, Unpaid, In progress
+     .st--live      Dotted edge             In use, Checked in, Session running
+     .st--off       Sunken hatch, dashed    Blocked, Closed, Cancelled, Refunded
+     .st--work      Double rule             Maintenance
+     .st--crit      Red edge and wash       Overdue, Failed, Conflict
+*/
+.chip{
+  display:inline-flex; align-items:center; gap:5px; padding:2px 9px;
+  border-radius:var(--r-chip); border:1px solid rgba(var(--ghost-edge),.22);
+  background:rgba(var(--ghost-fill),.07);
+  font-size:var(--fs-legal); line-height:19px; font-weight:600; white-space:nowrap;
+}
+.chip svg{ width:15px; height:15px; flex:none; }
+.chip--quiet{ background:transparent; border-color:var(--hairline); color:var(--text-secondary); font-weight:500; }
+
+.st{
+  display:inline-flex; align-items:center; gap:5px; padding:2px 9px;
+  border-radius:var(--r-chip); border:1px solid rgba(var(--ghost-edge),.30);
+  background:rgba(var(--ghost-fill),.07);
+  font-size:12px; line-height:17px; font-weight:700; letter-spacing:.04em;
+  text-transform:uppercase; white-space:nowrap;
+}
+.st svg{ width:13px; height:13px; flex:none; }
+.st--ok{ border:1.5px solid var(--border-strong); background:rgba(var(--ghost-fill),.10); }
+.st--hold{ border:1.5px dashed var(--border-strong); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+.st--live{ border:2px dotted var(--border-strong); background:rgba(var(--ghost-fill),.14); }
+.st--off{ border:1.5px dashed var(--border-default); background:var(--surface-sunken); color:var(--text-secondary); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+.st--work{ border:3px double var(--border-strong); background:rgba(var(--ghost-fill),.10); }
+.st--crit{ border:1.5px solid var(--critical-edge); background:var(--critical-surface); color:var(--critical); }
+/* Priority is not a status and must not borrow one of the six treatments above,
+   or a High task reads as a Paid booking on the same row. It gets the inverse
+   fill instead, which is the console's way of saying "this one, first" wherever
+   it appears: a pressed filter, a selected day, a current tab. Medium and Low
+   stay as quiet chips, because a priority that is not high does not need to
+   announce itself three times on one screen. */
+.st--prio{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); }
+
+/* ---------- STATUS PLATE ----------
+   One fact, stated large. Used for the alert list and for the standing status at
+   the top of a detail screen. */
+.plate{
+  position:relative; border-radius:var(--r-plate);
+  padding:var(--s3) var(--s3) var(--s3) calc(var(--s3) + var(--bar-w));
+  background:rgba(var(--ghost-fill),.10); border:1.5px solid rgba(var(--ghost-edge),.45);
+  overflow:hidden; text-decoration:none; color:var(--text-primary); display:block;
+  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  transition:background var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
+}
+a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
+.plate__bar{ position:absolute; left:0; top:0; bottom:0; width:var(--bar-w); background:var(--border-strong); }
+.plate__bar--hatched{ background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); border-right:1px solid var(--border-default); }
+.plate__bar--crit{ background:var(--critical); }
+.plate__head{ display:flex; align-items:center; gap:var(--s2); font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700; letter-spacing:.10em; text-transform:uppercase; }
+.plate__head svg{ width:16px; height:16px; flex:none; }
+.plate__phrase{ margin-top:5px; font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:700; font-variant-numeric:tabular-nums; }
+.plate__meta{ margin-top:3px; font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
+.plate--crit{ border-color:var(--critical-edge); background:var(--critical-surface); }
+.plate--crit .plate__head{ color:var(--critical); }
+.plate--work{ border:3px double var(--border-strong); }
+.plate--off{ border:1.5px dashed var(--border-default); background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+/* The moving hazard band on a court that is in play right now. It is the only
+   animation in the console that runs on its own, and it only ever means "live". */
+.plate__pole{ position:absolute; left:0; right:0; top:0; height:6px; background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); background-size:14px 14px; }
+@media (prefers-reduced-motion: no-preference){ .plate__pole--live{ animation:pole 1.2s linear infinite; } }
+@keyframes pole{ from{ background-position:0 0; } to{ background-position:14px 0; } }
+
+/* ---------- DATE NAVIGATOR ----------
+   Previous, the date itself, next. The date in the middle is a button too,
+   because the fastest way to a date three weeks out is not thirty taps on an
+   arrow. */
+.datenav{ display:flex; align-items:center; gap:var(--s2); }
+.datenav__date{
+  flex:1 1 auto; display:flex; align-items:center; justify-content:center; gap:var(--s2);
+  min-height:var(--tap-row); padding:0 var(--s3);
+  border:1px solid rgba(var(--ghost-edge),.30); border-radius:var(--r-btn);
+  background:rgba(var(--ghost-fill),.08);
+  font-size:var(--fs-label); font-weight:700; font-variant-numeric:tabular-nums;
+  transition:background var(--dur-ui) var(--ease);
+}
+.datenav__date:active{ background:rgba(var(--ghost-fill),.24); }
+.datenav__date svg{ width:17px; height:17px; }
+.datenav .iconbtn{ border-color:rgba(var(--ghost-edge),.30); border-radius:var(--r-btn); min-height:var(--tap-row); }
+.datenav .iconbtn:active{ background:rgba(var(--ghost-fill),.24); }
+
+/* ---------- DATE STRIP ---------- */
+.datestrip{ display:flex; gap:var(--s2); overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:var(--s2); margin-inline:calc(-1 * var(--gutter)); padding-inline:var(--gutter); }
+.datestrip::-webkit-scrollbar{ height:0; }
+.daybtn{ scroll-snap-align:start; flex:none; width:60px; min-height:70px; display:grid; align-content:center; justify-items:center; gap:2px; border:1px solid var(--border-default); border-radius:var(--r-card); background:var(--surface-raised); text-align:center; padding:var(--s2) 4px; }
+.daybtn small{ font-size:var(--fs-eyebrow); font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.daybtn strong{ font-size:var(--fs-txn); font-weight:800; font-variant-numeric:tabular-nums; }
+.daybtn i{ font-style:normal; font-size:11px; line-height:13px; font-weight:600; color:var(--text-secondary); }
+.daybtn[data-state="closed"]{ background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); border-style:dashed; }
+.daybtn[aria-pressed="true"]{ background:var(--surface-inverse); background-image:none; color:var(--text-inverse); border:2px solid var(--border-strong); }
+.daybtn[aria-pressed="true"] i{ color:var(--text-inverse-secondary); }
+
+/* ---------- SEARCH AND FILTERS ---------- */
+.search{ position:relative; display:flex; align-items:center; }
+.search svg{ position:absolute; left:var(--s3); width:18px; height:18px; opacity:.6; pointer-events:none; }
+.search input{
+  width:100%; min-height:var(--tap-row); padding:0 var(--s3) 0 42px;
+  border:1px solid rgba(var(--ghost-edge),.30); border-radius:var(--r-input);
+  background:rgba(var(--ghost-fill),.06); font-size:var(--fs-label); font-weight:500;
+}
+.search input::placeholder{ color:var(--text-secondary); }
+
+/* A horizontal rail of filters. It scrolls rather than wraps, so the row height
+   never changes as filters are added and the list below never jumps. */
+.filterbar{ display:flex; gap:var(--s2); overflow-x:auto; margin-inline:calc(-1 * var(--gutter)); padding:2px var(--gutter); }
+.filterbar::-webkit-scrollbar{ height:0; }
+.filter{
+  flex:none; display:inline-flex; align-items:center; gap:5px;
+  min-height:var(--tap-min); padding:0 var(--s3);
+  border:1px solid rgba(var(--ghost-edge),.28); border-radius:var(--r-chip);
+  background:rgba(var(--ghost-fill),.06);
+  font-size:var(--fs-legal); font-weight:600; white-space:nowrap;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.filter svg{ width:15px; height:15px; }
+.filter[aria-pressed="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); font-weight:700; }
+.filter:active{ background:rgba(var(--ghost-fill),.22); }
+
+/* ---------- SEGMENTED (tabs within a page) ---------- */
+.seg{ display:flex; gap:6px; }
+/* Every segment is one line. Letting one of three labels wrap makes that
+   segment taller than its neighbours, which reads as a different kind of
+   control rather than a longer word, so the type steps down instead and the
+   count beside it shrinks with it. */
+.seg button, .seg a{
+  flex:1 1 0; min-width:0; min-height:var(--tap-row); padding:0 6px;
+  border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-btn);
+  background:rgba(var(--ghost-fill),.07); text-decoration:none; color:var(--text-primary);
+  font-size:13px; line-height:17px; font-weight:600; text-align:center; white-space:nowrap;
+  display:flex; align-items:center; justify-content:center; gap:4px;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.seg .countpill{ min-width:17px; height:17px; padding:0 4px; font-size:10px; }
+.seg [aria-pressed="true"], .seg [aria-selected="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); font-weight:700; }
+.seg button:active{ background:rgba(var(--ghost-fill),.24); }
+
+/* ---------- DEFINITION LIST (detail screens) ----------
+   Label left, value right, hairline between. A booking has fourteen facts and a
+   card per fact would be unreadable. */
+.deflist{ display:grid; }
+.deflist > div{
+  display:flex; align-items:baseline; justify-content:space-between; gap:var(--s4);
+  padding:var(--s3) 0; border-top:1px solid var(--hairline);
+}
+.deflist > div:first-child{ border-top:0; padding-top:0; }
+.deflist dt{ flex:none; font-size:var(--fs-legal); font-weight:600; color:var(--text-secondary); }
+.deflist dd{ text-align:right; font-size:var(--fs-label); font-weight:600; font-variant-numeric:tabular-nums; min-width:0; overflow-wrap:anywhere; }
+.deflist dd .st{ vertical-align:middle; }
+.deflist--block > div{ flex-direction:column; align-items:flex-start; gap:2px; }
+.deflist--block dd{ text-align:left; }
+
+/* ---------- ACTIVITY TIMELINE ----------
+   A rail with a node per entry. The rail is what makes six timestamps read as one
+   sequence instead of six unrelated lines. */
+.timeline{ display:grid; gap:0; }
+.tl{ position:relative; padding:0 0 var(--s4) var(--s5); }
+.tl::before{ content:""; position:absolute; left:5px; top:6px; bottom:0; width:1px; background:var(--hairline); }
+.tl:last-child::before{ display:none; }
+.tl::after{ content:""; position:absolute; left:0; top:4px; width:11px; height:11px; border-radius:999px; border:2px solid var(--border-strong); background:var(--surface); }
+.tl--now::after{ background:var(--border-strong); }
+.tl__when{ font-size:12px; line-height:16px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--text-secondary); font-variant-numeric:tabular-nums; }
+.tl__what{ font-size:var(--fs-label); line-height:20px; font-weight:600; }
+.tl__who{ font-size:var(--fs-legal); line-height:19px; color:var(--text-secondary); }
+
+/* ---------- METER ----------
+   Utilization and capacity. The fill is ink, the track is hatched, so the two
+   are told apart by texture as well as by value. */
+.meter{ display:grid; gap:5px; }
+.meter__top{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--s3); font-size:var(--fs-legal); font-weight:600; }
+.meter__top b{ font-variant-numeric:tabular-nums; }
+.meter__track{
+  height:10px; border-radius:999px; overflow:hidden;
+  border:1px solid rgba(var(--ghost-edge),.30); background:var(--surface-sunken);
+  background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px);
+}
+.meter__fill{ height:100%; background:var(--border-strong); border-radius:999px 0 0 999px; }
+.meter__fill--crit{ background:var(--critical); }
+
+/* A row of small figures under a heading, for the reports page. */
+.figs{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
+.fig{ padding:var(--s3); border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-card); background:rgba(var(--ghost-fill),.07); }
+.fig b{ display:block; font-size:24px; line-height:28px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.fig span{ display:block; font-size:var(--fs-legal); line-height:18px; color:var(--text-secondary); font-weight:600; }
+.fig i{ font-style:normal; font-size:12px; line-height:16px; font-weight:700; }
+
+/* A simple column chart drawn in CSS. Seven bars, one per day, labelled. */
+.bars{ display:flex; align-items:flex-end; gap:var(--s2); height:120px; padding-top:var(--s2); }
+.bars > div{ flex:1 1 0; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:5px; height:100%; }
+.bars .bar{ width:100%; background:rgba(var(--ghost-fill),.20); border:1px solid rgba(var(--ghost-edge),.40); border-radius:4px 4px 0 0; }
+.bars .bar--on{ background:var(--border-strong); }
+.bars small{ font-size:11px; line-height:14px; font-weight:600; color:var(--text-secondary); }
+
+/* ---------- FORM FIELDS ---------- */
+.field{ display:grid; gap:5px; }
+.field > label{ font-size:var(--fs-legal); line-height:18px; font-weight:700; }
+.field input, .field select, .field textarea{
+  width:100%; min-height:var(--tap-row); padding:var(--s2) var(--s3);
+  border:1px solid rgba(var(--ghost-edge),.30); border-radius:var(--r-input);
+  background:rgba(var(--ghost-fill),.06); font-size:var(--fs-label); font-weight:500;
+}
+.field textarea{ min-height:84px; resize:vertical; line-height:21px; }
+.field small{ font-size:12px; line-height:16px; color:var(--text-secondary); }
+.field-row{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s3); }
+
+/* A priority or option picker built from radios, so it is a real single choice
+   for the keyboard and for assistive technology. */
+.pick{ display:flex; gap:var(--s2); }
+.pick label{ flex:1 1 0; position:relative; }
+.pick input{ position:absolute; opacity:0; width:1px; height:1px; }
+.pick span{
+  display:flex; align-items:center; justify-content:center; gap:5px;
+  min-height:var(--tap-row); padding:0 var(--s2);
+  border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-btn);
+  background:rgba(var(--ghost-fill),.07);
+  font-size:var(--fs-legal); font-weight:600; text-align:center; cursor:pointer;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.pick input:checked + span{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); font-weight:700; }
+.pick input:focus-visible + span{ outline:3px solid var(--focus-ring); outline-offset:2px; box-shadow:0 0 0 5px var(--focus-halo); }
+
+/* A switch row for the settings screens. */
+.setrow{ display:flex; align-items:center; gap:var(--s3); padding:var(--s3) 0; border-top:1px solid var(--hairline); }
+.setrow:first-child{ border-top:0; }
+.setrow__main{ flex:1 1 auto; min-width:0; }
+.setrow__main b{ display:block; font-size:var(--fs-label); line-height:20px; font-weight:600; }
+.setrow__main span{ display:block; font-size:var(--fs-legal); line-height:19px; color:var(--text-secondary); }
+.switch{ flex:none; width:48px; height:28px; border-radius:999px; border:1.5px solid var(--border-strong); background:var(--surface-sunken); padding:2px; transition:background var(--dur-ui) var(--ease); }
+.switch::after{ content:""; display:block; width:20px; height:20px; border-radius:999px; background:var(--border-strong); transition:transform var(--dur-ui) var(--ease); }
+.switch[aria-checked="true"]{ background:var(--surface-inverse); }
+.switch[aria-checked="true"]::after{ transform:translateX(20px); background:var(--text-inverse); }
+
+/* ---------- SHEET (bottom modal) ---------- */
+.sheet[open]{ display:flex; flex-direction:column; justify-content:flex-end; position:fixed; inset:0; width:auto; height:auto; }
+.sheet__panel{
+  width:100%; max-width:min(var(--content-max), 40rem, 100%); margin:auto auto 0;
+  background:var(--surface-raised); border:1px solid var(--border-strong);
+  border-radius:var(--r-sheet) var(--r-sheet) 0 0;
+  max-height:85svh; display:flex; flex-direction:column;
+}
+@media (prefers-reduced-motion:no-preference){
+  .sheet[open] .sheet__panel{ animation:sheet-in 180ms var(--ease) both; }
+  .sheet[open]::backdrop{ animation:fade-in 180ms var(--ease) both; }
+}
+@keyframes sheet-in{ from{ transform:translateY(14px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+.sheet__head{ display:flex; align-items:center; justify-content:space-between; gap:var(--s3); padding:var(--s3) var(--gutter); border-bottom:1px solid var(--hairline); }
+.sheet__head h2{ font-size:var(--fs-h3); font-weight:700; }
+.sheet__body{ overflow-y:auto; padding:var(--s4) var(--gutter) calc(var(--s5) + env(safe-area-inset-bottom)); display:grid; gap:var(--s3); }
+.sheet__close{ min-width:var(--tap-min); min-height:var(--tap-min); display:grid; place-items:center; border:1px solid var(--border-default); border-radius:var(--r-btn); }
+
+/* An action list inside a sheet: one verb per line, hairline between. */
+.actlist{ display:grid; }
+.actlist button, .actlist a{
+  display:flex; align-items:center; gap:var(--s3); width:100%;
+  min-height:var(--tap-row); padding:var(--s2) 0; border-top:1px solid var(--hairline);
+  font-size:var(--fs-label); font-weight:600; text-decoration:none; color:var(--text-primary);
+}
+.actlist button:first-child, .actlist a:first-child{ border-top:0; }
+.actlist svg{ width:19px; height:19px; opacity:.9; }
+.actlist .is-danger{ color:var(--critical); }
+
+/* ---------- EMPTY STATE ---------- */
+.empty{
+  display:grid; justify-items:center; gap:var(--s2); padding:var(--s7) var(--s4); text-align:center;
+  border:1px dashed var(--border-default); border-radius:var(--r-card);
+  background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px);
+}
+.empty svg{ width:26px; height:26px; opacity:.6; }
+.empty b{ font-size:var(--fs-label); font-weight:700; }
+.empty span{ font-size:var(--fs-legal); line-height:19px; color:var(--text-secondary); max-width:32ch; }
+
+/* ---------- SANDBOX MARK ----------
+   Every page in this folder is a prototype and says so once, quietly, at the
+   bottom. It is not a banner, because a banner that appears on twenty four
+   screens stops being read by the second one. */
+.sandbox{
+  margin-top:var(--section-gap); padding:var(--s3);
+  border:1px dashed var(--border-default); border-radius:var(--r-card);
+  display:flex; align-items:flex-start; gap:var(--s2);
+  font-size:var(--fs-legal); line-height:19px; color:var(--text-secondary);
+}
+.sandbox svg{ width:16px; height:16px; margin-top:2px; opacity:.7; }
+
+/* ============================================================
+   SURFACE INVERSION
+   The page is near white and the components are solid ink.
+
+   This section comes last on purpose. Everything above it draws a component as
+   a sheer wash whose alpha is chosen at each use, which is what the customer
+   app does over photography. The console has no photograph under it, so the
+   same components are re-based onto a solid ink fill here rather than being
+   rewritten in place. The wash rules above still do the work, only now they
+   resolve against cream inside a dark box instead of against ink on a cream
+   page: that is what the token block below buys, and it is why no chip, meter,
+   hairline, or hatch further up needed touching.
+
+   The rule is one line long. A component that is ink redeclares the palette
+   locally, so everything nested inside it inherits the dark reading of every
+   token it already used.
+   ============================================================ */
+
+.card, .row, .btn, .sumcard, .qact, .plate, .fig,
+.filter, .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn,
+.search input, .field input, .field select, .field textarea, .pick span,
+.drawer__panel, .sheet__panel{
+  background:var(--card-surface);
+  color:#F5F3DC;
+
+  /* The washes and hairlines above now tint toward cream, because they are
+     being painted on ink rather than on paper. */
+  --ghost-fill:246,244,221;
+  --ghost-edge:246,244,221;
+  --hatch:rgba(245,243,220,0.16);
+  --hatch-strong:rgba(245,243,220,0.26);
+
+  /* Type and rules inside the box. */
+  --text-primary:#F5F3DC;
+  --text-secondary:#A9A794;
+  --border-strong:#F5F3DC;
+  --border-default:#6F6F63;
+  --hairline:#3A3A36;
+
+  /* Surfaces inside the box, so a nested panel drops below the card and a
+     nested "selected" fill rises above it as cream. */
+  --surface:var(--card-surface);
+  --surface-raised:#262626;
+  --surface-sunken:#101010;
+  --surface-inverse:#F5F3DC;
+  --text-inverse:#171717;
+
+  --focus-ring:#F5F3DC;
+  --focus-halo:#171717;
+
+  /* The red has to lift off ink now, not off paper. */
+  --critical:#F2857D;
+  --critical-on:#171717;
+  --critical-surface:rgba(242,133,125,0.12);
+  --critical-edge:rgba(242,133,125,0.60);
+  --critical-glow:rgba(242,133,125,0.30);
+}
+.card, .row, .sumcard, .plate, .fig{ box-shadow:0 1px 2px var(--shadow-card); }
+
+/* Full width fills that would otherwise replace the ink rather than sit on it.
+   A translucent wash set as `background` discards the solid underneath it and
+   lets the page show through, so these three mix their tint into the ink and
+   stay opaque. */
+.card--sunken{ background:color-mix(in srgb, #F5F3DC 9%, var(--card-surface)); }
+.row--crit,
+.sumcard--alert{ background:color-mix(in srgb, #F2857D 13%, var(--card-surface)); }
+.plate--crit{ background:color-mix(in srgb, #F2857D 13%, var(--card-surface)); }
+
+/* WHAT STAYS ON PAPER.
+   Ink is for a thing that is live and actionable. Anything finished, blocked,
+   or absent drops back to the page as hatched paper, which is a stronger
+   distinction than the old muted fill managed and costs no colour: a completed
+   task and a cancelled booking now read as inert at a glance, from across the
+   desk, before any word on them is read. */
+.row--muted,
+.empty{
+  background:var(--surface-sunken);
+  color:var(--text-primary);
+  --ghost-fill:23,23,23;
+  --ghost-edge:23,23,23;
+  --hatch:rgba(23,23,23,0.14);
+  --hatch-strong:rgba(23,23,23,0.22);
+  --text-primary:#171717;
+  --text-secondary:#57574E;
+  --border-strong:#171717;
+  --border-default:#A8A695;
+  --hairline:#D9D6C5;
+  --surface:#FAF9F2;
+  --surface-sunken:#EDEBDE;
+  --surface-inverse:#171717;
+  --text-inverse:#F5F3DC;
+  --focus-ring:#171717;
+  --focus-halo:#FAF9F2;
+  --critical:#B3261E;
+  --critical-on:#FFFFFF;
+  --critical-surface:rgba(179,38,30,0.08);
+  --critical-edge:rgba(179,38,30,0.55);
+}
+.row--muted{ box-shadow:none; }
+
+/* ---------- BUTTONS ON INK ----------
+   The three weights are told apart the way they always were, by fill weight and
+   border, never by a hue. Primary carries a cream wash and a full strength
+   edge, secondary is bare ink with a mid edge, ghost keeps its dashed hairline.
+   All three are ink with cream type, which is the whole point of the change. */
+.btn--primary{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface)); border-color:rgba(246,244,221,.85); }
+.btn--secondary{ background:var(--card-surface); border-color:rgba(246,244,221,.42); }
+.btn--ghost{ background:var(--card-surface); border-color:rgba(246,244,221,.34); }
+.btn--danger{ background:color-mix(in srgb, #F2857D 12%, var(--card-surface)); border-color:var(--critical-edge); color:var(--critical); }
+.btn[disabled]{ background:var(--card-surface); color:#7A7869; border-color:rgba(246,244,221,.22); }
+.btn:active{ background:color-mix(in srgb, #F5F3DC 26%, var(--card-surface)); border-color:rgba(246,244,221,.95); }
+.btn--primary:active{ background:color-mix(in srgb, #F5F3DC 34%, var(--card-surface)); }
+.btn--danger:active{ background:color-mix(in srgb, #F2857D 26%, var(--card-surface)); }
+.btn[disabled]:active{ background:var(--card-surface); border-color:rgba(246,244,221,.22); }
+@media (hover:hover) and (pointer:fine){
+  .btn--primary:hover{ background:color-mix(in srgb, #F5F3DC 22%, var(--card-surface)); }
+  .btn--secondary:hover,
+  .btn--ghost:hover{ background:color-mix(in srgb, #F5F3DC 12%, var(--card-surface)); }
+  .btn--danger:hover{ background:color-mix(in srgb, #F2857D 20%, var(--card-surface)); }
+  a.row:hover, button.row:hover,
+  .sumcard:hover{ background:color-mix(in srgb, #F5F3DC 10%, var(--card-surface)); }
+}
+a.row:active, button.row:active,
+.sumcard:active,
+.qact:active,
+.filter:active,
+.datenav__date:active,
+.datenav .iconbtn:active,
+.seg button:active{ background:color-mix(in srgb, #F5F3DC 18%, var(--card-surface)); }
+a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface)); }
+
+/* ---------- CHROME ----------
+   The app bar and the tab bar are ink in both themes now. In the dark theme
+   they drop below the page rather than inverting to cream, because a frame that
+   is lighter than what it frames stops reading as a frame. */
+.appbar,
+.tabbar,
+.drawer__head{
+  background:var(--chrome-surface); color:#F5F3DC; border-color:#3A3A36;
+  /* The chrome is ink in both themes, so the "on inverse" pair has to be
+     pinned rather than left to the theme. Read from the theme it flips to dark
+     type in the dark theme and paints the bell, the avatar, and the account
+     line in near black on near black. */
+  --text-inverse:#F5F3DC;
+  --text-inverse-secondary:#B0AE97;
+  --border-default:#6F6F63;
+}
+.appbar .iconbtn:focus-visible{ box-shadow:0 0 0 5px var(--chrome-surface); }
+.badge{ border-color:var(--chrome-surface); }
+
+/* A pressed segment or filter flips to a cream fill, so the quiet count sitting
+   inside it has to flip with it. Left alone it inherited the ink context's cream
+   type and painted cream on cream. */
+.seg [aria-pressed="true"] .countpill--quiet,
+.filter[aria-pressed="true"] .countpill--quiet{
+  background:rgba(23,23,23,.12); color:#171717; border-color:rgba(23,23,23,.28);
+}
+
+/* The selected day is the one cream fill inside an ink component, so the note
+   under it is the only place that needs the dark secondary rather than the
+   light one every other inverse surface in the console uses. */
+.daybtn[aria-pressed="true"] i{ color:#4A4A42; }
+
+/* The oval behind the current tab is the whole indicator. The brush stroke that
+   used to sit above it was a second one saying the same thing, and two marks
+   for one state is one mark too many. */
+.tabbar a[aria-current="page"]::after{ content:none; }
+.tabbar a[aria-current="page"] .tabpill{ background:#F5F3DC; color:#171717; }

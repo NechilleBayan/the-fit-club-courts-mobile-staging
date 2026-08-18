@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Notifications - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Notifications" data-nav="dashboard" data-back="dashboard.html">
+<div id="shell">
+<main id="main">
+
+  <div class="sechead">
+    <h1 class="screen" tabindex="-1">Notifications</h1>
+  </div>
+  <p class="legal"><span class="countpill">4</span> unread &middot; Everything the club has done or been told since yesterday.</p>
+
+  <!-- ---------- THE FEED, AND WHAT IT IS FOR ----------
+       This is the full record, which is exactly what the dashboard's Alerts
+       block is not. A new booking belongs here and does not belong there,
+       because it is news rather than a problem. An unread item carries the solid
+       bar and a heavier edge; a read one drops to the ordinary row. -->
+  <div class="btn-row" style="margin-top:16px;">
+    <button class="btn btn--sm btn--ghost" type="button" data-stub="Mark all 4 unread notifications as read."><span data-icon="check"></span>Mark All Read</button>
+    <button class="btn btn--sm btn--ghost" type="button" data-stub="Choose which events send a notification."><span data-icon="settings"></span>Preferences</button>
+  </div>
+
+  <div class="filterbar" role="group" aria-label="Filter notifications" data-toggle="single" style="margin-top:12px;">
+    <button class="filter" type="button" aria-pressed="true">All</button>
+    <button class="filter" type="button" aria-pressed="false">Unread <span class="countpill tnum">4</span></button>
+    <button class="filter" type="button" aria-pressed="false">Bookings</button>
+    <button class="filter" type="button" aria-pressed="false">Payments</button>
+    <button class="filter" type="button" aria-pressed="false">Tasks</button>
+    <button class="filter" type="button" aria-pressed="false">Courts</button>
+  </div>
+
+  <section class="section" aria-labelledby="s-today">
+    <h2 class="sec" id="s-today">Today</h2>
+    <div class="rows">
+
+      <a class="row row--two row--bar row--barcrit row--crit" href="payments.html">
+        <span class="row__line">
+          <span data-icon="alert"></span>
+          <span class="row__main">
+            <span class="row__title">Payment overdue</span>
+            <span class="row__sub">Andrea Lim &middot; BK-2291 &middot; PHP 1,200, three days late</span>
+          </span>
+          <span class="badge badge--onpage" style="position:static;" aria-label="Unread"></span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">9:31 AM</span>
+          <span class="st st--crit">Payment</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar row--barcrit row--crit" href="bookings.html">
+        <span class="row__line">
+          <span data-icon="ban"></span>
+          <span class="row__main">
+            <span class="row__title">Booking conflict detected</span>
+            <span class="row__sub">Court 2 &middot; Open Play overlaps a private booking at 4:00 PM</span>
+          </span>
+          <span class="badge badge--onpage" style="position:static;" aria-label="Unread"></span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">9:12 AM</span>
+          <span class="st st--crit">Booking</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar row--barcrit row--crit" href="tasks.html">
+        <span class="row__line">
+          <span data-icon="clock"></span>
+          <span class="row__main">
+            <span class="row__title">Task overdue</span>
+            <span class="row__sub">Restock towels &middot; Joy Mendoza &middot; was due 8:00 AM</span>
+          </span>
+          <span class="badge badge--onpage" style="position:static;" aria-label="Unread"></span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">8:30 AM</span>
+          <span class="st st--crit">Task</span>
+        </span>
+      </a>
+
+      <a class="row row--two row--bar" href="booking-details.html">
+        <span class="row__line">
+          <span data-icon="calendar"></span>
+          <span class="row__main">
+            <span class="row__title">New booking</span>
+            <span class="row__sub">Rico Alvarez &middot; Court 4 &middot; today, 3:30 PM to 5:00 PM</span>
+          </span>
+          <span class="badge badge--onpage" style="position:static;" aria-label="Unread"></span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">8:04 AM</span>
+          <span class="st st--ok">Booking</span>
+        </span>
+      </a>
+
+      <a class="row row--two" href="court-details.html">
+        <span class="row__line">
+          <span data-icon="wrench"></span>
+          <span class="row__main">
+            <span class="row__title">Maintenance scheduled</span>
+            <span class="row__sub">Court 4 &middot; net replacement, 1:00 PM to 3:00 PM</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">7:45 AM</span>
+          <span class="chip chip--quiet">Court</span>
+        </span>
+      </a>
+
+      <a class="row row--two" href="tasks.html">
+        <span class="row__line">
+          <span data-icon="checkc"></span>
+          <span class="row__main">
+            <span class="row__title">Task completed</span>
+            <span class="row__sub">Check court lighting on Courts 1 to 4 &middot; Paolo Reyes</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">7:22 AM</span>
+          <span class="chip chip--quiet">Task</span>
+        </span>
+      </a>
+
+      <a class="row row--two" href="bookings.html">
+        <span class="row__line">
+          <span data-icon="refresh"></span>
+          <span class="row__main">
+            <span class="row__title">Booking cancelled</span>
+            <span class="row__sub">Nathan Cruz &middot; Court 3, 5:00 PM &middot; refunded PHP 900</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">6:58 AM</span>
+          <span class="chip chip--quiet">Booking</span>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-yest">
+    <h2 class="sec" id="s-yest">Yesterday</h2>
+    <div class="rows">
+
+      <a class="row row--two" href="payments.html">
+        <span class="row__line">
+          <span data-icon="card"></span>
+          <span class="row__main">
+            <span class="row__title">Payment failed</span>
+            <span class="row__sub">Dennis Ocampo &middot; BK-2310 &middot; card declined</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">4:11 PM</span>
+          <span class="chip chip--quiet">Payment</span>
+        </span>
+      </a>
+
+      <a class="row row--two" href="booking-details.html">
+        <span class="row__line">
+          <span data-icon="edit"></span>
+          <span class="row__main">
+            <span class="row__title">Booking changed</span>
+            <span class="row__sub">Grace Villanueva moved from 2:00 PM to 3:00 PM</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">1:36 PM</span>
+          <span class="chip chip--quiet">Booking</span>
+        </span>
+      </a>
+
+      <a class="row row--two" href="open-play.html">
+        <span class="row__line">
+          <span data-icon="users"></span>
+          <span class="row__main">
+            <span class="row__title">Open Play session full</span>
+            <span class="row__sub">Beginner Clinic &middot; 8 of 8, waitlist opened</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">11:02 AM</span>
+          <span class="chip chip--quiet">Open Play</span>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample feed. Tapping an item would open the booking, court,
+    payment, or task it refers to.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

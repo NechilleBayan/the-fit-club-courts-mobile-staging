@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Court 4 - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Court 4" data-nav="courts" data-back="courts.html">
+<div id="shell">
+<main id="main">
+
+  <!-- ---------- THE POINT OF THIS SCREEN ----------
+       Managing one court without walking the whole booking calendar. Everything
+       here is scoped to Court 4 and to today, and the actions at the bottom are
+       the four things that change a court's state. -->
+  <p class="eyebrow muted">Outdoor &middot; Court 4</p>
+  <h1 class="screen" tabindex="-1">Court 4</h1>
+
+  <div class="plate plate--work" style="margin-top:14px;">
+    <span class="plate__bar plate__bar--hatched" aria-hidden="true"></span>
+    <span class="plate__head"><span data-icon="wrench"></span>Out Of Service</span>
+    <span class="plate__phrase">Net replacement</span>
+    <span class="plate__meta">Blocked 1:00 PM to 3:00 PM &middot; Assigned to Paolo Reyes</span>
+  </div>
+
+  <section class="section" aria-labelledby="s-state">
+    <h2 class="vh" id="s-state">Current state</h2>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Status</dt><dd><span class="st st--work"><span data-icon="wrench"></span>Maintenance</span></dd></div>
+        <div><dt>Current Booking</dt><dd class="muted">None</dd></div>
+        <div><dt>Next Booking</dt><dd>Rico Alvarez &middot; 3:30 PM</dd></div>
+        <div><dt>Available From</dt><dd class="tnum">3:00 PM</dd></div>
+        <div><dt>Surface</dt><dd>Acrylic &middot; Resurfaced Jan 2026</dd></div>
+        <div><dt>Lighting</dt><dd>Working</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ---------- TODAY ON THIS COURT ----------
+       The whole day in one column, including the gaps. The free periods are
+       drawn as rows too rather than left as whitespace, because "when is this
+       court free" is the question this screen is opened to answer and an empty
+       gap does not answer it. -->
+  <section class="section" aria-labelledby="s-today">
+    <div class="sechead">
+      <h2 class="sec" id="s-today">Today's Schedule</h2>
+      <span class="legal">Sat 15 Aug</span>
+    </div>
+
+    <div class="rows">
+
+      <div class="row row--two row--timed row--bar">
+        <div class="row__line">
+          <span class="row__time"><b>8:00</b><span>9:30 AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Karen Uy</span>
+            <span class="row__sub">Private &middot; 4 players</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Completed</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--timed row--muted">
+        <div class="row__line">
+          <span class="row__time"><b>9:30</b><span>1:00 PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Free</span>
+            <span class="row__sub">3 hours 30 minutes unbooked</span>
+          </span>
+          <button class="btn btn--sm btn--ghost" type="button" style="width:auto; flex:none;" data-stub="Create a booking on Court 4 between 9:30 AM and 1:00 PM."><span data-icon="plus"></span>Book</button>
+        </div>
+      </div>
+
+      <div class="row row--two row--timed row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__time"><b>1:00</b><span>3:00 PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Net replacement</span>
+            <span class="row__sub">Blocked &middot; Paolo Reyes</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--work"><span data-icon="wrench"></span>Maintenance</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--timed row--bar">
+        <div class="row__line">
+          <span class="row__time"><b>3:30</b><span>5:00 PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Rico Alvarez</span>
+            <span class="row__sub">Private &middot; 2 players</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+          <span class="st st--hold"><span data-icon="clock"></span>Confirmed</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--timed row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__time"><b>6:00</b><span>8:00 PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Evening Open Play</span>
+            <span class="row__sub">14 of 16 registered</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Reserved</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ---------- BLOCKED PERIODS ---------- -->
+  <section class="section" aria-labelledby="s-blocks">
+    <h2 class="sec" id="s-blocks">Blocked Periods</h2>
+    <div class="rows">
+      <div class="row row--muted">
+        <span class="row__main">
+          <span class="row__title">Today &middot; 1:00 PM to 3:00 PM</span>
+          <span class="row__sub">Net replacement &middot; Set by Rea Salvador</span>
+        </span>
+        <button class="iconbtn iconbtn--bare" type="button" data-stub="Release this block and return Court 4 to service." aria-label="Release the 1:00 PM block"><span data-icon="close"></span></button>
+      </div>
+      <div class="row row--muted">
+        <span class="row__main">
+          <span class="row__title">Mon 17 Aug &middot; All day</span>
+          <span class="row__sub">Club closed &middot; Weekly rest day</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- MAINTENANCE NOTES ---------- -->
+  <section class="section" aria-labelledby="s-maint">
+    <div class="sechead">
+      <h2 class="sec" id="s-maint">Maintenance Notes</h2>
+      <button class="textbtn" type="button" data-stub="Add a maintenance note to Court 4."><span data-icon="plus"></span>Add</button>
+    </div>
+    <div class="card card--sunken">
+      <div class="timeline">
+        <div class="tl tl--now">
+          <p class="tl__when">13 Aug, 7:40 AM</p>
+          <p class="tl__what">Net tension failed inspection</p>
+          <p class="tl__who">Paolo Reyes &middot; Replacement net ordered same day</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">2 Aug, 6:15 AM</p>
+          <p class="tl__what">Surface swept and lines checked</p>
+          <p class="tl__who">Paolo Reyes &middot; Routine, no issues</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">18 Jan, 9:00 AM</p>
+          <p class="tl__what">Court resurfaced</p>
+          <p class="tl__who">External contractor &middot; 3 year expected life</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- THE FOUR STATE CHANGES ---------- -->
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="sec" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--primary" type="button" data-stub="Mark Court 4 ready, release the block, and reopen it for booking."><span data-icon="checkc"></span>Mark Ready</button>
+      <button class="btn btn--secondary" type="button" data-stub="Create a booking on Court 4."><span data-icon="plus"></span>Create Booking</button>
+      <div class="btn-row">
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Block a period on Court 4, with a reason."><span data-icon="lock"></span>Block Time</button>
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Log maintenance work against Court 4."><span data-icon="wrench"></span>Maintenance</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: One sample court on one sample day.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

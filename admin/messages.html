@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Messages - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Messages" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Messages</h1>
+  <p class="legal"><span class="countpill">2</span> unanswered &middot; Conversations with customers about their bookings.</p>
+
+  <label class="search" style="margin-top:16px;">
+    <span class="vh">Search messages</span>
+    <span data-icon="search"></span>
+    <input type="search" placeholder="Customer name or booking reference" autocomplete="off">
+  </label>
+
+  <div class="filterbar" role="group" aria-label="Filter messages" data-toggle="single" style="margin-top:10px;">
+    <button class="filter" type="button" aria-pressed="true">All</button>
+    <button class="filter" type="button" aria-pressed="false">Unanswered <span class="countpill tnum">2</span></button>
+    <button class="filter" type="button" aria-pressed="false">Today</button>
+  </div>
+
+  <!-- An unanswered thread carries the solid bar and a heavier edge, the same
+       treatment an unread notification gets, so "needs me" looks identical
+       wherever it appears in the console. -->
+  <section class="section" aria-labelledby="s-threads">
+    <h2 class="sec" id="s-threads">Conversations</h2>
+    <div class="rows">
+
+      <button class="row row--two row--bar row--strong" type="button" data-stub="Open the conversation with Andrea Lim.">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">AL</span>
+          <span class="row__main">
+            <span class="row__title">Andrea Lim</span>
+            <span class="row__sub">Can I pay when I arrive? I could not get the app to take my card.</span>
+          </span>
+          <span class="badge badge--onpage" style="position:static;" aria-label="Unanswered"></span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">9:22 AM</span>
+          <span class="st st--crit"><span data-icon="alert"></span>Unanswered</span>
+          <span class="chip chip--quiet">BK-2291</span>
+        </span>
+      </button>
+
+      <button class="row row--two row--bar row--strong" type="button" data-stub="Open the conversation with Dennis Ocampo.">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">DO</span>
+          <span class="row__main">
+            <span class="row__title">Dennis Ocampo</span>
+            <span class="row__sub">Sorry I missed yesterday. Can I move it to Sunday morning?</span>
+          </span>
+          <span class="badge badge--onpage" style="position:static;" aria-label="Unanswered"></span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">8:05 AM</span>
+          <span class="st st--crit"><span data-icon="alert"></span>Unanswered</span>
+          <span class="chip chip--quiet">BK-2310</span>
+        </span>
+      </button>
+
+      <button class="row row--two" type="button" data-stub="Open the conversation with Grace Villanueva.">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">GV</span>
+          <span class="row__main">
+            <span class="row__title">Grace Villanueva</span>
+            <span class="row__sub">You: Moved you to 3:00 PM, Court 2. See you then.</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">Yesterday</span>
+          <span class="chip chip--quiet">Answered by Joy M.</span>
+        </span>
+      </button>
+
+      <button class="row row--two" type="button" data-stub="Open the conversation with Karen Uy.">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">KU</span>
+          <span class="row__main">
+            <span class="row__title">Karen Uy</span>
+            <span class="row__sub">You: The clinic is full but you are third on the waitlist.</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">13 Aug</span>
+          <span class="chip chip--quiet">Answered by Rea S.</span>
+        </span>
+      </button>
+
+      <button class="row row--two" type="button" data-stub="Open the conversation with Rico Alvarez.">
+        <span class="row__line">
+          <span class="avatar avatar--lg" aria-hidden="true">RA</span>
+          <span class="row__main">
+            <span class="row__title">Rico Alvarez</span>
+            <span class="row__sub">You: Court 4 is back in service from 3:00 PM today.</span>
+          </span>
+        </span>
+        <span class="row__tags">
+          <span class="chip chip--quiet tnum">13 Aug</span>
+          <span class="chip chip--quiet">Answered by Rea S.</span>
+        </span>
+      </button>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="vh" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--primary" type="button" data-stub="Start a new message to a customer."><span data-icon="plus"></span>New Message</button>
+      <button class="btn btn--sm btn--ghost" type="button" data-stub="Send an announcement to everyone booked today."><span data-icon="mail"></span>Announce to Today's Players</button>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample conversations. Nothing is sent.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

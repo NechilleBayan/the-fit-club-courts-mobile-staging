@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Joy Mendoza - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Staff Member" data-nav="staff" data-back="staff.html">
+<div id="shell">
+<main id="main">
+
+  <div class="row__line" style="gap:14px;">
+    <span class="avatar avatar--lg" aria-hidden="true" style="width:56px; height:56px; font-size:19px;">JM</span>
+    <span class="row__main">
+      <h1 class="screen" tabindex="-1" style="font-size:var(--fs-h2); line-height:var(--lh-h2);">Joy Mendoza</h1>
+      <span class="legal">Front Desk &middot; On duty until 2:00 PM</span>
+    </span>
+  </div>
+
+  <div class="btn-row" style="margin-top:16px;">
+    <a class="btn btn--sm btn--secondary" href="tel:+639175550101"><span data-icon="phone"></span>Call</a>
+    <button class="btn btn--sm btn--secondary" type="button" data-stub="Message Joy Mendoza."><span data-icon="message"></span>Message</button>
+  </div>
+
+  <!-- Workload before anything else, because the reason a manager opens a staff
+       member is almost always to decide whether to give them one more job. -->
+  <div class="card card--strong" style="margin-top:16px;">
+    <div class="meter">
+      <div class="meter__top">
+        <span>Workload today</span>
+        <b class="tnum">Heavy</b>
+      </div>
+      <div class="meter__track" role="img" aria-label="Workload today, heavy">
+        <div class="meter__fill meter__fill--crit" style="width:85%;"></div>
+      </div>
+    </div>
+    <p class="legal" style="margin-top:10px;">
+      3 open tasks, <span class="countpill">1</span> of them overdue. Consider giving
+      the next job to Mika Dizon, who has none.
+    </p>
+  </div>
+
+  <section class="section" aria-labelledby="s-det">
+    <h2 class="sec" id="s-det">Details</h2>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Role</dt><dd>Front Desk</dd></div>
+        <div><dt>Status</dt><dd><span class="st st--live"><span data-icon="checkc"></span>On Duty</span></dd></div>
+        <div><dt>Shift today</dt><dd class="tnum">6:00 AM to 2:00 PM</dd></div>
+        <div><dt>Phone</dt><dd class="tnum">+63 917 555 0101</dd></div>
+        <div><dt>Email</dt><dd>joy.m@thefitclubcourts.ph</dd></div>
+        <div><dt>Started</dt><dd>June 2024</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-tasks">
+    <div class="sechead">
+      <h2 class="sec" id="s-tasks">Tasks</h2>
+      <a class="textbtn" href="tasks.html">All Tasks <span data-icon="arrowR"></span></a>
+    </div>
+    <div class="rows">
+      <div class="row row--two row--bar row--barcrit row--crit">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Restock towels</span>
+            <span class="row__sub">Front desk &middot; was due 8:00 AM</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Overdue</span>
+          <span class="st st--prio">High</span>
+        </div>
+      </div>
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Count and log ball inventory</span>
+            <span class="row__sub">Due 1:00 PM</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Low</span>
+        </div>
+      </div>
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Print weekly rate card for the desk</span>
+            <span class="row__sub">Due tomorrow</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Low</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-sched">
+    <h2 class="sec" id="s-sched">This Week</h2>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Sat 15 Aug</dt><dd class="tnum">6:00 AM to 2:00 PM</dd></div>
+        <div><dt>Sun 16 Aug</dt><dd class="tnum">6:00 AM to 2:00 PM</dd></div>
+        <div><dt>Mon 17 Aug</dt><dd class="muted">Club closed</dd></div>
+        <div><dt>Tue 18 Aug</dt><dd class="muted">Rest day</dd></div>
+        <div><dt>Wed 19 Aug</dt><dd class="tnum">2:00 PM to 10:00 PM</dd></div>
+        <div><dt>Thu 20 Aug</dt><dd class="tnum">2:00 PM to 10:00 PM</dd></div>
+        <div><dt>Fri 21 Aug</dt><dd class="tnum">6:00 AM to 2:00 PM</dd></div>
+      </dl>
+      <p class="legal" style="margin-top:12px;">38 hours scheduled this week.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-avail">
+    <h2 class="sec" id="s-avail">Availability</h2>
+    <div class="card card--sunken">
+      <p class="lede">Marked unavailable on Tuesday mornings from September. Happy to
+      cover evening shifts at short notice.</p>
+      <p class="legal" style="margin-top:8px;">Set by Joy Mendoza &middot; 4 Aug</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="sec" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <a class="btn btn--primary" href="tasks.html#assign"><span data-icon="plus"></span>Assign a Task</a>
+      <div class="btn-row">
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Edit Joy Mendoza's shift for today."><span data-icon="calendar"></span>Edit Shift</button>
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Mark Joy Mendoza off duty and reassign her open tasks."><span data-icon="logout"></span>End Shift</button>
+      </div>
+      <a class="btn btn--sm btn--ghost" href="staff-manage.html"><span data-icon="key"></span>Role and Permissions</a>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: One sample staff member.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Andrea Lim - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Player" data-nav="more" data-back="players.html">
+<div id="shell">
+<main id="main">
+
+  <div class="row__line" style="gap:14px;">
+    <span class="avatar avatar--lg" aria-hidden="true" style="width:56px; height:56px; font-size:19px;">AL</span>
+    <span class="row__main">
+      <h1 class="screen" tabindex="-1" style="font-size:var(--fs-h2); line-height:var(--lh-h2);">Andrea Lim</h1>
+      <span class="legal">Member since March 2024 &middot; 23 bookings</span>
+    </span>
+  </div>
+
+  <div class="btn-row" style="margin-top:16px;">
+    <a class="btn btn--sm btn--secondary" href="tel:+639171234567"><span data-icon="phone"></span>Call</a>
+    <button class="btn btn--sm btn--secondary" type="button" data-stub="Message Andrea Lim."><span data-icon="message"></span>Message</button>
+  </div>
+
+  <!-- The one thing wrong with this record, stated before the record itself. -->
+  <a class="plate plate--crit" href="payments.html" style="margin-top:16px;">
+    <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>
+    <span class="plate__head"><span data-icon="alert"></span>Payment Issue</span>
+    <span class="plate__phrase">PHP 1,200 overdue</span>
+    <span class="plate__meta">BK-2291 &middot; Due 12 August &middot; Booking is today at 11:00 AM</span>
+  </a>
+
+  <section class="section" aria-labelledby="s-contact">
+    <h2 class="sec" id="s-contact">Contact</h2>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Phone</dt><dd class="tnum">+63 917 123 4567</dd></div>
+        <div><dt>Email</dt><dd>andrea.lim@example.com</dd></div>
+        <div><dt>Preferred</dt><dd>Messages, not calls</dd></div>
+        <div><dt>Joined</dt><dd>14 March 2024</dd></div>
+        <div><dt>Type</dt><dd>Member</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-up">
+    <h2 class="sec" id="s-up">Upcoming Bookings</h2>
+    <div class="rows">
+      <a class="row row--two row--timed row--bar row--barcrit row--crit" href="booking-details.html">
+        <span class="row__line">
+          <span class="row__time"><b>11:00</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Today &middot; Court 3</span>
+            <span class="row__sub">Private &middot; 2 players &middot; BK-2291</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Overdue</span>
+        </span>
+      </a>
+      <a class="row row--two row--timed row--bar" href="booking-details.html">
+        <span class="row__line">
+          <span class="row__time"><b>9:00</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Sun 23 Aug &middot; Court 1</span>
+            <span class="row__sub">Private &middot; 4 players &middot; BK-2340</span>
+          </span>
+          <span data-icon="chevR" data-icon-class="row__chev"></span>
+        </span>
+        <span class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-recent">
+    <h2 class="sec" id="s-recent">Recent Bookings</h2>
+    <div class="rows">
+      <a class="row" href="booking-details.html">
+        <span class="row__main">
+          <span class="row__title">8 Aug &middot; Court 2</span>
+          <span class="row__sub">Private &middot; PHP 1,200 &middot; Paid</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+      <a class="row" href="booking-details.html">
+        <span class="row__main">
+          <span class="row__title">1 Aug &middot; Open Play</span>
+          <span class="row__sub">Morning Social &middot; PHP 350 &middot; Paid</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+      <a class="row row--muted" href="booking-details.html">
+        <span class="row__main">
+          <span class="row__title">26 Jul &middot; Court 3</span>
+          <span class="row__sub">Cancelled by customer &middot; Refunded</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-notes">
+    <div class="sechead">
+      <h2 class="sec" id="s-notes">Notes</h2>
+      <button class="textbtn" type="button" data-stub="Add a note to this customer record."><span data-icon="plus"></span>Add</button>
+    </div>
+    <div class="card card--sunken">
+      <p class="lede">Prefers the court nearest the entrance. Usually books with a
+      guest, so check whether the guest fee has been collected.</p>
+      <p class="legal" style="margin-top:8px;">Added by Joy M. &middot; 12 Aug</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="sec" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--secondary" type="button" data-stub="Start a new booking with Andrea Lim as the customer."><span data-icon="plus"></span>New Booking</button>
+      <div class="btn-row">
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Edit this customer record."><span data-icon="edit"></span>Edit</button>
+        <a class="btn btn--sm btn--ghost" href="payments.html"><span data-icon="card"></span>Payments</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: One sample customer record.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

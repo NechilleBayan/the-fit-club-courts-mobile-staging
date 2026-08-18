@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>More - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="More" data-nav="more">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">More</h1>
+  <p class="legal">Operational tools that do not need a permanent slot in the bottom bar.</p>
+
+  <!-- ---------- WHY THIS PAGE EXISTS ----------
+       The bottom bar is capped at five, and these eight are all real daily
+       tools: they are used often enough to belong in the operational half of the
+       app rather than behind the menu, but not often enough to displace
+       Dashboard, Bookings, Courts, or Staff. The menu behind the hamburger is a
+       different thing again: that is where the club's settings live, not its
+       shift work. -->
+  <section class="section" aria-labelledby="s-daily">
+    <h2 class="sec" id="s-daily">Daily Tools</h2>
+    <div class="rows">
+
+      <a class="row" href="check-in.html">
+        <span data-icon="checkc"></span>
+        <span class="row__main">
+          <span class="row__title">Check-in</span>
+          <span class="row__sub">Arrivals for today, court by court</span>
+        </span>
+        <span class="countpill">6</span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="open-play.html">
+        <span data-icon="play"></span>
+        <span class="row__main">
+          <span class="row__title">Open Play</span>
+          <span class="row__sub">Sessions, rosters, and capacity</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="payments.html">
+        <span data-icon="card"></span>
+        <span class="row__main">
+          <span class="row__title">Payments</span>
+          <span class="row__sub">Balances, refunds, and receipts</span>
+        </span>
+        <span class="countpill">4</span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="maintenance.html">
+        <span data-icon="wrench"></span>
+        <span class="row__main">
+          <span class="row__title">Maintenance</span>
+          <span class="row__sub">Court work, logs, and inspections</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="closures.html">
+        <span data-icon="lock"></span>
+        <span class="row__main">
+          <span class="row__title">Blocked Dates and Closures</span>
+          <span class="row__sub">Rest days, holidays, and full day blocks</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="messages.html">
+        <span data-icon="message"></span>
+        <span class="row__main">
+          <span class="row__title">Messages</span>
+          <span class="row__sub">Conversations with customers</span>
+        </span>
+        <span class="countpill">2</span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="reports.html">
+        <span data-icon="chart"></span>
+        <span class="row__main">
+          <span class="row__title">Reports</span>
+          <span class="row__sub">Bookings, revenue, and utilization</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+      <a class="row" href="activity.html">
+        <span data-icon="activity"></span>
+        <span class="row__main">
+          <span class="row__title">Activity Log</span>
+          <span class="row__sub">Who changed what, and when</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-else">
+    <h2 class="sec" id="s-else">Elsewhere</h2>
+    <div class="card card--sunken">
+      <p class="lede">Club settings, staff accounts, rates, and operating hours live
+      in the menu behind the hamburger, top left on any main screen.</p>
+      <a class="textbtn" href="settings.html" style="margin-top:8px;">Open Settings <span data-icon="arrowR"></span></a>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Counts on this page are sample data.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

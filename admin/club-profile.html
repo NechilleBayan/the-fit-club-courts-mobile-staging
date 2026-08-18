@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Club Profile - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Club Profile" data-nav="dashboard" data-back="dashboard.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Club Profile</h1>
+  <p class="legal">What customers see about the club in the booking app.</p>
+
+  <section class="section" aria-labelledby="s-club">
+    <div class="sechead">
+      <h2 class="sec" id="s-club">Details</h2>
+      <button class="textbtn" type="button" data-stub="Edit the club details shown to customers."><span data-icon="edit"></span>Edit</button>
+    </div>
+    <div class="card">
+      <dl class="deflist deflist--block">
+        <div><dt>Club name</dt><dd>The Fit Club Courts</dd></div>
+        <div><dt>Address</dt><dd>Unit 4, Brixton Street, Kapitolyo, Pasig City 1603</dd></div>
+        <div><dt>Phone</dt><dd class="tnum">+63 2 8555 0140</dd></div>
+        <div><dt>Email</dt><dd>hello@thefitclubcourts.ph</dd></div>
+        <div><dt>Courts</dt><dd>4 outdoor courts, floodlit</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-about">
+    <div class="sechead">
+      <h2 class="sec" id="s-about">Description</h2>
+      <button class="textbtn" type="button" data-stub="Edit the club description."><span data-icon="edit"></span>Edit</button>
+    </div>
+    <div class="card card--sunken">
+      <p class="lede">Four floodlit pickleball courts in Kapitolyo. Open play every
+      morning and evening, coaching by appointment, and paddles to borrow at the
+      desk for anyone trying the sport for the first time.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-facil">
+    <h2 class="sec" id="s-facil">Facilities</h2>
+    <div class="card">
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Paddle hire</b><span>PHP 100 per session</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Paddle hire"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Showers</b><span>Two, in the clubhouse</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Showers"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Parking</b><span>Six spaces, first come</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Parking"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Pro shop</b><span>Not open yet</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="false" aria-label="Pro shop"></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-links">
+    <h2 class="sec" id="s-links">Related</h2>
+    <div class="rows">
+      <a class="row" href="hours.html">
+        <span data-icon="hours"></span>
+        <span class="row__main">
+          <span class="row__title">Operating Hours</span>
+          <span class="row__sub">6:00 AM to 10:00 PM &middot; closed Mondays</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+      <a class="row" href="rates.html">
+        <span data-icon="tag"></span>
+        <span class="row__main">
+          <span class="row__title">Rates and Promotions</span>
+          <span class="row__sub">Court, open play, and coaching pricing</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+      <a class="row" href="staff-manage.html">
+        <span data-icon="key"></span>
+        <span class="row__main">
+          <span class="row__title">Staff Management</span>
+          <span class="row__sub">8 accounts &middot; 1 pending invite</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample club record. The address and contact details are
+    fictional.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

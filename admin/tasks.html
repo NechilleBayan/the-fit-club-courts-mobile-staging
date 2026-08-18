@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tasks - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Tasks" data-nav="staff" data-back="staff.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Tasks</h1>
+  <p class="legal">Delegated work and its state. <span class="countpill">5</span> pending across 3 staff members.</p>
+
+  <!-- ---------- ASSIGN ----------
+       The form is on the same screen as the queue rather than behind a plus
+       button, because delegating is the reason this page is opened and a
+       manager assigning three jobs in a row should not have to reopen a sheet
+       three times. It is a <details> so it folds away once the queue is what is
+       being read. -->
+  <details class="card" id="assign" style="margin-top:16px;" open>
+    <summary style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; list-style:none;">
+      <span class="sec" style="font-size:var(--fs-h3); font-weight:700;">Assign a Task</span>
+      <span data-icon="chevD"></span>
+    </summary>
+
+    <div class="stack-sm" style="margin-top:16px;">
+      <div class="field">
+        <label for="t-title">Task title</label>
+        <input id="t-title" type="text" placeholder="Restock towels at front desk">
+      </div>
+
+      <div class="field">
+        <label for="t-notes">Description or notes</label>
+        <textarea id="t-notes" placeholder="What needs doing, and anything the person should know before they start."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="t-who">Assign to</label>
+        <select id="t-who">
+          <option>Joy Mendoza &middot; Front Desk &middot; 3 tasks</option>
+          <option>Paolo Reyes &middot; Maintenance &middot; 2 tasks</option>
+          <option>Carlo Santos &middot; Coach &middot; 1 task</option>
+          <option>Mika Dizon &middot; Front Desk &middot; no tasks</option>
+          <option>Bea Lorenzo &middot; Front Desk &middot; 1 task</option>
+        </select>
+        <small>Current workload is shown beside each name.</small>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="t-date">Due date</label>
+          <input id="t-date" type="date" value="2026-08-15">
+        </div>
+        <div class="field">
+          <label for="t-time">Due time</label>
+          <input id="t-time" type="time" value="14:00">
+        </div>
+      </div>
+
+      <!-- Priority is a real radio group, so it is a single choice for the
+           keyboard and for assistive technology rather than three buttons that
+           happen to look exclusive. -->
+      <fieldset class="field" style="border:0; padding:0; margin:0;">
+        <legend style="font-size:var(--fs-legal); font-weight:700; padding:0 0 5px;">Priority</legend>
+        <div class="pick">
+          <label><input type="radio" name="prio" value="low"><span>Low</span></label>
+          <label><input type="radio" name="prio" value="med" checked><span>Medium</span></label>
+          <label><input type="radio" name="prio" value="high"><span>High</span></label>
+        </div>
+      </fieldset>
+
+      <button class="btn btn--primary" type="button" data-stub="Assign the task and notify the staff member."><span data-icon="plus"></span>Assign Task</button>
+    </div>
+  </details>
+
+  <!-- ---------- THE QUEUE ----------
+       Four states and each is drawn as well as named. Overdue is the only one
+       that takes the red, because it is the only one that is a problem rather
+       than a stage. -->
+  <div class="seg" role="group" aria-label="Filter by status" data-toggle="single" style="margin-top:20px;">
+    <button type="button" aria-pressed="true">All <span class="countpill countpill--quiet tnum">16</span></button>
+    <button type="button" aria-pressed="false">Pending <span class="countpill tnum">5</span></button>
+    <button type="button" aria-pressed="false">Active <span class="countpill countpill--quiet tnum">2</span></button>
+    <button type="button" aria-pressed="false">Done <span class="countpill countpill--quiet tnum">9</span></button>
+  </div>
+
+  <section class="section" aria-labelledby="s-queue">
+    <h2 class="sec" id="s-queue">Task Queue</h2>
+
+    <div class="rows">
+
+      <!-- OVERDUE -->
+      <div class="row row--two row--bar row--barcrit row--crit">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Restock towels</span>
+            <span class="row__sub">Joy Mendoza &middot; Front desk</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Restock towels"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Overdue</span>
+          <span class="st st--prio">High</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Was due 8:00 AM</span>
+        </div>
+      </div>
+
+      <!-- IN PROGRESS -->
+      <div class="row row--two row--bar">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Fit replacement net on Court 4</span>
+            <span class="row__sub">Paolo Reyes &middot; Maintenance</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Fit replacement net on Court 4"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>In Progress</span>
+          <span class="st st--prio">High</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Due 3:00 PM</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Chase overdue payment, BK-2291</span>
+            <span class="row__sub">Rea Salvador &middot; Club Manager</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Chase overdue payment"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>In Progress</span>
+          <span class="st st--prio">High</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Due 11:00 AM</span>
+        </div>
+      </div>
+
+      <!-- PENDING -->
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Set up nets for Evening Open Play</span>
+            <span class="row__sub">Paolo Reyes &middot; Maintenance</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Set up nets for Evening Open Play"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Medium</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Due 5:30 PM</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Confirm Sunday coaching slots</span>
+            <span class="row__sub">Carlo Santos &middot; Coach</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Confirm Sunday coaching slots"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Medium</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Due 6:00 PM</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Count and log ball inventory</span>
+            <span class="row__sub">Joy Mendoza &middot; Front desk</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Count and log ball inventory"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Low</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Due 1:00 PM</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Wipe down seating area</span>
+            <span class="row__sub">Bea Lorenzo &middot; Front desk</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Wipe down seating area"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Low</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Due 8:00 PM</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barhatch">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Print weekly rate card for the desk</span>
+            <span class="row__sub">Joy Mendoza &middot; Front desk</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Print weekly rate card"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
+          <span class="chip chip--quiet">Low</span>
+          <span class="chip chip--quiet"><span data-icon="clock"></span>Due tomorrow</span>
+        </div>
+      </div>
+
+      <!-- COMPLETED. Muted rather than removed, because "did that get done" is a
+           question a manager asks at the end of a shift. -->
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Open club and unlock courts</span>
+            <span class="row__sub">Joy Mendoza &middot; Completed 6:04 AM</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Completed</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Check court lighting on Courts 1 to 4</span>
+            <span class="row__sub">Paolo Reyes &middot; Completed 7:22 AM</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Completed</span>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="legal" style="text-align:center; padding-top:8px;">7 more completed today</p>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample task queue. The form paints and validates but does not
+    save anything.</span>
+  </p>
+
+</main>
+
+<dialog class="sheet" id="tacts" aria-label="Task actions">
+  <div class="sheet__panel">
+    <div class="sheet__head">
+      <h2>Task Actions</h2>
+      <button class="sheet__close" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="sheet__body">
+      <div class="actlist">
+        <button type="button" data-stub="Mark this task complete and stamp who closed it."><span data-icon="checkc"></span>Mark Complete</button>
+        <button type="button" data-stub="Open this task in edit mode."><span data-icon="edit"></span>Edit Task</button>
+        <button type="button" data-stub="Hand this task to a different staff member."><span data-icon="users"></span>Reassign</button>
+        <button type="button" data-stub="Change the priority between Low, Medium, and High."><span data-icon="flag"></span>Change Priority</button>
+        <button type="button" class="is-danger" data-stub="Delete this task. It will not appear in the activity log as completed."><span data-icon="trash"></span>Delete Task</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

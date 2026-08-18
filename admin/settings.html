@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Settings - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Settings" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Settings</h1>
+
+  <section class="section" aria-labelledby="s-notif">
+    <h2 class="sec" id="s-notif">Notifications</h2>
+    <div class="card">
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>New bookings</b><span>Every booking made from the app</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Notify on new bookings"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Cancellations</b><span>Including customer cancellations</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Notify on cancellations"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Payment alerts</b><span>Failed, overdue, and refunded</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Notify on payment alerts"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Task updates</b><span>When staff complete or miss a task</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Notify on task updates"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Maintenance alerts</b><span>Court status changes</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="false" aria-label="Notify on maintenance alerts"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Daily summary</b><span>Sent at 9:00 PM each night</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Daily summary"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- APPEARANCE ----------
+       Three states, not two. System is the default and has to stay reachable,
+       because a console that cannot be put back on the operating system's
+       setting is one the reader has permanently taken over. -->
+  <section class="section" aria-labelledby="s-look">
+    <h2 class="sec" id="s-look">Appearance</h2>
+    <div class="card">
+      <p class="legal" style="margin-bottom:8px;">Theme</p>
+      <div class="pick">
+        <label><input type="radio" name="theme" value="system" checked><span>System</span></label>
+        <label><input type="radio" name="theme" value="light"><span>Light</span></label>
+        <label><input type="radio" name="theme" value="dark"><span>Dark</span></label>
+      </div>
+      <p class="legal" style="margin-top:10px;">The console follows the phone's setting
+      unless you choose one here.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-book">
+    <h2 class="sec" id="s-book">Booking Defaults</h2>
+    <div class="card">
+      <div class="stack-sm">
+        <div class="field">
+          <label for="s-dur">Default booking length</label>
+          <select id="s-dur">
+            <option>60 minutes</option>
+            <option selected>90 minutes</option>
+            <option>120 minutes</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="s-cur">Currency</label>
+          <select id="s-cur">
+            <option selected>Philippine peso, PHP</option>
+            <option>US dollar, USD</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="s-tz">Time zone</label>
+          <select id="s-tz">
+            <option selected>Asia / Manila, GMT+8</option>
+            <option>Asia / Singapore, GMT+8</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-acct">
+    <h2 class="sec" id="s-acct">Account</h2>
+    <div class="rows">
+      <a class="row" href="staff-details.html">
+        <span class="avatar avatar--lg" aria-hidden="true">RS</span>
+        <span class="row__main">
+          <span class="row__title">Rea Salvador</span>
+          <span class="row__sub">Club Manager &middot; Admin access</span>
+        </span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+      <button class="row" type="button" data-stub="Change your password.">
+        <span data-icon="key"></span>
+        <span class="row__main"><span class="row__title">Change Password</span></span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </button>
+      <a class="row" href="help.html">
+        <span data-icon="help"></span>
+        <span class="row__main"><span class="row__title">Help and Support</span></span>
+        <span data-icon="chevR" data-icon-class="row__chev"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-out">
+    <h2 class="vh" id="s-out">Session</h2>
+    <a class="btn btn--sm btn--danger" href="#logout"><span data-icon="logout"></span>Log Out</a>
+    <p class="legal" style="text-align:center;">Version 0.4 &middot; Sandbox build</p>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Switches and pickers paint their state but nothing is
+    saved.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+<script>
+/* The theme picker is the one control in the sandbox that does something real,
+   because seeing both themes is half the point of a design prototype. It writes
+   data-theme on the root, which is what the token blocks in admin.css switch on;
+   removing the attribute hands the decision back to the operating system. */
+document.addEventListener("change", function(e){
+  if (!e.target.matches('input[name="theme"]')) return;
+  var v = e.target.value;
+  if (v === "system") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", v);
+});
+</script>
+</body>
+</html>

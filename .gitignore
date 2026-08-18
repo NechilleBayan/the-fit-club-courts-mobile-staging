@@ -9,3 +9,8 @@ desktop.ini
 # working directory; they are simply never part of a commit.
 claude-version-index.html
 CLAUDE-APP-PLAN.md
+
+# Visual regression baselines. Regenerated on demand by the screenshot runner and
+# diffed locally; a hundred-odd PNGs in the history would bury the diffs this
+# branch actually needs to be readable.
+.baseline/

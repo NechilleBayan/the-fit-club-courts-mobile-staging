@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Closures - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Closures" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Blocked Dates and Closures</h1>
+  <p class="legal">Days and periods the club is not taking bookings.</p>
+
+  <!-- ---------- WHAT CLOSING ACTUALLY DOES ----------
+       Stated once here rather than assumed, because the difference between a
+       full day closure and a court block is the difference between turning
+       eighty people away and turning four away. -->
+  <div class="card card--sunken" style="margin-top:16px;">
+    <p class="lede">A closure removes every court from booking for the period and
+    hides those slots from the customer app. Existing bookings are not cancelled
+    automatically: you will be shown what is affected first.</p>
+  </div>
+
+  <section class="section" aria-labelledby="s-recur">
+    <h2 class="sec" id="s-recur">Recurring</h2>
+    <div class="rows">
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Every Monday</span>
+            <span class="row__sub">Weekly rest day &middot; all courts, all day</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the weekly Monday closure." aria-label="Edit weekly Monday closure"><span data-icon="edit"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="ban"></span>Closed</span>
+          <span class="chip chip--quiet">Since Jan 2024</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-up">
+    <h2 class="sec" id="s-up">Upcoming</h2>
+    <div class="rows">
+
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Mon 17 Aug &middot; All day</span>
+            <span class="row__sub">Weekly rest day &middot; monthly surface sweep booked in</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the 17 August closure." aria-label="Edit 17 August closure"><span data-icon="edit"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="ban"></span>Closed</span>
+          <span class="chip chip--quiet">No bookings affected</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--muted">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Mon 31 Aug &middot; All day</span>
+            <span class="row__sub">National Heroes Day &middot; public holiday</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the 31 August closure." aria-label="Edit 31 August closure"><span data-icon="edit"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="ban"></span>Closed</span>
+          <span class="chip chip--quiet">No bookings affected</span>
+        </div>
+      </div>
+
+      <div class="row row--two row--bar row--barcrit row--crit">
+        <div class="row__line">
+          <span class="row__main">
+            <span class="row__title">Sat 12 Sep &middot; 6:00 AM to 1:00 PM</span>
+            <span class="row__sub">Club tournament &middot; courts closed to the public</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the 12 September closure." aria-label="Edit 12 September closure"><span data-icon="edit"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>9 Bookings Affected</span>
+        </div>
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Review the 9 bookings that fall inside the 12 September closure and decide whether to move or refund them."><span data-icon="list"></span>Review Affected Bookings</button>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-past">
+    <h2 class="sec" id="s-past">Past</h2>
+    <div class="rows">
+      <div class="row row--muted">
+        <span class="row__main">
+          <span class="row__title">Wed 6 Aug &middot; 2:00 PM to close</span>
+          <span class="row__sub">Typhoon signal 2 &middot; 11 bookings refunded</span>
+        </span>
+      </div>
+      <div class="row row--muted">
+        <span class="row__main">
+          <span class="row__title">Mon 10 Aug &middot; All day</span>
+          <span class="row__sub">Weekly rest day</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="vh" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--primary" type="button" data-stub="Add a closure: Date or range, whole club or selected courts, and a reason."><span data-icon="plus"></span>Add Closure</button>
+      <a class="btn btn--sm btn--ghost" href="hours.html"><span data-icon="hours"></span>Operating Hours</a>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample closures.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

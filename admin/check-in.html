@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Check-in - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Check-in" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Check-in</h1>
+  <p class="legal">Arrivals for today. <span class="countpill">6</span> still to check in.</p>
+
+  <!-- ---------- BUILT FOR THE DESK ----------
+       This screen is used standing up with somebody waiting, so the check in
+       button is on the row itself rather than behind a details page. Search is
+       at the top because the customer says their name before anything else. -->
+  <label class="search" style="margin-top:16px;">
+    <span class="vh">Search arrivals</span>
+    <span data-icon="search"></span>
+    <input type="search" placeholder="Name or booking reference" autocomplete="off">
+  </label>
+
+  <div class="seg" role="group" aria-label="Arrival status" data-toggle="single" style="margin-top:12px;">
+    <button type="button" aria-pressed="true">Due <span class="countpill tnum">6</span></button>
+    <button type="button" aria-pressed="false">Checked In <span class="countpill countpill--quiet tnum">5</span></button>
+    <button type="button" aria-pressed="false">No Show <span class="countpill countpill--quiet tnum">1</span></button>
+  </div>
+
+  <section class="section" aria-labelledby="s-now">
+    <h2 class="sec" id="s-now">Next Up</h2>
+    <div class="rows">
+
+      <div class="row row--two row--timed row--bar row--barcrit row--crit">
+        <div class="row__line">
+          <span class="row__time"><b>11:00</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Andrea Lim</span>
+            <span class="row__sub">Court 3 &middot; 2 players &middot; BK-2291</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Collect PHP 1,200</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--sm btn--primary" type="button" data-stub="Take PHP 1,200 from Andrea Lim, then check her in."><span data-icon="card"></span>Take Payment</button>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Check Andrea Lim in without collecting payment. The balance stays outstanding."><span data-icon="checkc"></span>Check In</button>
+        </div>
+      </div>
+
+      <div class="row row--two row--timed row--bar">
+        <div class="row__line">
+          <span class="row__time"><b>12:00</b><span>PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Jomar Bautista</span>
+            <span class="row__sub">Court 1 &middot; 4 players &middot; BK-2318</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Pay at desk</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--sm btn--primary" type="button" data-stub="Take PHP 1,050 from Jomar Bautista, then check the party in."><span data-icon="card"></span>Take Payment</button>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Check Jomar Bautista in without collecting payment."><span data-icon="checkc"></span>Check In</button>
+        </div>
+      </div>
+
+      <div class="row row--two row--timed row--bar">
+        <div class="row__line">
+          <span class="row__time"><b>1:00</b><span>PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Beginner Clinic</span>
+            <span class="row__sub">Court 1 &middot; 8 players &middot; Carlo Santos</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>All paid</span>
+          <span class="chip chip--quiet">0 of 8 arrived</span>
+        </div>
+        <button class="btn btn--sm btn--primary" type="button" data-stub="Open the Beginner Clinic roster and tick players off as they arrive."><span data-icon="users"></span>Check In Roster</button>
+      </div>
+
+      <div class="row row--two row--timed row--bar">
+        <div class="row__line">
+          <span class="row__time"><b>3:00</b><span>PM</span></span>
+          <span class="row__main">
+            <span class="row__title">Grace Villanueva</span>
+            <span class="row__sub">Court 2 &middot; Coaching &middot; BK-2301</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+        </div>
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Check Grace Villanueva in and start the Court 2 clock."><span data-icon="checkc"></span>Check In</button>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-done">
+    <h2 class="sec" id="s-done">Already In</h2>
+    <div class="rows">
+      <div class="row row--two row--timed row--muted">
+        <div class="row__line">
+          <span class="row__time"><b>9:00</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Miguel Tan</span>
+            <span class="row__sub">Court 1 &middot; checked in 8:54 AM</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Undo the check-in for Miguel Tan." aria-label="Undo check-in for Miguel Tan"><span data-icon="refresh"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>On Court</span>
+        </div>
+      </div>
+      <div class="row row--two row--timed row--muted">
+        <div class="row__line">
+          <span class="row__time"><b>10:30</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Morning Social</span>
+            <span class="row__sub">Court 2 &middot; 9 of 11 arrived</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Open the Morning Social roster." aria-label="Open Morning Social roster"><span data-icon="users"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--live"><span data-icon="play"></span>In Session</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-noshow">
+    <h2 class="sec" id="s-noshow">No Show</h2>
+    <div class="rows">
+      <div class="row row--two row--timed row--muted">
+        <div class="row__line">
+          <span class="row__time"><b>7:30</b><span>AM</span></span>
+          <span class="row__main">
+            <span class="row__title">Dennis Ocampo</span>
+            <span class="row__sub">Court 2 &middot; 30 minutes past start &middot; BK-2310</span>
+          </span>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="ban"></span>No Show</span>
+          <span class="st st--crit"><span data-icon="alert"></span>Payment Failed</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Call Dennis Ocampo about the missed booking."><span data-icon="phone"></span>Contact</button>
+          <button class="btn btn--sm btn--ghost" type="button" data-stub="Release the court and mark the booking closed."><span data-icon="checkc"></span>Release Court</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample arrivals for one day.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

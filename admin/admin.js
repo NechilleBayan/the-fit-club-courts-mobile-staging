@@ -1,0 +1,379 @@
+/* ============================================================
+   THE FIT CLUB COURTS - ADMIN / STAFF CONSOLE
+   Shared shell, loaded by every page in this folder.
+
+   The chrome is built here rather than pasted into each page. There are more
+   than twenty screens in this sandbox and the app bar, the drawer, and the tab
+   bar are identical on all of them, so they live in one place: change a
+   destination once and every screen follows. Each page declares what it is
+   through data attributes on <body> and this file does the rest.
+
+     data-title   The label in the centre of the app bar.
+     data-nav     Which of the five tab bar items is current.
+     data-back    Present if the left slot is a back arrow rather than the
+                  hamburger. Its value is the href to go back to.
+
+   Nothing here is a framework. It is plain DOM in one closure, because a
+   prototype that needs a build step is a prototype nobody opens.
+   ============================================================ */
+(function(){
+  "use strict";
+
+  /* ---------- DEMO STATE ----------
+     One source for the numbers that appear in more than one place, so the badge
+     on the bell, the count in the drawer, and the figure on the dashboard
+     cannot disagree with each other. */
+  var DATA = {
+    club:   { name:"The Fit Club Courts", plan:"Kapitolyo, Pasig" },
+    admin:  { name:"Rea Salvador", role:"Club Manager", initials:"RS" },
+    unread: 4,
+    pendingTasks: 5
+  };
+  window.ADMIN = DATA;
+
+  /* ---------- ICONS ----------
+     One sprite, injected once per page. Stroked rather than filled, 24px grid,
+     1.75 weight: the same drawing language as the customer app, which never
+     uses a filled icon except inside a pressed tab pill. */
+  var ICONS = {
+    menu:      '<path d="M3 6h18M3 12h18M3 18h18"/>',
+    close:     '<path d="M6 6l12 12M18 6L6 18"/>',
+    bell:      '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/>',
+    grid:      '<rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/>',
+    calendar:  '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    court:     '<rect x="2.5" y="5" width="19" height="14" rx="1.5"/><path d="M12 5v14M2.5 12h19M7 9.5h10v5H7z"/>',
+    users:     '<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.6a3.2 3.2 0 0 1 0 4.8M17.5 14.2A6.5 6.5 0 0 1 21.5 20"/>',
+    dots:      '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    chevR:     '<path d="M9 5l7 7-7 7"/>',
+    chevL:     '<path d="M15 5l-7 7 7 7"/>',
+    chevD:     '<path d="M5 9l7 7 7-7"/>',
+    clock:     '<circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2"/>',
+    check:     '<path d="M4 12.5l5 5L20 6.5"/>',
+    checkc:    '<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9.5"/>',
+    alert:     '<path d="M12 3.5 1.8 20.5h20.4z"/><path d="M12 10v4"/><circle cx="12" cy="17.4" r="1"/>',
+    info:      '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r="1"/>',
+    card:      '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 9.5h19"/>',
+    peso:      '<path d="M7 20V4h5.5a4 4 0 0 1 0 8H7"/><path d="M4.5 9.5h9M4.5 13h9"/>',
+    chart:     '<path d="M3.5 20.5h17"/><rect x="5" y="11" width="3.5" height="7"/><rect x="10.2" y="6.5" width="3.5" height="11.5"/><rect x="15.5" y="14" width="3.5" height="4"/>',
+    tag:       '<path d="M11 3H3v8l10 10 8-8L11 3z"/><circle cx="7.2" cy="7.2" r="1.3"/>',
+    hours:     '<circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l4 2.2"/>',
+    activity:  '<path d="M2.5 12h4l2.5-7 5 14 2.5-7h5"/>',
+    settings:  '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/>',
+    help:      '<circle cx="12" cy="12" r="9"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 3.1c-.6.2-.9.7-.9 1.3v.5"/><circle cx="12" cy="17.2" r="1"/>',
+    logout:    '<path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4M6 12h10"/>',
+    building:  '<path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h9A1.5 1.5 0 0 1 16 5.5V21"/><path d="M16 10h3a1 1 0 0 1 1 1v10M2.5 21h19M7.5 8h5M7.5 12h5M7.5 16h5"/>',
+    plus:      '<path d="M12 5v14M5 12h14"/>',
+    search:    '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+    filter:    '<path d="M3.5 5.5h17l-6.5 7.5v6l-4 2v-8z"/>',
+    edit:      '<path d="M15.5 4.5l4 4L8 20H4v-4z"/>',
+    user:      '<circle cx="12" cy="8" r="3.5"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
+    phone:     '<path d="M6 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4 5.7 2 2 0 0 1 6 3.5z"/>',
+    mail:      '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/>',
+    message:   '<path d="M20.5 15.5a2 2 0 0 1-2 2H8l-4.5 3.5V5.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/>',
+    wrench:    '<path d="M15.5 3.5a5.5 5.5 0 0 0-6.4 7.2L3 16.8 6.2 20l6.1-6.1a5.5 5.5 0 0 0 7.2-6.4l-3.2 3.2-2.8-.7-.7-2.8z"/>',
+    lock:      '<rect x="4.5" y="10" width="15" height="10.5" rx="2"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/>',
+    ban:       '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
+    list:      '<path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12M3.5 6.5h1M3.5 12h1M3.5 17.5h1"/>',
+    tasks:     '<path d="M9.5 6.5h11M9.5 12h11M9.5 17.5h11"/><path d="M3.5 6.3l1.4 1.4 2.3-2.6M3.5 11.8l1.4 1.4 2.3-2.6"/><path d="M3.6 16.6h3.4"/>',
+    play:      '<circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z"/>',
+    flag:      '<path d="M5 21V4h13l-2.5 4L18 12H5"/>',
+    trash:     '<path d="M4.5 6.5h15M9 6.5V4.5h6v2M6.5 6.5l1 13.5h9l1-13.5"/>',
+    arrowR:    '<path d="M4 12h15M13 6l6 6-6 6"/>',
+    refresh:   '<path d="M20 11a8 8 0 1 0-.6 4"/><path d="M20 4.5V11h-6"/>',
+    key:       '<circle cx="8" cy="14" r="4.5"/><path d="M11.4 11.2 20 3.5M16.5 7l2.5 2.5M14.2 9.2l2.2 2.2"/>',
+    download:  '<path d="M12 3.5v11M7.5 10.5l4.5 4.5 4.5-4.5M4 20.5h16"/>'
+  };
+
+  function svg(name, cls){
+    var body = ICONS[name] || "";
+    return '<svg class="' + (cls || "") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+           'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + '</svg>';
+  }
+  window.icon = svg;
+
+  /* ---------- NAVIGATION MODEL ----------
+     The bottom bar is capped at five and this array is the enforcement: there is
+     nowhere to put a sixth. Anything that does not earn a permanent slot lives
+     in More or in the drawer. */
+  var TABS = [
+    { id:"dashboard", label:"Dashboard", href:"dashboard.html", icon:"grid" },
+    { id:"bookings",  label:"Bookings",  href:"bookings.html",  icon:"calendar" },
+    { id:"courts",    label:"Courts",    href:"courts.html",    icon:"court" },
+    { id:"staff",     label:"Staff",     href:"staff.html",     icon:"users" },
+    { id:"more",      label:"More",      href:"more.html",      icon:"dots" }
+  ];
+
+  /* The drawer holds the secondary and system areas. None of the five tab bar
+     destinations is repeated here: "Staff Management" is the roles, accounts,
+     and pay area, which is a different job from the Staff tab's question of who
+     is on shift right now, and it has its own screen. */
+  var DRAWER = [
+    { group:"Club" },
+    { label:"Club Profile",       href:"club-profile.html", icon:"building" },
+    { label:"Staff Management",   href:"staff-manage.html", icon:"key" },
+    { label:"Players / Customers",href:"players.html",      icon:"user" },
+    { group:"Money" },
+    { label:"Payments",           href:"payments.html",     icon:"card" },
+    { label:"Reports & Analytics",href:"reports.html",      icon:"chart" },
+    { label:"Rates & Promotions", href:"rates.html",        icon:"tag" },
+    { group:"System" },
+    { label:"Operating Hours",    href:"hours.html",        icon:"hours" },
+    { label:"Notifications",      href:"notifications.html",icon:"bell", badge:"unread" },
+    { label:"Activity Log",       href:"activity.html",     icon:"activity" },
+    { label:"Settings",           href:"settings.html",     icon:"settings" },
+    { label:"Help / Support",     href:"help.html",         icon:"help" },
+    { group:"Session" },
+    { label:"Log Out",            href:"#logout",           icon:"logout", danger:true }
+  ];
+
+  /* ---------- BUILD THE CHROME ---------- */
+  function build(){
+    var body = document.body;
+    var title = body.getAttribute("data-title") || "Admin";
+    var nav   = body.getAttribute("data-nav") || "";
+    var back  = body.getAttribute("data-back");
+
+    /* The app bar. The left slot is either the hamburger or a back arrow, never
+       both: a screen that is one level down does not also need the drawer,
+       which is always two taps away from wherever it lands. */
+    var left = back
+      ? '<a class="iconbtn iconbtn--bare" href="' + back + '" aria-label="Back">' + svg("chevL") + '</a>'
+      : '<button class="iconbtn iconbtn--bare" type="button" id="menuBtn" aria-label="Open menu" aria-haspopup="dialog">' + svg("menu") + '</button>';
+
+    var bellLabel = DATA.unread
+      ? "Notifications, " + DATA.unread + " unread"
+      : "Notifications, none unread";
+    var bell = '<a class="iconbtn iconbtn--bare hasbadge" href="notifications.html" aria-label="' + bellLabel + '">' +
+               svg("bell") + (DATA.unread ? '<span class="badge" aria-hidden="true"></span>' : "") + '</a>';
+
+    var avatar = '<a class="iconbtn iconbtn--bare appbar__avatar" href="club-profile.html" aria-label="' +
+                 DATA.admin.name + ', ' + DATA.admin.role + '">' +
+                 '<span class="avatar">' + DATA.admin.initials + '</span></a>';
+
+    var bar = document.createElement("header");
+    bar.className = "appbar";
+    bar.innerHTML =
+      '<div class="appbar__in">' +
+        '<div class="appbar__start">' + left + '</div>' +
+        '<h1 class="appbar__title" id="barTitle">' + title + '</h1>' +
+        '<div class="appbar__end">' + bell + avatar + '</div>' +
+      '</div>';
+
+    var shell = document.getElementById("shell");
+    shell.insertBefore(bar, shell.firstChild);
+
+    /* The tab bar, appended last so it is the final thing in the tab order
+       before the page ends. */
+    var tabs = document.createElement("nav");
+    tabs.className = "tabbar";
+    tabs.setAttribute("aria-label", "Main");
+    tabs.innerHTML = '<div class="tabbar__in">' + TABS.map(function(t){
+      var cur = (t.id === nav);
+      var badge = (t.id === "more" && DATA.pendingTasks) ? '<span class="badge" aria-hidden="true"></span>' : "";
+      return '<a href="' + t.href + '"' + (cur ? ' aria-current="page"' : "") + (badge ? ' class="hasbadge"' : "") + '>' +
+             '<span class="tabpill">' + svg(t.icon) + '</span>' + badge +
+             '<span>' + t.label + '</span></a>';
+    }).join("") + '</div>';
+    shell.appendChild(tabs);
+
+    if (!back) buildDrawer(shell);
+    hydrateIcons(document);
+    wire();
+  }
+
+  /* Pages ask for an icon by name and get the drawing here, so no page carries
+     a path definition and the whole console changes shape from one object. */
+  function hydrateIcons(root){
+    Array.prototype.forEach.call(root.querySelectorAll("[data-icon]"), function(el){
+      var name = el.getAttribute("data-icon");
+      var cls = el.getAttribute("data-icon-class") || "";
+      el.outerHTML = svg(name, cls);
+    });
+  }
+
+  function buildDrawer(shell){
+    var d = document.createElement("dialog");
+    d.className = "drawer";
+    d.id = "drawer";
+    d.setAttribute("aria-label", "Admin menu");
+
+    var rows = DRAWER.map(function(item){
+      if (item.group) return '<div class="drawer__group"><span>' + item.group + '</span></div>';
+      var here = location.pathname.split("/").pop() === item.href;
+      var count = item.badge && DATA[item.badge]
+        ? '<span class="countpill" aria-hidden="true">' + DATA[item.badge] + '</span>' : "";
+      var label = item.label + (count ? ", " + DATA[item.badge] + " unread" : "");
+      return '<a class="navrow' + (item.danger ? " navrow--danger" : "") + '" href="' + item.href + '"' +
+             (here ? ' aria-current="page"' : "") + (count ? ' aria-label="' + label + '"' : "") + '>' +
+             svg(item.icon) + '<span>' + item.label + '</span>' + count +
+             (item.danger ? "" : svg("chevR", "row__chev")) + '</a>';
+    }).join("");
+
+    d.innerHTML =
+      '<div class="drawer__panel">' +
+        '<div class="drawer__head">' +
+          '<span class="avatar avatar--lg" aria-hidden="true">' + DATA.admin.initials + '</span>' +
+          '<span class="drawer__id"><b>' + DATA.admin.name + '</b><span>' + DATA.admin.role + ' &middot; ' + DATA.club.name + '</span></span>' +
+          '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close menu">' + svg("close") + '</button>' +
+        '</div>' +
+        '<div class="drawer__body">' + rows + '</div>' +
+      '</div>';
+    shell.appendChild(d);
+  }
+
+  /* ---------- BEHAVIOUR ---------- */
+  function wire(){
+    var drawer = document.getElementById("drawer");
+    var menuBtn = document.getElementById("menuBtn");
+
+    if (menuBtn && drawer){
+      menuBtn.addEventListener("click", function(){ drawer.showModal(); });
+      /* A click on the backdrop is a click on the dialog element itself, since
+         the panel does not cover the whole box. That is the whole test. */
+      drawer.addEventListener("click", function(e){
+        if (e.target === drawer) drawer.close();
+      });
+      drawer.addEventListener("close", function(){ menuBtn.focus(); });
+    }
+    document.addEventListener("click", function(e){
+      var c = e.target.closest("[data-close]");
+      if (c){ var dlg = c.closest("dialog"); if (dlg) dlg.close(); }
+      var o = e.target.closest("[data-open]");
+      if (o){
+        var t = document.getElementById(o.getAttribute("data-open"));
+        if (t && t.showModal) { t.showModal(); }
+      }
+      var s = e.target.closest("dialog.sheet");
+      if (s && e.target === s) s.close();
+    });
+
+    /* Log Out is the one drawer row that is not a destination. In the sandbox it
+       says what it would do rather than pretending to do it. */
+    document.addEventListener("click", function(e){
+      var a = e.target.closest('a[href="#logout"]');
+      if (!a) return;
+      e.preventDefault();
+      alert("Sandbox: This would sign " + DATA.admin.name + " out and return to the staff login.");
+    });
+
+    /* Pressed state for anything that is a toggle in a rail: filters, segmented
+       controls, and the day buttons. In the sandbox this only paints; there is
+       no list behind it to re-query. */
+    document.addEventListener("click", function(e){
+      var b = e.target.closest('[data-toggle="single"] > [aria-pressed]');
+      if (!b) return;
+      var group = b.parentNode;
+      Array.prototype.forEach.call(group.querySelectorAll("[aria-pressed]"), function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+    });
+    document.addEventListener("click", function(e){
+      var b = e.target.closest('[data-toggle="multi"] > [aria-pressed]');
+      if (!b) return;
+      b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
+    });
+
+    /* Switches. A real control with a real role, not a styled checkbox that a
+       screen reader has to guess at. */
+    document.addEventListener("click", function(e){
+      var s = e.target.closest(".switch");
+      if (!s) return;
+      s.setAttribute("aria-checked", s.getAttribute("aria-checked") === "true" ? "false" : "true");
+    });
+
+    /* Every other control in the sandbox is a stub. Rather than let a staff
+       member tap Cancel and watch nothing happen, the button says what it would
+       have done. One handler covers all of them. */
+    document.addEventListener("click", function(e){
+      var b = e.target.closest("[data-stub]");
+      if (!b) return;
+      e.preventDefault();
+      var dlg = b.closest("dialog");
+      if (dlg) dlg.close();
+      alert("Sandbox: " + b.getAttribute("data-stub"));
+    });
+  }
+
+  /* ---------- SCROLL CUE ----------
+     No track, no gutter, no permanent bar: a short translucent cue that appears
+     while something is moving and fades once it stops. Capture phase, because a
+     scroll event does not bubble but does propagate down, so one listener on the
+     document sees every scroller including ones that do not exist yet. When the
+     thing that scrolled is inside an open dialog the cue moves into that dialog,
+     because a modal is painted in the top layer and a cue parented to the body
+     would sit behind the backdrop.
+     Fine pointers only. A touch platform already does all of this natively. */
+  function scrollcue(){
+    if (!window.matchMedia || !matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+    function make(cls){
+      var e = document.createElement("div");
+      e.className = cls; e.setAttribute("aria-hidden","true");
+      document.body.appendChild(e); return e;
+    }
+    var V = make("scrollcue scrollcue--v");
+    var H = make("scrollcue scrollcue--h");
+    var MIN = 26, GAP = 3;
+    var hideT = null, queued = false, pending = null;
+
+    function rest(){
+      V.removeAttribute("data-on"); H.removeAttribute("data-on");
+      if (V.parentNode !== document.body) document.body.appendChild(V);
+      if (H.parentNode !== document.body) document.body.appendChild(H);
+    }
+    function arm(){ clearTimeout(hideT); hideT = setTimeout(rest, 620); }
+
+    function paint(){
+      queued = false;
+      var t = pending; pending = null;
+      if (!t) return;
+      var doc = (t === document || t === document.documentElement || t === document.body);
+      var el = doc ? document.documentElement : t;
+      if (!doc && el.nodeType !== 1) return;
+
+      var top, left, vw, vh;
+      if (doc){
+        top = 0; left = 0;
+        vw = document.documentElement.clientWidth;
+        vh = document.documentElement.clientHeight;
+      } else {
+        var r = el.getBoundingClientRect();
+        top = r.top + el.clientTop; left = r.left + el.clientLeft;
+        vw = el.clientWidth; vh = el.clientHeight;
+      }
+      var host = (!doc && el.closest && el.closest("dialog[open]")) || document.body;
+      var sh = el.scrollHeight, sw = el.scrollWidth;
+      var st = doc ? (window.scrollY || el.scrollTop) : el.scrollTop;
+      var sl = doc ? (window.scrollX || el.scrollLeft) : el.scrollLeft;
+
+      if (sh > vh + 1 && vh > MIN * 2){
+        var len = Math.max(MIN, Math.round(vh * vh / sh));
+        V.style.top = Math.round(top + (st / (sh - vh)) * (vh - len)) + "px";
+        V.style.height = len + "px";
+        V.style.left = Math.round(left + vw - GAP - 6) + "px";
+        if (V.parentNode !== host) host.appendChild(V);
+        V.setAttribute("data-on","1");
+      }
+      if (sw > vw + 1 && vw > MIN * 2){
+        var lenH = Math.max(MIN, Math.round(vw * vw / sw));
+        H.style.left = Math.round(left + (sl / (sw - vw)) * (vw - lenH)) + "px";
+        H.style.width = lenH + "px";
+        H.style.top = Math.round(top + vh - GAP - 6) + "px";
+        if (H.parentNode !== host) host.appendChild(H);
+        H.setAttribute("data-on","1");
+      }
+      arm();
+    }
+
+    document.addEventListener("scroll", function(ev){
+      pending = ev.target;
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(paint);
+    }, true);
+    window.addEventListener("resize", rest, { passive:true });
+  }
+
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", function(){ build(); scrollcue(); });
+  } else { build(); scrollcue(); }
+})();

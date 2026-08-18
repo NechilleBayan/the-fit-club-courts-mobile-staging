@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bookings - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Bookings" data-nav="bookings" class="has-dock" style="--dock-h:78px;">
+<div id="shell">
+<main id="main">
+
+  <h1 class="vh" tabindex="-1">Bookings</h1>
+
+  <!-- ---------- DATE ----------
+       Previous, the date, next. The date in the middle is a button as well,
+       because the fastest route to a Saturday three weeks out is not twenty
+       taps on an arrow. -->
+  <div class="datenav">
+    <button class="iconbtn" type="button" data-stub="Step back to Friday, 14 August." aria-label="Previous day"><span data-icon="chevL"></span></button>
+    <button class="datenav__date" type="button" data-stub="Open a calendar to jump to any date.">
+      <span data-icon="calendar"></span> Sat 15 Aug &middot; Today
+    </button>
+    <button class="iconbtn" type="button" data-stub="Step forward to Sunday, 16 August." aria-label="Next day"><span data-icon="chevR"></span></button>
+  </div>
+
+  <!-- The week rail. Redundant with the arrows on purpose: the arrows are for a
+       neighbouring day and the rail is for reading the week's shape at once. A
+       day the club is closed is hatched and dashed, never just greyed. -->
+  <div class="datestrip" role="group" aria-label="Pick a day" data-toggle="single" style="margin-top:12px;">
+    <button class="daybtn" type="button" aria-pressed="false"><small>Thu</small><strong>13</strong><i>14 bk</i></button>
+    <button class="daybtn" type="button" aria-pressed="false"><small>Fri</small><strong>14</strong><i>17 bk</i></button>
+    <button class="daybtn" type="button" aria-pressed="true"><small>Sat</small><strong>15</strong><i>18 bk</i></button>
+    <button class="daybtn" type="button" aria-pressed="false"><small>Sun</small><strong>16</strong><i>21 bk</i></button>
+    <button class="daybtn" type="button" aria-pressed="false" data-state="closed"><small>Mon</small><strong>17</strong><i>Closed</i></button>
+    <button class="daybtn" type="button" aria-pressed="false"><small>Tue</small><strong>18</strong><i>9 bk</i></button>
+    <button class="daybtn" type="button" aria-pressed="false"><small>Wed</small><strong>19</strong><i>12 bk</i></button>
+  </div>
+
+  <!-- ---------- WHAT KIND ----------
+       Three kinds of thing occupy a court and they are not variants of each
+       other, so they get a real switch rather than a filter chip. Blocked Time
+       belongs here because from the court's point of view it is the same
+       question: who has this court at 3 PM. -->
+  <div class="seg" role="group" aria-label="Booking type" data-toggle="single" style="margin-top:16px;">
+    <button type="button" aria-pressed="true">Bookings <span class="countpill countpill--quiet tnum">18</span></button>
+    <button type="button" aria-pressed="false">Open Play <span class="countpill countpill--quiet tnum">3</span></button>
+    <button type="button" aria-pressed="false">Blocked <span class="countpill countpill--quiet tnum">2</span></button>
+  </div>
+
+  <label class="search" style="margin-top:12px;">
+    <span class="vh">Search bookings</span>
+    <span data-icon="search"></span>
+    <input type="search" placeholder="Name, reference, or phone" autocomplete="off">
+  </label>
+
+  <!-- Filters scroll rather than wrap, so the row height never changes as
+       filters are added and the list below never jumps. -->
+  <div class="filterbar" role="group" aria-label="Filter bookings" data-toggle="multi" style="margin-top:10px;">
+    <button class="filter" type="button" aria-pressed="false"><span data-icon="filter"></span>All Courts</button>
+    <button class="filter" type="button" aria-pressed="true">Unpaid</button>
+    <button class="filter" type="button" aria-pressed="false">Not Checked In</button>
+    <button class="filter" type="button" aria-pressed="false">Confirmed</button>
+    <button class="filter" type="button" aria-pressed="false">Cancelled</button>
+  </div>
+
+  <!-- ---------- THE LIST ----------
+       Every row states both statuses, because a booking has two independent
+       ones and a staff member is usually chasing exactly one of them. Payment
+       sits on the left of the pair and the booking state on the right, in that
+       order on every row, so the eye can run down one column. -->
+  <section class="section" aria-labelledby="s-list" style="margin-top:20px;">
+    <div class="sechead">
+      <h2 class="sec" id="s-list">18 Bookings</h2>
+      <span class="legal">Sat 15 Aug</span>
+    </div>
+
+    <div class="rows">
+
+      <div class="row row--bar row--two row--timed">
+        <div class="row__line">
+          <span class="row__time"><b>9:00</b><span>10:30 AM</span></span>
+          <a class="row__main" href="booking-details.html">
+            <span class="row__title">Miguel Tan</span>
+            <span class="row__sub">Court 1 &middot; Private &middot; 4 players</span>
+          </a>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="acts" aria-label="Actions for Miguel Tan, 9:00 AM"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+          <span class="st st--live"><span data-icon="play"></span>Checked In</span>
+        </div>
+      </div>
+
+      <div class="row row--bar row--barhatch row--two row--timed">
+        <div class="row__line">
+          <span class="row__time"><b>10:30</b><span>12:00 PM</span></span>
+          <a class="row__main" href="booking-details.html">
+            <span class="row__title">Morning Social</span>
+            <span class="row__sub">Court 2 &middot; Open Play &middot; 11 of 16</span>
+          </a>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="acts" aria-label="Actions for Morning Social, 10:30 AM"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+          <span class="st st--hold"><span data-icon="clock"></span>Confirmed</span>
+        </div>
+      </div>
+
+      <div class="row row--bar row--barcrit row--crit row--two row--timed">
+        <div class="row__line">
+          <span class="row__time"><b>11:00</b><span>12:00 PM</span></span>
+          <a class="row__main" href="booking-details.html">
+            <span class="row__title">Andrea Lim</span>
+            <span class="row__sub">Court 3 &middot; Private &middot; 2 players</span>
+          </a>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="acts" aria-label="Actions for Andrea Lim, 11:00 AM"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--crit"><span data-icon="alert"></span>Overdue</span>
+          <span class="st st--hold"><span data-icon="clock"></span>Confirmed</span>
+        </div>
+      </div>
+
+      <div class="row row--bar row--two row--timed">
+        <div class="row__line">
+          <span class="row__time"><b>12:00</b><span>1:30 PM</span></span>
+          <a class="row__main" href="booking-details.html">
+            <span class="row__title">Jomar Bautista</span>
+            <span class="row__sub">Court 1 &middot; Private &middot; 4 players</span>
+          </a>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="acts" aria-label="Actions for Jomar Bautista, 12:00 PM"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--hold"><span data-icon="clock"></span>Unpaid</span>
+          <span class="st st--hold"><span data-icon="clock"></span>Confirmed</span>
+        </div>
+      </div>
+
+      <div class="row row--bar row--barhatch row--muted row--two row--timed">
+        <div class="row__line">
+          <span class="row__time"><b>1:00</b><span>3:00 PM</span></span>
+          <a class="row__main" href="court-details.html">
+            <span class="row__title">Court 4 Blocked</span>
+            <span class="row__sub">Net replacement &middot; Paolo R.</span>
+          </a>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="acts" aria-label="Actions for Court 4 block, 1:00 PM"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--work"><span data-icon="wrench"></span>Maintenance</span>
+        </div>
+      </div>
+
+      <div class="row row--bar row--two row--timed">
+        <div class="row__line">
+          <span class="row__time"><b>3:00</b><span>4:30 PM</span></span>
+          <a class="row__main" href="booking-details.html">
+            <span class="row__title">Grace Villanueva</span>
+            <span class="row__sub">Court 2 &middot; Coaching &middot; 2 players</span>
+          </a>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="acts" aria-label="Actions for Grace Villanueva, 3:00 PM"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--ok"><span data-icon="check"></span>Paid</span>
+          <span class="st st--hold"><span data-icon="clock"></span>Confirmed</span>
+        </div>
+      </div>
+
+      <div class="row row--bar row--muted row--two row--timed">
+        <div class="row__line">
+          <span class="row__time"><b>5:00</b><span>6:00 PM</span></span>
+          <a class="row__main" href="booking-details.html">
+            <span class="row__title">Nathan Cruz</span>
+            <span class="row__sub">Court 3 &middot; Private &middot; 2 players</span>
+          </a>
+          <button class="iconbtn iconbtn--bare" type="button" data-open="acts" aria-label="Actions for Nathan Cruz, 5:00 PM"><span data-icon="dots"></span></button>
+        </div>
+        <div class="row__tags">
+          <span class="st st--off"><span data-icon="refresh"></span>Refunded</span>
+          <span class="st st--off"><span data-icon="ban"></span>Cancelled</span>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="legal" style="text-align:center; padding-top:8px;">11 more bookings later today</p>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: The list is sample data for one day. Filters and the date
+    controls paint their state but do not re-query anything.</span>
+  </p>
+
+</main>
+
+<!-- ---------- THE ACTION SHEET ----------
+     Six verbs is too many for a row and too few for a page, which is what a
+     bottom sheet is for. It opens from the row's own overflow button, so the
+     thing that appeared is visibly the thing that was pressed. -->
+<dialog class="sheet" id="acts" aria-label="Booking actions">
+  <div class="sheet__panel">
+    <div class="sheet__head">
+      <h2>Booking Actions</h2>
+      <button class="sheet__close" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="sheet__body">
+      <div class="actlist">
+        <a href="booking-details.html"><span data-icon="list"></span>View Details</a>
+        <button type="button" data-stub="Open the booking in edit mode."><span data-icon="edit"></span>Edit Booking</button>
+        <button type="button" data-stub="Pick a new date, time, or court for this booking."><span data-icon="calendar"></span>Reschedule</button>
+        <button type="button" data-stub="Record the payment and receipt this booking."><span data-icon="card"></span>Mark Paid</button>
+        <button type="button" data-stub="Check the party in and start the court clock."><span data-icon="checkc"></span>Check In</button>
+        <button type="button" class="is-danger" data-stub="Cancel this booking and ask whether to refund."><span data-icon="ban"></span>Cancel Booking</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+</div>
+
+<!-- The one thing this screen exists to let a staff member do, pinned above the
+     tab bar so it survives a long list. -->
+<div class="dock">
+  <div class="dock__in">
+    <button class="btn btn--primary" type="button" data-stub="Start a new booking: Court, date, time, customer, and payment."><span data-icon="plus"></span>New Booking</button>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

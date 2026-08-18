@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Activity Log - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Activity Log" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Activity Log</h1>
+  <p class="legal">Who changed what, and when. Every entry names a person, because
+  an audit trail that says "system" is not one.</p>
+
+  <label class="search" style="margin-top:16px;">
+    <span class="vh">Search the activity log</span>
+    <span data-icon="search"></span>
+    <input type="search" placeholder="Person, booking reference, or court" autocomplete="off">
+  </label>
+
+  <div class="filterbar" role="group" aria-label="Filter activity" data-toggle="single" style="margin-top:10px;">
+    <button class="filter" type="button" aria-pressed="true">All</button>
+    <button class="filter" type="button" aria-pressed="false">Bookings</button>
+    <button class="filter" type="button" aria-pressed="false">Payments</button>
+    <button class="filter" type="button" aria-pressed="false">Courts</button>
+    <button class="filter" type="button" aria-pressed="false">Staff</button>
+    <button class="filter" type="button" aria-pressed="false">Settings</button>
+  </div>
+
+  <section class="section" aria-labelledby="s-today">
+    <h2 class="sec" id="s-today">Today</h2>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl tl--now">
+          <p class="tl__when">9:31 AM</p>
+          <p class="tl__what">Payment reminder sent for BK-2291</p>
+          <p class="tl__who">Automatic &middot; Rule: Second reminder at 72 hours</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">9:12 AM</p>
+          <p class="tl__what">Booking conflict flagged on Court 2, 4:00 PM</p>
+          <p class="tl__who">Automatic &middot; Open Play overlaps BK-2327</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">8:54 AM</p>
+          <p class="tl__what">Miguel Tan checked in to Court 1</p>
+          <p class="tl__who">Joy Mendoza &middot; Front Desk</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">8:04 AM</p>
+          <p class="tl__what">Booking BK-2331 created, Court 4 at 3:30 PM</p>
+          <p class="tl__who">Rico Alvarez &middot; Customer app</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">7:45 AM</p>
+          <p class="tl__what">Court 4 blocked, 1:00 PM to 3:00 PM</p>
+          <p class="tl__who">Rea Salvador &middot; Reason: Net replacement</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">7:22 AM</p>
+          <p class="tl__what">Task completed: Check court lighting</p>
+          <p class="tl__who">Paolo Reyes &middot; Maintenance</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">6:58 AM</p>
+          <p class="tl__what">Booking BK-2288 cancelled and refunded PHP 900</p>
+          <p class="tl__who">Joy Mendoza &middot; Requested by Nathan Cruz</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">6:04 AM</p>
+          <p class="tl__what">Club opened, all courts unlocked</p>
+          <p class="tl__who">Joy Mendoza &middot; Front Desk</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-yest">
+    <h2 class="sec" id="s-yest">Yesterday</h2>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl">
+          <p class="tl__when">6:40 PM</p>
+          <p class="tl__what">Weekend rate raised to PHP 800 per hour</p>
+          <p class="tl__who">Rea Salvador &middot; Effective 1 September</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">4:11 PM</p>
+          <p class="tl__what">Payment failed on BK-2310, card declined</p>
+          <p class="tl__who">Automatic &middot; Dennis Ocampo notified</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">1:36 PM</p>
+          <p class="tl__what">BK-2301 moved from 2:00 PM to 3:00 PM</p>
+          <p class="tl__who">Joy Mendoza &middot; Requested by Grace Villanueva</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">11:02 AM</p>
+          <p class="tl__what">Beginner Clinic reached capacity, waitlist opened</p>
+          <p class="tl__who">Automatic &middot; 8 of 8 registered</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">9:15 AM</p>
+          <p class="tl__what">Staff invite sent to tricia.f@example.com</p>
+          <p class="tl__who">Rea Salvador &middot; Role: Front Desk</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-exp">
+    <h2 class="vh" id="s-exp">Export</h2>
+    <button class="btn btn--sm btn--ghost" type="button" data-stub="Export the activity log for a date range."><span data-icon="download"></span>Export Log</button>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample log entries for two days.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

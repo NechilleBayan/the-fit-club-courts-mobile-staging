@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Operating Hours - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Operating Hours" data-nav="more" data-back="more.html">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Operating Hours</h1>
+  <p class="legal">The window customers can book inside. Closures and court blocks
+  cut into these hours without changing them.</p>
+
+  <section class="section" aria-labelledby="s-week">
+    <div class="sechead">
+      <h2 class="sec" id="s-week">Weekly Hours</h2>
+      <button class="textbtn" type="button" data-stub="Edit the weekly opening hours."><span data-icon="edit"></span>Edit</button>
+    </div>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Monday</dt><dd><span class="st st--off"><span data-icon="ban"></span>Closed</span></dd></div>
+        <div><dt>Tuesday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
+        <div><dt>Wednesday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
+        <div><dt>Thursday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
+        <div><dt>Friday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
+        <div><dt>Saturday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
+        <div><dt>Sunday</dt><dd class="tnum">6:00 AM to 8:00 PM</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-slot">
+    <div class="sechead">
+      <h2 class="sec" id="s-slot">Booking Rules</h2>
+      <button class="textbtn" type="button" data-stub="Edit the booking rules."><span data-icon="edit"></span>Edit</button>
+    </div>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Slot length</dt><dd class="tnum">30 minutes</dd></div>
+        <div><dt>Minimum booking</dt><dd class="tnum">60 minutes</dd></div>
+        <div><dt>Maximum booking</dt><dd class="tnum">180 minutes</dd></div>
+        <div><dt>Book ahead</dt><dd class="tnum">Up to 30 days</dd></div>
+        <div><dt>Last start</dt><dd class="tnum">60 min before close</dd></div>
+        <div><dt>Free cancellation</dt><dd class="tnum">Up to 12 hours before</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="s-tog">
+    <h2 class="sec" id="s-tog">Availability</h2>
+    <div class="card">
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Accept online bookings</b><span>Customers can book from the app</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Accept online bookings"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Allow same day bookings</b><span>Up to 60 minutes before the slot</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Allow same day bookings"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Require payment at booking</b><span>Off means players can pay at the desk</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="false" aria-label="Require payment at booking"></button>
+      </div>
+      <div class="setrow">
+        <span class="row__main setrow__main"><b>Waitlist when full</b><span>Open play sessions only</span></span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Waitlist when full"></button>
+      </div>
+    </div>
+    <p class="legal">Payment at booking is currently off, which is why four bookings
+    are sitting unpaid today.</p>
+  </section>
+
+  <section class="section" aria-labelledby="s-links">
+    <h2 class="vh" id="s-links">Related</h2>
+    <a class="btn btn--sm btn--ghost" href="closures.html"><span data-icon="lock"></span>Blocked Dates and Closures</a>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Sample hours and rules.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

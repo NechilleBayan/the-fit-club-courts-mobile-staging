@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Open Play - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Open Play" data-nav="more" data-back="more.html" class="has-dock" style="--dock-h:78px;">
+<div id="shell">
+<main id="main">
+
+  <h1 class="screen" tabindex="-1">Open Play</h1>
+  <p class="legal">Sessions with a roster, managed apart from private court bookings.</p>
+
+  <div class="datenav" style="margin-top:16px;">
+    <button class="iconbtn" type="button" data-stub="Step back to Friday, 14 August." aria-label="Previous day"><span data-icon="chevL"></span></button>
+    <button class="datenav__date" type="button" data-stub="Open a calendar to jump to any date.">
+      <span data-icon="calendar"></span> Sat 15 Aug &middot; Today
+    </button>
+    <button class="iconbtn" type="button" data-stub="Step forward to Sunday, 16 August." aria-label="Next day"><span data-icon="chevR"></span></button>
+  </div>
+
+  <div class="filterbar" role="group" aria-label="Filter sessions" data-toggle="single" style="margin-top:12px;">
+    <button class="filter" type="button" aria-pressed="true">Today</button>
+    <button class="filter" type="button" aria-pressed="false">Open</button>
+    <button class="filter" type="button" aria-pressed="false">Full</button>
+    <button class="filter" type="button" aria-pressed="false">Closed</button>
+  </div>
+
+  <!-- ---------- THE SESSIONS ----------
+       Capacity is the whole story on this page, so every card leads with the
+       meter. Spots left is stated as a number as well, because "4 left" is what
+       a staff member says out loud to the person at the desk and reading it off
+       a bar is slower than reading it off a word. -->
+  <section class="section" aria-labelledby="s-sessions">
+    <div class="sechead">
+      <h2 class="sec" id="s-sessions">3 Sessions</h2>
+      <span class="legal">Sat 15 Aug</span>
+    </div>
+
+    <div class="rows">
+
+      <!-- OPEN, filling -->
+      <div class="card card--strong">
+        <div class="card__head">
+          <div>
+            <h3 class="sub">Morning Social</h3>
+            <p class="legal tnum">10:30 AM to 12:00 PM &middot; Court 2</p>
+          </div>
+          <span class="st st--hold"><span data-icon="clock"></span>Open</span>
+        </div>
+
+        <div class="meter" style="margin-top:14px;">
+          <div class="meter__top">
+            <span>11 of 16 registered</span>
+            <b class="tnum">5 spots left</b>
+          </div>
+          <div class="meter__track" role="img" aria-label="11 of 16 players registered">
+            <div class="meter__fill" style="width:69%;"></div>
+          </div>
+        </div>
+
+        <dl class="deflist" style="margin-top:14px;">
+          <div><dt>Capacity</dt><dd class="tnum">16 players</dd></div>
+          <div><dt>Registered</dt><dd class="tnum">11 players</dd></div>
+          <div><dt>Level</dt><dd>All levels</dd></div>
+          <div><dt>Fee</dt><dd class="tnum">PHP 350 per player</dd></div>
+        </dl>
+
+        <div class="btn-col" style="margin-top:14px;">
+          <button class="btn btn--sm btn--primary" type="button" data-open="roster"><span data-icon="users"></span>Manage Roster</button>
+          <div class="btn-row">
+            <button class="btn btn--sm btn--ghost" type="button" data-stub="Edit the Morning Social session details."><span data-icon="edit"></span>Edit</button>
+            <button class="btn btn--sm btn--ghost" type="button" data-stub="Close registration on Morning Social. Existing players keep their spot."><span data-icon="lock"></span>Close Reg.</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEARLY FULL -->
+      <div class="card card--strong">
+        <div class="card__head">
+          <div>
+            <h3 class="sub">Evening Open Play</h3>
+            <p class="legal tnum">6:00 PM to 8:00 PM &middot; Court 4</p>
+          </div>
+          <span class="st st--hold"><span data-icon="clock"></span>Open</span>
+        </div>
+
+        <div class="meter" style="margin-top:14px;">
+          <div class="meter__top">
+            <span>14 of 16 registered</span>
+            <b class="tnum">2 spots left</b>
+          </div>
+          <div class="meter__track" role="img" aria-label="14 of 16 players registered">
+            <div class="meter__fill" style="width:88%;"></div>
+          </div>
+        </div>
+
+        <dl class="deflist" style="margin-top:14px;">
+          <div><dt>Capacity</dt><dd class="tnum">16 players</dd></div>
+          <div><dt>Registered</dt><dd class="tnum">14 players</dd></div>
+          <div><dt>Waitlist</dt><dd class="tnum">3 players</dd></div>
+          <div><dt>Level</dt><dd>Intermediate and up</dd></div>
+          <div><dt>Fee</dt><dd class="tnum">PHP 350 per player</dd></div>
+        </dl>
+
+        <div class="card--sunken" style="margin-top:12px; padding:10px; border-radius:12px;">
+          <p class="legal"><b>Court 4 is in maintenance until 3:00 PM.</b> The session
+          is after the block clears, but check the net before players arrive.</p>
+        </div>
+
+        <div class="btn-col" style="margin-top:14px;">
+          <button class="btn btn--sm btn--primary" type="button" data-open="roster"><span data-icon="users"></span>Manage Roster</button>
+          <div class="btn-row">
+            <button class="btn btn--sm btn--ghost" type="button" data-stub="Edit the Evening Open Play session details."><span data-icon="edit"></span>Edit</button>
+            <button class="btn btn--sm btn--ghost" type="button" data-stub="Close registration on Evening Open Play."><span data-icon="lock"></span>Close Reg.</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FULL AND CLOSED. Hatched and dashed, so a full session does not read
+           as merely another open one with a bigger bar. -->
+      <div class="card" style="border:1.5px dashed var(--border-strong); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px);">
+        <div class="card__head">
+          <div>
+            <h3 class="sub">Beginner Clinic</h3>
+            <p class="legal tnum">1:00 PM to 2:30 PM &middot; Court 1</p>
+          </div>
+          <span class="st st--off"><span data-icon="lock"></span>Full</span>
+        </div>
+
+        <div class="meter" style="margin-top:14px;">
+          <div class="meter__top">
+            <span>8 of 8 registered</span>
+            <b class="tnum">No spots left</b>
+          </div>
+          <div class="meter__track" role="img" aria-label="8 of 8 players registered, full">
+            <div class="meter__fill" style="width:100%;"></div>
+          </div>
+        </div>
+
+        <dl class="deflist" style="margin-top:14px;">
+          <div><dt>Capacity</dt><dd class="tnum">8 players</dd></div>
+          <div><dt>Registered</dt><dd class="tnum">8 players</dd></div>
+          <div><dt>Waitlist</dt><dd class="tnum">5 players</dd></div>
+          <div><dt>Coach</dt><dd>Carlo Santos</dd></div>
+          <div><dt>Fee</dt><dd class="tnum">PHP 600 per player</dd></div>
+        </dl>
+
+        <div class="btn-col" style="margin-top:14px;">
+          <button class="btn btn--sm btn--primary" type="button" data-open="roster"><span data-icon="users"></span>Manage Roster</button>
+          <div class="btn-row">
+            <button class="btn btn--sm btn--ghost" type="button" data-stub="Reopen registration and pull from the waitlist."><span data-icon="refresh"></span>Reopen</button>
+            <button class="btn btn--sm btn--danger" type="button" data-stub="Cancel the Beginner Clinic. All 8 players will be notified and refunded."><span data-icon="ban"></span>Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: Three sample sessions. The roster sheet lists sample players.</span>
+  </p>
+
+</main>
+
+<!-- ---------- ROSTER ----------
+     Adding and removing players is a list operation, so it gets a list rather
+     than a form. Each player is one row with one action, and the action says
+     what it removes. -->
+<dialog class="sheet" id="roster" aria-label="Session roster">
+  <div class="sheet__panel">
+    <div class="sheet__head">
+      <h2>Roster &middot; 11 of 16</h2>
+      <button class="sheet__close" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="sheet__body">
+
+      <button class="btn btn--sm btn--primary" type="button" data-stub="Search the customer list and add a player to this session."><span data-icon="plus"></span>Add Player</button>
+
+      <div class="rows">
+        <div class="row">
+          <span class="avatar" aria-hidden="true">MT</span>
+          <span class="row__main">
+            <span class="row__title">Miguel Tan</span>
+            <span class="row__sub">Paid &middot; Registered 12 Aug</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Remove Miguel Tan from this session and refund the fee." aria-label="Remove Miguel Tan"><span data-icon="close"></span></button>
+        </div>
+        <div class="row">
+          <span class="avatar" aria-hidden="true">GV</span>
+          <span class="row__main">
+            <span class="row__title">Grace Villanueva</span>
+            <span class="row__sub">Paid &middot; Registered 12 Aug</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Remove Grace Villanueva from this session and refund the fee." aria-label="Remove Grace Villanueva"><span data-icon="close"></span></button>
+        </div>
+        <div class="row row--crit">
+          <span class="avatar" aria-hidden="true">JB</span>
+          <span class="row__main">
+            <span class="row__title">Jomar Bautista</span>
+            <span class="row__sub">Unpaid &middot; Collect PHP 350 at the desk</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Remove Jomar Bautista from this session." aria-label="Remove Jomar Bautista"><span data-icon="close"></span></button>
+        </div>
+        <div class="row">
+          <span class="avatar" aria-hidden="true">KU</span>
+          <span class="row__main">
+            <span class="row__title">Karen Uy</span>
+            <span class="row__sub">Paid &middot; Registered 13 Aug</span>
+          </span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Remove Karen Uy from this session and refund the fee." aria-label="Remove Karen Uy"><span data-icon="close"></span></button>
+        </div>
+      </div>
+
+      <p class="legal" style="text-align:center;">7 more registered players</p>
+    </div>
+  </div>
+</dialog>
+</div>
+
+<div class="dock">
+  <div class="dock__in">
+    <button class="btn btn--primary" type="button" data-stub="Create an Open Play session: Date, time, court, capacity, level, and fee." id="new"><span data-icon="plus"></span>Create Open Play</button>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

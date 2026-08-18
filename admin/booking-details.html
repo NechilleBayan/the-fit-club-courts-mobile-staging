@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Booking BK-2291 - Admin - The Fit Club Courts</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-title="Booking Details" data-nav="bookings" data-back="bookings.html">
+<div id="shell">
+<main id="main">
+
+  <!-- ---------- THE STANDING FACT ----------
+       A staff member opens this screen with one question and it is almost always
+       the same one: is this paid, and are they here yet. So the two statuses are
+       the first thing on the page at plate size, above the reference number and
+       above the name. Everything else is reference material. -->
+  <p class="eyebrow muted">Booking Reference</p>
+  <h1 class="screen code" tabindex="-1">BK-2291</h1>
+
+  <div class="stack-sm" style="margin-top:16px;">
+    <div class="plate plate--crit">
+      <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>
+      <span class="plate__head"><span data-icon="alert"></span>Payment Overdue</span>
+      <span class="plate__phrase">PHP 1,200 unpaid</span>
+      <span class="plate__meta">Due 12 August &middot; 3 days late &middot; No payment method on file</span>
+    </div>
+
+    <div class="plate">
+      <span class="plate__bar" aria-hidden="true"></span>
+      <span class="plate__head"><span data-icon="clock"></span>Booking Confirmed</span>
+      <span class="plate__phrase">Not checked in</span>
+      <span class="plate__meta">Starts in 42 minutes &middot; Court 3</span>
+    </div>
+  </div>
+
+  <!-- ---------- THE CUSTOMER ---------- -->
+  <section class="section" aria-labelledby="s-cust">
+    <h2 class="sec" id="s-cust">Customer</h2>
+    <div class="card">
+      <div class="row__line" style="gap:12px;">
+        <span class="avatar avatar--lg" aria-hidden="true">AL</span>
+        <span class="row__main">
+          <span class="row__title">Andrea Lim</span>
+          <span class="row__sub">Member since March 2024 &middot; 23 bookings</span>
+        </span>
+      </div>
+      <div class="btn-row" style="margin-top:14px;">
+        <a class="btn btn--sm btn--secondary" href="tel:+639171234567"><span data-icon="phone"></span>Call</a>
+        <button class="btn btn--sm btn--secondary" type="button" data-stub="Send Andrea Lim a message about this booking."><span data-icon="message"></span>Message</button>
+      </div>
+      <dl class="deflist" style="margin-top:14px;">
+        <div><dt>Phone</dt><dd class="tnum">+63 917 123 4567</dd></div>
+        <div><dt>Email</dt><dd>andrea.lim@example.com</dd></div>
+      </dl>
+      <a class="textbtn" href="player-details.html" style="margin-top:6px;">View customer record <span data-icon="arrowR"></span></a>
+    </div>
+  </section>
+
+  <!-- ---------- THE BOOKING ----------
+       Fourteen facts, and a card for each one would be unreadable. Label left,
+       value right, hairline between: the eye runs down the right hand column and
+       finds the one number it came for. -->
+  <section class="section" aria-labelledby="s-book">
+    <h2 class="sec" id="s-book">Booking</h2>
+    <div class="card">
+      <dl class="deflist">
+        <div><dt>Date</dt><dd>Sat 15 Aug 2026</dd></div>
+        <div><dt>Time</dt><dd class="tnum">11:00 AM to 12:00 PM</dd></div>
+        <div><dt>Duration</dt><dd>60 minutes</dd></div>
+        <div><dt>Court</dt><dd>Court 3</dd></div>
+        <div><dt>Players</dt><dd class="tnum">2</dd></div>
+        <div><dt>Booking Type</dt><dd>Private Court Rental</dd></div>
+        <div><dt>Price</dt><dd class="tnum">PHP 1,200.00</dd></div>
+        <div><dt>Payment Status</dt><dd><span class="st st--crit"><span data-icon="alert"></span>Overdue</span></dd></div>
+        <div><dt>Booking Status</dt><dd><span class="st st--hold"><span data-icon="clock"></span>Confirmed</span></dd></div>
+        <div><dt>Booked On</dt><dd>10 Aug 2026, 8:14 PM</dd></div>
+        <div><dt>Channel</dt><dd>Customer app</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ---------- NOTES ---------- -->
+  <section class="section" aria-labelledby="s-notes">
+    <div class="sechead">
+      <h2 class="sec" id="s-notes">Notes</h2>
+      <button class="textbtn" type="button" data-stub="Add a note to this booking. Notes are visible to all staff."><span data-icon="plus"></span>Add</button>
+    </div>
+    <div class="card card--sunken">
+      <p class="lede">Requested the court nearest the entrance. Bringing a guest who
+      is not a member yet, so collect the guest fee at the desk.</p>
+      <p class="legal" style="margin-top:8px;">Added by Joy M. &middot; 12 Aug, 9:02 AM</p>
+    </div>
+  </section>
+
+  <!-- ---------- ACTIVITY ----------
+       Below the booking, never above it. This is the audit trail, and it answers
+       "who changed this and when", which is a question that only comes up after
+       the facts above have already been read. -->
+  <section class="section" aria-labelledby="s-act">
+    <h2 class="sec" id="s-act">Activity</h2>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl tl--now">
+          <p class="tl__when">Today, 9:31 AM</p>
+          <p class="tl__what">Payment reminder sent</p>
+          <p class="tl__who">Automatic &middot; Second reminder</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">14 Aug, 4:20 PM</p>
+          <p class="tl__what">Payment marked overdue</p>
+          <p class="tl__who">Automatic &middot; 48 hours past due date</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">12 Aug, 9:02 AM</p>
+          <p class="tl__what">Note added</p>
+          <p class="tl__who">Joy Mendoza &middot; Front Desk</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">11 Aug, 2:45 PM</p>
+          <p class="tl__what">Rescheduled from Court 1 to Court 3</p>
+          <p class="tl__who">Rea Salvador &middot; Club Manager</p>
+        </div>
+        <div class="tl">
+          <p class="tl__when">10 Aug, 8:14 PM</p>
+          <p class="tl__what">Booking created</p>
+          <p class="tl__who">Andrea Lim &middot; Customer app</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ACTIONS ----------
+       Six verbs, ordered by how often a staff member reaches for them at the
+       desk, not alphabetically and not by how the data model is shaped. Mark
+       Paid and Check In are what the next person through the door needs, so they
+       are first and they are the two full weight buttons. Cancel is last, alone,
+       and carries the red edge. -->
+  <section class="section" aria-labelledby="s-actions">
+    <h2 class="sec" id="s-actions">Actions</h2>
+    <div class="btn-col">
+      <button class="btn btn--primary" type="button" data-stub="Record PHP 1,200 against booking BK-2291 and issue a receipt."><span data-icon="card"></span>Mark Paid</button>
+      <button class="btn btn--secondary" type="button" data-stub="Check Andrea Lim in and start the Court 3 clock."><span data-icon="checkc"></span>Check In</button>
+      <div class="btn-row">
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Open this booking in edit mode."><span data-icon="edit"></span>Edit</button>
+        <button class="btn btn--sm btn--ghost" type="button" data-stub="Pick a new date, time, or court."><span data-icon="calendar"></span>Reschedule</button>
+      </div>
+      <button class="btn btn--sm btn--ghost" type="button" data-stub="Call, message, or email Andrea Lim."><span data-icon="phone"></span>Contact Customer</button>
+      <button class="btn btn--sm btn--danger" type="button" data-stub="Cancel BK-2291. You will be asked whether to refund and whether to tell the customer."><span data-icon="ban"></span>Cancel Booking</button>
+    </div>
+  </section>
+
+  <p class="sandbox">
+    <span data-icon="info"></span>
+    <span>Sandbox: This is one sample booking. Every action describes what it
+    would do rather than changing anything.</span>
+  </p>
+
+</main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>
