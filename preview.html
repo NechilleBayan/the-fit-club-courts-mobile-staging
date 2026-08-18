@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fit Club Courts staging preview</title>
 <style>
-  :root{ --ink:#17181A; --paper:#F1EFEA; --line:#8C8880; }
-  @media (prefers-color-scheme: dark){ :root{ --ink:#F2F0EB; --paper:#17181A; --line:#6E6A63; } }
+  :root{ --ink:#17181A; --paper:#F1EFEA; --line:#8C8880; --quiet:#6E6A63; }
+  @media (prefers-color-scheme: dark){ :root{ --ink:#F2F0EB; --paper:#17181A; --line:#6E6A63; --quiet:#A9A794; } }
   *{ box-sizing:border-box; }
   body{
     margin:0; min-height:100vh; background:var(--paper); color:var(--ink);
@@ -15,55 +15,166 @@
   }
   h1{ font-size:19px; margin:0; text-align:center; }
   p{ margin:0; font-size:14px; max-width:64ch; text-align:center; }
+  p.quiet{ color:var(--quiet); font-size:13px; }
   code{ font-size:13px; }
-  .controls{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .controls{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; }
+  .controls b{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--quiet); margin-right:2px; }
   .controls button{
     min-height:44px; padding:0 14px; border:1px solid var(--ink); border-radius:8px;
     background:transparent; color:inherit; font:inherit; font-weight:600; cursor:pointer;
   }
   .controls button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); }
+  .controls button small{ display:block; font-size:11px; font-weight:500; opacity:.75; }
+
+  /* The stage holds the space the scaled device actually occupies. Without it a
+     device scaled to 60% would still reserve its full unscaled height, because a
+     transform does not affect layout, and the page would end in a long empty
+     gap. */
+  .stage{ width:100%; display:flex; justify-content:center; }
   .device{
     /* content-box, so the labelled size is the viewport the build actually gets
        and the bezel sits outside it rather than eating 20 pixels of it. */
     box-sizing:content-box;
     border:10px solid var(--ink); border-radius:34px; overflow:hidden;
     box-shadow:0 16px 36px rgba(0,0,0,.18); background:var(--paper);
-    width:390px; height:844px; flex:none; max-width:100%;
+    width:390px; height:844px; flex:none;
+    transform-origin:top center;
   }
+  /* A 34 pixel phone bezel drawn around a 1440 pixel viewport is not a smaller
+     phone, it is a category error. Above the breakpoint the frame becomes what a
+     window is: a thin edge and square corners. */
+  .device.is-desktop{ border-width:1px; border-radius:4px; box-shadow:0 10px 30px rgba(0,0,0,.14); }
   iframe{ width:100%; height:100%; border:0; display:block; background:var(--paper); }
 </style>
 </head>
 <body>
-  <h1>The Fit Club Courts, mobile staging preview</h1>
+  <h1>The Fit Club Courts, staging preview</h1>
   <p>
-    This frame runs <code>index.html</code> at a real phone viewport. The build is a complete document, so the frame
-    loads it directly and what you see here is what a phone renders. Desktop Chrome adds a scrollbar inside the frame
+    This frame runs the build at a real viewport. Both halves are complete documents, so the frame loads them
+    directly and what you see is what that width renders. Desktop Chrome adds a scrollbar inside the frame
     that a phone does not, so the build gets roughly 15 pixels less than the label says.
   </p>
+  <p class="quiet">
+    The frame and this page share an origin, so the staging harness dials, the armed scenario, and the theme
+    carry across the Customer and Admin targets exactly as they do in a real tab.
+  </p>
 
-  <div class="controls" id="sizes"></div>
-  <div class="device" id="device"><iframe id="frame" src="index.html" title="Fit Club Courts staging build"></iframe></div>
+  <div class="controls" id="targets" role="group" aria-label="Target"></div>
+  <div class="controls" id="sizes" role="group" aria-label="Viewport size"></div>
+  <p class="quiet" id="note"></p>
+
+  <div class="stage" id="stage">
+    <div class="device" id="device"><iframe id="frame" src="index.html" title="Fit Club Courts staging build"></iframe></div>
+  </div>
 
 <script>
-  var SIZES = [["360 x 800", 360, 800], ["390 x 844", 390, 844], ["430 x 932", 430, 932], ["768 x 1024", 768, 1024]];
+  "use strict";
+
+  /* Two targets, because the prototype is two documents and reviewing one of
+     them at a laptop width while the other is only reachable by leaving this
+     page was the gap this control closes. Admin points at the dashboard rather
+     than at admin/, which redirects there anyway; naming the real document keeps
+     the address bar honest about what is loaded. */
+  var TARGETS = [
+    ["Customer", "index.html"],
+    ["Admin", "admin/dashboard.html"]
+  ];
+
+  /* The desktop widths are here because the build now has a desktop layout worth
+     looking at: a sidebar above 1024, a two strip header below it on the customer
+     side. 768 is the one that catches people out, so it says so on the button. */
+  var SIZES = [
+    ["360 x 800", 360, 800, ""],
+    ["390 x 844", 390, 844, ""],
+    ["430 x 932", 430, 932, ""],
+    ["768 x 1024", 768, 1024, "below 1024, mobile chrome"],
+    ["1280 x 800", 1280, 800, "sidebar"],
+    ["1440 x 900", 1440, 900, "sidebar"]
+  ];
+
+  /* Defaults unchanged on purpose: opening this file looks exactly as it did
+     before the desktop widths and the target switch existed. */
   var current = 1;
-  var box = document.getElementById("sizes");
+  var target = 0;
+
+  var sizeBox = document.getElementById("sizes");
+  var targetBox = document.getElementById("targets");
+  var stage = document.getElementById("stage");
   var device = document.getElementById("device");
+  var frame = document.getElementById("frame");
+  var note = document.getElementById("note");
 
   function paint(){
-    box.innerHTML = "";
+    targetBox.innerHTML = "<b>Target</b>";
+    TARGETS.forEach(function(t, i){
+      var b = document.createElement("button");
+      b.textContent = t[0];
+      b.setAttribute("aria-pressed", String(i === target));
+      b.onclick = function(){ target = i; frame.src = t[1]; paint(); };
+      targetBox.appendChild(b);
+    });
+
+    sizeBox.innerHTML = "<b>Size</b>";
     SIZES.forEach(function(s, i){
       var b = document.createElement("button");
-      b.textContent = s[0];
+      b.innerHTML = s[0] + (s[3] ? "<small>" + s[3] + "</small>" : "");
       b.setAttribute("aria-pressed", String(i === current));
       b.onclick = function(){ current = i; size(); paint(); };
-      box.appendChild(b);
+      sizeBox.appendChild(b);
     });
   }
+
+  /* SCALED TO FIT, NOT CROPPED, AND NOT UNBEZELLED INTO A SCROLLBAR.
+     A 1440 pixel frame does not fit inside a 1440 pixel laptop once this page's
+     own padding is taken out, and until now the frame simply overflowed. Of the
+     two ways out, scaling is the one that keeps the review honest: the iframe
+     still LAYS OUT at the labelled width, so every media query fires exactly as
+     it would on a real machine of that size, and only the picture of it is
+     smaller. Letting the frame overflow and scroll instead would have kept the
+     pixels sharp and made it impossible to see a 1440 layout as a layout, which
+     is the entire reason for looking at one.
+
+     The cost is stated rather than hidden: below 100% the type is resampled, so
+     this is a layout check and not a type check, and the note says so with the
+     percentage in it. Nobody should be measuring letterforms off a scaled frame.
+
+     At the phone widths the scale is 1 and none of this applies, which is why
+     the default view is untouched. */
   function size(){
-    device.style.width = SIZES[current][1] + "px";
-    device.style.height = SIZES[current][2] + "px";
+    var s = SIZES[current];
+    var w = s[1], h = s[2];
+
+    device.style.width = w + "px";
+    device.style.height = h + "px";
+    device.classList.toggle("is-desktop", w >= 1024);
+
+    var bezel = w >= 1024 ? 2 : 20;               /* both borders */
+    var room = stage.clientWidth;
+    var scale = Math.min(1, room / (w + bezel));
+    device.style.transform = scale < 1 ? "scale(" + scale + ")" : "";
+    stage.style.height = Math.ceil((h + bezel) * scale) + "px";
+
+    var pct = Math.round(scale * 100);
+    var lines = [];
+    if (scale < 1){
+      lines.push("Shown at " + pct + "%. The frame still lays out at " + w +
+        " pixels, so every breakpoint fires as it would at full size; only the picture is smaller. " +
+        "Read layout here, not type.");
+    }
+    if (w === 768){
+      lines.push("768 is below the 1024 breakpoint, so this shows the phone chrome at tablet width. " +
+        "That is correct, not a bug: the bottom tab bar and the hamburger are still the navigation until 1024.");
+    }
+    if (w >= 1024){
+      lines.push("Above the breakpoint. The bezel is dropped here, because a phone bezel drawn around a desktop viewport is not a smaller phone.");
+    }
+    note.textContent = lines.join(" ");
   }
+
+  /* The scale depends on how much room this page has, so it is recomputed when
+     that changes rather than only when a size button is pressed. */
+  window.addEventListener("resize", size, { passive:true });
+
   paint();
   size();
 </script>
