@@ -71,7 +71,16 @@
       { label: "Notifications",   href: "notifications.html", icon: "bell", badge: "unread" },
       { label: "Activity Log",    href: "activity.html",      icon: "activity" },
       { label: "Settings",        href: "settings.html",      icon: "settings" },
-      { label: "Help / Support",  href: "help.html",          icon: "help" }
+      { label: "Help / Support",  href: "help.html",          icon: "help" },
+      /* The way back to the customer build. It used to be a button on the
+         console's contact sheet, which was the only page that had one and which
+         no longer exists; without a home here, the console would be a folder you
+         can enter and not leave except through the address bar. absolute keeps
+         the prefix off it, since it is already relative to admin/, and
+         consoleOnly keeps it out of the staff shell's rail, where a link to the
+         document you are already reading would be furniture. */
+      { label: "Customer Build",  href: "../index.html",      icon: "arrowR",
+        absolute: true, consoleOnly: true }
     ] },
     { group: "Session", items: [
       { label: "Log Out", href: "#logout", icon: "logout", danger: true }
@@ -153,7 +162,7 @@
     (opts.groups || []).forEach(function (g) {
       html += '<p class="sidenav__group"><span>' + esc(g.group) + "</span></p>";
       html += '<ul class="sidenav__list">' + g.items.map(function (item) {
-        var href = item.href.charAt(0) === "#" ? item.href : prefix + item.href;
+        var href = (item.href.charAt(0) === "#" || item.absolute) ? item.href : prefix + item.href;
         return row(item, href, !!opts.isCurrent && opts.isCurrent(item));
       }).join("") + "</ul>";
     });
@@ -233,8 +242,14 @@
        passes the whole list. As everywhere else in this build, hiding a row is
        not the security boundary, and the rail says so where it trims one. */
     groupsFor: function (surface) {
-      if (surface === "opsmanager") return GROUPS;
-      return GROUPS.filter(function (g) { return !g.ops; });
+      var allowed = surface === "opsmanager" ? GROUPS : GROUPS.filter(function (g) { return !g.ops; });
+      /* consoleOnly rows are dropped for every caller of this function, because
+         the only caller is the customer build. The console reaches for GROUPS
+         directly and keeps them. */
+      return allowed.map(function (g) {
+        var items = g.items.filter(function (it) { return !it.consoleOnly; });
+        return items.length === g.items.length ? g : { group: g.group, ops: g.ops, items: items };
+      });
     }
   };
 })();

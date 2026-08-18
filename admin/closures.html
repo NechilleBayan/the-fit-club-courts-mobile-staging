@@ -12,6 +12,7 @@
      screen ships with selected; it applies only while nobody has chosen. -->
 <script src="../staging-state.js" data-default-theme="system"></script>
 <script src="../console-nav.js"></script>
+<script src="../club.js"></script>
 <link rel="stylesheet" href="admin.css">
 <!-- The desktop rail, shared with the customer build. After admin.css, so the
      component's own rules win over the generic ones it happens to share a class
@@ -38,17 +39,21 @@
   <section class="section" aria-labelledby="s-recur">
     <h2 class="sec" id="s-recur">Recurring</h2>
     <div class="rows">
+      <!-- There used to be a weekly Monday closure here, described as a rest
+           day and carried across three screens. It was removed rather than kept,
+           because the customer build offers seven consecutive dates with no
+           exclusions and sells Open Play on every one of them: a closure the
+           booking flow does not honour is not a closure, it is a screen that
+           disagrees with the product. An empty state rather than a deleted
+           section, because "no recurring closures" is a real answer to the
+           question this section asks. -->
       <div class="row row--two row--muted">
         <div class="row__line">
           <span class="row__main">
-            <span class="row__title">Every Monday</span>
-            <span class="row__sub">Weekly rest day &middot; all courts, all day</span>
+            <span class="row__title">No recurring closures</span>
+            <span class="row__sub">The club is open every day, 6:00 AM to 11:00 PM</span>
           </span>
-          <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the weekly Monday closure." aria-label="Edit weekly Monday closure"><span data-icon="edit"></span></button>
-        </div>
-        <div class="row__tags">
-          <span class="st st--off"><span data-icon="ban"></span>Closed</span>
-          <span class="chip chip--quiet">Since Jan 2024</span>
+          <button class="iconbtn iconbtn--bare" type="button" data-stub="Add a closure that repeats every week." aria-label="Add a recurring closure"><span data-icon="plus"></span></button>
         </div>
       </div>
     </div>
@@ -62,7 +67,7 @@
         <div class="row__line">
           <span class="row__main">
             <span class="row__title">Mon 17 Aug &middot; All day</span>
-            <span class="row__sub">Weekly rest day &middot; monthly surface sweep booked in</span>
+            <span class="row__sub">Monthly surface sweep on all four courts</span>
           </span>
           <button class="iconbtn iconbtn--bare" type="button" data-stub="Edit the 17 August closure." aria-label="Edit 17 August closure"><span data-icon="edit"></span></button>
         </div>
@@ -115,7 +120,7 @@
       <div class="row row--muted">
         <span class="row__main">
           <span class="row__title">Mon 10 Aug &middot; All day</span>
-          <span class="row__sub">Weekly rest day</span>
+          <span class="row__sub">Court resurfacing, all four courts</span>
         </span>
       </div>
     </div>

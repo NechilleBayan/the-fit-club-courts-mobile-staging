@@ -52,7 +52,10 @@
   var UNASSIGNED = { pending:2, inProgress:1 };
 
   var DATA = {
-    club:   { name:"The Fit Club Courts", plan:"Kapitolyo, Pasig" },
+    /* From club.js, shared with the customer build. It used to be a literal
+       here saying Kapitolyo, Pasig, which is a different city from the one the
+       customer build sends people to. */
+    club:   window.CLUB,
     admin:  STAFF[0],
     staff:  STAFF,
     unassigned: UNASSIGNED,
@@ -239,6 +242,7 @@
                  badge:(t.id === "more" ? "pendingTasks" : null), quiet:true };
       }),
       groups: NAV.GROUPS,
+      note: "Customer Build, in the System group, is the way back to the other half of this prototype. It carries the theme and the armed scenario across.",
       isCurrent: function(item){ return item.href === here; }
     });
 

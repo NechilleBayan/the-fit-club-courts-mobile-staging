@@ -12,6 +12,7 @@
      screen ships with selected; it applies only while nobody has chosen. -->
 <script src="../staging-state.js" data-default-theme="system"></script>
 <script src="../console-nav.js"></script>
+<script src="../club.js"></script>
 <link rel="stylesheet" href="admin.css">
 <!-- The desktop rail, shared with the customer build. After admin.css, so the
      component's own rules win over the generic ones it happens to share a class
@@ -85,18 +86,18 @@
   <section class="section" aria-labelledby="s-vol">
     <h2 class="sec" id="s-vol">Bookings By Day</h2>
     <div class="card">
-      <div class="bars" role="img" aria-label="Bookings by day: Saturday 18, Sunday 21, Monday closed, Tuesday 9, Wednesday 12, Thursday 14, Friday 17">
+      <div class="bars" role="img" aria-label="Bookings by day: Saturday 18, Sunday 21, Monday 7, Tuesday 9, Wednesday 12, Thursday 14, Friday 17">
         <div><div class="bar bar--on" style="height:78%;"></div><small>Sat</small></div>
         <div><div class="bar bar--on" style="height:92%;"></div><small>Sun</small></div>
-        <div><div class="bar" style="height:4%;"></div><small>Mon</small></div>
+        <div><div class="bar" style="height:30%;"></div><small>Mon</small></div>
         <div><div class="bar" style="height:38%;"></div><small>Tue</small></div>
         <div><div class="bar" style="height:52%;"></div><small>Wed</small></div>
         <div><div class="bar" style="height:60%;"></div><small>Thu</small></div>
         <div><div class="bar" style="height:74%;"></div><small>Fri</small></div>
       </div>
-      <p class="legal" style="margin-top:12px;">Monday is the weekly rest day. Weekend
-      demand is roughly double the midweek average, which is where the two busiest
-      staff shifts sit.</p>
+      <p class="legal" style="margin-top:12px;">Monday is the quietest day the club
+      is open, not a day it is shut. Weekend demand is roughly triple it, which is
+      where the two busiest staff shifts sit.</p>
     </div>
   </section>
 

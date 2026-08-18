@@ -22,6 +22,10 @@
      document is still parsing, and a deferred script would not have run yet. -->
 <script src="console-nav.js"></script>
 
+<!-- The club itself: One address, one pair of opening times, read by both
+     builds. See club.js for which build won which argument. -->
+<script src="club.js"></script>
+
 <!-- The desktop rail. Same component, same stylesheet, both builds. It names no
      colours: every value is a token, and this document declares all of them, which
      is what lets one sheet serve two palettes that are inverses of each other.
@@ -2565,13 +2569,11 @@ const OP_CAPACITY = 50;              // default confirmed admissions per window
    a smaller per-order figure the reader has no way to see the reason for. */
 const DEMO_QTY_CAP = OP_CAPACITY;
 const TZ = "Asia/Manila";
-const VENUE = {
-  name: "The Fit Club Courts",
-  area: "Silway-8, Polomolok, South Cotabato",
-  email: "thefitclubph@gmail.com",
-  phone: "+63 999 195 3170",
-  courts: 4
-};
+/* The club's own details now live in club.js, which the admin console reads too.
+   VENUE stays as the name this file has always used them by, so the two hundred
+   or so references below did not all have to be rewritten to prove a point about
+   where the strings are kept. */
+const VENUE = window.CLUB;
 
 /* ---------- STATE ---------- */
 const S = {
@@ -3525,7 +3527,7 @@ function readForm(ids){
 
 
 /* ---------- v2 shared blocks ---------- */
-var MAPS_URL = "https://www.google.com/maps/search/?api=1&query=The+Fit+Club+Courts+Silway-8+Polomolok+South+Cotabato";
+var MAPS_URL = VENUE.maps;
 
 /* What each choice actually buys you. Printed inside the choice itself, because a
    sentence sitting somewhere else on the page is not part of the decision. */
@@ -3559,7 +3561,7 @@ function footerBlock(){
         '<a href="' + MAPS_URL + '" target="_blank" rel="noopener">' + icon("pin") + esc(VENUE.area) + "</a>" +
         '<a href="tel:+639991953170">' + icon("phone") + esc(VENUE.phone) + "</a>" +
         '<a href="mailto:' + esc(VENUE.email) + '">' + icon("mail") + esc(VENUE.email) + "</a>" +
-        '<p class="footline">' + icon("clock") + "<span>Open daily, 6AM to 11PM</span></p>" +
+        '<p class="footline">' + icon("clock") + "<span>" + esc(VENUE.hoursPhrase) + "</span></p>" +
         /* Visit folded into the phone menu when the bottom bar went, and the menu
            button is a phone control, so from 1024px up this is the way to the page.
            A plain hash link: the router already answers to one.
@@ -3786,7 +3788,7 @@ function scrVisit(){
     "<p class=\"txn\" style=\"margin-top:var(--s2)\">" + esc(VENUE.area) + "</p>" +
     '<p class="legal" style="margin-top:var(--s2)">Exact street address and pin: To be confirmed.</p></div></div>';
   html += '<div class="section"><div class="card"><p class="eyebrow muted">Hours</p>' +
-    '<p class="txn" style="margin-top:var(--s2)">Hours: 6AM to 11PM ' + sampleMark("Sample") + "</p>" +
+    '<p class="txn" style="margin-top:var(--s2)">Hours: ' + esc(VENUE.opens) + " to " + esc(VENUE.closes) + " " + sampleMark("Sample") + "</p>" +
     '<p class="legal" style="margin-top:var(--s2)">Bookable hours appear in the court time list. They are sample values on this build.</p></div></div>';
   html += '<div class="section"><div class="card"><p class="eyebrow muted">Contact</p>' +
     '<p style="margin-top:var(--s2)">' + esc(VENUE.phone) + "<br>" + esc(VENUE.email) + "</p>" +
@@ -6265,7 +6267,51 @@ const ALL_ROUTES = [
   ["/staff/openplay/w1","stf-openplay, Open Play window, staff"], ["/staff/exceptions","stf-exceptions, Exception queue"],
   ["/sys/link","sys-link, Link not valid"], ["/sys/interruption","sys-interruption, Service interruption"],
   ["/demo","sys-demo, Staging harness"],
-  ["/t/name/expired","tok-name, Player name invite, expired"]
+    ["/t/name/expired","tok-name, Player name invite, expired"],
+
+  /* ---------- THE ADMIN CONSOLE ----------
+     Twenty-six screens that are not routes in this router. They are separate
+     documents in admin/, so their entries carry a third element: The group they
+     belong to, which doubles as the flag that says this is an href rather than a
+     hash. The list renders them under their group headings with the real file
+     path in the code line, so nobody mistakes one for a route this file can
+     resolve.
+
+     They are in THIS array rather than one of their own because the console used
+     to keep a hand-maintained contact sheet of itself at admin/index.html. The
+     moment this harness also listed the admin pages there were two indexes of one
+     folder, both maintained by hand, and the second one to be edited would have
+     been wrong. The contact sheet is gone. This is the index. */
+
+  ["admin/dashboard.html", "adm-dashboard, Dashboard", "Console"],
+  ["admin/bookings.html", "adm-bookings, Bookings", "Console"],
+  ["admin/courts.html", "adm-courts, Courts", "Console"],
+  ["admin/staff.html", "adm-staff, Staff", "Console"],
+  ["admin/more.html", "adm-more, More", "Console"],
+
+  ["admin/booking-details.html", "adm-booking, Booking detail", "Detail screens"],
+  ["admin/court-details.html", "adm-court, Court detail", "Detail screens"],
+  ["admin/staff-details.html", "adm-staff-one, Staff member", "Detail screens"],
+  ["admin/player-details.html", "adm-player, Player record", "Detail screens"],
+
+  ["admin/tasks.html", "adm-tasks, Tasks and delegation", "Operations"],
+  ["admin/open-play.html", "adm-openplay, Open Play", "Operations"],
+  ["admin/check-in.html", "adm-checkin, Check-in", "Operations"],
+  ["admin/payments.html", "adm-payments, Payments", "Operations"],
+  ["admin/players.html", "adm-players, Players and customers", "Operations"],
+  ["admin/maintenance.html", "adm-maintenance, Maintenance", "Operations"],
+  ["admin/closures.html", "adm-closures, Blocked dates and closures", "Operations"],
+  ["admin/messages.html", "adm-messages, Messages", "Operations"],
+  ["admin/notifications.html", "adm-notifications, Notifications", "Operations"],
+  ["admin/reports.html", "adm-reports, Reports", "Operations"],
+  ["admin/activity.html", "adm-activity, Activity log", "Operations"],
+
+  ["admin/club-profile.html", "adm-club, Club profile", "Club and system"],
+  ["admin/staff-manage.html", "adm-staff-manage, Staff management", "Club and system"],
+  ["admin/rates.html", "adm-rates, Rates and promotions", "Club and system"],
+  ["admin/hours.html", "adm-hours, Operating hours", "Club and system"],
+  ["admin/settings.html", "adm-settings, Settings", "Club and system"],
+  ["admin/help.html", "adm-help, Help and support", "Club and system"]
 ];
 
 function openDemo(){
@@ -6361,11 +6407,30 @@ function openDemo(){
     hlink("/sys/link", "Invalid or revoked link") +
     '</div><p class="legal" style="margin-top:var(--s2)">A shared pass link opens one pass and nothing else: No pass list, no other players, no organizer details, and no route to the booking.</p></div>';
 
+  /* One list, two kinds of destination. A hash route re-renders this document
+     and closes the sheet on the way; an admin screen is a separate document, so
+     the link is a plain href, the sheet needs no closing because the page is
+     leaving, and the code line carries the real file path rather than a route.
+     The group heading appears only for the second kind, which is what tells the
+     two apart at a glance without a badge on every row. */
+  let lastGroup = null;
   b += '<div><h3>Every screen</h3><div class="routelist">' +
     ALL_ROUTES.map(function(r){
       const parts = r[1].split(", ");
-      return '<a href="#' + esc(r[0]) + '" data-action="closesheet">' + esc(parts[1]) + "<code>" + esc(r[0]) + " &middot; " + esc(parts[0]) + "</code></a>";
-    }).join("") + '</div><p class="legal" style="margin-top:var(--s2)">Every route that needs no live order. The rest are under This order\'s screens above.</p></div>';
+      const group = r[2];
+      let out = "";
+      if (group && group !== lastGroup){
+        lastGroup = group;
+        out += '<p class="legal" style="margin:var(--s4) 0 var(--s1)">' + esc(group) + "</p>";
+      }
+      if (group){
+        return out + '<a href="' + esc(r[0]) + '">' + esc(parts[1]) +
+          "<code>" + esc(r[0]) + " &middot; " + esc(parts[0]) + "</code></a>";
+      }
+      return out + '<a href="#' + esc(r[0]) + '" data-action="closesheet">' + esc(parts[1]) +
+        "<code>" + esc(r[0]) + " &middot; " + esc(parts[0]) + "</code></a>";
+    }).join("") +
+    '</div><p class="legal" style="margin-top:var(--s2)">Everything above the Console heading is a route in this document that needs no live order; the rest are under This order\'s screens. Everything below it is a separate document in admin/, and opens in this tab carrying the current scenario and theme with it.</p></div>';
 
   b += '<div><button class="h" style="width:100%" data-action="resetall">Reset all state</button></div>';
 
@@ -6401,7 +6466,7 @@ function scrDemo(){
      ["Open Play capacity","Places available, Almost full, or Full."],
      ["This order's screens","The hold, the checkout, the booking detail, and the passes, which need a live order and so cannot sit in a static index."],
      ["Token links","Valid, expired, and revoked variants, since no real link can be issued without a backend."],
-     ["Screen index","Every route that needs no live order, by screen id."]].map(function(r){
+     ["Screen index","Every route that needs no live order, by screen id, and then all 26 admin console screens. The console retired its own hand-maintained contact sheet when this list took the job."]].map(function(r){
       return '<li class="row"><span class="row__main"><span class="row__title">' + esc(r[0]) + '</span><span class="row__sub">' + esc(r[1]) + "</span></span></li>";
     }).join("") + "</ul></div>";
   html += '<p class="legal section">A forced state always renders a hatched marker under the app bar, so nothing you see during a walkthrough is mistaken for natural behaviour.</p>';

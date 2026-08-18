@@ -12,6 +12,7 @@
      screen ships with selected; it applies only while nobody has chosen. -->
 <script src="../staging-state.js" data-default-theme="system"></script>
 <script src="../console-nav.js"></script>
+<script src="../club.js"></script>
 <link rel="stylesheet" href="admin.css">
 <!-- The desktop rail, shared with the customer build. After admin.css, so the
      component's own rules win over the generic ones it happens to share a class
@@ -80,13 +81,18 @@
       <p class="legal" style="margin-bottom:12px;">Every status is drawn as well as
       named, so the screen still reads correctly in bright sun, in greyscale, and
       to anyone who cannot separate the red from the ink.</p>
+      <p class="legal" style="margin-bottom:12px;">The words are the customer
+      build's words. A booking a customer is told is Held is Held here too, and
+      never Reserved: Held is the one that admits the time is not secured yet,
+      which is the whole point of saying it. Needs review is the same state the
+      customer sees when a payment arrives that does not match its order.</p>
       <dl class="deflist">
         <div><dt><span class="st st--ok"><span data-icon="check"></span>Solid</span></dt><dd>Available, Paid, Completed, Confirmed</dd></div>
-        <div><dt><span class="st st--hold"><span data-icon="clock"></span>Hatched</span></dt><dd>Reserved, Pending, Unpaid, In progress</dd></div>
+        <div><dt><span class="st st--hold"><span data-icon="clock"></span>Hatched</span></dt><dd>Held, Pending, Unpaid, In progress</dd></div>
         <div><dt><span class="st st--live"><span data-icon="play"></span>Dotted</span></dt><dd>In use, Checked in, Session running</dd></div>
         <div><dt><span class="st st--off"><span data-icon="ban"></span>Dashed</span></dt><dd>Blocked, Closed, Cancelled, Refunded</dd></div>
         <div><dt><span class="st st--work"><span data-icon="wrench"></span>Double</span></dt><dd>Maintenance, out of service</dd></div>
-        <div><dt><span class="st st--crit"><span data-icon="alert"></span>Red</span></dt><dd>Overdue, Failed, Conflict</dd></div>
+        <div><dt><span class="st st--crit"><span data-icon="alert"></span>Red</span></dt><dd>Overdue, Failed, Conflict, Needs review</dd></div>
       </dl>
       <p class="legal" style="margin-top:14px;">Priority is not a status and does not
       use any of the six above. A <span class="st st--prio">High</span> task carries
@@ -100,11 +106,11 @@
       <p class="lede">Something broken, or a question the guides do not answer.</p>
       <div class="btn-col" style="margin-top:14px;">
         <button class="btn btn--sm btn--primary" type="button" data-stub="Open a support request with a description and a screenshot."><span data-icon="message"></span>Open a Support Request</button>
-        <a class="btn btn--sm btn--ghost" href="mailto:support@thefitclubcourts.ph"><span data-icon="mail"></span>Email Support</a>
+        <a class="btn btn--sm btn--ghost" href="mailto:thefitclubph@gmail.com"><span data-icon="mail"></span>Email Support</a>
       </div>
       <dl class="deflist" style="margin-top:14px;">
         <div><dt>Response time</dt><dd>Within one working day</dd></div>
-        <div><dt>Urgent issues</dt><dd class="tnum">+63 2 8555 0140</dd></div>
+        <div><dt>Urgent issues</dt><dd class="tnum">+63 999 195 3170</dd></div>
       </dl>
     </div>
   </section>

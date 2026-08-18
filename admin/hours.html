@@ -12,6 +12,7 @@
      screen ships with selected; it applies only while nobody has chosen. -->
 <script src="../staging-state.js" data-default-theme="system"></script>
 <script src="../console-nav.js"></script>
+<script src="../club.js"></script>
 <link rel="stylesheet" href="admin.css">
 <!-- The desktop rail, shared with the customer build. After admin.css, so the
      component's own rules win over the generic ones it happens to share a class
@@ -25,6 +26,10 @@
   <h1 class="screen" tabindex="-1">Operating Hours</h1>
   <p class="legal">The window customers can book inside. Closures and court blocks
   cut into these hours without changing them.</p>
+  <p class="legal">Seven identical rows because the club is open seven identical
+  days. The customer build sells Open Play from 7:00 PM to 11:00 PM and offers
+  seven consecutive dates with no exclusions, so these are the hours it is
+  already trading on.</p>
 
   <section class="section" aria-labelledby="s-week">
     <div class="sechead">
@@ -33,13 +38,13 @@
     </div>
     <div class="card">
       <dl class="deflist">
-        <div><dt>Monday</dt><dd><span class="st st--off"><span data-icon="ban"></span>Closed</span></dd></div>
-        <div><dt>Tuesday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
-        <div><dt>Wednesday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
-        <div><dt>Thursday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
-        <div><dt>Friday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
-        <div><dt>Saturday</dt><dd class="tnum">6:00 AM to 10:00 PM</dd></div>
-        <div><dt>Sunday</dt><dd class="tnum">6:00 AM to 8:00 PM</dd></div>
+        <div><dt>Monday</dt><dd class="tnum">6:00 AM to 11:00 PM</dd></div>
+        <div><dt>Tuesday</dt><dd class="tnum">6:00 AM to 11:00 PM</dd></div>
+        <div><dt>Wednesday</dt><dd class="tnum">6:00 AM to 11:00 PM</dd></div>
+        <div><dt>Thursday</dt><dd class="tnum">6:00 AM to 11:00 PM</dd></div>
+        <div><dt>Friday</dt><dd class="tnum">6:00 AM to 11:00 PM</dd></div>
+        <div><dt>Saturday</dt><dd class="tnum">6:00 AM to 11:00 PM</dd></div>
+        <div><dt>Sunday</dt><dd class="tnum">6:00 AM to 11:00 PM</dd></div>
       </dl>
     </div>
   </section>

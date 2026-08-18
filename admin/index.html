@@ -2,98 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Admin Console - The Fit Club Courts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin console - The Fit Club Courts</title>
 <meta name="color-scheme" content="light dark">
-<!-- The staging bridge, shared with the customer build one level up. Synchronous
-     and ahead of the stylesheet because the first thing it does is settle the
-     theme, and a theme settled after the first paint is a flash of the wrong
-     one. system is this console's own default, which is what the Settings
-     screen ships with selected; it applies only while nobody has chosen. -->
-<script src="../staging-state.js" data-default-theme="system"></script>
-<script src="../console-nav.js"></script>
+
+<!-- ============================================================
+     THE CONTACT SHEET IS GONE.
+     This file used to be a hand-maintained index of all twenty-six console
+     screens, four sections of rows, kept in step with the folder by whoever
+     remembered. The staging harness in the customer build now lists every one of
+     them under Every screen, beside the customer routes, from the same array the
+     harness has always used. Two hand-maintained indexes of one folder is one
+     too many, and the second one to be edited would have been the wrong one.
+
+     What is left is the reason this filename still has to exist: a request for
+     admin/ with no trailing document resolves here, and a static server with no
+     index would answer it with a directory listing or a 404. Neither is a
+     sensible place to land. The dashboard is.
+
+     Three redirects, because each covers a case the others do not. The script
+     runs first and uses replace() so this page never enters the history and Back
+     does not bounce the reader straight back into it. The meta refresh covers
+     scripting being off. The link covers both being off, and is the only one a
+     screen reader will ever announce, which is why it reads as a sentence rather
+     than as the word "here".
+     ============================================================ -->
+<script>location.replace("dashboard.html");</script>
+<meta http-equiv="refresh" content="0; url=dashboard.html">
+<link rel="canonical" href="dashboard.html">
 <link rel="stylesheet" href="admin.css">
-<!-- The desktop rail, shared with the customer build. After admin.css, so the
-     component's own rules win over the generic ones it happens to share a class
-     name with. -->
-<link rel="stylesheet" href="../console-nav.css">
 </head>
-<body data-title="Admin Sandbox" data-nav="">
+<body data-title="Admin console">
 <div id="shell">
 <main id="main">
-
-  <p class="eyebrow muted">The Fit Club Courts</p>
-  <h1 class="screen" tabindex="-1">Admin Console</h1>
-  <p class="lede">Staff facing sandbox. Every screen carries the palette, type,
-  button behaviour, and hidden scrollbar of the customer prototype, with the app
-  bar and tab bar inverted so a staff member can tell the two apart at a glance.</p>
-
-  <div class="btn-col" style="margin-top:20px;">
-    <a class="btn btn--primary" href="dashboard.html"><span data-icon="grid"></span>Open the Console</a>
-    <a class="btn btn--sm btn--ghost" href="../index.html"><span data-icon="arrowR"></span>Customer Prototype</a>
-  </div>
-
-  <!-- ---------- CONTACT SHEET ----------
-       Not part of the product. This page exists so the whole build can be
-       reviewed without hunting for a route into each screen. -->
-  <section class="section" aria-labelledby="s-main">
-    <h2 class="sec" id="s-main">Bottom Navigation</h2>
-    <div class="rows">
-      <a class="row" href="dashboard.html"><span data-icon="grid"></span><span class="row__main"><span class="row__title">Dashboard</span><span class="row__sub">Daily operational overview</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="bookings.html"><span data-icon="calendar"></span><span class="row__main"><span class="row__title">Bookings</span><span class="row__sub">Reservation and schedule management</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="courts.html"><span data-icon="court"></span><span class="row__main"><span class="row__title">Courts</span><span class="row__sub">Court availability and status</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="staff.html"><span data-icon="users"></span><span class="row__main"><span class="row__title">Staff</span><span class="row__sub">Availability and delegated tasks</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="more.html"><span data-icon="dots"></span><span class="row__main"><span class="row__title">More</span><span class="row__sub">Secondary operational tools</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="s-detail">
-    <h2 class="sec" id="s-detail">Detail Screens</h2>
-    <div class="rows">
-      <a class="row" href="booking-details.html"><span data-icon="list"></span><span class="row__main"><span class="row__title">Booking Details</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="court-details.html"><span data-icon="court"></span><span class="row__main"><span class="row__title">Court Details</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="staff-details.html"><span data-icon="user"></span><span class="row__main"><span class="row__title">Staff Member</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="player-details.html"><span data-icon="user"></span><span class="row__main"><span class="row__title">Player Record</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="s-ops">
-    <h2 class="sec" id="s-ops">Operations</h2>
-    <div class="rows">
-      <a class="row" href="tasks.html"><span data-icon="tasks"></span><span class="row__main"><span class="row__title">Tasks and Delegation</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="open-play.html"><span data-icon="play"></span><span class="row__main"><span class="row__title">Open Play</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="check-in.html"><span data-icon="checkc"></span><span class="row__main"><span class="row__title">Check-in</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="payments.html"><span data-icon="card"></span><span class="row__main"><span class="row__title">Payments</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="players.html"><span data-icon="user"></span><span class="row__main"><span class="row__title">Players and Customers</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="maintenance.html"><span data-icon="wrench"></span><span class="row__main"><span class="row__title">Maintenance</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="closures.html"><span data-icon="lock"></span><span class="row__main"><span class="row__title">Blocked Dates and Closures</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="messages.html"><span data-icon="message"></span><span class="row__main"><span class="row__title">Messages</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="notifications.html"><span data-icon="bell"></span><span class="row__main"><span class="row__title">Notifications</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="reports.html"><span data-icon="chart"></span><span class="row__main"><span class="row__title">Reports</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="activity.html"><span data-icon="activity"></span><span class="row__main"><span class="row__title">Activity Log</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="s-sys">
-    <h2 class="sec" id="s-sys">Club and System</h2>
-    <div class="rows">
-      <a class="row" href="club-profile.html"><span data-icon="building"></span><span class="row__main"><span class="row__title">Club Profile</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="staff-manage.html"><span data-icon="key"></span><span class="row__main"><span class="row__title">Staff Management</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="rates.html"><span data-icon="tag"></span><span class="row__main"><span class="row__title">Rates and Promotions</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="hours.html"><span data-icon="hours"></span><span class="row__main"><span class="row__title">Operating Hours</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="settings.html"><span data-icon="settings"></span><span class="row__main"><span class="row__title">Settings</span><span class="row__sub">Includes the light and dark theme switch</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-      <a class="row" href="help.html"><span data-icon="help"></span><span class="row__main"><span class="row__title">Help and Support</span><span class="row__sub">Includes the full status legend</span></span><span data-icon="chevR" data-icon-class="row__chev"></span></a>
-    </div>
-  </section>
-
-  <p class="sandbox">
-    <span data-icon="info"></span>
-    <span>Sandbox: 26 screens, all sample data. Actions describe what they would
-    do rather than changing anything, except the theme switch in Settings.</span>
-  </p>
-
+  <h1 class="screen" tabindex="-1">Admin console</h1>
+  <p class="lede">This address opens the dashboard.
+    <a href="dashboard.html">Continue to the dashboard</a> if it has not already.</p>
+  <p class="legal">Looking for the full screen index? It lives in the staging
+  harness in the customer build, under Every screen.</p>
 </main>
 </div>
-<script src="admin.js"></script>
 </body>
 </html>
