@@ -946,15 +946,6 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
   background-image:linear-gradient(rgba(var(--ghost-fill),.40),rgba(var(--ghost-fill),.40));
 }
 
-/* Neither state leans on colour, so neither needs a colour here. What more
-   contrast buys is separation: the chip's fill goes to the strongest thing the
-   page has that is not the inverse plate, and both borders thicken, so the two
-   idioms stay two idioms rather than converging at the top of the scale. */
-@media (prefers-contrast:more){
-  .filter[aria-pressed="true"]{ background-image:linear-gradient(rgba(var(--ghost-fill),.45),rgba(var(--ghost-fill),.45)); border-width:2px; }
-  .seg [aria-pressed="true"], .seg [aria-selected="true"]{ border-width:2px; }
-}
-
 /* ---------- SEGMENTED (tabs within a page) ---------- */
 .seg{ display:flex; gap:6px; }
 /* Every segment is one line. Letting one of three labels wrap makes that
@@ -975,6 +966,21 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
    ink and inverts. See the note on .filter[aria-pressed] above for the pair. */
 .seg [aria-pressed="true"], .seg [aria-selected="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); font-weight:700; }
 .seg button:active{ background:rgba(var(--ghost-fill),.24); }
+
+/* Placed after both idioms rather than beside the first of them, because a
+   media query adds no specificity: written above the .seg rule it lost to it at
+   equal weight and the segmented control silently kept its 1.5px border. Found
+   by the Phase 4 sweep, which is the argument for asserting on computed values
+   rather than on the stylesheet reading correctly.
+
+   Neither state leans on colour, so neither needs a colour here. What more
+   contrast buys is separation: the chip's fill goes to the strongest thing the
+   page has that is not the inverse plate, and both borders thicken, so the two
+   idioms stay two idioms rather than converging at the top of the scale. */
+@media (prefers-contrast:more){
+  .filter[aria-pressed="true"]{ background-image:linear-gradient(rgba(var(--ghost-fill),.45),rgba(var(--ghost-fill),.45)); border-width:2px; }
+  .seg [aria-pressed="true"], .seg [aria-selected="true"]{ border-width:2px; }
+}
 
 /* ---------- DEFINITION LIST (detail screens) ----------
    Label left, value right, hairline between. A booking has fourteen facts and a
