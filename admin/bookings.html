@@ -44,7 +44,7 @@
   <div class="datestrip" role="group" aria-label="Pick a day" data-toggle="single" style="margin-top:12px;">
     <button class="daybtn" type="button" aria-pressed="false"><small>Thu</small><strong>13</strong><i>14 bk</i></button>
     <button class="daybtn" type="button" aria-pressed="false"><small>Fri</small><strong>14</strong><i>17 bk</i></button>
-    <button class="daybtn" type="button" aria-pressed="true"><small>Sat</small><strong>15</strong><i>18 bk</i></button>
+    <button class="daybtn" type="button" aria-pressed="true"><small>Sat</small><strong>15</strong><i data-daycount="list">0 bk</i></button>
     <button class="daybtn" type="button" aria-pressed="false"><small>Sun</small><strong>16</strong><i>21 bk</i></button>
     <button class="daybtn" type="button" aria-pressed="false" data-state="closed"><small>Mon</small><strong>17</strong><i>Closed</i></button>
     <button class="daybtn" type="button" aria-pressed="false"><small>Tue</small><strong>18</strong><i>9 bk</i></button>
@@ -56,10 +56,15 @@
        other, so they get a real switch rather than a filter chip. Blocked Time
        belongs here because from the court's point of view it is the same
        question: who has this court at 3 PM. -->
-  <div class="seg" role="group" aria-label="Booking type" data-toggle="single" style="margin-top:16px;">
-    <button type="button" aria-pressed="true">Bookings <span class="countpill countpill--quiet tnum">18</span></button>
-    <button type="button" aria-pressed="false">Open Play <span class="countpill countpill--quiet tnum">3</span></button>
-    <button type="button" aria-pressed="false">Blocked <span class="countpill countpill--quiet tnum">2</span></button>
+  <!-- data-mode, not just data-filters. This group changes what kind of thing
+       the list is showing, so the option that is pressed renames the heading
+       below rather than adding itself to the list of filters applied to it.
+       "1 Blocked time" is what a blocked court is; "1 Booking, filtered by
+       Blocked" is the same fact said wrong. -->
+  <div class="seg" role="group" aria-label="Booking type" data-toggle="single" data-filters="list" data-mode style="margin-top:16px;">
+    <button type="button" aria-pressed="true" data-match="kind=booking" data-noun="Booking">Bookings <span class="countpill countpill--quiet tnum" data-count="kind=booking">0</span></button>
+    <button type="button" aria-pressed="false" data-match="kind=openplay" data-noun="Open Play session">Open Play <span class="countpill countpill--quiet tnum" data-count="kind=openplay">0</span></button>
+    <button type="button" aria-pressed="false" data-match="kind=blocked" data-noun="Blocked time">Blocked <span class="countpill countpill--quiet tnum" data-count="kind=blocked">0</span></button>
   </div>
 
   <label class="search" style="margin-top:12px;">
@@ -70,12 +75,21 @@
 
   <!-- Filters scroll rather than wrap, so the row height never changes as
        filters are added and the list below never jumps. -->
-  <div class="filterbar" role="group" aria-label="Filter bookings" data-toggle="multi" style="margin-top:10px;">
-    <button class="filter" type="button" aria-pressed="false"><span data-icon="filter"></span>All Courts</button>
-    <button class="filter" type="button" aria-pressed="true">Unpaid</button>
-    <button class="filter" type="button" aria-pressed="false">Not Checked In</button>
-    <button class="filter" type="button" aria-pressed="false">Confirmed</button>
-    <button class="filter" type="button" aria-pressed="false">Cancelled</button>
+  <div class="filterbar" role="group" aria-label="Filter bookings" data-toggle="multi" data-filters="list" style="margin-top:10px;">
+    <!-- Not a toggle, so it carries no aria-pressed and the toggle handler
+         skips it. A court picker is the one control in this bar that needs a
+         list of its own, and a chip that says "All Courts" and paints itself
+         pressed would be claiming to have narrowed something. It says what it
+         would open instead. -->
+    <button class="filter" type="button" data-stub="Open a court picker and narrow the list to one court."><span data-icon="filter"></span>All Courts</button>
+    <!-- Unpaid takes Overdue with it. Overdue is unpaid and late, and a staff
+         member chasing money wants both; the alternation is written here rather
+         than buried in the handler so the chip's definition is readable beside
+         the chip. -->
+    <button class="filter" type="button" aria-pressed="false" data-match="pay=unpaid|overdue">Unpaid</button>
+    <button class="filter" type="button" aria-pressed="false" data-match="checkedin=false">Not Checked In</button>
+    <button class="filter" type="button" aria-pressed="false" data-match="status=confirmed">Confirmed</button>
+    <button class="filter" type="button" aria-pressed="false" data-match="status=cancelled">Cancelled</button>
   </div>
 
   <!-- ---------- THE LIST ----------
@@ -85,13 +99,13 @@
        order on every row, so the eye can run down one column. -->
   <section class="section" aria-labelledby="s-list" style="margin-top:20px;">
     <div class="sechead">
-      <h2 class="sec" id="s-list">18 Bookings</h2>
+      <h2 class="sec" id="s-list" data-listcount="Booking">0 Bookings</h2>
       <span class="legal">Sat 15 Aug</span>
     </div>
 
-    <div class="rows" data-scn-slot="rows">
+    <div class="rows" data-rowset="list" data-scn-slot="rows">
 
-      <div class="row row--bar row--two row--timed">
+      <div class="row row--bar row--two row--timed" data-kind="booking" data-court="1" data-pay="paid" data-checkedin="true" data-status="checkedin">
         <div class="row__line">
           <span class="row__time"><b>9:00</b><span>10:30 AM</span></span>
           <a class="row__main" href="booking-details.html">
@@ -106,7 +120,7 @@
         </div>
       </div>
 
-      <div class="row row--bar row--barhatch row--two row--timed">
+      <div class="row row--bar row--barhatch row--two row--timed" data-kind="openplay" data-court="2" data-pay="paid" data-checkedin="false" data-status="confirmed">
         <div class="row__line">
           <span class="row__time"><b>10:30</b><span>12:00 PM</span></span>
           <a class="row__main" href="booking-details.html">
@@ -121,7 +135,7 @@
         </div>
       </div>
 
-      <div class="row row--bar row--barcrit row--crit row--two row--timed">
+      <div class="row row--bar row--barcrit row--crit row--two row--timed" data-kind="booking" data-court="3" data-pay="overdue" data-checkedin="false" data-status="confirmed">
         <div class="row__line">
           <span class="row__time"><b>11:00</b><span>12:00 PM</span></span>
           <a class="row__main" href="booking-details.html">
@@ -136,7 +150,7 @@
         </div>
       </div>
 
-      <div class="row row--bar row--two row--timed">
+      <div class="row row--bar row--two row--timed" data-kind="booking" data-court="1" data-pay="unpaid" data-checkedin="false" data-status="confirmed">
         <div class="row__line">
           <span class="row__time"><b>12:00</b><span>1:30 PM</span></span>
           <a class="row__main" href="booking-details.html">
@@ -151,7 +165,7 @@
         </div>
       </div>
 
-      <div class="row row--bar row--barhatch row--muted row--two row--timed">
+      <div class="row row--bar row--barhatch row--muted row--two row--timed" data-kind="blocked" data-court="4" data-pay="none" data-checkedin="false">
         <div class="row__line">
           <span class="row__time"><b>1:00</b><span>3:00 PM</span></span>
           <a class="row__main" href="court-details.html">
@@ -165,7 +179,7 @@
         </div>
       </div>
 
-      <div class="row row--bar row--two row--timed">
+      <div class="row row--bar row--two row--timed" data-kind="booking" data-court="2" data-pay="paid" data-checkedin="false" data-status="confirmed">
         <div class="row__line">
           <span class="row__time"><b>3:00</b><span>4:30 PM</span></span>
           <a class="row__main" href="booking-details.html">
@@ -180,7 +194,7 @@
         </div>
       </div>
 
-      <div class="row row--bar row--muted row--two row--timed">
+      <div class="row row--bar row--muted row--two row--timed" data-kind="booking" data-court="3" data-pay="refunded" data-checkedin="false" data-status="cancelled">
         <div class="row__line">
           <span class="row__time"><b>5:00</b><span>6:00 PM</span></span>
           <a class="row__main" href="booking-details.html">
@@ -197,13 +211,26 @@
 
     </div>
 
-    <p class="legal" style="text-align:center; padding-top:8px;">11 more bookings later today</p>
+    <!-- Shown only when a filter combination selects nothing. A dead end here
+         would be worse than the pre-pressed chip this finding started as: the
+         reader would have an empty list, no count, and no statement of which
+         chip emptied it. -->
+    <div class="empty" data-empty="list" hidden>
+      <span data-icon="filter"></span>
+      <b>Nothing matches these filters.</b>
+      <span>Sat 15 Aug has seven rows in the sandbox and the filters above have
+      narrowed them to none.</span>
+      <button class="btn btn--secondary btn--sm" type="button" style="width:auto; padding:0 16px; margin-top:4px;" data-clearfilters="list">Clear filters</button>
+    </div>
   </section>
 
   <p class="sandbox">
     <span data-icon="info"></span>
-    <span>Sandbox: The list is sample data for one day. Filters and the date
-    controls paint their state but do not re-query anything.</span>
+    <span>Sandbox: Seven sample rows for one day. The type switch, the filters,
+    and every count on this screen are derived from those seven rows, so what
+    the headings say is what is on screen. The date controls and the court
+    picker still only paint: there is no second day and no court list behind
+    them.</span>
   </p>
 
 </main>

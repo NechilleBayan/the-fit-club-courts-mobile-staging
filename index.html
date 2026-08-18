@@ -5941,7 +5941,13 @@ function scrToday(){
 
   html += '<div class="section"><h2 class="sec">Now and next</h2><ul class="rows">';
   if (!list.length){
-    html += '<li class="row"><span class="row__main"><span class="row__title" style="font-size:var(--fs-body);font-weight:400">No bookings today. Add a walk-in or view another date.</span></span></li>';
+    /* "No bookings today" sat directly above a grid showing a held court and
+       four courts of Open Play, and both were on screen at once. The line was
+       never wrong, it was under-said: this list counts customer bookings, and
+       Open Play is a venue operation window rather than four bookings, which is
+       the distinction the note under the grid exists to teach. Saying which
+       kind of thing is absent costs one clause and removes the contradiction. */
+    html += '<li class="row"><span class="row__main"><span class="row__title" style="font-size:var(--fs-body);font-weight:400">No customer bookings today. Open Play still runs, see the courts below.</span></span></li>';
   } else {
     list.slice(0,3).forEach(function(o){
       const st = displayStatus(o);
@@ -5954,8 +5960,24 @@ function scrToday(){
   }
   html += "</ul></div>";
 
+  /* The Courts grid is sample and says so, rather than being derived. Deriving
+     it was the better answer and the data is not there: a court timeline needs
+     four courts of occupancy for today, and this file has no per-court
+     maintenance state anywhere (the customer flow's closedDay is a day index,
+     and COURT_TIMES is one venue-wide strip with no court dimension), while the
+     only Open Play window it knows about is OP_WINDOWS.w1 at dayOffset 1, which
+     is tomorrow. S.orders does carry assignedCourt and startsAt, so bookings
+     alone could have been placed; but the contradiction this fixes appears
+     exactly when S.orders is empty, which is the state with nothing to place.
+     Deriving the grid would have meant inventing the two models it is missing
+     and calling the result live, which is the failure this whole sweep is
+     about. So it is marked, and the marker is the same hatched one the harness
+     uses on every other screen that is showing something the club did not put
+     there. */
   html += '<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;gap:var(--s3)"><h2 class="sec">Courts</h2>' +
     '<button class="btn btn--ghost btn--sm" style="width:auto;padding:0 var(--s3)" data-action="toggletimeline" data-fk="tl">' + (S.timeline ? "Switch to card view" : "Switch to timeline") + "</button></div>";
+  html += '<p class="injected" style="margin:var(--s3) calc(-1 * var(--gutter)) 0">' + icon("flask") +
+    "<span>Sample courts. Four fixed courts for one evening, not this venue's live occupancy.</span></p>";
   if (S.timeline){
     html += '<div class="timeline" tabindex="0" role="region" aria-label="Four court timeline, scrolls horizontally"><table><caption class="vh">Court schedule for today</caption><thead><tr><th>Time</th>' +
       [1,2,3,4].map(function(n){ return "<th>Court " + n + "</th>"; }).join("") + "</tr></thead><tbody>";

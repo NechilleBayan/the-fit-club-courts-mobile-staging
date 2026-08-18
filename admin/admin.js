@@ -202,6 +202,9 @@
 
     if (!back) buildDrawer(shell);
     buildSidebar(shell, nav);
+    buildToast();
+    buildLive();
+    liftToast();
     hydrateIcons(document);
     wire();
   }
@@ -317,6 +320,234 @@
     shell.appendChild(d);
   }
 
+  /* ---------- TOAST ----------
+     One node, built once by build() and reused for every message. It replaces
+     the two alert() calls this file used to make.
+
+     It hangs off document.body rather than off #shell, and that is not a
+     stylistic preference: #shell is overflow-x:clip, which establishes a
+     containing block, and a position:fixed toast inside it would be clipped by
+     it at exactly the moment it slides in from the bottom edge.
+
+     A second message replaces the first rather than stacking. A stack is a
+     queue the reader did not ask to manage, and replacing the text of one live
+     region is also what makes a screen reader announce once per message instead
+     of once per node. */
+  var toastEl = null, toastMsg = null, toastTimer = null, toastPaused = false, toastReturn = null;
+
+  /* Five seconds, doubled when the reader has asked for less motion. The
+     entrance is what tells a sighted reader something arrived; with the slide
+     gone there is nothing to catch the eye, so the same five seconds is less
+     time in practice than it looks. Hovering or focusing anything inside stops
+     the clock outright, so neither number is a deadline. */
+  var TOAST_MS = 5000;
+
+  function toastStop(){ if (toastTimer){ clearTimeout(toastTimer); toastTimer = null; } }
+  function toastStart(){
+    toastStop();
+    if (toastPaused) return;
+    var reduced = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches;
+    toastTimer = setTimeout(toastHide, reduced ? TOAST_MS * 2 : TOAST_MS);
+  }
+  function toastHide(){
+    toastStop();
+    if (!toastEl) return;
+    /* Focus goes back where it was, but only if the reader moved it in here to
+       press Dismiss. The toast is about to become visibility:hidden, and a
+       focused element inside a hidden subtree drops focus to <body>, which
+       loses a keyboard reader their place in the page. When focus was never in
+       the toast, nothing is touched: A message timing out under someone typing
+       must not move their cursor. */
+    var returning = toastEl.contains(document.activeElement);
+    toastEl.classList.remove("toast--on");
+    if (returning && toastReturn && toastReturn.isConnected) toastReturn.focus();
+    toastReturn = null;
+    /* The text is cleared only after the fade, so the message is still readable
+       while it leaves and the live region is not re-announced as empty. */
+    setTimeout(function(){ if (!toastEl.classList.contains("toast--on")) toastMsg.textContent = ""; }, 260);
+  }
+
+  function toast(msg){
+    if (!toastEl) return;
+    toastStop();
+    toastPaused = false;
+    /* Captured before the toast appears, and not overwritten while it is still
+       up, so a stub pressed twice still returns to the button that was pressed
+       rather than to the toast itself. */
+    if (!toastEl.contains(document.activeElement)) toastReturn = document.activeElement;
+    toastEl.classList.add("toast--on");
+    /* Visible first, text second. A live region has to be in the accessibility
+       tree at the moment its content changes, and visibility:hidden takes it
+       out of that tree; setting both in one frame is the reliable way to lose
+       the announcement on some readers. */
+    requestAnimationFrame(function(){
+      toastMsg.textContent = msg;
+      toastStart();
+    });
+  }
+
+  /* The count announcement goes here rather than through the visible toast, and
+     the split is deliberate. A filter result is already on screen in the
+     re-derived heading, so popping a plate over the list to repeat it would be
+     stating the same fact twice, in the reader's way, on every chip press. The
+     toast is for messages with nowhere else to live. index.html draws the same
+     line between its screen-reader-only announce() and its visible UI, and this
+     is the console's half of it. */
+  var liveEl = null;
+  function announce(msg){
+    if (!liveEl) return;
+    /* Cleared first, so pressing a chip that lands on the same count as the
+       last one still counts as a change and is still read out. */
+    liveEl.textContent = "";
+    requestAnimationFrame(function(){ liveEl.textContent = msg; });
+  }
+  function buildLive(){
+    var l = document.createElement("p");
+    l.className = "vh";
+    l.setAttribute("role", "status");
+    l.setAttribute("aria-live", "polite");
+    document.body.appendChild(l);
+    liveEl = l;
+  }
+
+  /* The dock is the one action a screen exists to perform, pinned to the foot.
+     A message that covers it for five seconds is worse than the alert() this
+     replaced, so the toast is lifted by the dock's measured height rather than
+     by a number copied from the stylesheet: three screens have a dock and their
+     docks are not the same height. */
+  function liftToast(){
+    var dock = document.querySelector(".dock");
+    document.documentElement.style.setProperty("--toast-lift",
+      (dock ? Math.round(dock.getBoundingClientRect().height) : 0) + "px");
+  }
+
+  function buildToast(){
+    var t = document.createElement("div");
+    t.className = "toast";
+    t.setAttribute("role", "status");
+    t.setAttribute("aria-live", "polite");
+    t.innerHTML =
+      '<p class="toast__msg"></p>' +
+      '<button class="toast__x" type="button" aria-label="Dismiss message">' + svg("close") + "</button>";
+    document.body.appendChild(t);
+    toastEl = t;
+    toastMsg = t.querySelector(".toast__msg");
+
+    t.querySelector(".toast__x").addEventListener("click", toastHide);
+
+    /* Pointer and keyboard get the same pause, because they are the same
+       request: someone is reading it. focusin / focusout stand in for
+       :focus-within, which CSS can express and a timer cannot. */
+    t.addEventListener("mouseenter", function(){ toastPaused = true; toastStop(); });
+    t.addEventListener("mouseleave", function(){ toastPaused = false; if (t.classList.contains("toast--on")) toastStart(); });
+    t.addEventListener("focusin",  function(){ toastPaused = true; toastStop(); });
+    t.addEventListener("focusout", function(){ toastPaused = false; if (t.classList.contains("toast--on")) toastStart(); });
+    return t;
+  }
+
+  /* ---------- ROW FILTERS ----------
+     Two querySelectorAll loops over static rows, which is the right size for
+     this. There is no list model behind these screens and there does not need
+     to be one: the rows are in the document, they already state their status in
+     words, and the attributes added beside those words say the same thing in a
+     form a loop can read. The attribute and the pill agree by construction,
+     because each was written from the other.
+
+     A control declares what it selects in its own markup, as data-match, so a
+     reader can see a chip's definition beside the chip instead of hunting for
+     it in here. The grammar is one pair, with an optional alternation:
+
+       data-match="kind=booking"          the row's data-kind is booking
+       data-match="pay=unpaid|overdue"    the row's data-pay is either of those
+
+     Every pressed control has to match. Two chips from different facets narrow
+     each other, which is what a reader pressing both means; two that contradict
+     select nothing, which is what the empty state is for. Rejected alternative:
+     Or within a group and and across groups, which reads better on paper and
+     then cannot express "unpaid and confirmed" without a second grammar.
+
+     Rows are found by data-kind rather than by class, so a row the scenario
+     harness injects, which carries data-scn-row and no data-kind, is left alone
+     and is neither hidden nor counted. The harness speaking is not the club's
+     list, and a filter should not be able to hide the marker that explains why
+     the screen looks the way it does. */
+  function matches(row, spec){
+    var eq = spec.indexOf("=");
+    if (eq < 0) return true;
+    var val = row.getAttribute("data-" + spec.slice(0, eq));
+    var want = spec.slice(eq + 1).split("|");
+    for (var i = 0; i < want.length; i++) if (val === want[i]) return true;
+    return false;
+  }
+
+  function filterSet(name){
+    var set = document.querySelector('[data-rowset="' + name + '"]');
+    if (!set) return null;
+    var rows = set.querySelectorAll("[data-kind]");
+    var controls = document.querySelectorAll('[data-filters="' + name + '"] [aria-pressed="true"][data-match]');
+    var specs = [], labels = [], noun = null;
+    Array.prototype.forEach.call(controls, function(c){
+      specs.push(c.getAttribute("data-match"));
+      /* A mode names the list; a filter narrows it. The pressed option of a
+         mode group therefore supplies the heading's noun and stays out of the
+         "filtered by" phrase, because it is not a filter applied to bookings,
+         it is the answer to what these rows are. */
+      if (c.closest("[data-mode]")){ noun = c.getAttribute("data-noun") || noun; return; }
+      /* The chip's own words, so the announcement cannot drift from the label
+         the sighted reader pressed. The count pill inside the segmented control
+         is stripped, because "Bookings 5" read aloud as a filter name is the
+         count said twice in one sentence. */
+      var t = c.cloneNode(true);
+      Array.prototype.forEach.call(t.querySelectorAll(".countpill"), function(x){ x.remove(); });
+      labels.push((t.textContent || "").replace(/\s+/g, " ").trim());
+    });
+
+    var shown = 0;
+    Array.prototype.forEach.call(rows, function(r){
+      var ok = true;
+      for (var i = 0; i < specs.length && ok; i++) ok = matches(r, specs[i]);
+      /* The hidden attribute, not a class. A class would leave the row in the
+         accessibility tree, which means a screen reader still walks rows the
+         sighted reader cannot see and the count above it becomes the only
+         honest thing on the screen. */
+      r.hidden = !ok;
+      if (ok) shown++;
+    });
+
+    /* Every figure on the screen comes out of this one pass, so the heading,
+       the type switch, and the day rail cannot disagree with each other or with
+       what is on screen. The count pills count the whole day rather than the
+       filtered set, because they label what pressing that segment would show. */
+    var head = set.parentNode.querySelector("[data-listcount]");
+    if (!noun && head) noun = head.getAttribute("data-listcount");
+    if (head) head.textContent = shown + " " + noun + (shown === 1 ? "" : "s");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-count]"), function(el){
+      var n = 0;
+      Array.prototype.forEach.call(rows, function(r){ if (matches(r, el.getAttribute("data-count"))) n++; });
+      el.textContent = n;
+    });
+    var day = document.querySelector('[data-daycount="' + name + '"]');
+    if (day) day.textContent = rows.length + " bk";
+
+    var empty = document.querySelector('[data-empty="' + name + '"]');
+    if (empty) empty.hidden = shown > 0;
+
+    return { shown: shown, labels: labels, noun: noun || "row" };
+  }
+
+  /* Announced rather than left silent. A filter that reorders the page under a
+     screen reader without saying so has not finished, and the sighted reader
+     gets the same fact in the heading at the same moment. */
+  function filterAndSay(name){
+    var r = filterSet(name);
+    if (!r) return;
+    /* The noun is not lowercased on the way into the announcement. Open Play is
+       a proper noun in this product and "1 open play session" is the one place
+       in the build that would have said otherwise. */
+    var msg = r.shown + " " + r.noun + (r.shown === 1 ? "" : "s");
+    announce(r.labels.length ? msg + ", filtered by " + r.labels.join(" and ") + "." : msg + ", no filters.");
+  }
+
   /* ---------- BEHAVIOUR ---------- */
   function wire(){
     var drawer = document.getElementById("drawer");
@@ -367,12 +598,19 @@
       var a = e.target.closest('a[href="#logout"]');
       if (!a) return;
       e.preventDefault();
-      alert("Sandbox: This would sign " + DATA.admin.name + " out and return to the staff login.");
+      toast("Sandbox: This would sign " + DATA.admin.name + " out and return to the staff login.");
     });
 
     /* Pressed state for anything that is a toggle in a rail: filters, segmented
-       controls, and the day buttons. In the sandbox this only paints; there is
-       no list behind it to re-query. */
+       controls, and the day buttons.
+
+       This used to say that in the sandbox it only paints, and that was true and
+       was the whole of finding 2. A chip painted itself pressed over a list it
+       did not touch, which a reviewer cannot tell apart from a filter that is
+       broken. Where the group names a row set through data-filters, the press
+       now re-queries that set and every count on the screen comes with it. The
+       day rail still only paints, because there is no second day behind it, and
+       the sandbox note on each screen says which is which. */
     document.addEventListener("click", function(e){
       var b = e.target.closest('[data-toggle="single"] > [aria-pressed]');
       if (!b) return;
@@ -380,11 +618,32 @@
       Array.prototype.forEach.call(group.querySelectorAll("[aria-pressed]"), function(x){
         x.setAttribute("aria-pressed", x === b ? "true" : "false");
       });
+      var set = group.getAttribute("data-filters");
+      if (set) filterAndSay(set);
     });
     document.addEventListener("click", function(e){
       var b = e.target.closest('[data-toggle="multi"] > [aria-pressed]');
       if (!b) return;
       b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
+      var set = b.parentNode.getAttribute("data-filters");
+      if (set) filterAndSay(set);
+    });
+
+    /* The way out of a combination that selects nothing. It clears the chips a
+       reader pressed and leaves a single-select group on its first option,
+       because a single-select group has no all-off state to return to. */
+    document.addEventListener("click", function(e){
+      var c = e.target.closest("[data-clearfilters]");
+      if (!c) return;
+      var name = c.getAttribute("data-clearfilters");
+      Array.prototype.forEach.call(document.querySelectorAll('[data-filters="' + name + '"]'), function(g){
+        var opts = g.querySelectorAll("[aria-pressed]");
+        var single = g.getAttribute("data-toggle") === "single";
+        Array.prototype.forEach.call(opts, function(x, i){
+          x.setAttribute("aria-pressed", single && i === 0 ? "true" : "false");
+        });
+      });
+      filterAndSay(name);
     });
 
     /* Switches. A real control with a real role, not a styled checkbox that a
@@ -404,7 +663,7 @@
       e.preventDefault();
       var dlg = b.closest("dialog");
       if (dlg) dlg.close();
-      alert("Sandbox: " + b.getAttribute("data-stub"));
+      toast("Sandbox: " + b.getAttribute("data-stub"));
     });
   }
 
@@ -624,7 +883,18 @@
     }
   }
 
+  /* Filters run once on load, after the scenario has had its chance to inject.
+     Nothing on these screens ships with a typed count: the headings, the type
+     switch, and the day rail all start at zero in the markup and are filled
+     from the rows here, so a row added or removed by hand cannot leave a
+     figure behind that used to be true. */
+  function start(){
+    build(); bridge(); applyScenario(); scrollcue();
+    Array.prototype.forEach.call(document.querySelectorAll("[data-rowset]"), function(set){
+      filterSet(set.getAttribute("data-rowset"));
+    });
+  }
   if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", function(){ build(); bridge(); applyScenario(); scrollcue(); });
-  } else { build(); bridge(); applyScenario(); scrollcue(); }
+    document.addEventListener("DOMContentLoaded", start);
+  } else { start(); }
 })();

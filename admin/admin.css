@@ -216,6 +216,13 @@
   --shell-max:34rem;
   --measure:34rem;
   --dur-fast:120ms; --dur-sheet:180ms; --dur-ui:200ms; --ease:cubic-bezier(.2,.7,.3,1);
+  /* How far the toast has to clear the bottom of the screen. Zero on a screen
+     with no dock; admin.js measures the dock and writes the real height here on
+     the screens that have one. It is deliberately not --dock-h: that token is
+     already in two padding calculations, and giving it a real value would move
+     the foot of every docked screen, which is a layout change no finding in
+     this sweep asked for. */
+  --toast-lift:0px;
   --header-h:var(--appbar-h);
 }
 @media (max-width:359px){ :root{ --card-pad:14px; --gutter:14px; } }
@@ -223,6 +230,13 @@
 
 /* ---------- RESET ---------- */
 *,*::before,*::after{ box-sizing:border-box; }
+/* The hidden attribute wins. Every row on this build sets its own display, and
+   an author display rule beats the browser's [hidden]{display:none}, so a row
+   the filter had hidden stayed on screen while the count above it said it was
+   gone. That is a worse lie than the one the filters were fixed to stop
+   telling, and !important is the honest fix rather than a specificity race with
+   every component that will ever be filtered. */
+[hidden]{ display:none !important; }
 :root{ color-scheme:light; accent-color:var(--text-primary); }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ color-scheme:dark; } }
 :root[data-theme="dark"]{ color-scheme:dark; }
@@ -494,6 +508,89 @@ dialog::backdrop{ background:var(--overlay); }
   padding-bottom:calc(var(--s3) + max(0px,env(safe-area-inset-bottom)));
 }
 .dock__in{ width:100%; max-width:var(--content-max); margin:0 auto; display:grid; gap:var(--s2); }
+
+/* ---------- TOAST ----------
+   What a stub says when it has nothing to do. It replaces alert(), and the
+   reason is not taste: a native alert paints "nechillebayan.github.io says" in
+   an OS dialog over this console's dark chrome, which reads as a browser
+   security prompt rather than as the product, and on a phone it is
+   indistinguishable from a permissions request. It also blocks the main thread.
+   Every stub button in the sandbox routes through here, so it is the single
+   most-seen interaction in the build and it was the one wearing someone else's
+   clothes.
+
+   One node, reused. A stack of toasts is a queue the reader did not ask to
+   manage; a second message replaces the first, which is also what makes the
+   live region announce exactly once per message.
+
+   Visibility rather than display or the hidden attribute. It is a live region,
+   so it has to stay in the DOM and stay announceable; visibility:hidden takes
+   it and its dismiss button out of the accessibility tree and the tab order
+   while nothing is showing, and comes back in one property. The transition
+   delays the flip back to hidden until the fade has finished, which is the only
+   reason visibility is in the transition list at all. */
+.toast{
+  position:fixed; z-index:60;
+  left:var(--gutter); right:var(--gutter);
+  bottom:calc(var(--tabbar-h) + var(--toast-lift) + var(--s3) + max(0px,env(safe-area-inset-bottom)));
+  display:flex; align-items:flex-start; gap:var(--s2);
+  max-width:var(--content-max); margin-inline:auto;
+  padding:var(--s3) var(--s3) var(--s3) var(--s4);
+  background:var(--surface-raised); border:1.5px solid var(--border-strong);
+  border-radius:var(--r-card); box-shadow:0 -8px 24px var(--shadow-dock);
+  color:var(--text-primary); font-size:var(--fs-label); line-height:var(--lh-label);
+  visibility:hidden; opacity:0; transform:translateY(12px);
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+             visibility 0s linear var(--dur-ui);
+}
+.toast--on{
+  visibility:visible; opacity:1; transform:none;
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+             visibility 0s;
+}
+.toast__msg{ flex:1 1 auto; margin:0; padding-top:calc((var(--tap-min) - var(--lh-label)) / 2); }
+/* The dismiss button is the reason this is not only-dismissable-by-waiting, so
+   it carries the full target rather than the visual size of the glyph. */
+.toast__x{
+  flex:none; display:flex; align-items:center; justify-content:center;
+  width:var(--tap-min); height:var(--tap-min); margin:0; padding:0;
+  background:none; border:0; border-radius:var(--r-btn); color:var(--text-primary);
+  cursor:pointer; transition:background var(--dur-ui) var(--ease);
+}
+.toast__x svg{ width:22px; height:22px; }
+.toast__x:hover{ background:rgba(var(--ghost-fill),.08); }
+
+@media (min-width:1024px){
+  /* Bottom right, and never under the rail. The left bound is the live rail
+     width rather than a copy of it, so a collapse moves the bound with it; the
+     box then right-aligns inside those bounds because max-width leaves it room
+     and margin-left:auto spends it. Same transition as .dock, so the two move
+     together when the rail collapses. */
+  .toast{
+    left:calc(var(--sidenav-w) + var(--s5)); right:var(--s5);
+    bottom:calc(var(--toast-lift) + var(--s5));
+    max-width:26rem; margin-inline:auto 0;
+    transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+               left var(--dur-ui) var(--ease), visibility 0s linear var(--dur-ui);
+  }
+  .toast--on{
+    transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+               left var(--dur-ui) var(--ease), visibility 0s;
+  }
+}
+
+/* Fade, no slide. The timer compensates separately: with no movement to catch
+   the eye, admin.js doubles the dwell rather than leaving a slow reader the
+   same five seconds it gives someone the motion already alerted. */
+@media (prefers-reduced-motion:reduce){
+  .toast{ transform:none; }
+}
+
+/* A solid plate and a real border, so it stops being a raised surface among
+   raised surfaces and starts being a thing in front of the page. */
+@media (prefers-contrast:more){
+  .toast{ background:var(--surface); border-width:2px; box-shadow:none; }
+}
 
 /* ---------- BUTTONS ----------
    Sheer, never opaque. The label and the icon stay at full strength: nothing

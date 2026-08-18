@@ -56,10 +56,10 @@
   <!-- Off Duty was a fourth filter here. With a cast of two who are both on
        shift it selected an empty list every time, which reads as a broken
        control rather than an honest answer. -->
-  <div class="filterbar" role="group" aria-label="Filter staff" data-toggle="single" style="margin-top:14px;">
+  <div class="filterbar" role="group" aria-label="Filter staff" data-toggle="single" data-filters="team" style="margin-top:14px;">
     <button class="filter" type="button" aria-pressed="true">All</button>
-    <button class="filter" type="button" aria-pressed="false">On Duty</button>
-    <button class="filter" type="button" aria-pressed="false">Has Pending Tasks</button>
+    <button class="filter" type="button" aria-pressed="false" data-match="onduty=true">On Duty</button>
+    <button class="filter" type="button" aria-pressed="false" data-match="pending=true">Has Pending Tasks</button>
   </div>
 
   <!-- ---------- THE TEAM ----------
@@ -70,13 +70,13 @@
        without reading. -->
   <section class="section" aria-labelledby="s-list" id="s-list">
     <div class="sechead">
-      <h2 class="sec">2 Staff Members</h2>
+      <h2 class="sec" id="s-count" data-listcount="Staff Member">0 Staff Members</h2>
       <span class="legal tnum">Sat 15 Aug</span>
     </div>
 
-    <div class="rows">
+    <div class="rows" data-rowset="team">
 
-      <a class="row row--two row--bar" href="staff-details.html">
+      <a class="row row--two row--bar" data-kind="staff" data-onduty="true" data-pending="true" href="staff-details.html">
         <span class="row__line">
           <span class="avatar avatar--lg" aria-hidden="true">JM</span>
           <span class="row__main">
@@ -95,7 +95,7 @@
         </span>
       </a>
 
-      <a class="row row--two row--bar" href="staff-details.html">
+      <a class="row row--two row--bar" data-kind="staff" data-onduty="true" data-pending="true" href="staff-details.html">
         <span class="row__line">
           <span class="avatar avatar--lg" aria-hidden="true">RS</span>
           <span class="row__main">
@@ -113,6 +113,15 @@
         </span>
       </a>
 
+    </div>
+
+    <div class="empty" data-empty="team" hidden>
+      <span data-icon="filter"></span>
+      <b>No staff match this filter.</b>
+      <span>Both sample staff are on duty and both are carrying tasks, so every
+      filter on this bar selects both of them. This state is reachable only if
+      the cast changes.</span>
+      <button class="btn btn--secondary btn--sm" type="button" style="width:auto; padding:0 16px; margin-top:4px;" data-clearfilters="team">Clear filters</button>
     </div>
   </section>
 
@@ -132,7 +141,9 @@
     <span data-icon="info"></span>
     <span>Sandbox: Two sample staff members, which is the smallest cast that
     still shows the difference between what a Club Manager may do and what Front
-    Desk may. Roles, pay, and permissions live in Staff Management.</span>
+    Desk may. The chips above filter these two rows and the heading counts what
+    survives, so both chips currently select both people. Roles, pay, and
+    permissions live in Staff Management.</span>
   </p>
 
 </main>
