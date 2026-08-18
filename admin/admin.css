@@ -1047,8 +1047,36 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .search input::placeholder{ color:var(--text-secondary); }
 
 /* A horizontal rail of filters. It scrolls rather than wraps, so the row height
-   never changes as filters are added and the list below never jumps. */
-.filterbar{ display:flex; gap:var(--s2); overflow-x:auto; margin-inline:calc(-1 * var(--gutter)); padding:2px var(--gutter); }
+   never changes as filters are added and the list below never jumps.
+
+   THE PADDING IS THE FOCUS RING'S ROOM. A scroll container cannot have a visible
+   overflow on one axis: setting overflow-x to auto forces overflow-y to auto as
+   well, so anything a chip paints outside itself is clipped by this box. A
+   focused chip paints a 3px outline at 2px offset and a 5px halo behind it, and
+   2px of padding cut the top and bottom off both. Six is what the ring needs.
+
+   The rail is therefore 8px taller than it was, 56 rather than 48, and that is
+   the honest price. A negative block margin to claw the height back was tried
+   and does not work here: every one of the nine rails carries its own authored
+   margin-top in the page, so the compensation only ever landed on the bottom
+   half and the rails grew by four instead of zero. A fix that is neutral on some
+   pages and not others is worse than one that is the same everywhere.
+
+   Measured rather than assumed, and two things the brief expected to find were
+   not there. The chip is border-box with a 44px minimum, so a pressed chip
+   measures 44.00px and an unpressed one measures 44.00px: the row does not
+   twitch. And the first chip already sits at the gutter, which is where the
+   cards start, so it is aligned rather than jammed. The inline padding here is a
+   full gutter and the negative inline margin is what lets the rail bleed past it.
+
+   Not fixed here, and worth writing down: the pressed chip asks for a 1.5px
+   border and Chrome renders 1px of it at device pixel ratio 1. The build is
+   drawn for a phone, where 1.5px is three device pixels and lands, so the
+   1.5px stays; a desktop reader is seeing one pixel less separation than the
+   design intends, on this chip and on the segmented control and the status
+   pills alike. Changing it is a decision about the whole 1.5px idiom, not
+   about this rail. */
+.filterbar{ display:flex; gap:var(--s2); overflow-x:auto; margin-inline:calc(-1 * var(--gutter)); padding:6px var(--gutter); }
 .filterbar::-webkit-scrollbar{ height:0; }
 .filter{
   flex:none; display:inline-flex; align-items:center; gap:5px;

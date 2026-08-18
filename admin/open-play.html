@@ -98,7 +98,7 @@
             <h3 class="sub">Evening Open Play</h3>
             <p class="legal tnum">6:00 PM to 8:00 PM &middot; Court 4</p>
           </div>
-          <span class="st st--hold"><span data-icon="clock"></span>Open</span>
+          <span class="st st--caution"><span data-icon="squarehalf"></span>Almost Full</span>
         </div>
 
         <div class="meter" style="margin-top:14px;">
@@ -107,7 +107,7 @@
             <b class="tnum">2 spots left</b>
           </div>
           <div class="meter__track" role="img" aria-label="14 of 16 players registered">
-            <div class="meter__fill" style="width:88%;"></div>
+            <div class="meter__fill meter__fill--caution" style="width:88%;"></div>
           </div>
         </div>
 
@@ -133,15 +133,19 @@
         </div>
       </div>
 
-      <!-- FULL AND CLOSED. Hatched and dashed, so a full session does not read
-           as merely another open one with a bigger bar. -->
-      <div class="card" style="border:1.5px dashed var(--border-strong); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px);">
+      <!-- FULL. Solid and heavy, so it does not read as merely another open one
+           with a bigger bar, and does not read as cancelled either. It used to
+           carry the dashed hatch, which is this build's mark for a thing that is
+           GONE: a closed day, a blocked court, a refunded booking. A session
+           that sold every seat has not gone anywhere. See the capacity scale in
+           admin.css: the settled treatment is weight, not void. -->
+      <div class="card card--strong">
         <div class="card__head">
           <div>
             <h3 class="sub">Beginner Clinic</h3>
             <p class="legal tnum">1:00 PM to 2:30 PM &middot; Court 1</p>
           </div>
-          <span class="st st--off"><span data-icon="lock"></span>Full</span>
+          <span class="st st--atcapacity"><span data-icon="lock"></span>Full</span>
         </div>
 
         <div class="meter" style="margin-top:14px;">

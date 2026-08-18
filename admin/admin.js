@@ -114,6 +114,13 @@
     message:   '<path d="M20.5 15.5a2 2 0 0 1-2 2H8l-4.5 3.5V5.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/>',
     wrench:    '<path d="M15.5 3.5a5.5 5.5 0 0 0-6.4 7.2L3 16.8 6.2 20l6.1-6.1a5.5 5.5 0 0 0 7.2-6.4l-3.2 3.2-2.8-.7-.7-2.8z"/>',
     lock:      '<rect x="4.5" y="10" width="15" height="10.5" rx="2"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/>',
+    /* The half filled square, for Almost Full on the capacity scale. It is drawn
+       here rather than borrowed because the two documents keep two sprites on
+       purpose, but it is the same drawing as the customer build's i-square-half:
+       the scale is one scale, and a step that changes shape between the two
+       halves of the product is not one step. The fill is what carries it, so it
+       still reads at 13px and in greyscale. */
+    squarehalf:'<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="4" y="4" width="8" height="16" fill="currentColor" stroke="none"/>',
     ban:       '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
     list:      '<path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12M3.5 6.5h1M3.5 12h1M3.5 17.5h1"/>',
     tasks:     '<path d="M9.5 6.5h11M9.5 12h11M9.5 17.5h11"/><path d="M3.5 6.3l1.4 1.4 2.3-2.6M3.5 11.8l1.4 1.4 2.3-2.6"/><path d="M3.6 16.6h3.4"/>',
