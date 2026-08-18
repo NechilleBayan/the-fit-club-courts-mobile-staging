@@ -1,0 +1,17 @@
+# Line endings are decided here, not by whatever core.autocrlf happens to be set
+# to on the machine doing the commit. The index was already uniformly LF when
+# this file landed, so it changes no content today; it exists so that a checkout
+# on a machine without core.autocrlf=true cannot quietly start committing CRLF
+# and bury a real diff under a whole-file rewrite.
+* text=auto
+
+# Declared rather than sniffed. text=auto guesses from content, and a JPEG whose
+# first 8000 bytes happen to look textual is a corrupted JPEG once it has been
+# through EOL conversion.
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+*.ico  binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
