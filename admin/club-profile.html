@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Club Profile - Admin - The Fit Club Courts</title>
 <meta name="color-scheme" content="light dark">
+<!-- The staging bridge, shared with the customer build one level up. Synchronous
+     and ahead of the stylesheet because the first thing it does is settle the
+     theme, and a theme settled after the first paint is a flash of the wrong
+     one. system is this console's own default, which is what the Settings
+     screen ships with selected; it applies only while nobody has chosen. -->
+<script src="../staging-state.js" data-default-theme="system"></script>
 <link rel="stylesheet" href="admin.css">
 </head>
 <body data-title="Club Profile" data-nav="dashboard" data-back="dashboard.html">

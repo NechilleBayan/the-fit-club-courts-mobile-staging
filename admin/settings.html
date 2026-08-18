@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Settings - Admin - The Fit Club Courts</title>
 <meta name="color-scheme" content="light dark">
+<!-- The staging bridge, shared with the customer build one level up. Synchronous
+     and ahead of the stylesheet because the first thing it does is settle the
+     theme, and a theme settled after the first paint is a flash of the wrong
+     one. system is this console's own default, which is what the Settings
+     screen ships with selected; it applies only while nobody has chosen. -->
+<script src="../staging-state.js" data-default-theme="system"></script>
 <link rel="stylesheet" href="admin.css">
 </head>
 <body data-title="Settings" data-nav="more" data-back="more.html">
@@ -57,7 +63,8 @@
         <label><input type="radio" name="theme" value="dark"><span>Dark</span></label>
       </div>
       <p class="legal" style="margin-top:10px;">The console follows the phone's setting
-      unless you choose one here.</p>
+      unless you choose one here. This choice is remembered, and the customer
+      build one level up wears it too.</p>
     </div>
   </section>
 
@@ -124,7 +131,8 @@
   <p class="sandbox">
     <span data-icon="info"></span>
     <span>Sandbox: Switches and pickers paint their state but nothing is
-    saved.</span>
+    saved, with one exception. Theme is real, is remembered, and is shared with
+    the customer build.</span>
   </p>
 
 </main>
@@ -132,15 +140,42 @@
 <script src="admin.js"></script>
 <script>
 /* The theme picker is the one control in the sandbox that does something real,
-   because seeing both themes is half the point of a design prototype. It writes
-   data-theme on the root, which is what the token blocks in admin.css switch on;
-   removing the attribute hands the decision back to the operating system. */
-document.addEventListener("change", function(e){
-  if (!e.target.matches('input[name="theme"]')) return;
-  var v = e.target.value;
-  if (v === "system") document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme", v);
-});
+   because seeing both themes is half the point of a design prototype. It used to
+   write data-theme on the root and stop there, which meant the choice did not
+   survive a click on any other destination in a folder of static pages: the
+   reader picked Dark, opened Bookings, and got light back. It now goes through
+   the staging bridge, so the choice outlives the navigation and the customer
+   build one level up is already wearing it on arrival.
+
+   Painting is left to the bridge's subscriber in admin.js rather than done here,
+   so a change made in another tab and a change made on this screen end in the
+   same place. */
+(function(){
+  "use strict";
+  if (!window.STAGING) return;
+
+  /* Reflect what is stored, which the markup cannot know. The System radio is
+     checked in the markup as the default, and that is still right while nobody
+     has chosen: getTheme() returns null then, and null means each build keeps
+     its own default, which for this console is System. */
+  var stored = STAGING.getTheme() || "system";
+  var here = document.querySelector('input[name="theme"][value="' + stored + '"]');
+  if (here) here.checked = true;
+
+  document.addEventListener("change", function(e){
+    if (!e.target.matches('input[name="theme"]')) return;
+    STAGING.setTheme(e.target.value);
+  });
+
+  /* Someone flipped the theme in the customer build, or in a second copy of this
+     screen. Move the radio to match, so the control is never showing an answer
+     the page is not painted in. */
+  STAGING.subscribe(function(state, changed){
+    if (changed.indexOf("theme") < 0) return;
+    var el = document.querySelector('input[name="theme"][value="' + (state.theme || "system") + '"]');
+    if (el) el.checked = true;
+  });
+})();
 </script>
 </body>
 </html>

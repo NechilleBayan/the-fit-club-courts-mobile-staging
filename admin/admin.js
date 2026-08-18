@@ -373,7 +373,31 @@
     window.addEventListener("resize", rest, { passive:true });
   }
 
+  /* ---------- THE STAGING BRIDGE ----------
+     staging-state.js is loaded in the head of every page in this folder, ahead
+     of the stylesheet, because it settles the theme before the first paint. By
+     the time this file runs the theme is already correct; what is left is
+     keeping it correct while the page is open.
+
+     This console is a folder of static documents, so most of what the bridge
+     carries is read once at load and never changes underneath the reader. Theme
+     is the exception: it can be flipped in the customer build, in a second tab,
+     or in the frame around a preview, and a console still painted in the other
+     one is a bug the reader can see. So the chrome subscribes to exactly that.
+
+     Defensive about STAGING being absent rather than assuming it. A page opened
+     straight off the filesystem, with no server and no sibling script, should
+     still draw its chrome; the dials are a convenience on top of a console that
+     has to work without them. */
+  function bridge(){
+    if (!window.STAGING) return;
+    STAGING.subscribe(function(state, changed){
+      if (changed.indexOf("theme") < 0) return;
+      STAGING.applyTheme("system");
+    });
+  }
+
   if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", function(){ build(); scrollcue(); });
-  } else { build(); scrollcue(); }
+    document.addEventListener("DOMContentLoaded", function(){ build(); bridge(); scrollcue(); });
+  } else { build(); bridge(); scrollcue(); }
 })();
