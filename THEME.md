@@ -41,7 +41,7 @@ surface is one of the two with a little of the other mixed in.
 | `--surface-sunken` | A plane that sits **below** the page: A meter track, an inert row, the ground under a hatch. |
 | `--surface-inverse` | The ink plate. Used when a thing is settled or selected and needs to be the heaviest object in view. |
 | `--text-primary` | Body and headings. The default reading colour. |
-| `--text-secondary` | Supporting type: subtitles, metadata, notes. Never below 4.5:1. |
+| `--text-secondary` | Supporting type: Subtitles, metadata, notes. Never below 4.5:1. |
 | `--text-inverse` | Type drawn **on** `--surface-inverse` or on chrome. |
 | `--text-inverse-secondary` | Supporting type on the same. |
 | `--border-strong` | The edge of something deliberate: A pressed control, a selected row, a card that is asking to be read first. |
@@ -265,7 +265,7 @@ its own children's value. `--card-surface` is the one that stays put.
 
 ---
 
-## 5. Cream type: where it belongs and where it does not
+## 5. Cream type: Where it belongs and where it does not
 
 Cream is the type colour **on ink**: The app bar, the tab bar, the drawer head,
 the rail's brand row, the whole dark theme, and the selected pill. It is also

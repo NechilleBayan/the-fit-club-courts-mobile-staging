@@ -1581,12 +1581,17 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 }
 .hnd--t{ top:-15px; } .hnd--b{ bottom:-15px; }
 
-/* ---------- ATTENTION RED ----------
-   One pair per theme. The dark theme lightens rather than reusing the light value,
-   so red type on the page and page type on the red wash both stay readable. Red is
-   never the whole state: every rule below it also changes a border, and the field
-   it paints always carries its sentence underneath, so the meaning survives being
-   read in grayscale or by a screen reader. */
+/* ---------- THE TWO SEMANTIC FAMILIES ----------
+   One pair per theme each. The dark theme lightens rather than reusing the light
+   value, so coloured type on the page and page type on a coloured wash both stay
+   readable. Neither is ever the whole state: Every rule below also changes a
+   border, and the field it paints always carries its sentence underneath, so the
+   meaning survives being read in greyscale or by a screen reader.
+
+   Red is --critical and means something is wrong or lost. Ochre is --caution and
+   means something needs attention. In this document the red is spent on form
+   validation and the ochre on capacity; the console spends both far more widely,
+   and the sentence that separates them is written out in THEME.md. */
 :root{
   /* Was #B3261E. Moved toward the dark theme's muted coral as far as the 4.5:1
      this palette owes small type on cream will allow: The coral itself is 1.6:1

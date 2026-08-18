@@ -82,11 +82,24 @@
   --paper-100:#F5F3DC;
   --paper-200:#E9E6CB;
 
-  /* The page is the lightest thing in the build now, and the components sit on
-     it as solid ink. That is the inversion: the customer app painted sheer ink
-     washes on cream paper, and the console paints cream type on ink cards over
-     a near white page. The two colours are unchanged, only which one carries
-     the surface and which one carries the type. */
+  /* The page is an off white and the cards sit on it as cream. Both colours are
+     the build's two, and which one carries the surface is the thing this task
+     reversed.
+
+     What stood here, and what it claimed, so a reader who finds this line from
+     the history is not left guessing:
+
+       "The page is the lightest thing in the build now, and the components sit
+        on it as solid ink. That is the inversion: the customer app painted
+        sheer ink washes on cream paper, and the console paints cream type on
+        ink cards over a near white page. The two colours are unchanged, only
+        which one carries the surface and which one carries the type."
+
+     That is no longer true and is deliberately no longer true. The full argument
+     for overturning it, and the block it governed, are at THE CARD PLANE near
+     the foot of this file. The short version: The ink slabs read as a different
+     product rather than a denser one, and density is type size and row height,
+     which this console already does without spending a colour on it. */
   --surface:#F8F7F2;
   --surface-raised:#F2EEDD;
   --surface-sunken:#E4E0CE;
@@ -153,7 +166,7 @@
      pixel pill, which is the reverse of the order a manager needs to read them in.
 
      --critical was #B3261E, a destructive-error red doing operational work. It
-     is now #C0392B, which is as far toward the dark theme's muted coral as the
+     is now #AC3227, which is as far toward the dark theme's muted coral as the
      4.5:1 this palette owes small type on cream will go: the coral itself is
      1.6:1 there and would have to stop being type to be used.
 
@@ -1033,14 +1046,17 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .daybtn .countpill{ font-size:11px; min-width:22px; height:18px; }
 .daybtn[aria-pressed="true"]{ background:var(--surface-inverse); background-image:none; color:var(--text-inverse); border:2px solid var(--border-strong); }
 .daybtn[aria-pressed="true"] i{ color:var(--text-inverse-secondary); }
-/* The pressed day inverts to a cream plate, and the count pill inside it draws
-   its wash and its hairline from --ghost-fill and --ghost-edge, which up to
-   here point at cream. Left alone that is a cream pill on a cream plate with
-   cream type. The tokens are flipped locally rather than the pill being given
-   its own colours, which is the same move the surface inversion block at the
-   foot of this file makes, one level further in. */
-.daybtn[aria-pressed="true"]{ --ghost-fill:23,23,23; --ghost-edge:23,23,23; }
-.daybtn[aria-pressed="true"] .countpill--quiet{ color:var(--text-inverse); }
+/* The count pill inside a pressed day is handled with the pressed segment and
+   the pressed filter, at the foot of this file, because all three are the same
+   problem: A quiet pill on the inverse plate, needing the colour the plate is
+   already printing in.
+
+   What stood here pinned --ghost-fill and --ghost-edge to ink on the pressed
+   day, because the plate was cream in BOTH themes: the old card block flipped
+   --surface-inverse, so a selected day was cream even in the light theme. With
+   the cards cream the plate is ink in light, and the pin painted an ink pill
+   with an ink edge on an ink plate. Measured at 1.00:1 for the edge, which is
+   to say the pill was not there. */
 
 /* ---------- SEARCH AND FILTERS ---------- */
 .search{ position:relative; display:flex; align-items:center; }
@@ -1111,12 +1127,15 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
    claim. */
 /* The wash is a background-IMAGE over the plate, not a background that replaces
    it, and that distinction is load-bearing rather than fussy. The surface
-   inversion block near the foot of this file re-bases .filter onto solid ink
+   card plane near the foot of this file re-bases .filter onto the card fill
    with a one-class selector; any rule up here carrying a state also carries
-   more specificity, so writing `background:` wins and takes the ink away with
-   it. The wash then composites against the page instead of against the plate,
-   which on the day theme is cream under cream type. Layering keeps the plate
-   and puts the wash on top of it, so the chip reads the same on both themes.
+   more specificity, so writing `background:` wins and takes the card fill away
+   with it. The wash then composites against the page instead of against the
+   card, which is a chip the same colour as what it sits on. Layering keeps the
+   fill and puts the wash on top of it, so the chip reads the same on both
+   themes. The block it names is dark-only now and the fill it would take away
+   is cream rather than ink, which changes none of this: the trap is the
+   shorthand, not the colour.
    The same trap is still set for a handful of other :active rules in this file;
    they are noted in UI-FINDINGS.md rather than swept up here. */
 .filter[aria-pressed="true"]{
@@ -1526,24 +1545,21 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
 .appbar .iconbtn:focus-visible{ box-shadow:0 0 0 5px var(--chrome-surface); }
 .badge{ border-color:var(--chrome-surface); }
 
-/* A pressed segment or filter takes the inverse plate, so the quiet count
+/* A pressed segment, filter, or day takes the inverse plate, so the quiet count
    sitting inside it has to flip with it or it paints its own fill's colour on
-   its own fill. It used to say "ink on cream" in literals, because the plate was
-   cream in both themes: The card block flipped --surface-inverse, so a pressed
-   chip was cream on a dark card in the light theme too. With the card cream the
-   plate is ink in light and cream in dark, and the only thing that is true in
-   both is that the pill matches the type the plate is already using. */
+   its own fill. Two of the three used to say "ink on cream" in literals and the
+   third pinned the same thing as tokens, because the plate was cream in BOTH
+   themes: The card block flipped --surface-inverse, so a pressed chip was cream
+   on a dark card in the light theme too. With the cards cream the plate is ink
+   in light and cream in dark, and the only thing true in both is that the pill
+   matches the type the plate is already printing in. */
 .seg [aria-pressed="true"] .countpill--quiet,
+.daybtn[aria-pressed="true"] .countpill--quiet,
 .filter[aria-pressed="true"] .countpill--quiet{
   background:color-mix(in srgb, var(--text-inverse) 12%, transparent);
   color:var(--text-inverse);
   border-color:color-mix(in srgb, var(--text-inverse) 28%, transparent);
 }
-
-/* The note under a selected day sits on the inverse plate, which is exactly what
-   --text-inverse-secondary is for. It was a literal because the card block had
-   flipped that token out from under it. */
-.daybtn[aria-pressed="true"] i{ color:var(--text-inverse-secondary); }
 
 /* The oval behind the current tab is the whole indicator. The brush stroke that
    used to sit above it was a second one saying the same thing, and two marks
@@ -1681,9 +1697,10 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
    because :is() takes the specificity of its heaviest argument and
    .datenav .iconbtn in this list is two classes deep.
 
-   Weighing nothing is only safe because nothing competes: These four custom
-   properties are set in exactly two places, the root and here, and the paper
-   reset that has to beat the card list is written after it.
+   Weighing nothing is only safe because nothing competes for these four custom
+   properties. They are set at the root, on the card list here, and on the paper
+   island below it, and nowhere else in either stylesheet; the island has to beat
+   the card list and does so by being written after it at the same weight.
    ============================================================ */
 
 @media (prefers-color-scheme: dark){

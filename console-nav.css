@@ -323,11 +323,6 @@
   }
 }
 
-/* The rail slides, and a reader who has asked for less movement gets none. The
-   token block at the top of this file already collapses --dur-ui to 0.01ms under
-   prefers-reduced-motion, so both transitions above resolve to an instant swap
-   without a second rule. This one is here for the property that is not on a
-   token: The toggle's rotation, which is decorative either way. */
 /* ---------- THE UTILITY STRIP ----------
    The slim strip of build controls at the very top of the page: The day and
    night toggle and the way into the staging harness. Two documents render it
@@ -374,6 +369,15 @@
     .utilbar .iconbtn{ opacity:1; }
     .utilbar .iconbtn--demo{ border-color:var(--border-default); }
   }
+}
+
+/* The rail slides, and a reader who has asked for less movement gets none. The
+   token block at the top of this file already collapses --dur-ui to 0.01ms under
+   prefers-reduced-motion, so both transitions above resolve to an instant swap
+   without a second rule. This one is here for the property that is not on a
+   token: The toggle's rotation, which is decorative either way. */
+@media (prefers-reduced-motion:reduce){
+  .sidenav__toggle{ transition:none; }
 }
 
 /* ---------- THE STAGING NOTICE ----------
@@ -447,10 +451,6 @@
     -webkit-backdrop-filter:none; backdrop-filter:none;
     background:var(--surface-raised);
   }
-}
-
-@media (prefers-reduced-motion:reduce){
-  .sidenav__toggle{ transition:none; }
 }
 
 /* Readability first when the reader has asked for it. The rail's separator and
