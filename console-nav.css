@@ -56,23 +56,96 @@
     overflow:hidden;
   }
 
-  /* The identity block wears the same inverse surface as the app bar beside it,
+  /* The brand block wears the same inverse surface as the app bar beside it,
      so the two read as one continuous frame across the top of the page rather
-     than as a pale box next to a dark bar. */
+     than as a pale box next to a dark bar. Its height is still pinned to
+     --appbar-h, which is the whole reason the wordmark took this row and the
+     name took the row below: this is the row that has to line up with the bar,
+     and it can only do that if nothing in it wants to be taller. */
   .sidenav__head{
     display:flex; align-items:center; gap:var(--s3);
     min-height:var(--appbar-h); padding:var(--s3) var(--s3) var(--s3) var(--s4);
     background:var(--surface-inverse); color:var(--text-inverse);
     border-bottom:1px solid var(--border-strong);
   }
+
+  /* ---------- THE WORDMARK ----------
+     Sized from height, with the mark's own ratio on the box, which is the same
+     move the customer build's .wordmark makes and for the same reason: the file
+     is 640x337 and background-size:contain fits by the tighter axis, so a box
+     with any other ratio paints a small mark in a large gap and reads as an
+     alignment bug. One free dimension means it cannot be stretched, squashed, or
+     cropped by anything downstream.
+
+     The source is a token with the file as its fallback. The customer build
+     already declares --img-logo as a data URL and keeps it, because that
+     document is opened from a file:// path often enough that a second request
+     is a second thing to fail; the console declares nothing and gets the file.
+     The relative path resolves against this stylesheet, not the page, so the
+     same one line serves admin/*.html and the root document. */
+  .sidenav__brand{
+    flex:1 1 auto; min-width:0;
+    display:flex; align-items:center;
+    text-decoration:none; color:inherit;
+    border-radius:var(--r-btn);
+  }
+  .sidenav__mark{
+    display:block; width:auto; height:26px;
+    aspect-ratio:640 / 337;
+    background:var(--img-logo, url("v2/assets/logo.png")) left center/contain no-repeat;
+  }
+  /* THE INVERSION, AND WHY IT RUNS THE WAY ROUND IT DOES.
+     The file is black on transparency, and this block is painted on
+     --surface-inverse, which is not a fixed colour: both builds resolve it to
+     ink in the light theme and to cream in the dark one, because the whole point
+     of the token is to be the opposite of the page. So the mark has to follow
+     --text-inverse, and --text-inverse is cream in the light theme and ink in
+     the dark one.
+
+     That makes the light theme the one that inverts and the dark theme the one
+     that leaves the file alone, which reads backwards and is why it is written
+     down. Getting it the intuitive way round paints a white mark on cream and
+     the brand simply disappears in the dark theme, which is exactly what the
+     first pass at this did.
+
+     The pair of selectors is the same pair the customer header already uses for
+     .wordmark__img: the attribute for an explicit choice, the media query for a
+     reader who has expressed none. */
+  .sidenav__mark{ filter:invert(1); }
+  :root[data-theme="dark"] .sidenav__mark{ filter:none; }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .sidenav__mark{ filter:none; }
+  }
+  .sidenav__brand:focus-visible{ outline:2px solid var(--text-inverse); outline-offset:2px; }
+  .sidenav__brand[href]:hover .sidenav__mark{ opacity:.82; }
+
+  /* The mark carries no text, so its name is a visually hidden sibling rather
+     than an alt attribute. Clipped, not display:none, so it stays in the
+     accessible name and a screen reader does not meet a bare link. */
+  .sidenav__vh{
+    position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+    overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap;
+  }
+
+  /* ---------- THE IDENTITY ROW ----------
+     Below the brand and outside the inverse block, on the rail's own surface, so
+     it reads as the first thing in the list rather than as a second title. */
+  .sidenav__who{
+    display:flex; align-items:center;
+    padding:var(--s3) var(--s4);
+    border-bottom:1px solid var(--hairline);
+  }
   .sidenav__id{ flex:1 1 auto; min-width:0; overflow:hidden; }
   .sidenav__id b{
     display:block; font-size:var(--fs-label); line-height:var(--lh-label); font-weight:700;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
+  /* Was --text-inverse-secondary, which was correct while this sat inside the
+     inverse head. It does not any more, and on the rail's own surface that token
+     is near invisible. The row moved; its colours had to move with it. */
   .sidenav__id span{
     display:block; font-size:var(--fs-legal); line-height:var(--lh-legal);
-    color:var(--text-inverse-secondary);
+    color:var(--text-secondary);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .sidenav__toggle{
@@ -168,9 +241,46 @@
     opacity:0; width:0; flex:0 0 0; margin:0;
   }
   .sidenav[data-collapsed="true"] .sidenav__row{ justify-content:center; padding-inline:0; }
-  .sidenav[data-collapsed="true"] .sidenav__id{ opacity:0; width:0; flex:0 0 0; }
+  /* The identity row goes entirely, rather than clipping to nothing the way a
+     destination's label does. The distinction is whether the thing left behind
+     still works: a clipped row keeps its icon and stays a usable link, while a
+     clipped name is an empty box with a border, and the app bar's avatar answers
+     "who am I" at this width already. */
+  .sidenav[data-collapsed="true"] .sidenav__who{ display:none; }
   .sidenav[data-collapsed="true"] .sidenav__head{ padding-inline:var(--s2); justify-content:center; }
-  .sidenav[data-collapsed="true"] .sidenav__toggle{ transform:rotate(180deg); }
+  /* The mark stays, smaller. 4.5rem of rail less its padding leaves about 40px,
+     and a 1.9:1 wordmark in that width is 21px tall, which is legible at arm's
+     length and is the same mark rather than a different one. Swapping in a
+     letterform monogram here was the alternative and would have put a second
+     piece of brand art in the build for one state of one component. */
+  .sidenav[data-collapsed="true"] .sidenav__brand{ flex:0 0 auto; justify-content:center; }
+  .sidenav[data-collapsed="true"] .sidenav__mark{ height:21px; }
+
+  /* The head is 72px wide less its padding, so about 56px, and it is being asked
+     to hold a 40px mark and a 44px target. It cannot, and the two ways out both
+     cost something: stacking them makes the head taller than --appbar-h and
+     breaks the one alignment this block exists to hold, and shrinking the toggle
+     takes it under the tap minimum.
+
+     So the toggle leaves the head instead. It goes to the foot of the rail, full
+     size, which is where a collapsed rail's expand control sits in most consoles
+     that have one, and the head goes back to being exactly the app bar's height
+     with the mark centred in it. Absolute against .sidenav__in, which is already
+     positioned, and the scroll area gives up the matching amount of its bottom
+     padding so the last destination is never underneath it. */
+  .sidenav[data-collapsed="true"] .sidenav__toggle{
+    position:absolute; left:50%; bottom:var(--s3);
+    transform:translateX(-50%) rotate(180deg);
+    background:rgba(var(--ghost-fill),.10);
+    color:var(--text-primary);
+  }
+  .sidenav[data-collapsed="true"] .sidenav__toggle:hover{ background:rgba(var(--ghost-fill),.18); }
+  .sidenav[data-collapsed="true"] .sidenav__toggle:focus-visible{ outline-color:var(--focus-ring); }
+  .sidenav[data-collapsed="true"] .sidenav__scroll{ padding-bottom:calc(var(--tap-min) + var(--s5)); }
+  /* The rotation used to live on its own line here. It is folded into the
+     positioning rule above instead: transform is one property, and a second
+     declaration further down the file would have quietly dropped the translate
+     that centres the button. */
   .sidenav[data-collapsed="true"] .sidenav__note{ display:none; }
   .sidenav[data-collapsed="true"] .sidenav__row .countpill{ display:none; }
 

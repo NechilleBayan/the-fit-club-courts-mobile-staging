@@ -3128,6 +3128,10 @@ function paintSidenav(view, path){
     prefix: "admin/",
     collapsed: STAGING.getNavCollapsed(),
     head: { title: roleLabel(), sub: VENUE.name },
+    /* Today, not the customer landing page. This rail belongs to the shift, and
+       the top of the shift is the shift's own first screen. */
+    home: "#/staff/today",
+    brandLabel: VENUE.name + ", shift home",
     primary: STAFF_TABS.map(function(t){
       return { href:"#" + tabHref(t), label:t.label, icon:t.glyph, current:t.match.indexOf(path) >= 0 };
     }),

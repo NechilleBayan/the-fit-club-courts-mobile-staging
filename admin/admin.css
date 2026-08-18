@@ -390,9 +390,40 @@ dialog::backdrop{ background:var(--overlay); }
 @keyframes drawer-in{ from{ transform:translateX(-100%); } to{ transform:translateX(0); } }
 @keyframes fade-in{ from{ opacity:0; } to{ opacity:1; } }
 
+/* THE BRAND ROW.
+   The phone menu is the only navigation a reader sees at this width, and until
+   now it opened onto a name and a role with nothing saying whose club this was.
+   The mark takes the top of the panel, above the identity, and carries the
+   safe-area padding that used to sit on the head, since it is the row that now
+   touches the notch.
+
+   Sized from height with the file's own 640x337 ratio on the box, the same way
+   the rail and the customer header size it: background-size:contain fits by the
+   tighter axis, so any other ratio paints a small mark inside a wide empty box.
+   The source is the shared token with the file as its fallback, and the path
+   resolves against this stylesheet in admin/, hence the step up. */
+.drawer__brand{
+  display:flex; align-items:center; gap:var(--s3);
+  padding:calc(var(--s4) + env(safe-area-inset-top)) var(--s4) var(--s3);
+  background:var(--surface-inverse); color:var(--text-inverse);
+}
+.drawer__mark{ flex:1 1 auto; min-width:0; display:flex; align-items:center; border-radius:var(--r-btn); }
+.drawer__markimg{
+  display:block; width:auto; height:30px;
+  aspect-ratio:640 / 337;
+  background:var(--img-logo, url("../v2/assets/logo.png")) left center/contain no-repeat;
+  /* The file is black on transparency and this block is the inverse surface in
+     both themes, so the inversion is unconditional rather than theme-keyed. */
+  filter:invert(1);
+}
+.drawer__mark:focus-visible{ outline:2px solid var(--text-inverse); outline-offset:2px; }
+.drawer__mark:hover .drawer__markimg{ opacity:.82; }
+
+/* The identity row keeps the inverse surface so the brand and the person read as
+   one block, but it gives up the top padding to the row above it. */
 .drawer__head{
   display:flex; align-items:center; gap:var(--s3);
-  padding:calc(var(--s4) + env(safe-area-inset-top)) var(--s4) var(--s4);
+  padding:0 var(--s4) var(--s4);
   background:var(--surface-inverse); color:var(--text-inverse);
 }
 .drawer__id{ min-width:0; flex:1 1 auto; }
@@ -1072,6 +1103,11 @@ a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface));
    is lighter than what it frames stops reading as a frame. */
 .appbar,
 .tabbar,
+/* The brand row is the same block of chrome as the identity row under it, so it
+   takes the same pinned pair. Left on --surface-inverse it would flip with the
+   theme while the row it is welded to did not, and the panel would open with a
+   pale strip above a dark one. */
+.drawer__brand,
 .drawer__head{
   background:var(--chrome-surface); color:#F5F3DC; border-color:#3A3A36;
   /* The chrome is ink in both themes, so the "on inverse" pair has to be

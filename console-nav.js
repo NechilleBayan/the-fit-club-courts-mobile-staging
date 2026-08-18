@@ -103,7 +103,10 @@
      opts.groups      the GROUPS subset this surface may see
      opts.counts      { unread: 4 } resolves a row's badge
      opts.badgeNoun   { unread: "unread" } names it for a screen reader
-     opts.head        { title, sub } the identity block at the top
+     opts.head        { title, sub } the identity block under the brand
+     opts.home        href the wordmark links to, or nothing to leave it inert
+     opts.brandLabel  the accessible name for the mark, since the mark is a
+                      picture of the club's name and carries no text of its own
      opts.collapsed   boolean, the persisted rail state
      opts.note        a sentence under the list, or nothing
 
@@ -140,16 +143,56 @@
 
     var html = '<div class="sidenav__in">';
 
+    /* ---------- THE BRAND ROW ----------
+       Two rows, not one. The head used to be the person and nothing else, which
+       left the console as the only surface in the build that never said whose
+       club it was; the customer header has carried the wordmark since it had a
+       header. Putting the mark on the identity's own line was tried and is what
+       these two rows are avoiding: 264px minus a 44px toggle does not hold a
+       wordmark and "Rea Salvador" at once without one of them truncating, and
+       the one that truncates is always the name.
+
+       So the brand takes the row that is height-matched to the app bar, which is
+       the row that has to align with the bar beside it anyway, and the identity
+       drops to a quieter row underneath where it has the full width to itself.
+
+       The mark is painted as a background on an empty span and named in a
+       visually hidden sibling. It is the same reasoning the customer build's
+       .wordmark uses: the mark is a picture of the club's name, so an <img alt>
+       would have a screen reader read the club name here and again in the
+       identity row two lines down. The link wrapper is what carries the name,
+       and it says "home" rather than the club, because that is what activating
+       it does.
+
+       opts.home is a href. Where a surface has no home to point at, the brand
+       renders as a plain span and is inert, rather than a link to "#" that moves
+       focus and does nothing. */
+    var markInner = '<span class="sidenav__mark" aria-hidden="true"></span>';
+    var brand = opts.home
+      ? '<a class="sidenav__brand" href="' + esc(opts.home) + '">' + markInner +
+        '<span class="sidenav__vh">' + esc(opts.brandLabel || "The Fit Club Courts, home") + "</span></a>"
+      : '<span class="sidenav__brand">' + markInner +
+        '<span class="sidenav__vh">' + esc(opts.brandLabel || "The Fit Club Courts") + "</span></span>";
+
     html += '<div class="sidenav__head">' +
-      '<span class="sidenav__id">' +
-        '<b>' + esc(opts.head.title) + "</b>" +
-        '<span>' + esc(opts.head.sub) + "</span>" +
-      "</span>" +
+      brand +
       '<button class="sidenav__toggle" type="button" id="sidenavToggle"' +
         ' aria-expanded="' + (opts.collapsed ? "false" : "true") + '" aria-controls="sidenav-body"' +
         ' aria-label="' + (opts.collapsed ? "Expand the navigation" : "Collapse the navigation") + '">' +
         icon("chevL") +
       "</button>" +
+    "</div>";
+
+    /* The identity, on its own row below the brand. Outside .sidenav__head so it
+       is not inside the block whose height is pinned to the app bar's, and so
+       collapsing can drop it entirely: a name clipped to 4.5rem is not a name,
+       and the avatar in the app bar is already the console's answer to "who am
+       I" at every width. */
+    html += '<div class="sidenav__who">' +
+      '<span class="sidenav__id">' +
+        '<b>' + esc(opts.head.title) + "</b>" +
+        '<span>' + esc(opts.head.sub) + "</span>" +
+      "</span>" +
     "</div>";
 
     html += '<div class="sidenav__scroll" id="sidenav-body">';

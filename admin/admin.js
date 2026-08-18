@@ -242,6 +242,12 @@
          narrower than that and the club name is the half that truncates, which
          leaves "Club Manager, The F..." saying less than "Club Manager" does. */
       head: { title: DATA.admin.name, sub: DATA.admin.role },
+      /* The console's home is the dashboard, not the customer landing page. A
+         reader who clicks a wordmark inside a back office expects the top of the
+         back office; the way out to the other build is a named row in System and
+         says so. */
+      home: "dashboard.html",
+      brandLabel: DATA.club.name + ", console home",
       primary: TABS.map(function(t){
         return { href:t.href, label:t.label, icon:t.icon, current:(t.id === nav),
                  badge:(t.id === "more" ? "pendingTasks" : null), quiet:true };
@@ -286,10 +292,25 @@
 
     d.innerHTML =
       '<div class="drawer__panel">' +
+        /* The brand takes the top of the panel and the close button sits beside
+           it, which is the same two-row shape the desktop rail uses: mark first,
+           then who is signed in. It is also where the close button already was,
+           so nothing about reaching it changed.
+
+           The mark is a picture of the club's name, so it is painted on an empty
+           span and named in a visually hidden sibling rather than given an alt.
+           The row below names the club again in full, and an alt here would have
+           a screen reader read it twice before reaching a single destination. */
+        '<div class="drawer__brand">' +
+          '<a class="drawer__mark" href="dashboard.html">' +
+            '<span class="drawer__markimg" aria-hidden="true"></span>' +
+            '<span class="vh">' + DATA.club.name + ', console home</span>' +
+          '</a>' +
+          '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close menu">' + svg("close") + '</button>' +
+        '</div>' +
         '<div class="drawer__head">' +
           '<span class="avatar avatar--lg" aria-hidden="true">' + DATA.admin.initials + '</span>' +
           '<span class="drawer__id"><b>' + DATA.admin.name + '</b><span>' + DATA.admin.role + ' &middot; ' + DATA.club.name + '</span></span>' +
-          '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close menu">' + svg("close") + '</button>' +
         '</div>' +
         '<div class="drawer__body">' + rows + '</div>' +
       '</div>';
