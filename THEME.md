@@ -122,6 +122,14 @@ separately.
   page. The value it replaced, `#A8A695`, reached 2.33:1 and had been failing
   since before this task.
 
+The **card outline** uses neither. It needed no new rule at all: every card
+already draws `border:1px solid rgba(var(--ghost-edge),.22)`, and the only
+reason that edge was invisible in the light console is that the old ink-card
+block set `--ghost-edge` to cream *on the card*, so each card outlined itself in
+its own fill. With that override gone the same rule resolves to ink at 22% over
+cream, which lands within a shade of the warm gray the review asked for. At
+`prefers-contrast:more` the card family switches to `--border-default`.
+
 ---
 
 ## 2. Semantic families
@@ -151,24 +159,36 @@ Both families have the identical five-token shape:
 
 | Token | Light (both documents) | Dark (both documents) |
 |---|---|---|
-| `--critical` | `#C0392B` | `#F2857D` |
+| `--critical` | `#AC3227` | `#F2857D` |
 | `--critical-on` | `#FFFFFF` | `#171717` |
-| `--critical-surface` | `rgba(192,57,43,0.10)` | `rgba(242,133,125,0.12)` |
-| `--critical-edge` | `rgba(192,57,43,0.55)` | `rgba(242,133,125,0.60)` |
-| `--critical-glow` | `rgba(192,57,43,0.28)` | `rgba(242,133,125,0.30)` |
-| `--caution` | `#856110` | `#E0A94A` |
+| `--critical-surface` | `rgba(172,50,39,0.10)` | `rgba(242,133,125,0.12)` |
+| `--critical-edge` | `rgba(172,50,39,0.55)` | `rgba(242,133,125,0.60)` |
+| `--critical-glow` | `rgba(172,50,39,0.28)` | `rgba(242,133,125,0.30)` |
+| `--caution` | `#7B5A12` | `#E0A94A` |
 | `--caution-on` | `#FFFFFF` | `#171717` |
-| `--caution-surface` | `rgba(133,97,16,0.10)` | `rgba(224,169,74,0.14)` |
-| `--caution-edge` | `rgba(133,97,16,0.55)` | `rgba(224,169,74,0.60)` |
-| `--caution-glow` | `rgba(133,97,16,0.28)` | `rgba(224,169,74,0.30)` |
+| `--caution-surface` | `rgba(123,90,18,0.10)` | `rgba(224,169,74,0.14)` |
+| `--caution-edge` | `rgba(123,90,18,0.55)` | `rgba(224,169,74,0.60)` |
+| `--caution-glow` | `rgba(123,90,18,0.28)` | `rgba(224,169,74,0.30)` |
 
-### Why `--critical` moved, and only so far
+### Both light values are solved, not chosen
 
-`#B3261E` is a destructive-error red and it was doing operational work. It is
-now `#C0392B`, which is as far toward the dark theme's muted coral as the 4.5:1
-this palette owes small type on cream will go: the coral itself is 1.6:1 there
-and would have to stop being type to be used. The dark value is untouched,
-because the finding was only ever about the light theme.
+Each is **the lightest value that still clears 4.5:1 against the darkest ground
+its own family ever paints under it**, which is the 13% wash on `.row--crit` and
+`.plate--crit`. Lighter than this and the 12px status pills stop meeting AA on
+exactly the rows that need them most.
+
+That **bounds** the review's finding rather than granting it. "The red is too
+aggressive" cannot be answered by much on a cream page, because a red legible as
+12px bold type on cream has to be dark: `#B3261E` became `#AC3227`, which is
+warmer and a touch lighter and not much else. The dark value is untouched,
+because the finding was only ever about light.
+
+What actually made the staff screen quieter was the **family split**, not the
+hue. *Shift Unfilled* moved to ochre, and an ochre plate beside a red one is
+unmistakably the calmer of the two in a way no amount of tuning within the red
+could have been. If a future change wants a genuinely soft red, the move is to
+stop using `--critical` as small type (make `.st--crit` a solid fill with
+`--critical-on`), not to lighten the hue.
 
 ### Why `--caution` is an ochre and not the terracotta that was asked for
 

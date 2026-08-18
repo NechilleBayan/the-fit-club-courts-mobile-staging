@@ -110,13 +110,24 @@
   --focus-ring:#171717;
   --focus-halo:#F8F7F2;
 
-  /* The two surfaces that are always ink, whatever the theme is doing.
-     --chrome-surface is the app bar and the tab bar; --card-surface is every
-     card, row, and button. They are separate tokens because in the dark theme
-     the chrome has to drop below the page to stay legible as a frame, while a
-     card has to lift above it. */
+  /* --chrome-surface is the app bar, the tab bar, the drawer head, and the
+     rail's brand block, and it is ink in BOTH themes: A frame lighter than what
+     it frames stops reading as a frame, so in the dark theme it drops below the
+     page rather than inverting.
+
+     --card-surface is the fill of every card, row, and button. It used to be
+     ink in both themes as well, which is the decision this task reversed; see
+     the CARD PLANE section at the foot of this file for what was overturned and
+     why. It is now the cream card surface in light and the lifted near black in
+     dark, which is to say it agrees with --surface-raised in both.
+
+     They stay two tokens because the difference between them is not the colour,
+     it is the scope. A card redeclares --surface locally so that anything nested
+     inside it resolves against the card rather than against the page; a token
+     that a card overrides cannot also be the token the card paints itself with,
+     or the card would paint itself with its own children's value. */
   --chrome-surface:#171717;
-  --card-surface:#171717;
+  --card-surface:#F2EEDD;
 
   --overlay:rgba(15,15,15,0.66);
   --hatch:rgba(23,23,23,0.14);
@@ -144,8 +155,20 @@
      --critical was #B3261E, a destructive-error red doing operational work. It
      is now #C0392B, which is as far toward the dark theme's muted coral as the
      4.5:1 this palette owes small type on cream will go: the coral itself is
-     1.6:1 there and would have to stop being type to be used. 4.67:1 on the
-     card, 5.07:1 on the page.
+     1.6:1 there and would have to stop being type to be used.
+
+     BOTH LIGHT VALUES ARE SOLVED RATHER THAN CHOSEN. Each is the lightest value
+     that still clears 4.5:1 against the darkest ground its own family ever paints
+     under it, which is the 13% wash on .row--crit and .plate--crit. Lighter than
+     this and the eleven pixel status pills stop meeting AA on the very rows that
+     need them most; the audit that found it is in DECISIONS.md.
+
+     That bounds the review's finding rather than granting it. "The red is too
+     aggressive" cannot be answered by much on a cream page, because a red that
+     is legible as 12px bold type on cream has to be dark. What actually made the
+     staff screen quieter was the family split, not the hue: Shift Unfilled moved
+     to ochre, and an ochre plate beside a red one is unmistakably the calmer of
+     the two in a way that no amount of tuning within the red could have been.
 
      --caution is an ochre rather than the terracotta the review asked for, and
      the terracotta is worth naming because it was tried first. At the luminance
@@ -157,17 +180,17 @@
      reading the word first, which is the only reason to add a family at all.
      Neither family is ever the sole carrier of a state: every use below also
      carries a word, an icon, and a drawn treatment. */
-  --critical:#C0392B;
+  --critical:#AC3227;
   --critical-on:#FFFFFF;
-  --critical-surface:rgba(192,57,43,0.10);
-  --critical-edge:rgba(192,57,43,0.55);
-  --critical-glow:rgba(192,57,43,0.28);
+  --critical-surface:rgba(172,50,39,0.10);
+  --critical-edge:rgba(172,50,39,0.55);
+  --critical-glow:rgba(172,50,39,0.28);
 
-  --caution:#856110;
+  --caution:#7B5A12;
   --caution-on:#FFFFFF;
-  --caution-surface:rgba(133,97,16,0.10);
-  --caution-edge:rgba(133,97,16,0.55);
-  --caution-glow:rgba(133,97,16,0.28);
+  --caution-surface:rgba(123,90,18,0.10);
+  --caution-edge:rgba(123,90,18,0.55);
+  --caution-glow:rgba(123,90,18,0.28);
 }
 
 /* ---------- DARK tokens. Near black, warm cream on top of it. ----------
@@ -881,6 +904,10 @@ a.row:active, button.row:active{ background:rgba(var(--ghost-fill),.22); border-
   background:rgba(var(--ghost-fill),.07);
   font-size:12px; line-height:17px; font-weight:700; letter-spacing:.04em;
   text-transform:uppercase; white-space:nowrap;
+  /* A status pill is a pill, not body text. Without this it inherits whatever
+     it is sitting in, which on the legend page is a <dt> in the secondary tone,
+     and a pill drawn in the colour of a label is 4.35:1 rather than 15:1. */
+  color:var(--text-primary);
 }
 .st svg{ width:13px; height:13px; flex:none; }
 .st--ok{ border:1.5px solid var(--border-strong); background:rgba(var(--ghost-fill),.10); }
@@ -920,6 +947,20 @@ a.row:active, button.row:active{ background:rgba(var(--ghost-fill),.22); border-
    third family: a session with two seats left needs attention and has lost
    nothing, which is the sentence that decides the family. */
 .st--caution{ border:1.5px solid var(--caution-edge); background:var(--caution-surface); color:var(--caution); }
+
+/* A pill inside a row of its own family drops its wash. Both were washing the
+   same hue over the same card, and two 10% coats of red under 12px red type cost
+   the pill more than a whole step of the palette: it measured 3.42:1 where the
+   single coat measures 4.60:1. The row is already saying which family this is,
+   and the pill saying it a second time was making it harder to read, not easier. */
+.row--crit .st--crit, .plate--crit .st--crit,
+.row--crit .st--caution, .plate--caution .st--caution,
+.sumcard--alert .st--crit, .sumcard--caution .st--caution,
+/* And on sunken paper, for the same reason with a different ground. A no-show
+   row is already the darkest surface a pill sits on; a wash on top of it took
+   Payment Failed to 4.24:1. */
+.row--muted .st--crit, .row--muted .st--caution,
+.empty .st--crit, .empty .st--caution{ background:transparent; }
 
 /* ---------- STATUS PLATE ----------
    One fact, stated large. Used for the alert list and for the standing status at
@@ -1266,21 +1307,53 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 }
 
 /* ============================================================
-   SURFACE INVERSION
-   The page is near white and the components are solid ink.
+   THE CARD PLANE
+   The page is near white and the cards sit on it as cream.
 
-   This section comes last on purpose. Everything above it draws a component as
-   a sheer wash whose alpha is chosen at each use, which is what the customer
-   app does over photography. The console has no photograph under it, so the
-   same components are re-based onto a solid ink fill here rather than being
-   rewritten in place. The wash rules above still do the work, only now they
-   resolve against cream inside a dark box instead of against ink on a cream
-   page: that is what the token block below buys, and it is why no chip, meter,
-   hairline, or hatch further up needed touching.
+   WHAT THIS REPLACED. Until this task the section here said:
 
-   The rule is one line long. A component that is ink redeclares the palette
-   locally, so everything nested inside it inherits the dark reading of every
-   token it already used.
+     "The page is the lightest thing in the build now, and the components sit
+      on it as solid ink. That is the inversion: the customer app painted sheer
+      ink washes on cream paper, and the console paints cream type on ink cards
+      over a near white page. The two colours are unchanged, only which one
+      carries the surface and which one carries the type."
+
+   That was deliberate and it is deliberately overturned. The ink slabs were
+   internally coherent and read as belonging to a different product: put the two
+   halves side by side and the customer app is cream paper while the console is
+   a stack of black bricks, and nothing about a staff console needs a different
+   visual language, only a denser one. Density is a matter of type size, row
+   height, and how much fits on a screen, all of which this console already does
+   and keeps doing. It was carrying the density argument on a colour, and the
+   colour was doing a second job it was never asked to do.
+
+   So the reversal is: --card-surface in the light theme is now cream, and the
+   console reads as ink chrome around cream content, which is the same shape the
+   customer build has. The dark theme is untouched. What was lost with the ink is
+   worth naming: An ink card separated itself from a pale page with no outline at
+   all, and a cream card on an off-white page does not. The outline comes back
+   below, and at prefers-contrast:more it gets real weight.
+
+   HOW THE SECTION WORKS NOW. Everything above this point draws a component as a
+   sheer wash whose alpha is chosen at each use, which is what the customer app
+   does over photography. The console has no photograph under it, so the same
+   components are re-based onto a solid fill here rather than being rewritten in
+   place. What changed is how much re-basing that takes.
+
+   The old block redeclared fifteen tokens locally so that anything nested inside
+   a card inherited the dark reading of each. Thirteen of the fifteen were simply
+   the dark theme's own root values written out a second time, which was
+   invisible while cards were ink in both themes and would have been actively
+   wrong the moment one of them was not. They are gone. What is left is the four
+   that genuinely differ inside a card from outside it, and those four are the
+   only thing still keyed to the theme.
+
+   Rejected: Scoping the whole original block to the dark theme, which the brief
+   suggested and which works, but which would have carried thirteen redundant
+   declarations across the boundary and doubled a twenty two selector list to
+   hold them. Rejected also: Keeping the block unconditional and adding a light
+   theme block that undoes it, which is two rules for one fact and leaves the
+   next reader to work out which wins.
    ============================================================ */
 
 .card, .row, .btn, .sumcard, .qact, .plate, .fig,
@@ -1288,104 +1361,70 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .search input, .field input, .field select, .field textarea, .pick span,
 .drawer__panel, .sheet__panel{
   background:var(--card-surface);
-  color:#F5F3DC;
 
-  /* The washes and hairlines above now tint toward cream, because they are
-     being painted on ink rather than on paper. */
-  --ghost-fill:246,244,221;
-  --ghost-edge:246,244,221;
-  --hatch:rgba(245,243,220,0.16);
-  --hatch-strong:rgba(245,243,220,0.26);
-
-  /* Type and rules inside the box. */
-  --text-primary:#F5F3DC;
-  --text-secondary:#A9A794;
-  --border-strong:#F5F3DC;
-  --border-default:#6F6F63;
-  --hairline:#3A3A36;
-
-  /* Surfaces inside the box, so a nested panel drops below the card and a
-     nested "selected" fill rises above it as cream. */
+  /* A card is its own ground. Anything nested inside it resolves against the
+     card rather than against the page, which is what makes a sunken panel drop
+     below the card it is in rather than below the page the card is on. */
   --surface:var(--card-surface);
-  --surface-raised:#262626;
-  --surface-sunken:#101010;
-  --surface-inverse:#F5F3DC;
-  --text-inverse:#171717;
-
-  --focus-ring:#F5F3DC;
-  --focus-halo:#171717;
-
-  /* The red has to lift off ink now, not off paper. */
-  --critical:#F2857D;
-  --critical-on:#171717;
-  --critical-surface:rgba(242,133,125,0.12);
-  --critical-edge:rgba(242,133,125,0.60);
-  --critical-glow:rgba(242,133,125,0.30);
 }
 .card, .row, .sumcard, .plate, .fig{ box-shadow:0 1px 2px var(--shadow-card); }
 
-/* Full width fills that would otherwise replace the ink rather than sit on it.
-   A translucent wash set as `background` discards the solid underneath it and
-   lets the page show through, so these three mix their tint into the ink and
-   stay opaque. */
-.card--sunken{ background:color-mix(in srgb, #F5F3DC 9%, var(--card-surface)); }
+/* Full width fills that would otherwise replace the card fill rather than sit on
+   it. A translucent wash set as `background` discards the solid underneath and
+   lets the page show through, so these mix their tint into the card and stay
+   opaque.
+
+   The tint used to be the literal cream, on the assumption that the thing being
+   lightened was ink. Half of this file's hardcoded literals were that assumption
+   written out. They are var(--text-primary) now, which is the cream in the dark
+   theme and the ink in the light one, so every one of these resolves to "further
+   from the card" in both directions instead of "lighter" in one. The dark theme
+   computes to exactly the values it did before. */
+.card--sunken{ background:color-mix(in srgb, var(--text-primary) 9%, var(--card-surface)); }
 .row--crit,
-.sumcard--alert{ background:color-mix(in srgb, #F2857D 13%, var(--card-surface)); }
-.plate--crit{ background:color-mix(in srgb, #F2857D 13%, var(--card-surface)); }
+.sumcard--alert,
+.plate--crit{ background:color-mix(in srgb, var(--critical) 13%, var(--card-surface)); }
+.sumcard--caution,
+.plate--caution{ background:color-mix(in srgb, var(--caution) 13%, var(--card-surface)); }
 
 /* WHAT STAYS ON PAPER.
-   Ink is for a thing that is live and actionable. Anything finished, blocked,
+   A card is for a thing that is live and actionable. Anything finished, blocked,
    or absent drops back to the page as hatched paper, which is a stronger
    distinction than the old muted fill managed and costs no colour: a completed
-   task and a cancelled booking now read as inert at a glance, from across the
-   desk, before any word on them is read. */
+   task and a cancelled booking read as inert at a glance, from across the desk,
+   before any word on them is read.
+
+   In the light theme this needs no argument any more, because the card is paper
+   too and the sunken token already points the right way. The reset that makes it
+   work in the dark theme is at the foot of this file, with the other three
+   things that are genuinely about being dark. */
 .row--muted,
-.empty{
-  background:var(--surface-sunken);
-  color:var(--text-primary);
-  --ghost-fill:23,23,23;
-  --ghost-edge:23,23,23;
-  --hatch:rgba(23,23,23,0.14);
-  --hatch-strong:rgba(23,23,23,0.22);
-  --text-primary:#171717;
-  --text-secondary:#57574E;
-  --border-strong:#171717;
-  --border-default:#A8A695;
-  --hairline:#D9D6C5;
-  --surface:#FAF9F2;
-  --surface-sunken:#EDEBDE;
-  --surface-inverse:#171717;
-  --text-inverse:#F5F3DC;
-  --focus-ring:#171717;
-  --focus-halo:#FAF9F2;
-  --critical:#B3261E;
-  --critical-on:#FFFFFF;
-  --critical-surface:rgba(179,38,30,0.08);
-  --critical-edge:rgba(179,38,30,0.55);
-}
+.empty{ background:var(--surface-sunken); }
 .row--muted{ box-shadow:none; }
 
-/* ---------- BUTTONS ON INK ----------
+/* ---------- BUTTONS ON THE CARD ----------
    The three weights are told apart the way they always were, by fill weight and
-   border, never by a hue. Primary carries a cream wash and a full strength
-   edge, secondary is bare ink with a mid edge, ghost keeps its dashed hairline.
-   All three are ink with cream type, which is the whole point of the change. */
-.btn--primary{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface)); border-color:rgba(246,244,221,.85); }
-.btn--secondary{ background:var(--card-surface); border-color:rgba(246,244,221,.42); }
-.btn--ghost{ background:var(--card-surface); border-color:rgba(246,244,221,.34); }
-.btn--danger{ background:color-mix(in srgb, #F2857D 12%, var(--card-surface)); border-color:var(--critical-edge); color:var(--critical); }
-.btn[disabled]{ background:var(--card-surface); color:#7A7869; border-color:rgba(246,244,221,.22); }
-.btn:active{ background:color-mix(in srgb, #F5F3DC 26%, var(--card-surface)); border-color:rgba(246,244,221,.95); }
-.btn--primary:active{ background:color-mix(in srgb, #F5F3DC 34%, var(--card-surface)); }
-.btn--danger:active{ background:color-mix(in srgb, #F2857D 26%, var(--card-surface)); }
-.btn[disabled]:active{ background:var(--card-surface); border-color:rgba(246,244,221,.22); }
+   border, never by a hue. Primary carries a wash toward the type colour and a
+   full strength edge, secondary is the bare card with a mid edge, ghost keeps
+   its dashed hairline. The edges were literal cream and are now the --ghost-edge
+   triple, which is the token that already carried "the tint of a hairline on
+   this surface" and which resolves to the same cream in the dark theme. */
+.btn--primary{ background:color-mix(in srgb, var(--text-primary) 14%, var(--card-surface)); border-color:rgba(var(--ghost-edge),.85); }
+.btn--secondary{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.42); }
+.btn--ghost{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.34); }
+.btn--danger{ background:color-mix(in srgb, var(--critical) 12%, var(--card-surface)); border-color:var(--critical-edge); color:var(--critical); }
+.btn[disabled]{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.22); }
+.btn:active{ background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface)); border-color:rgba(var(--ghost-edge),.95); }
+.btn--primary:active{ background:color-mix(in srgb, var(--text-primary) 34%, var(--card-surface)); }
+.btn--danger:active{ background:color-mix(in srgb, var(--critical) 26%, var(--card-surface)); }
+.btn[disabled]:active{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.22); }
 @media (hover:hover) and (pointer:fine){
-  .btn--primary:hover{ background:color-mix(in srgb, #F5F3DC 22%, var(--card-surface)); }
+  .btn--primary:hover{ background:color-mix(in srgb, var(--text-primary) 22%, var(--card-surface)); }
   .btn--secondary:hover,
-  .btn--ghost:hover{ background:color-mix(in srgb, #F5F3DC 12%, var(--card-surface)); }
-  .btn--danger:hover{ background:color-mix(in srgb, #F2857D 20%, var(--card-surface)); }
+  .btn--ghost:hover{ background:color-mix(in srgb, var(--text-primary) 12%, var(--card-surface)); }
+  .btn--danger:hover{ background:color-mix(in srgb, var(--critical) 20%, var(--card-surface)); }
   a.row:hover, button.row:hover,
-  .sumcard:hover{ background:color-mix(in srgb, #F5F3DC 10%, var(--card-surface)); }
+  .sumcard:hover{ background:color-mix(in srgb, var(--text-primary) 10%, var(--card-surface)); }
 }
 a.row:active, button.row:active,
 .sumcard:active,
@@ -1393,8 +1432,32 @@ a.row:active, button.row:active,
 .filter:active,
 .datenav__date:active,
 .datenav .iconbtn:active,
-.seg button:active{ background:color-mix(in srgb, #F5F3DC 18%, var(--card-surface)); }
-a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface)); }
+.seg button:active{ background:color-mix(in srgb, var(--text-primary) 18%, var(--card-surface)); }
+a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--card-surface)); }
+
+/* The outline the ink slab did not need.
+
+   It needed no rule in the end, and that is worth saying rather than leaving as
+   a coincidence. Every card in this family already draws
+   border:1px solid rgba(var(--ghost-edge),.22), and the only reason that edge
+   was invisible in the light theme is that the old block set --ghost-edge to
+   cream ON the card, so the card outlined itself in its own fill. With that
+   override gone the same rule resolves to ink at 22% over cream, which lands
+   within a shade of the warm gray the review asked for and separates a cream
+   card from an off-white page without a second declaration.
+
+   Rejected: Restating the edge as var(--hairline), which reads as more
+   deliberate and is worse. It is a second source of truth for a value the wash
+   system already computes, and in the dark theme it resolves darker than the
+   edge those cards have today, so it would have moved a theme this task is not
+   allowed to touch.
+
+   What does need stating is the strong reading. At more contrast the edge stops
+   being a wash and becomes the token that identifies a control, because that is
+   the point at which a reader has said the soft rule is not enough. */
+@media (prefers-contrast:more){
+  .card, .sumcard, .plate, .fig, .row{ border-color:var(--border-default); }
+}
 
 /* ---------- CHROME ----------
    The app bar and the tab bar are ink in both themes now. In the dark theme
@@ -1408,7 +1471,7 @@ a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface));
    pale strip above a dark one. */
 .drawer__brand,
 .drawer__head{
-  background:var(--chrome-surface); color:#F5F3DC; border-color:#3A3A36;
+  background:var(--chrome-surface); color:var(--text-inverse); border-color:#3A3A36;
   /* The chrome is ink in both themes, so the "on inverse" pair has to be
      pinned rather than left to the theme. Read from the theme it flips to dark
      type in the dark theme and paints the bell, the avatar, and the account
@@ -1420,24 +1483,34 @@ a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface));
 .appbar .iconbtn:focus-visible{ box-shadow:0 0 0 5px var(--chrome-surface); }
 .badge{ border-color:var(--chrome-surface); }
 
-/* A pressed segment or filter flips to a cream fill, so the quiet count sitting
-   inside it has to flip with it. Left alone it inherited the ink context's cream
-   type and painted cream on cream. */
+/* A pressed segment or filter takes the inverse plate, so the quiet count
+   sitting inside it has to flip with it or it paints its own fill's colour on
+   its own fill. It used to say "ink on cream" in literals, because the plate was
+   cream in both themes: The card block flipped --surface-inverse, so a pressed
+   chip was cream on a dark card in the light theme too. With the card cream the
+   plate is ink in light and cream in dark, and the only thing that is true in
+   both is that the pill matches the type the plate is already using. */
 .seg [aria-pressed="true"] .countpill--quiet,
 .filter[aria-pressed="true"] .countpill--quiet{
-  background:rgba(23,23,23,.12); color:#171717; border-color:rgba(23,23,23,.28);
+  background:color-mix(in srgb, var(--text-inverse) 12%, transparent);
+  color:var(--text-inverse);
+  border-color:color-mix(in srgb, var(--text-inverse) 28%, transparent);
 }
 
-/* The selected day is the one cream fill inside an ink component, so the note
-   under it is the only place that needs the dark secondary rather than the
-   light one every other inverse surface in the console uses. */
-.daybtn[aria-pressed="true"] i{ color:#4A4A42; }
+/* The note under a selected day sits on the inverse plate, which is exactly what
+   --text-inverse-secondary is for. It was a literal because the card block had
+   flipped that token out from under it. */
+.daybtn[aria-pressed="true"] i{ color:var(--text-inverse-secondary); }
 
 /* The oval behind the current tab is the whole indicator. The brush stroke that
    used to sit above it was a second one saying the same thing, and two marks
    for one state is one mark too many. */
 .tabbar a[aria-current="page"]::after{ content:none; }
-.tabbar a[aria-current="page"] .tabpill{ background:#F5F3DC; color:#171717; }
+/* The fill is the pinned cream this block already declares. The type on it is
+   the literal ink and not var(--chrome-surface), which would be the tidier read
+   and is 0D0D0D in the dark theme: the pill is a plate ON the bar rather than a
+   hole THROUGH it, so it takes the ink both themes agree on. */
+.tabbar a[aria-current="page"] .tabpill{ background:var(--text-inverse); color:#171717; }
 
 /* ============================================================
    DESKTOP LAYOUT
@@ -1531,4 +1604,117 @@ a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface));
   margin-top:calc(-1 * var(--s5));
   background-image:none; background:var(--surface-sunken);
   border-bottom:1px solid var(--hairline); font-weight:500;
+}
+
+
+/* ============================================================
+   THE FOUR THINGS THAT ARE ACTUALLY ABOUT BEING DARK
+   Everything above resolves correctly in both themes through tokens that already
+   flip. These four do not, because they describe how a card differs from the
+   page it is on, and that difference has opposite signs in the two themes.
+
+   Written twice, once for the system preference and once for the explicit
+   toggle, for the same reason the token blocks at the top of this file are: The
+   toggle has to be able to win in both directions.
+
+   Both halves of every selector below are wrapped in :where(), which contributes
+   no specificity, so each rule weighs nothing at all. That is deliberate and it
+   is the safe direction. Scoped the obvious way, :root[data-theme="dark"] .card
+   weighs more than .daybtn[aria-pressed="true"] and .seg [aria-pressed="true"]
+   further up the file, and would quietly repaint every pressed control with the
+   card fill. :is() on the selector list does the same damage from the other end,
+   because :is() takes the specificity of its heaviest argument and
+   .datenav .iconbtn in this list is two classes deep.
+
+   Weighing nothing is only safe because nothing competes: these four custom
+   properties are set in exactly two places, the root and here, and the paper
+   reset that has to beat the card list is written after it.
+   ============================================================ */
+
+@media (prefers-color-scheme: dark){
+  :where(:root:not([data-theme="light"])) :where(.card, .row, .btn, .sumcard, .qact, .plate, .fig,
+  .filter, .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn,
+  .search input, .field input, .field select, .field textarea, .pick span,
+  .drawer__panel, .sheet__panel){
+    /* The washes and hairlines above tint toward cream here, because they are
+       being painted on a dark card rather than on paper. */
+    --ghost-fill:246,244,221;
+    --hairline:#3A3A36;
+    --hatch:rgba(245,243,220,0.16);
+    --hatch-strong:rgba(245,243,220,0.26);
+  }
+  /* Paper inside the dark theme. The row is deliberately light here: it is the
+     one place the console still inverts, and it is how a finished thing reads as
+     finished on a dark screen. */
+  :where(:root:not([data-theme="light"])) :where(.row--muted, .empty){
+    --ghost-fill:23,23,23;
+    --ghost-edge:23,23,23;
+    --hatch:rgba(23,23,23,0.14);
+    --hatch-strong:rgba(23,23,23,0.22);
+    --text-primary:#171717;
+    --text-secondary:#57574E;
+    --border-strong:#171717;
+    --border-default:#A8A695;
+    --hairline:#D9D6C5;
+    --surface:#FAF9F2;
+    --surface-sunken:#EDEBDE;
+    --surface-inverse:#171717;
+    --text-inverse:#F5F3DC;
+    --focus-ring:#171717;
+    --focus-halo:#FAF9F2;
+    --critical:#AC3227;
+    --critical-on:#FFFFFF;
+    --critical-surface:rgba(172,50,39,0.10);
+    --critical-edge:rgba(172,50,39,0.55);
+    --caution:#7B5A12;
+    --caution-on:#FFFFFF;
+    --caution-surface:rgba(123,90,18,0.10);
+    --caution-edge:rgba(123,90,18,0.55);
+    /* And the card fill, so a button or a chip inside this island paints as
+       paper too. Without it the island's ink type lands on a component still
+       filled from the theme, which measured 1.09:1 on the Contact button in a
+       no-show row. The old block hid it by pinning cream type on every card. */
+    --card-surface:#FAF9F2;
+    color:var(--text-primary);
+  }
+}
+:where(:root[data-theme="dark"]) :where(.card, .row, .btn, .sumcard, .qact, .plate, .fig,
+.filter, .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn,
+.search input, .field input, .field select, .field textarea, .pick span,
+.drawer__panel, .sheet__panel){
+  --ghost-fill:246,244,221;
+  --hairline:#3A3A36;
+  --hatch:rgba(245,243,220,0.16);
+  --hatch-strong:rgba(245,243,220,0.26);
+}
+:where(:root[data-theme="dark"]) :where(.row--muted, .empty){
+  --ghost-fill:23,23,23;
+  --ghost-edge:23,23,23;
+  --hatch:rgba(23,23,23,0.14);
+  --hatch-strong:rgba(23,23,23,0.22);
+  --text-primary:#171717;
+  --text-secondary:#57574E;
+  --border-strong:#171717;
+  --border-default:#A8A695;
+  --hairline:#D9D6C5;
+  --surface:#FAF9F2;
+  --surface-sunken:#EDEBDE;
+  --surface-inverse:#171717;
+  --text-inverse:#F5F3DC;
+  --focus-ring:#171717;
+  --focus-halo:#FAF9F2;
+  --critical:#AC3227;
+  --critical-on:#FFFFFF;
+  --critical-surface:rgba(172,50,39,0.10);
+  --critical-edge:rgba(172,50,39,0.55);
+  --caution:#7B5A12;
+  --caution-on:#FFFFFF;
+  --caution-surface:rgba(123,90,18,0.10);
+  --caution-edge:rgba(123,90,18,0.55);
+  /* And the card fill, so a button or a chip inside this island paints as
+     paper too. Without it the island's ink type lands on a component still
+     filled from the theme, which measured 1.09:1 on the Contact button in a
+     no-show row. The old block hid it by pinning cream type on every card. */
+  --card-surface:#FAF9F2;
+  color:var(--text-primary);
 }

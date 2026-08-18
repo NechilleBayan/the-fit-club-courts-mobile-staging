@@ -215,11 +215,18 @@
   .sidenav__row .countpill{
     flex:none;
     display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px;
-    border-radius:999px; background:var(--critical); color:#FFFFFF;
+    border-radius:999px; background:var(--caution); color:var(--caution-on);
     font-size:11px; line-height:1; font-weight:700; font-variant-numeric:tabular-nums;
   }
-  /* Red is the only colour either build spends, and it goes on money and on
-     closed courts. A queue length does not earn it. */
+  /* The solid pill counts unread notifications, which is something to attend to
+     rather than something lost, so it is --caution. It also stopped being white
+     on the hue: the literal #FFFFFF here was 2.49:1 against the dark theme's
+     coral on all twenty seven console pages, because the light theme's "type on
+     a solid fill" value had been written out by hand instead of taken from the
+     token that flips with the theme.
+
+     The quiet variant stays quiet. A count that the expanded row does not claim
+     is urgent should not become urgent because the rail collapsed. */
   .sidenav__row .countpill--quiet{
     background:rgba(var(--ghost-fill),.14); color:var(--text-primary);
     border:1px solid rgba(var(--ghost-edge),.30);

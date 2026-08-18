@@ -784,7 +784,12 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; }
    Almost full is the only new colour in the scale and it is --caution, not a
    third family: a session with two seats left needs attention and has lost
    nothing, which is the sentence that decides the family. */
-.chip--almost{ border:2px solid var(--caution-edge); background:var(--caution-surface); color:var(--caution); font-weight:700; }
+/* The fill is an opaque mix rather than the translucent --caution-surface, so
+   the pill has the same ground wherever it lands. Left translucent it stacked on
+   whatever row it was in and measured 4.32:1 on the Open Play list, which is a
+   pill failing AA because of the thing behind it rather than because of itself.
+   The 2px caution edge is the loud half of this chip; the fill can be quiet. */
+.chip--almost{ border:2px solid var(--caution-edge); background:color-mix(in srgb, var(--caution) 8%, var(--surface-raised)); color:var(--caution); font-weight:700; }
 .chip--almost .chip__sfx{ border-left-color:var(--caution-edge); }
 .chip--atcapacity{ background:var(--surface-inverse); color:var(--text-inverse); border:2px solid var(--border-strong); font-weight:700; }
 /* The chip is a full pill, so the bar has to be clipped to that shape the way the
@@ -1592,11 +1597,11 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
      --critical-on is the type colour on a solid --critical fill. It is declared
      here because the console declares it, and console-nav.css draws a badge from
      whichever document is under it. */
-  --critical:#C0392B;
+  --critical:#AC3227;
   --critical-on:#FFFFFF;
-  --critical-surface:rgba(192,57,43,0.10);
-  --critical-edge:rgba(192,57,43,0.55);
-  --critical-glow:rgba(192,57,43,0.28);
+  --critical-surface:rgba(172,50,39,0.10);
+  --critical-edge:rgba(172,50,39,0.55);
+  --critical-glow:rgba(172,50,39,0.28);
 
   /* --caution is the second semantic family: SOMETHING NEEDS ATTENTION, where
      --critical means SOMETHING IS WRONG OR LOST. Nothing in the customer build
@@ -1604,11 +1609,11 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
      on is capacity: a session that is filling up needs attention and has lost
      nothing. See admin/admin.css for the full argument, including why the ochre
      is not the terracotta that was tried first. */
-  --caution:#856110;
+  --caution:#7B5A12;
   --caution-on:#FFFFFF;
-  --caution-surface:rgba(133,97,16,0.10);
-  --caution-edge:rgba(133,97,16,0.55);
-  --caution-glow:rgba(133,97,16,0.28);
+  --caution-surface:rgba(123,90,18,0.10);
+  --caution-edge:rgba(123,90,18,0.55);
+  --caution-glow:rgba(123,90,18,0.28);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
