@@ -5,10 +5,16 @@ _devframe.html
 Thumbs.db
 desktop.ini
 
-# Local working copies, kept out of the repo on purpose. Both still live in the
-# working directory; they are simply never part of a commit.
+# Local working copies, kept out of the repo on purpose. All of these still live
+# in the working directory; they are simply never part of a commit.
 claude-version-index.html
 CLAUDE-APP-PLAN.md
+
+# The task briefs. What they asked for is in the history, and what was decided
+# while answering them is in DECISIONS.md and UI-FINDINGS.md, which are the
+# documents a later reader needs. The briefs themselves are working input.
+PROMPT-admin-integration.md
+PROMPT-ui-fixes.md
 
 # Visual regression baselines. Regenerated on demand by the screenshot runner and
 # diffed locally; a hundred-odd PNGs in the history would bury the diffs this
