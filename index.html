@@ -3316,7 +3316,7 @@ function render(){
      and data-action="demo" in its own handler, because demo means a harness
      sheet here and a staging notice there. */
   document.getElementById("bar-util").innerHTML =
-    CONSOLE_NAV.utilbar({ icon: icon, theme: currentTheme(), demoName: "Staging harness" });
+    CONSOLE_NAV.utilbar({ icon: icon, theme: currentTheme(), demoName: "Demo, the staging harness" });
 
   /* NAVIGATION STRIP, right hand end.
      Two things, in this order: the swap slot and the menu button.
@@ -7963,8 +7963,13 @@ STAGING.subscribe(function(state, changed, origin){
        it: the strip's flask at desktop widths, the menu that holds the same row
        below them. Checked for a box rather than for existence, because the strip
        is in the markup at every width and hidden below 1024. */
+    /* A heading the router focused to announce a route change is not something
+       a reader chose, so it is not somewhere to hand focus back to. Anything
+       carrying tabindex="-1" is one of those: it was focused by script, never
+       by a person. */
     const a = document.activeElement;
-    opener = (a && a !== document.body && document.contains(a)) ? a : null;
+    opener = (a && a !== document.body && document.contains(a) &&
+              a.getAttribute("tabindex") !== "-1") ? a : null;
     if (!opener){
       const c = [document.querySelector('.utilbar [data-action="demo"]'), document.querySelector(".barmenu")];
       for (const el of c){ if (el && el.getClientRects().length){ opener = el; break; } }

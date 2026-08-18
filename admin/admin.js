@@ -251,10 +251,21 @@
     paintUtilbar();
   }
 
+  /* Repainting replaces the buttons, which throws focus to the body if the
+     reader got here with a keyboard: they press Enter on the toggle and land
+     nowhere, on a page whose colours just changed under them. The control that
+     was focused is refocused by its action name, which survives the rebuild
+     because it is what identifies the control rather than what it is. */
   function paintUtilbar(){
     var slot = document.getElementById("bar-util");
     if (!slot || !window.CONSOLE_NAV) return;
-    slot.innerHTML = CONSOLE_NAV.utilbar({ icon: svg, theme: currentTheme(), demoName: "Staging build" });
+    var had = document.activeElement && slot.contains(document.activeElement)
+      ? document.activeElement.getAttribute("data-action") : null;
+    slot.innerHTML = CONSOLE_NAV.utilbar({ icon: svg, theme: currentTheme(), demoName: "Demo, the staging build" });
+    if (had){
+      var back = slot.querySelector('[data-action="' + had + '"]');
+      if (back) back.focus();
+    }
   }
 
   /* The resolved theme rather than the stored preference: "system" is a real

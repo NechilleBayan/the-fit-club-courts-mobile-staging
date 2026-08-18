@@ -965,7 +965,27 @@ a.row:active, button.row:active{ background:rgba(var(--ghost-fill),.22); border-
    Almost full is the only new colour in the scale and it is --caution, not a
    third family: A session with two seats left needs attention and has lost
    nothing, which is the sentence that decides the family. */
-.st--caution{ border:1.5px solid var(--caution-edge); background:var(--caution-surface); color:var(--caution); }
+/* THE TWO FAMILIES CANNOT BE TOLD APART BY LUMINANCE, SO THEY ARE NOT ASKED TO.
+   --critical and --caution measure 1.02:1 against each other. That is not a
+   mistake to tune out: both owe 4.5:1 as small type on cream, which pins both
+   near the same lightness, and any pair that clears AA on this palette will be
+   close. Hue is the only axis left, and hue is the one axis this build has
+   always refused to depend on.
+
+   So the family carries two signals that survive greyscale. A thick leading
+   edge, which is the idiom .check.is-invalid already uses for a field that
+   needs attention, and its own glyph in the markup: the flag, against the
+   warning triangle --critical keeps. Print either screen in black and white and
+   Shift Unfilled and 1 Overdue are still two different things. */
+.st--caution{
+  border:1.5px solid var(--caution-edge);
+  border-inline-start-width:5px;
+  background:var(--caution-surface); color:var(--caution);
+}
+/* Dashed against the red plate's solid, for the same reason. .plate--off is
+   also dashed and is not confusable with this: it is sunken, hatched, and has
+   no colour at all. */
+.plate--caution{ border-style:dashed; }
 
 /* A pill inside a row of its own family drops its wash. Both were washing the
    same hue over the same card, and two 10% coats of red under 12px red type cost
@@ -1519,6 +1539,24 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
    the point at which a reader has said the soft rule is not enough. */
 @media (prefers-contrast:more){
   .card, .sumcard, .plate, .fig, .row{ border-color:var(--border-default); }
+  /* And every control, which is the half that matters more. A boundary drawn
+     from the --ghost-edge wash lands between 1.8:1 and 2.6:1 on a cream card,
+     under the 3:1 WCAG asks of anything you can press. That is an idiom older
+     than this task and shared with the customer build, so changing it at rest
+     is not this branch's to make; what IS this branch's is that the reader who
+     has already said the soft reading is not enough gets a real edge.
+
+     --border-strong rather than --border-default, and the first attempt used
+     the latter. It reads as the milder choice and is not: in the dark theme the
+     cream wash at 42% is already lighter than --border-default, so pinning that
+     token took the secondary button DOWN from 2.67:1 to 2.33:1 while claiming
+     to raise it. --border-strong cannot do that in either direction. The
+     pressed states stay distinguishable because they go to 2px here, and a
+     pressed chip carries a fill as well. */
+  .btn, .filter, .search input, .field input, .field select, .field textarea,
+  .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn, .qact{
+    border-color:var(--border-strong);
+  }
 }
 
 /* ---------- CHROME ----------

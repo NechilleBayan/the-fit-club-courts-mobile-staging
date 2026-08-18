@@ -145,9 +145,15 @@
       }
       /* The label is a real word and is hidden by CSS at widths where the strip
          has to share the line, not dropped from the markup. A button whose only
-         name is a flask is a button nobody can ask for. */
+         name is a flask is a button nobody can ask for.
+
+         The accessible name has to CONTAIN the visible one, which is WCAG 2.5.3
+         and is not pedantry here: the visible word is "Demo" and a reader using
+         voice control says what they can see. So the caller passes a name that
+         starts with it and then says which dialog it opens, rather than
+         replacing it. */
       return '<button class="iconbtn iconbtn--demo" type="button" data-action="' + c.id + '"' +
-        ' aria-haspopup="dialog" aria-label="' + esc(opts.demoName || "Staging harness") + '">' +
+        ' aria-haspopup="dialog" aria-label="' + esc(opts.demoName || "Demo, the staging harness") + '">' +
         icon(c.icon) + '<span class="iconbtn__t">' + esc(c.label) + "</span></button>";
     }).join("");
   }
