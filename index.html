@@ -884,6 +884,28 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; }
   font-size:var(--fs-body); transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
 }
 .field textarea{ min-height:96px; padding-top:var(--s3); resize:vertical; }
+/* The one control on this page whose open state the page does not draw. The
+   list is painted by the operating system, and color-scheme above already makes
+   it obey the theme rather than the machine, which is most of this fixed.
+
+   What color-scheme does not do is decide the colour of the rows inside it. On
+   Windows and Android the popup inherits the select's own background, and this
+   select's background is a ten percent ghost fill: composited under the
+   platform's list it produced grey type on a grey plate, which reads as a menu
+   full of disabled options rather than a menu. The options are given opaque
+   colours of their own so nothing is left to compositing. macOS ignores both
+   declarations and draws its own menu, which is acceptable and is the reason
+   this is not a custom listbox: a real select is the accessible, mobile-correct
+   control, and a div pretending to be one would be a downgrade on every
+   platform to fix the appearance on one.
+
+   The closed control keeps its ghost fill. Making it opaque to match the popup
+   would leave the single select on the event form looking unlike the eight
+   inputs stacked around it, which trades a fault nobody sees until they open it
+   for one everybody sees on arrival. */
+.field select{ color:var(--text-primary); }
+.field select option{ background-color:var(--surface); color:var(--text-primary); }
+.field select option:disabled{ color:var(--text-secondary); }
 .field .hint{ font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary); }
 /* The invalid treatment itself lives with the attention red further down the
    sheet. What stays here is the shape of the message under the box.
@@ -3496,7 +3518,14 @@ function fieldHtml(id, label, opts){
     (opts.type === "textarea"
       ? '<textarea id="' + id + '" name="' + id + '" rows="3"' + (opts.placeholder ? ' placeholder="' + esc(opts.placeholder) + '"' : "") + ">" + esc(opts.value || "") + "</textarea>"
       : opts.type === "select"
-        ? '<select id="' + id + '" name="' + id + '">' + (opts.options || []).map(function(o){ return '<option' + (o === opts.value ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>"
+        /* The prompt line is a disabled option with an empty value rather than
+           the first entry in the list. As a plain option, "Choose one" was a
+           valid answer: it could be submitted, and on a form where the field is
+           optional it would have been submitted often. Disabled keeps it
+           readable as the box's current state and unselectable as a reply. */
+        ? '<select id="' + id + '" name="' + id + '">' +
+          (opts.placeholder ? '<option value="" disabled' + (opts.value ? "" : " selected") + ">" + esc(opts.placeholder) + "</option>" : "") +
+          (opts.options || []).map(function(o){ return '<option' + (o === opts.value ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>"
         : '<input id="' + id + '" name="' + id + '" type="' + (opts.type || "text") + '"' +
           (opts.inputmode ? ' inputmode="' + opts.inputmode + '"' : "") +
           (opts.autocomplete ? ' autocomplete="' + opts.autocomplete + '"' : "") +
@@ -5523,7 +5552,7 @@ function scrEvent(){
     fieldHtml("estart","Preferred start time",{ type:"time" }) +
     fieldHtml("eend","Preferred end time",{ type:"time", optional:true }) +
     fieldHtml("ecount","Expected attendance",{ inputmode:"numeric", placeholder:"e.g. 32" }) +
-    fieldHtml("etype","Event type",{ type:"select", options:["Choose one","Club day","Tournament","Company activity","Private match event","Other"] }) +
+    fieldHtml("etype","Event type",{ type:"select", placeholder:"Choose one", options:["Club day","Tournament","Company activity","Private match event","Other"] }) +
     fieldHtml("enotes","Anything else",{ type:"textarea", optional:true, placeholder:"Timing flexibility or setup needs" }) +
     "</form>";
   html += '<p class="legal section">No price, deposit, or response time is shown, because none is approved yet.</p>';
@@ -5974,8 +6003,22 @@ function scrToday(){
      about. So it is marked, and the marker is the same hatched one the harness
      uses on every other screen that is showing something the club did not put
      there. */
+  /* A segmented control, not a ghost button that names its destination. The
+     button said "Switch to card view", which states where pressing it goes and
+     says nothing at all about where the reader currently is, so parsing it
+     required already knowing the answer. Two options with a pressed state say
+     which view is on screen without being read.
+
+     .seg is this file's own, from line 824, not a copy of the console's. The
+     fk per option follows the My Bookings tabs directly above: one focus key
+     each, so a rerender returns focus to the segment that was pressed rather
+     than always to the first one. */
   html += '<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;gap:var(--s3)"><h2 class="sec">Courts</h2>' +
-    '<button class="btn btn--ghost btn--sm" style="width:auto;padding:0 var(--s3)" data-action="toggletimeline" data-fk="tl">' + (S.timeline ? "Switch to card view" : "Switch to timeline") + "</button></div>";
+    '<div class="seg" role="group" aria-label="Courts view">' +
+    [["timeline","Timeline"],["cards","Cards"]].map(function(t){
+      return '<button type="button" data-action="toggletimeline" data-view="' + t[0] +
+        '" data-fk="tl-' + t[0] + '" aria-pressed="' + (!!S.timeline === (t[0] === "timeline")) + '">' + t[1] + "</button>";
+    }).join("") + "</div></div>";
   html += '<p class="injected" style="margin:var(--s3) calc(-1 * var(--gutter)) 0">' + icon("flask") +
     "<span>Sample courts. Four fixed courts for one evening, not this venue's live occupancy.</span></p>";
   if (S.timeline){
@@ -6732,7 +6775,16 @@ const ACTIONS = {
   retry: function(){ S.connectivity = "online"; syncDials(); announce("Retrying. Connection restored on this staging build."); render(); },
   copy: function(el){ copyText(el.getAttribute("data-value") || el.getAttribute("data-id")); },
   reveal: function(el){ const k = el.getAttribute("data-key"); S.reveal[k] = !S.reveal[k]; rerenderFrom(el); },
-  toggletimeline: function(el){ S.timeline = !S.timeline; rerenderFrom(el); },
+  /* Set, not flip. A segmented control has two options and pressing the one
+     already selected must be a no-op; a toggle would have made it swap, so the
+     control would have disagreed with its own pressed state on every second
+     press. data-view is read when present so the old flip stays available to
+     any caller that has no view to name. */
+  toggletimeline: function(el){
+    const v = el.getAttribute("data-view");
+    S.timeline = v ? v === "timeline" : !S.timeline;
+    rerenderFrom(el);
+  },
 
   startcourt: function(){ S.draft.product = "court"; go(S.connectivity === "maintenance" ? "/sys/interruption" : "/court"); },
   totop: function(){

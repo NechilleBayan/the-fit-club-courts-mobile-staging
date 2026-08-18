@@ -64,6 +64,12 @@
   /* 5 pending: Two of Joy's, one of Rea's, two with no owner. The overdue one is
      counted where it is, in progress, not here. */
   DATA.pendingTasks = STAFF.reduce(function(n, p){ return n + p.pending; }, 0) + UNASSIGNED.pending;
+  /* Every open job on the board today, owned or not. It is the denominator the
+     workload meters are a picture of, and it is derived here for the same
+     reason pendingTasks is: a task moved from a person to Unassigned must not
+     leave two bars claiming a share of a total that no longer exists. */
+  DATA.openTasks = STAFF.reduce(function(n, p){ return n + p.pending + p.inProgress; }, 0) +
+                   UNASSIGNED.pending + UNASSIGNED.inProgress;
   DATA.onDuty = STAFF.filter(function(p){ return p.onDuty; }).length;
   window.ADMIN = DATA;
 
@@ -205,6 +211,7 @@
     buildToast();
     buildLive();
     liftToast();
+    paintWorkload();
     hydrateIcons(document);
     wire();
   }
@@ -419,6 +426,39 @@
     var dock = document.querySelector(".dock");
     document.documentElement.style.setProperty("--toast-lift",
       (dock ? Math.round(dock.getBoundingClientRect().height) : 0) + "px");
+  }
+
+  /* ---------- WORKLOAD METERS ----------
+     The two bars on the Staff screen used to be 85% and 45%, named "heavy" and
+     "moderate", over two people carrying two open tasks each. Nothing in the
+     roster produced either number, so a sighted reader got a pink bar and a
+     cream bar and no way to check them, and the accessible name said a third
+     thing again.
+
+     What the roster does hold is counts, so counts are what the meter shows: a
+     person's open jobs as a share of every open job on the board today. That
+     needs no capacity figure, which is the one number this console would have
+     had to invent to keep the old reading, and the console does not get to
+     invent numbers in the middle of a sweep about not inventing numbers.
+
+     The bar is one colour now. It used to go crit for Joy, which was the meter
+     trying to say "overdue" as well as "loaded"; her row already carries a
+     1 Overdue pill two lines above, and one fact stated twice in two idioms is
+     how the pair got out of step in the first place. */
+  function paintWorkload(){
+    var meters = document.querySelectorAll("[data-workload]");
+    if (!meters.length) return;
+    var total = DATA.openTasks || 0;
+    Array.prototype.forEach.call(meters, function(m){
+      var who = null;
+      STAFF.forEach(function(p){ if (p.initials === m.getAttribute("data-workload")) who = p; });
+      if (!who) return;
+      var mine = who.pending + who.inProgress;
+      var phrase = "Share of today's tasks, " + mine + " of " + total;
+      m.querySelector("[data-workload-num]").textContent = mine + " of " + total;
+      m.querySelector(".meter__track").setAttribute("aria-label", phrase);
+      m.querySelector(".meter__fill").style.width = (total ? Math.round(mine / total * 100) : 0) + "%";
+    });
   }
 
   function buildToast(){

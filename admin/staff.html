@@ -63,11 +63,16 @@
   </div>
 
   <!-- ---------- THE TEAM ----------
-       Workload is stated as a meter as well as a number, because "3 tasks" means
-       nothing on its own and "3 tasks, near capacity" is the thing that decides
-       who gets the next job. A staff member who is off duty is drawn hatched and
-       dashed, so a manager scanning for someone to hand work to skips them
-       without reading. -->
+       Workload is stated as a number as well as a meter, because a bar on its
+       own is a shape and "2 of 7" is a fact. The number, the bar, and the
+       accessible name are one string painted three ways by admin.js from the
+       roster, so they cannot drift apart the way the old pair did: the bars
+       used to sit at 85% and 45% under the names "heavy" and "moderate", and
+       both people carry exactly two open tasks. Neither figure came from
+       anywhere.
+
+       A staff member who is off duty is drawn hatched and dashed, so a manager
+       scanning for someone to hand work to skips them without reading. -->
   <section class="section" aria-labelledby="s-list" id="s-list">
     <div class="sechead">
       <h2 class="sec" id="s-count" data-listcount="Staff Member">0 Staff Members</h2>
@@ -90,8 +95,9 @@
           <span class="st st--crit"><span data-icon="alert"></span>1 Overdue</span>
           <span class="chip chip--quiet">2 tasks</span>
         </span>
-        <span class="meter">
-          <span class="meter__track" role="img" aria-label="Workload, heavy"><span class="meter__fill meter__fill--crit" style="display:block; width:85%;"></span></span>
+        <span class="meter" data-workload="JM">
+          <span class="meter__top"><span>Share of today's tasks</span><b class="tnum" data-workload-num>&nbsp;</b></span>
+          <span class="meter__track" role="img"><span class="meter__fill" style="display:block; width:0%;"></span></span>
         </span>
       </a>
 
@@ -108,8 +114,9 @@
           <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
           <span class="chip chip--quiet">2 tasks</span>
         </span>
-        <span class="meter">
-          <span class="meter__track" role="img" aria-label="Workload, moderate"><span class="meter__fill" style="display:block; width:45%;"></span></span>
+        <span class="meter" data-workload="RS">
+          <span class="meter__top"><span>Share of today's tasks</span><b class="tnum" data-workload-num>&nbsp;</b></span>
+          <span class="meter__track" role="img"><span class="meter__fill" style="display:block; width:0%;"></span></span>
         </span>
       </a>
 

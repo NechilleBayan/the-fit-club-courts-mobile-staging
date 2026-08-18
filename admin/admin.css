@@ -896,8 +896,55 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
   transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
 }
 .filter svg{ width:15px; height:15px; }
-.filter[aria-pressed="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); font-weight:700; }
-.filter:active{ background:rgba(var(--ghost-fill),.22); }
+/* The quieter of the two selected states, and the reason is on the page it sits
+   on: bookings.html says a segmented control switches WHAT KIND of thing you
+   are looking at and a chip NARROWS the set. Both used to resolve to the same
+   pixels, so the code knew the difference and the screen did not.
+
+   A chip is a modifier. It does not change what the list is, so it does not
+   take the list's own ink away and wear it: the surface stays the page's, the
+   fill deepens, the hairline becomes a real border at full strength, and the
+   type steps up. Selected is still carried by three things that are not colour,
+   which is what keeps it legible where colour is not available.
+
+   The segmented control keeps the inverse fill, because it is the more
+   committed of the two and it renames the heading below it. Going the other way
+   round was the alternative and it costs this: a mode switch that reads lighter
+   than the chips modifying it would put the loudest treatment on the smallest
+   claim. */
+/* The wash is a background-IMAGE over the plate, not a background that replaces
+   it, and that distinction is load-bearing rather than fussy. The surface
+   inversion block near the foot of this file re-bases .filter onto solid ink
+   with a one-class selector; any rule up here carrying a state also carries
+   more specificity, so writing `background:` wins and takes the ink away with
+   it. The wash then composites against the page instead of against the plate,
+   which on the day theme is cream under cream type. Layering keeps the plate
+   and puts the wash on top of it, so the chip reads the same on both themes.
+   The same trap is still set for a handful of other :active rules in this file;
+   they are noted in UI-FINDINGS.md rather than swept up here. */
+.filter[aria-pressed="true"]{
+  background-color:var(--card-surface);
+  background-image:linear-gradient(rgba(var(--ghost-fill),.28),rgba(var(--ghost-fill),.28));
+  color:var(--text-primary);
+  border:1.5px solid var(--border-strong);
+  font-weight:700;
+}
+.filter:active{
+  background-color:var(--card-surface);
+  background-image:linear-gradient(rgba(var(--ghost-fill),.22),rgba(var(--ghost-fill),.22));
+}
+.filter[aria-pressed="true"]:active{
+  background-image:linear-gradient(rgba(var(--ghost-fill),.40),rgba(var(--ghost-fill),.40));
+}
+
+/* Neither state leans on colour, so neither needs a colour here. What more
+   contrast buys is separation: the chip's fill goes to the strongest thing the
+   page has that is not the inverse plate, and both borders thicken, so the two
+   idioms stay two idioms rather than converging at the top of the scale. */
+@media (prefers-contrast:more){
+  .filter[aria-pressed="true"]{ background-image:linear-gradient(rgba(var(--ghost-fill),.45),rgba(var(--ghost-fill),.45)); border-width:2px; }
+  .seg [aria-pressed="true"], .seg [aria-selected="true"]{ border-width:2px; }
+}
 
 /* ---------- SEGMENTED (tabs within a page) ---------- */
 .seg{ display:flex; gap:6px; }
@@ -914,6 +961,9 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
   transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
 }
 .seg .countpill{ min-width:17px; height:17px; padding:0 4px; font-size:10px; }
+/* The heavier of the two. It is a mode switch: the option pressed here decides
+   what the list holds and renames the heading under it, so it takes the page's
+   ink and inverts. See the note on .filter[aria-pressed] above for the pair. */
 .seg [aria-pressed="true"], .seg [aria-selected="true"]{ background:var(--surface-inverse); color:var(--text-inverse); border:1.5px solid var(--border-strong); font-weight:700; }
 .seg button:active{ background:rgba(var(--ghost-fill),.24); }
 
@@ -1054,14 +1104,34 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 /* ---------- SANDBOX MARK ----------
    Every page in this folder is a prototype and says so once, quietly, at the
    bottom. It is not a banner, because a banner that appears on twenty four
-   screens stops being read by the second one. */
+   screens stops being read by the second one. That decision stands; what
+   changed is the shape.
+
+   It used to be a dashed rectangle at the card radius, and on the night theme a
+   rounded outline sitting eight levels off the page reads as one more content
+   card, which is the one thing its own note says it must not be. The outline
+   and the radius are gone and a rule on the leading edge replaces them: an
+   aside about the page rather than a box on it, and a shape no card in this
+   console has.
+
+   Rejected: A fill instead of an outline, which is a quieter card and still a
+   card. Also rejected: Keeping the dash and taking it to --hatch, which would
+   have made this rhyme with .injected. Hatching in this build means the harness
+   has forced a state; a note saying the whole screen is a prototype is a
+   different claim, and borrowing the marker would blur both. */
 .sandbox{
-  margin-top:var(--section-gap); padding:var(--s3);
-  border:1px dashed var(--border-default); border-radius:var(--r-card);
+  margin-top:var(--section-gap);
+  padding:2px 0 2px var(--s3);
+  border-inline-start:2px solid var(--border-default);
   display:flex; align-items:flex-start; gap:var(--s2);
   font-size:var(--fs-legal); line-height:19px; color:var(--text-secondary);
 }
 .sandbox svg{ width:16px; height:16px; margin-top:2px; opacity:.7; }
+/* The rule is the whole signal, so where the reader has asked for more contrast
+   it stops being a hairline in a secondary tone. */
+@media (prefers-contrast:more){
+  .sandbox{ border-inline-start-width:3px; border-color:var(--border-strong); color:var(--text-primary); }
+}
 
 /* ============================================================
    SURFACE INVERSION
