@@ -33,8 +33,8 @@
     <a class="sumcard" href="#s-list">
       <span data-icon="users"></span>
       <span class="sumcard__label">On Duty Now</span>
-      <span class="sumcard__num tnum">5</span>
-      <span class="sumcard__note">of 8 staff</span>
+      <span class="sumcard__num tnum">2</span>
+      <span class="sumcard__note">of 2 staff</span>
     </a>
     <a class="sumcard sumcard--alert" href="tasks.html">
       <span data-icon="tasks"></span>
@@ -51,10 +51,12 @@
     <a class="qact" href="tasks.html#assign"><span data-icon="plus"></span>Assign Task</a>
   </div>
 
+  <!-- Off Duty was a fourth filter here. With a cast of two who are both on
+       shift it selected an empty list every time, which reads as a broken
+       control rather than an honest answer. -->
   <div class="filterbar" role="group" aria-label="Filter staff" data-toggle="single" style="margin-top:14px;">
     <button class="filter" type="button" aria-pressed="true">All</button>
     <button class="filter" type="button" aria-pressed="false">On Duty</button>
-    <button class="filter" type="button" aria-pressed="false">Off Duty</button>
     <button class="filter" type="button" aria-pressed="false">Has Pending Tasks</button>
   </div>
 
@@ -66,7 +68,7 @@
        without reading. -->
   <section class="section" aria-labelledby="s-list" id="s-list">
     <div class="sechead">
-      <h2 class="sec">8 Staff Members</h2>
+      <h2 class="sec">2 Staff Members</h2>
       <span class="legal tnum">Sat 15 Aug</span>
     </div>
 
@@ -84,64 +86,10 @@
         <span class="row__tags">
           <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
           <span class="st st--crit"><span data-icon="alert"></span>1 Overdue</span>
-          <span class="chip chip--quiet">3 tasks</span>
-        </span>
-        <span class="meter">
-          <span class="meter__track" role="img" aria-label="Workload, heavy"><span class="meter__fill meter__fill--crit" style="display:block; width:85%;"></span></span>
-        </span>
-      </a>
-
-      <a class="row row--two row--bar" href="staff-details.html">
-        <span class="row__line">
-          <span class="avatar avatar--lg" aria-hidden="true">PR</span>
-          <span class="row__main">
-            <span class="row__title">Paolo Reyes</span>
-            <span class="row__sub">Maintenance &middot; 7:00 AM to 4:00 PM</span>
-          </span>
-          <span data-icon="chevR" data-icon-class="row__chev"></span>
-        </span>
-        <span class="row__tags">
-          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
           <span class="chip chip--quiet">2 tasks</span>
         </span>
         <span class="meter">
-          <span class="meter__track" role="img" aria-label="Workload, moderate"><span class="meter__fill" style="display:block; width:55%;"></span></span>
-        </span>
-      </a>
-
-      <a class="row row--two row--bar" href="staff-details.html">
-        <span class="row__line">
-          <span class="avatar avatar--lg" aria-hidden="true">CS</span>
-          <span class="row__main">
-            <span class="row__title">Carlo Santos</span>
-            <span class="row__sub">Coach &middot; 8:00 AM to 5:00 PM</span>
-          </span>
-          <span data-icon="chevR" data-icon-class="row__chev"></span>
-        </span>
-        <span class="row__tags">
-          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
-          <span class="chip chip--quiet">1 task</span>
-        </span>
-        <span class="meter">
-          <span class="meter__track" role="img" aria-label="Workload, light"><span class="meter__fill" style="display:block; width:25%;"></span></span>
-        </span>
-      </a>
-
-      <a class="row row--two row--bar" href="staff-details.html">
-        <span class="row__line">
-          <span class="avatar avatar--lg" aria-hidden="true">MD</span>
-          <span class="row__main">
-            <span class="row__title">Mika Dizon</span>
-            <span class="row__sub">Front Desk &middot; 2:00 PM to 10:00 PM</span>
-          </span>
-          <span data-icon="chevR" data-icon-class="row__chev"></span>
-        </span>
-        <span class="row__tags">
-          <span class="st st--live"><span data-icon="checkc"></span>On Duty</span>
-          <span class="chip chip--quiet">No tasks</span>
-        </span>
-        <span class="meter">
-          <span class="meter__track" role="img" aria-label="Workload, none"><span class="meter__fill" style="display:block; width:6%;"></span></span>
+          <span class="meter__track" role="img" aria-label="Workload, heavy"><span class="meter__fill meter__fill--crit" style="display:block; width:85%;"></span></span>
         </span>
       </a>
 
@@ -163,51 +111,6 @@
         </span>
       </a>
 
-      <a class="row row--two row--muted" href="staff-details.html">
-        <span class="row__line">
-          <span class="avatar avatar--lg" aria-hidden="true">AT</span>
-          <span class="row__main">
-            <span class="row__title">Aldrin Torres</span>
-            <span class="row__sub">Coach &middot; Rest day</span>
-          </span>
-          <span data-icon="chevR" data-icon-class="row__chev"></span>
-        </span>
-        <span class="row__tags">
-          <span class="st st--off"><span data-icon="ban"></span>Off Duty</span>
-          <span class="chip chip--quiet">Back Sunday</span>
-        </span>
-      </a>
-
-      <a class="row row--two row--muted" href="staff-details.html">
-        <span class="row__line">
-          <span class="avatar avatar--lg" aria-hidden="true">BL</span>
-          <span class="row__main">
-            <span class="row__title">Bea Lorenzo</span>
-            <span class="row__sub">Front Desk &middot; Starts 6:00 PM</span>
-          </span>
-          <span data-icon="chevR" data-icon-class="row__chev"></span>
-        </span>
-        <span class="row__tags">
-          <span class="st st--off"><span data-icon="clock"></span>Off Duty</span>
-          <span class="chip chip--quiet">1 task queued</span>
-        </span>
-      </a>
-
-      <a class="row row--two row--muted" href="staff-details.html">
-        <span class="row__line">
-          <span class="avatar avatar--lg" aria-hidden="true">NG</span>
-          <span class="row__main">
-            <span class="row__title">Nico Garcia</span>
-            <span class="row__sub">Maintenance &middot; On leave</span>
-          </span>
-          <span data-icon="chevR" data-icon-class="row__chev"></span>
-        </span>
-        <span class="row__tags">
-          <span class="st st--off"><span data-icon="ban"></span>On Leave</span>
-          <span class="chip chip--quiet">Back 20 Aug</span>
-        </span>
-      </a>
-
     </div>
   </section>
 
@@ -219,14 +122,15 @@
       <span class="plate__bar plate__bar--crit" aria-hidden="true"></span>
       <span class="plate__head"><span data-icon="alert"></span>Shift Unfilled</span>
       <span class="plate__phrase">6:00 PM to 10:00 PM &middot; Front Desk</span>
-      <span class="plate__meta">Bea Lorenzo covers to 10:00 PM but is alone on the desk during Evening Open Play.</span>
+      <span class="plate__meta">Unassigned. Both staff finish by 3:00 PM, and Evening Open Play runs 7:00 PM to 11:00 PM across all four courts.</span>
     </a>
   </section>
 
   <p class="sandbox">
     <span data-icon="info"></span>
-    <span>Sandbox: Eight sample staff members. Roles, pay, and permissions live
-    in Staff Management inside the menu.</span>
+    <span>Sandbox: Two sample staff members, which is the smallest cast that
+    still shows the difference between what a Club Manager may do and what Front
+    Desk may. Roles, pay, and permissions live in Staff Management.</span>
   </p>
 
 </main>

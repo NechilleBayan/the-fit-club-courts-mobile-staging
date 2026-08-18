@@ -23,7 +23,7 @@
 <main id="main">
 
   <h1 class="screen" tabindex="-1">Tasks</h1>
-  <p class="legal">Delegated work and its state. <span class="countpill">5</span> pending across 3 staff members.</p>
+  <p class="legal">Delegated work and its state. <span class="countpill">5</span> pending: Three with staff, two with nobody yet.</p>
 
   <!-- ---------- ASSIGN ----------
        The form is on the same screen as the queue rather than behind a plus
@@ -51,13 +51,13 @@
       <div class="field">
         <label for="t-who">Assign to</label>
         <select id="t-who">
-          <option>Joy Mendoza &middot; Front Desk &middot; 3 tasks</option>
-          <option>Paolo Reyes &middot; Maintenance &middot; 2 tasks</option>
-          <option>Carlo Santos &middot; Coach &middot; 1 task</option>
-          <option>Mika Dizon &middot; Front Desk &middot; no tasks</option>
-          <option>Bea Lorenzo &middot; Front Desk &middot; 1 task</option>
+          <option>Joy Mendoza &middot; Front Desk &middot; 2 tasks</option>
+          <option>Rea Salvador &middot; Club Manager &middot; 2 tasks</option>
+          <option>Unassigned &middot; 3 tasks waiting for an owner</option>
         </select>
-        <small>Current workload is shown beside each name.</small>
+        <small>Current workload is shown beside each name. Unassigned is a real
+        answer: the job is recorded and visible, and the club has nobody
+        rostered to it yet.</small>
       </div>
 
       <div class="field-row">
@@ -88,9 +88,15 @@
   </details>
 
   <!-- ---------- THE QUEUE ----------
-       Four states and each is drawn as well as named. Overdue is the only one
-       that takes the red, because it is the only one that is a problem rather
-       than a stage. -->
+       Three stages, each drawn as well as named, and one condition. Overdue is
+       the condition: it is a Pending task that has passed its due time, not a
+       fourth stage, which is why it takes the red and why the segmented control
+       counts it inside Pending rather than beside it. That was not true before.
+       The queue used to show five rows tagged Pending plus one tagged Overdue
+       while the counts everywhere else said five pending, so the console
+       disagreed with itself by one in whichever direction the reader added it
+       up. Pending is five, one of them is late, and 5 + 2 + 9 is the 16 the
+       control has always claimed. -->
   <div class="seg" role="group" aria-label="Filter by status" data-toggle="single" style="margin-top:20px;">
     <button type="button" aria-pressed="true">All <span class="countpill countpill--quiet tnum">16</span></button>
     <button type="button" aria-pressed="false">Pending <span class="countpill tnum">5</span></button>
@@ -124,7 +130,7 @@
         <div class="row__line">
           <span class="row__main">
             <span class="row__title">Fit replacement net on Court 4</span>
-            <span class="row__sub">Paolo Reyes &middot; Maintenance</span>
+            <span class="row__sub">Unassigned &middot; Maintenance</span>
           </span>
           <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Fit replacement net on Court 4"><span data-icon="dots"></span></button>
         </div>
@@ -155,7 +161,7 @@
         <div class="row__line">
           <span class="row__main">
             <span class="row__title">Set up nets for Evening Open Play</span>
-            <span class="row__sub">Paolo Reyes &middot; Maintenance</span>
+            <span class="row__sub">Unassigned &middot; Maintenance</span>
           </span>
           <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Set up nets for Evening Open Play"><span data-icon="dots"></span></button>
         </div>
@@ -170,7 +176,7 @@
         <div class="row__line">
           <span class="row__main">
             <span class="row__title">Confirm Sunday coaching slots</span>
-            <span class="row__sub">Carlo Santos &middot; Coach</span>
+            <span class="row__sub">Rea Salvador &middot; Club Manager</span>
           </span>
           <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Confirm Sunday coaching slots"><span data-icon="dots"></span></button>
         </div>
@@ -200,7 +206,7 @@
         <div class="row__line">
           <span class="row__main">
             <span class="row__title">Wipe down seating area</span>
-            <span class="row__sub">Bea Lorenzo &middot; Front desk</span>
+            <span class="row__sub">Unassigned &middot; Evening desk shift</span>
           </span>
           <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Wipe down seating area"><span data-icon="dots"></span></button>
         </div>
@@ -208,21 +214,6 @@
           <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
           <span class="chip chip--quiet">Low</span>
           <span class="chip chip--quiet"><span data-icon="clock"></span>Due 8:00 PM</span>
-        </div>
-      </div>
-
-      <div class="row row--two row--bar row--barhatch">
-        <div class="row__line">
-          <span class="row__main">
-            <span class="row__title">Print weekly rate card for the desk</span>
-            <span class="row__sub">Joy Mendoza &middot; Front desk</span>
-          </span>
-          <button class="iconbtn iconbtn--bare" type="button" data-open="tacts" aria-label="Actions for Print weekly rate card"><span data-icon="dots"></span></button>
-        </div>
-        <div class="row__tags">
-          <span class="st st--hold"><span data-icon="clock"></span>Pending</span>
-          <span class="chip chip--quiet">Low</span>
-          <span class="chip chip--quiet"><span data-icon="clock"></span>Due tomorrow</span>
         </div>
       </div>
 
@@ -244,7 +235,7 @@
         <div class="row__line">
           <span class="row__main">
             <span class="row__title">Check court lighting on Courts 1 to 4</span>
-            <span class="row__sub">Paolo Reyes &middot; Completed 7:22 AM</span>
+            <span class="row__sub">Rea Salvador &middot; Completed 7:22 AM</span>
           </span>
         </div>
         <div class="row__tags">

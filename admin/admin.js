@@ -22,13 +22,46 @@
   /* ---------- DEMO STATE ----------
      One source for the numbers that appear in more than one place, so the badge
      on the bell, the count in the drawer, and the figure on the dashboard
-     cannot disagree with each other. */
+     cannot disagree with each other.
+
+     THE CAST IS TWO PEOPLE.
+     It used to be eight, spread across sixteen files, and eight fake names is
+     six more than the console can demonstrate anything with. Rea is the signed
+     in identity and maps to the Operations Manager surface; Joy is Front Desk,
+     on duty, and carries the overdue task the scenarios need. Two is the
+     smallest cast that still shows the permission boundary between those two
+     roles, which is the distinction the whole product turns on. Everything the
+     other six were holding is either theirs now or is Unassigned, which is
+     better demo material than a name nobody will meet twice.
+
+     The roster is here rather than only in the markup because the counts have to
+     agree in five places. pendingTasks is derived from it rather than typed
+     beside it, so a task moved between people cannot leave the bell, the drawer,
+     and the dashboard saying three different numbers. */
+  var STAFF = [
+    { name:"Rea Salvador", role:"Club Manager", initials:"RS",
+      shift:"6:00 AM to 3:00 PM", onDuty:true, pending:1, inProgress:1, overdue:0 },
+    { name:"Joy Mendoza",  role:"Front Desk",  initials:"JM",
+      shift:"6:00 AM to 2:00 PM", onDuty:true, pending:2, inProgress:0, overdue:1 }
+  ];
+  /* Work with no owner. Three jobs that used to belong to a Maintenance staffer
+     and a second Front Desk staffer who are no longer in the cast. They are not
+     quietly reassigned to the two who are left: an unfilled shift and unowned
+     maintenance are the states this console exists to make visible, and a club
+     this size genuinely has them. */
+  var UNASSIGNED = { pending:2, inProgress:1 };
+
   var DATA = {
     club:   { name:"The Fit Club Courts", plan:"Kapitolyo, Pasig" },
-    admin:  { name:"Rea Salvador", role:"Club Manager", initials:"RS" },
-    unread: 4,
-    pendingTasks: 5
+    admin:  STAFF[0],
+    staff:  STAFF,
+    unassigned: UNASSIGNED,
+    unread: 4
   };
+  /* 5 pending: Two of Joy's, one of Rea's, two with no owner. The overdue one is
+     counted where it is, in progress, not here. */
+  DATA.pendingTasks = STAFF.reduce(function(n, p){ return n + p.pending; }, 0) + UNASSIGNED.pending;
+  DATA.onDuty = STAFF.filter(function(p){ return p.onDuty; }).length;
   window.ADMIN = DATA;
 
   /* ---------- ICONS ----------
