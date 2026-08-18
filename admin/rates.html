@@ -11,7 +11,12 @@
      one. system is this console's own default, which is what the Settings
      screen ships with selected; it applies only while nobody has chosen. -->
 <script src="../staging-state.js" data-default-theme="system"></script>
+<script src="../console-nav.js"></script>
 <link rel="stylesheet" href="admin.css">
+<!-- The desktop rail, shared with the customer build. After admin.css, so the
+     component's own rules win over the generic ones it happens to share a class
+     name with. -->
+<link rel="stylesheet" href="../console-nav.css">
 </head>
 <body data-title="Rates" data-nav="more" data-back="more.html">
 <div id="shell">

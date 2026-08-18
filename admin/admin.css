@@ -1103,3 +1103,66 @@ a.plate:active{ background:color-mix(in srgb, #F5F3DC 14%, var(--card-surface));
    for one state is one mark too many. */
 .tabbar a[aria-current="page"]::after{ content:none; }
 .tabbar a[aria-current="page"] .tabpill{ background:#F5F3DC; color:#171717; }
+
+/* ============================================================
+   DESKTOP LAYOUT
+   Everything here is behind a min-width:1024px query. Nothing changes what a
+   phone renders, which is the point: The console's mobile layout was reviewed
+   and signed off, and a wider window is a different problem, not a licence to
+   redraw the small one.
+
+   1024 is the customer build's breakpoint, adopted rather than invented. This
+   stylesheet previously had no min-width query at all, only three max-width
+   ones, so there was no competing value to reconcile.
+
+   The rail itself is drawn by console-nav.css, which the customer build also
+   loads, because the component is the same component in both. What is here is
+   the part that is not: how this shell reflows around it, and which of the
+   phone's two navigations it replaces.
+
+   IT REPLACES BOTH OF THEM.
+   Below 1024 the console navigates with a five item bottom bar plus a drawer
+   dialog behind a hamburger. Above it, both go: The bar because a fixed strip
+   across the foot of a 1440px window is a phone control stranded on a desk, and
+   the drawer because everything it held now fits on screen permanently. A drawer
+   is a way to borrow space that does not exist, and at this width it does.
+   ============================================================ */
+@media (min-width:1024px){
+  :root{
+    /* The console takes the same room to breathe the customer build takes at
+       this width. The reading column is still bounded: A table of bookings can
+       use the width, a card of settings should not. */
+    --gutter:32px; --card-pad:22px; --pad-top:28px;
+    --shell-max:none;
+    --content-max:44rem;
+    --block-gap:24px; --section-gap:36px;
+  }
+
+  /* The shell stops being a column and becomes two. The sidebar spans both rows
+     so the app bar starts to the right of it rather than over it, which is what
+     keeps the rail reading as the frame and the bar as the page's own header.
+     minmax(0,1fr) rather than 1fr on the content column, because a grid track
+     defaults to a minimum of its content's min-content width and one wide table
+     would otherwise push the whole layout past the viewport. */
+  #shell{
+    display:grid;
+    grid-template-columns:var(--sidenav-w) minmax(0,1fr);
+    grid-template-rows:auto 1fr;
+    transition:grid-template-columns var(--dur-ui) var(--ease);
+  }
+  .sidenav{ grid-column:1; grid-row:1 / -1; min-width:0; }
+  .appbar{ grid-column:2; grid-row:1; }
+  #main{ grid-column:2; grid-row:2; }
+
+  /* Both of the phone's navigations, gone rather than hidden behind the content.
+     The hamburger goes with the drawer: A button that opens a dialog nobody
+     needs is worse than no button. */
+  .tabbar{ display:none; }
+  #menuBtn{ display:none; }
+
+  /* The tab bar was holding the foot of every screen open. With it gone, the
+     padding it reserved is a hole. */
+  main{ padding-bottom:var(--s8); }
+  body.has-dock main{ padding-bottom:calc(var(--dock-h) + var(--s8)); }
+  .dock{ left:var(--sidenav-w); bottom:0; transition:left var(--dur-ui) var(--ease); }
+}

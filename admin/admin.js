@@ -92,39 +92,22 @@
   window.icon = svg;
 
   /* ---------- NAVIGATION MODEL ----------
-     The bottom bar is capped at five and this array is the enforcement: there is
-     nowhere to put a sixth. Anything that does not earn a permanent slot lives
-     in More or in the drawer. */
-  var TABS = [
-    { id:"dashboard", label:"Dashboard", href:"dashboard.html", icon:"grid" },
-    { id:"bookings",  label:"Bookings",  href:"bookings.html",  icon:"calendar" },
-    { id:"courts",    label:"Courts",    href:"courts.html",    icon:"court" },
-    { id:"staff",     label:"Staff",     href:"staff.html",     icon:"users" },
-    { id:"more",      label:"More",      href:"more.html",      icon:"dots" }
-  ];
+     The destination list moved to console-nav.js one level up. It used to live
+     here, which was right while the console was the only thing that had one; the
+     staff shell in the customer build now draws the same sidebar, and two copies
+     of a destination list is one place too many to remember to add a screen. The
+     five tab bar items and the drawer's groups both come from there.
 
-  /* The drawer holds the secondary and system areas. None of the five tab bar
-     destinations is repeated here: "Staff Management" is the roles, accounts,
-     and pay area, which is a different job from the Staff tab's question of who
-     is on shift right now, and it has its own screen. */
-  var DRAWER = [
-    { group:"Club" },
-    { label:"Club Profile",       href:"club-profile.html", icon:"building" },
-    { label:"Staff Management",   href:"staff-manage.html", icon:"key" },
-    { label:"Players / Customers",href:"players.html",      icon:"user" },
-    { group:"Money" },
-    { label:"Payments",           href:"payments.html",     icon:"card" },
-    { label:"Reports & Analytics",href:"reports.html",      icon:"chart" },
-    { label:"Rates & Promotions", href:"rates.html",        icon:"tag" },
-    { group:"System" },
-    { label:"Operating Hours",    href:"hours.html",        icon:"hours" },
-    { label:"Notifications",      href:"notifications.html",icon:"bell", badge:"unread" },
-    { label:"Activity Log",       href:"activity.html",     icon:"activity" },
-    { label:"Settings",           href:"settings.html",     icon:"settings" },
-    { label:"Help / Support",     href:"help.html",         icon:"help" },
-    { group:"Session" },
-    { label:"Log Out",            href:"#logout",           icon:"logout", danger:true }
-  ];
+     Kept as locals under the old names so the rest of this file reads as it did.
+     The drawer flattens the grouped model back into the single sequence it has
+     always rendered, because a dialog on a phone has no room to be a two level
+     structure and never pretended to. */
+  var NAV = window.CONSOLE_NAV;
+  var TABS = NAV.TABS;
+  var DRAWER = NAV.GROUPS.reduce(function(list, g){
+    list.push({ group: g.group });
+    return list.concat(g.items);
+  }, []);
 
   /* ---------- BUILD THE CHROME ---------- */
   function build(){
@@ -177,8 +160,58 @@
     shell.appendChild(tabs);
 
     if (!back) buildDrawer(shell);
+    buildSidebar(shell, nav);
     hydrateIcons(document);
     wire();
+  }
+
+  /* ---------- THE SIDEBAR ----------
+     Built on every page and at every width, and hidden below 1024px by the
+     stylesheet rather than by a media query in here. A JS breakpoint would have
+     to be re-evaluated on resize, would race the first paint, and would leave the
+     rail half built if a reader dragged a window across the threshold. display:
+     none also takes it out of the tab order and out of the accessibility tree, so
+     a phone never meets a navigation it cannot see.
+
+     Unlike the drawer, this is built even on a screen that declares data-back.
+     The drawer is skipped there because a screen one level down does not need a
+     dialog it can reach in two taps; a sidebar is not a dialog, it is the frame,
+     and a detail screen missing the frame would be the only page in the console
+     with no way out but the browser.
+
+     The three sections of the model are drawn in the order the console reads
+     them: the five tab destinations first, because they are the same five the
+     phone gets, then the groups. */
+  function buildSidebar(shell, nav){
+    if (!window.CONSOLE_NAV) return;
+    var here = location.pathname.split("/").pop();
+
+    var el = document.createElement("nav");
+    el.className = "sidenav";
+    el.id = "sidenav";
+    el.setAttribute("aria-label", "Console");
+    el.innerHTML = NAV.sidebar({
+      icon: svg,
+      prefix: "",
+      counts: DATA,
+      badgeNoun: { unread:"unread", pendingTasks:"pending tasks" },
+      collapsed: !!(window.STAGING && STAGING.getNavCollapsed()),
+      /* Role only, not role plus club. The drawer can afford both because its
+         panel is 19rem of a phone screen with nothing beside it; the rail is
+         narrower than that and the club name is the half that truncates, which
+         leaves "Club Manager, The F..." saying less than "Club Manager" does. */
+      head: { title: DATA.admin.name, sub: DATA.admin.role },
+      primary: TABS.map(function(t){
+        return { href:t.href, label:t.label, icon:t.icon, current:(t.id === nav),
+                 badge:(t.id === "more" ? "pendingTasks" : null), quiet:true };
+      }),
+      groups: NAV.GROUPS,
+      isCurrent: function(item){ return item.href === here; }
+    });
+
+    /* First child, so the reading order and the tab order both start with the
+       navigation rather than reaching it after the whole page. */
+    shell.insertBefore(el, shell.firstChild);
   }
 
   /* Pages ask for an icon by name and get the drawing here, so no page carries
@@ -225,6 +258,24 @@
   function wire(){
     var drawer = document.getElementById("drawer");
     var menuBtn = document.getElementById("menuBtn");
+
+    if (window.CONSOLE_NAV) CONSOLE_NAV.wireSidebar(document);
+
+    /* The drawer and the sidebar are the same navigation at two widths, and they
+       must never both be present. Below 1024 the sidebar is display:none and the
+       drawer is the answer; from 1024 up the sidebar is the frame and the
+       hamburger that opens the drawer is hidden. The one gap either stylesheet
+       leaves is a reader who opens the drawer on a narrow window and then widens
+       it, which would leave a modal dialog sitting over a navigation that already
+       says the same thing. Closing it on the way past is the whole fix. */
+    if (window.matchMedia){
+      var wide = matchMedia("(min-width:1024px)");
+      var onWide = function(e){
+        if (e.matches && drawer && drawer.open) drawer.close();
+      };
+      if (wide.addEventListener) wide.addEventListener("change", onWide);
+      else if (wide.addListener) wide.addListener(onWide);
+    }
 
     if (menuBtn && drawer){
       menuBtn.addEventListener("click", function(){ drawer.showModal(); });

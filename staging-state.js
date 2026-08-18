@@ -13,9 +13,15 @@
    admin console does not silently start over halfway through.
 
    WHAT CROSSES THE BOUNDARY: DIALS, NOT ORDERS.
-   The persisted shape is six scalars and nothing else:
+   The persisted shape is seven scalars and nothing else:
 
-     { surface, scenario, connectivity, capacity, clockOffset, theme }
+     { surface, scenario, connectivity, capacity, clockOffset, theme, navCollapsed }
+
+   Six of those are harness dials. navCollapsed is not: it is a preference about
+   the chrome, in the same category as the theme, and it is here for the same
+   reason the theme is. The desktop sidebar exists in both documents, and a rail
+   a reader collapsed in the console should still be collapsed when they land in
+   the staff shell.
 
    Notably absent is S.orders. That is a live object graph carrying absolute
    hold deadlines, generated identifiers, and per-pass share tokens, and it is
@@ -75,7 +81,8 @@
     connectivity: "online",
     capacity: "available",
     clockOffset: 0,
-    theme: null
+    theme: null,
+    navCollapsed: false
   };
 
   var subs = [];
@@ -96,7 +103,8 @@
 
   function clone(o) {
     return { surface: o.surface, scenario: o.scenario, connectivity: o.connectivity,
-             capacity: o.capacity, clockOffset: o.clockOffset, theme: o.theme };
+             capacity: o.capacity, clockOffset: o.clockOffset, theme: o.theme,
+             navCollapsed: o.navCollapsed };
   }
 
   function pick(list, v, fallback) {
@@ -124,6 +132,8 @@
        already been checked in. */
     var off = Number(raw.clockOffset);
     s.clockOffset = isFinite(off) && off >= 0 ? off : 0;
+
+    s.navCollapsed = raw.navCollapsed === true;
 
     if (typeof raw.scenario === "string" && raw.scenario) {
       s.scenario = (scenarioKeys && scenarioKeys.indexOf(raw.scenario) < 0) ? null : raw.scenario;
@@ -219,6 +229,12 @@
     getTheme: function () { return read().theme; },
     setTheme: function (v) { return set("theme", v); },
 
+    /* Not a harness dial. The desktop sidebar's icon-only rail, shared by both
+       documents so the chrome does not change shape when a reader crosses
+       between them. */
+    getNavCollapsed: function () { return read().navCollapsed; },
+    setNavCollapsed: function (v) { return set("navCollapsed", v === true); },
+
     /* The harness owns the scenario list. Handing it over here lets a stored
        key be validated against the real table without this file keeping a copy
        of it that could fall behind. */
@@ -250,7 +266,7 @@
       mem = null;
       if (storageOk) { try { window.localStorage.removeItem(KEY); } catch (e) {} }
       mem = clone(DEFAULTS);
-      emit(["surface", "scenario", "connectivity", "capacity", "clockOffset", "theme"]);
+      emit(["surface", "scenario", "connectivity", "capacity", "clockOffset", "theme", "navCollapsed"]);
       return clone(DEFAULTS);
     },
 
@@ -293,7 +309,7 @@
   window.addEventListener("storage", function (e) {
     if (e.key !== null && e.key !== KEY) return;
     mem = null;
-    emit(["surface", "scenario", "connectivity", "capacity", "clockOffset", "theme"], "remote");
+    emit(["surface", "scenario", "connectivity", "capacity", "clockOffset", "theme", "navCollapsed"], "remote");
   });
 
   window.STAGING = STAGING;

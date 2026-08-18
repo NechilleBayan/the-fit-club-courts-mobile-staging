@@ -14,6 +14,21 @@
      either of them. See staging-state.js for what crosses and what does not. -->
 <script src="staging-state.js" data-default-theme="dark"></script>
 
+<!-- The console's destination list. The staff shell draws the same desktop
+     sidebar the admin console does, from the same array, so a screen added to
+     one navigation is added to both. Deferred is fine here: nothing it holds is
+     needed before the first paint, unlike the theme above it. Not deferred, all
+     the same: the router at the foot of this file calls render() while the
+     document is still parsing, and a deferred script would not have run yet. -->
+<script src="console-nav.js"></script>
+
+<!-- The desktop rail. Same component, same stylesheet, both builds. It names no
+     colours: every value is a token, and this document declares all of them, which
+     is what lets one sheet serve two palettes that are inverses of each other.
+     Layout is not in it. How this shell reflows around the rail is below, with the
+     rest of this document's desktop rules. -->
+<link rel="stylesheet" href="console-nav.css">
+
 <!-- Fonts are served from ./fonts, not from a font CDN. The faces are declared in the
      sheet below. Only these two are preloaded: they are the ones the first screen
      paints with, and preloading the other eight would compete with them for the same
@@ -2365,6 +2380,69 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .marquee__copy p{ font-size:15px; line-height:22px; }
 }
 
+
+/* ---------- DESKTOP: THE STAFF SHELL ----------
+   The staff shell's desktop navigation, and the one place in this stylesheet
+   where a route gets a different chrome rather than a wider one. Everything here
+   is behind body.shell-staff: no customer route reads a line of it, and below
+   1024px none of it applies at all.
+
+   The hook is body.has-sidenav rather than body.shell-staff, because two of the
+   five staff routes return the task shell. See paintSidenav for why the rail
+   follows the path instead.
+
+   TWO DESKTOP CHROMES, DELIBERATELY.
+   The strips above serve the customer product and are untouched. Staff get a
+   rail instead, and the reason is product rather than width. A visitor arrives
+   at a hero, reads down a page, and is offered one conversion action; a Front
+   Desk staffer spends a shift moving between five destinations with no hero, no
+   scroll, and nothing to convert. The second of those is a console, and it is
+   the same console admin/ is, so it wears the same rail rather than a second
+   desktop chrome that happens to sit next door to it.
+
+   The header nav this replaces was a deliberate choice too, not a gap: the
+   comment on the render branch says staff keep their destinations because they
+   are "a different application wearing the same chrome". That premise is exactly
+   what argues for the rail. Staff being a different application was right; the
+   conclusion has moved from same chrome to its own.
+
+   The rejected alternative was to leave the header nav alone and give the rail
+   only to admin/. It is cheaper and it regresses nothing, and it was turned down
+   because it leaves two staff-facing desktop chromes in one product, which is
+   the confusion this integration exists to remove. Customer and staff differing
+   is a distinction a reader can learn once; Front Desk and Ops Manager differing
+   is one nobody can.
+
+   Fixed rather than a grid column, which is how the console does it. The console
+   owns a plain #shell it can turn into two columns; this one is a flex column
+   carrying a sticky header group, a full bleed hero container, and a fixed dock,
+   and re-parenting all of that into grid tracks to move a navigation is a much
+   larger change than a padding offset for no more result. The rail sits outside
+   #shell for the same reason its element does: #shell clips its overflow. */
+@media (min-width:1024px){
+  body.has-sidenav #shell{
+    padding-inline-start:var(--sidenav-w);
+    transition:padding-inline-start var(--dur-ui) var(--ease);
+  }
+  body.has-sidenav #sidenav{
+    position:fixed; inset-block:0; inset-inline-start:0; z-index:60;
+    width:var(--sidenav-w);
+    transition:width var(--dur-ui) var(--ease);
+  }
+  /* The header keeps the clock, the harness, and the theme toggle. It gives up
+     the destinations, which are now in the rail: the same five links twice on one
+     screen is the duplication this integration set out to remove, not a fallback
+     in case the rail is missed. */
+  body.has-sidenav .topnav{ display:none; }
+  body.has-sidenav .dock{
+    left:var(--sidenav-w);
+    transition:left var(--dur-ui) var(--ease);
+  }
+  /* The header strips centre their content on the shell's own width. Inside a
+     padded shell that width is already correct, so the only thing to undo is the
+     assumption that the shell starts at the viewport edge. */
+  body.has-sidenav .totop{ right:var(--s6); }
+}
 </style>
 
 </head>
@@ -2422,6 +2500,20 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <symbol id="i-arrow-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></symbol>
 <symbol id="i-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
 <symbol id="i-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+<!-- The seven glyphs the shared navigation model names that this sprite did not
+     have. The path data comes from the console's own sprite in admin.js, so the
+     two builds draw the same Notifications bell rather than two bells; the stroke
+     weight is this file's 2 rather than the console's 1.75, because a symbol that
+     wore the console's weight would be the one icon in this document drawn
+     lighter than its neighbours. Reconciling the two weights is a question for
+     the sprite merge, not for a navigation that needs a bell today. -->
+<symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h9A1.5 1.5 0 0 1 16 5.5V21"/><path d="M16 10h3a1 1 0 0 1 1 1v10M2.5 21h19M7.5 8h5M7.5 12h5M7.5 16h5"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="14" r="4.5"/><path d="M11.4 11.2 20 3.5M16.5 7l2.5 2.5M14.2 9.2l2.2 2.2"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 9.5h19"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h17"/><rect x="5" y="11" width="3.5" height="7"/><rect x="10.2" y="6.5" width="3.5" height="11.5"/><rect x="15.5" y="14" width="3.5" height="4"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></symbol>
+<symbol id="i-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12h4l2.5-7 5 14 2.5-7h5"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/></symbol>
 </defs></svg>
 
 <div id="shell">
@@ -2916,6 +3008,119 @@ function resolve(path){
 function go(path){ if (location.hash.slice(1) === path) render(); else location.hash = path; }
 function currentPath(){ const h = location.hash.slice(1); return h && h[0] === "/" ? h : "/"; }
 
+/* ============================================================
+   STAFF SIDEBAR
+   The desktop navigation for the staff shell, and nothing else. Below 1024px it
+   is display:none and a Front Desk phone gets exactly the bottom bar it always
+   had; above 1024px it is the frame, and the header's staff destinations step
+   aside for it.
+
+   TWO DESKTOP CHROMES IN ONE DOCUMENT, ON PURPOSE.
+   From 1024px up this file already puts its navigation in a two strip header:
+   a utility strip for the build controls and a navigation strip for the
+   destinations. That header serves the customer product and it stays exactly as
+   it is. The staff shell now does something different, and the reason is not
+   width, it is product. A visitor arrives at a landing page with a hero and one
+   conversion action and reads down a page; a Front Desk staffer spends a shift
+   moving between five destinations and has no hero, no scroll, and no
+   conversion. The second is a console, and it is the same console the admin
+   folder is, wearing the same rail rather than a different chrome that happens to
+   sit next door.
+
+   The header nav this replaces was itself a deliberate choice, not an oversight:
+   the comment above the render branch says staff keep their destinations because
+   they are "a different application wearing the same chrome". That reasoning is
+   what argues for the rail. It was right that staff are a different application;
+   the conclusion has moved on from same chrome to its own.
+
+   WHAT THE STAFF RAIL CARRIES.
+   Its primary section is STAFF_TABS, this document's own five shift routes,
+   because they are hash routes into this router and mean nothing to the console.
+   Beneath them are the shared groups, which are real files in admin/ and are the
+   only route from a shift into the management console.
+
+   Front Desk does not get the Money group. That is the same boundary the
+   exception queue already draws, it is stated in the rail rather than left as a
+   silent absence, and as everywhere else in this build the server is what
+   actually enforces it.
+   ============================================================ */
+/* The shared model names its glyphs in the console's vocabulary. This sprite has
+   most of them under other names and, since the seven it was missing were added
+   to it, all of them somewhere. One table, so no caller has to know that a
+   calendar is called cal in here. */
+const NAV_GLYPH = {
+  calendar:"cal", user:"person", hours:"clock", help:"info", chevL:"chev-l",
+  logout:"return", grid:"square-half"
+};
+function navIcon(name){ return icon(NAV_GLYPH[name] || name); }
+
+function paintSidenav(view, path){
+  const shell = document.getElementById("shell");
+  let el = document.getElementById("sidenav");
+
+  /* WHICH ROUTES GET THE RAIL, AND WHY IT IS NOT "shell === staff".
+     Three of the staff routes return the staff shell and two return the task
+     shell: Walk-in and the Open Play window are focused flows with a back
+     control and a dock, the same shape a customer checkout has. On a phone that
+     distinction also decides the tab bar, which is absent on a task screen, and
+     rightly so: a phone has about sixty vertical pixels to spare and a task
+     needs every one of them plus one unambiguous way forward.
+
+     That constraint does not exist at 1280px. Keeping the rail off those two
+     screens would buy nothing and cost a 264 pixel jump of the whole page every
+     time a staffer starts or finishes a walk-in, which is a defect a reader
+     notices immediately. So the test is the path, not the shell: everything
+     under /staff/ keeps the frame, and the two renderings of the navigation
+     legitimately disagree about task screens because the reason for withholding
+     it was a phone's height.
+
+     Customer task routes are untouched. The element is removed rather than
+     hidden on those, so the customer document carries no navigation it is not
+     using, in the DOM as well as in the stylesheet. */
+  const wantsRail = view.shell === "staff" || path.indexOf("/staff/") === 0;
+  document.body.classList.toggle("has-sidenav", wantsRail);
+  if (!wantsRail){
+    if (el) el.remove();
+    return;
+  }
+  if (!window.CONSOLE_NAV) return;
+
+  if (!el){
+    el = document.createElement("nav");
+    el.className = "sidenav";
+    el.id = "sidenav";
+    el.setAttribute("aria-label", "Staff");
+    /* A sibling of the shell rather than a child of it, and before it, so the
+       reading order and the tab order both start with the navigation. Outside
+       #shell specifically because #shell carries overflow-x:clip, and a fixed
+       element inside a clipping ancestor is a bet on which browser is reading
+       the spec that week. Nothing is riding on it being in there. */
+    document.body.insertBefore(el, shell);
+  }
+
+  const isOps = S.surface === "opsmanager";
+  /* Session is dropped rather than filtered by permission. There is no session
+     in this document to end: the surface is a harness dial, not a login, and a
+     Log Out row here would be the first control in the build that does nothing.
+     The console keeps its own, where it at least has an identity to sign out. */
+  const groups = CONSOLE_NAV.groupsFor(S.surface).filter(function(g){ return g.group !== "Session"; });
+
+  el.innerHTML = CONSOLE_NAV.sidebar({
+    icon: navIcon,
+    prefix: "admin/",
+    collapsed: STAGING.getNavCollapsed(),
+    head: { title: roleLabel(), sub: VENUE.name },
+    primary: STAFF_TABS.map(function(t){
+      return { href:"#" + tabHref(t), label:t.label, icon:t.glyph, current:t.match.indexOf(path) >= 0 };
+    }),
+    groups: groups,
+    note: isOps
+      ? "The management console is a separate build. These open it in this tab."
+      : "The management console is a separate build. These open it in this tab. The money area is the Operations Manager's, so it is absent here. The server denies it too."
+  });
+  CONSOLE_NAV.wireSidebar(document);
+}
+
 /* ---------- CUSTOMER DESTINATIONS ----------
    One list, and one navigation built from it. There used to be two: a five item bar
    pinned to the bottom of a phone and a header nav that took over at 1024px. Both
@@ -3069,6 +3274,7 @@ function render(){
      destinations with no hero and no conversion action behind them, the phone menu
      carries none of them, and a shift is spent moving between them. It is a
      different application wearing the same chrome. */
+  paintSidenav(view, path);
   const tabhost = document.getElementById("tabhost");
   const topnav = document.getElementById("bar-nav");
   if (view.shell === "staff"){

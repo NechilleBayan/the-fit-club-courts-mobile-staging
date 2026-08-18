@@ -1,0 +1,215 @@
+
+/* ============================================================
+   THE FIT CLUB COURTS - DESKTOP SIDEBAR
+   Loaded by every page of the admin console and by the customer build.
+
+   One component, one stylesheet, two documents. The rail is the same rail on
+   both sides, so drawing it twice would be the same mistake as keeping two
+   destination lists: a change to the current-page marker that lands in one build
+   and not the other. What is NOT here is layout. How a shell reflows around the
+   rail is that shell's own business, and the two shells are not alike, so each
+   keeps its own grid: admin.css for the console, the block in index.html for the
+   staff shell.
+
+   This file names no colours. Every value is a token, and both documents already
+   declare all of them, which is what makes one stylesheet possible across two
+   builds whose palettes are inverses of each other. The console paints cream
+   type on ink cards over a near white page; the customer build paints the other
+   way round. The rail follows whichever it finds itself in.
+
+   Everything is behind a min-width:1024px query or is inert because .sidenav is
+   display:none until that width. Nothing here changes what a phone renders,
+   which is the point: both mobile layouts were reviewed and signed off, and a
+   wider window is a different problem, not a licence to redraw the small one.
+
+   1024 is the customer build's breakpoint, adopted rather than invented. The
+   console's stylesheet had no min-width query at all before this, only three
+   max-width ones, so there was no competing value to reconcile.
+   ============================================================ */
+.sidenav{ display:none; }
+
+@media (min-width:1024px){
+  :root{
+    /* Two widths and the live one. The expanded rail is sized to the longest
+       label, "Players / Customers", plus the icon and the gutters; the rail is
+       sized to the 44px target plus the padding that keeps the glyph off both
+       edges. --sidenav-w is what the grid reads, so the column and the rail can
+       never disagree about how wide it is. */
+    --sidenav-open:16.5rem;
+    --sidenav-rail:4.5rem;
+    --sidenav-w:var(--sidenav-open);
+
+  }
+  :root.nav-rail{ --sidenav-w:var(--sidenav-rail); }
+
+  .sidenav{ display:block; }
+
+  /* ---------- THE RAIL ITSELF ----------
+     Sticky rather than fixed, and full viewport height, so a long page scrolls
+     past a navigation that stays put while the navigation's own overflow scrolls
+     independently when the window is short. */
+  .sidenav__in{
+    position:sticky; top:0; height:100svh;
+    display:flex; flex-direction:column;
+    background:var(--surface-raised);
+    border-right:1px solid var(--hairline);
+    overflow:hidden;
+  }
+
+  /* The identity block wears the same inverse surface as the app bar beside it,
+     so the two read as one continuous frame across the top of the page rather
+     than as a pale box next to a dark bar. */
+  .sidenav__head{
+    display:flex; align-items:center; gap:var(--s3);
+    min-height:var(--appbar-h); padding:var(--s3) var(--s3) var(--s3) var(--s4);
+    background:var(--surface-inverse); color:var(--text-inverse);
+    border-bottom:1px solid var(--border-strong);
+  }
+  .sidenav__id{ flex:1 1 auto; min-width:0; overflow:hidden; }
+  .sidenav__id b{
+    display:block; font-size:var(--fs-label); line-height:var(--lh-label); font-weight:700;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .sidenav__id span{
+    display:block; font-size:var(--fs-legal); line-height:var(--lh-legal);
+    color:var(--text-inverse-secondary);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .sidenav__toggle{
+    flex:none; display:grid; place-items:center;
+    width:var(--tap-min); height:var(--tap-min);
+    border:1px solid transparent; border-radius:var(--r-btn);
+    color:var(--text-inverse); background:transparent;
+    transition:background var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
+  }
+  .sidenav__toggle svg{ width:20px; height:20px; }
+  .sidenav__toggle:hover{ background:rgba(var(--ghost-edge),.16); }
+  .sidenav__toggle:focus-visible{ outline:2px solid var(--text-inverse); outline-offset:2px; }
+
+  .sidenav__scroll{
+    flex:1 1 auto; overflow-y:auto; overscroll-behavior:contain;
+    padding:var(--s3) 0 var(--s5);
+    /* The cue in admin.js paints its own indicator on fine pointers, so the
+       native bar is no more wanted here than anywhere else in the console. */
+    scrollbar-width:none;
+  }
+  .sidenav__scroll::-webkit-scrollbar{ width:0; height:0; }
+
+  .sidenav__list{ list-style:none; margin:0; padding:0; }
+  .sidenav__group{
+    margin:0;
+    padding:var(--s4) var(--s4) var(--s2);
+    font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--text-secondary);
+  }
+
+  /* A destination, not a card. Same reasoning as the drawer's rows: Fourteen
+     boxes for fourteen one line links would be the heaviest thing on the page.
+     48px rather than 44, because these sit in a vertical run where the extra four
+     pixels are the difference between a list and a stack of buttons. */
+  .sidenav__row{
+    position:relative;
+    display:flex; align-items:center; gap:var(--s3);
+    min-height:var(--tap-row); padding:var(--s2) var(--s4);
+    text-decoration:none; color:var(--text-primary);
+    font-size:var(--fs-label); line-height:var(--lh-label); font-weight:600;
+    transition:background var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease);
+  }
+  .sidenav__row svg{ flex:none; width:22px; height:22px; opacity:.9; }
+  .sidenav__label{
+    flex:1 1 auto; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    transition:opacity var(--dur-ui) var(--ease);
+  }
+  .sidenav__row:hover{ background:rgba(var(--ghost-fill),.07); }
+  .sidenav__row:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:-2px; }
+
+  /* The current destination. A left edge marker rather than a filled pill,
+     because a filled row at this width is a slab, and the marker is quieter than
+     the brush stroke the tab bar uses, which was drawn for a 38px pill and does
+     not scale to a full width row. */
+  .sidenav__row[aria-current="page"]{ background:rgba(var(--ghost-fill),.10); font-weight:700; }
+  .sidenav__row[aria-current="page"]::before{
+    content:""; position:absolute; left:0; top:6px; bottom:6px; width:3px;
+    background:var(--text-primary); border-radius:0 var(--r-pill) var(--r-pill) 0;
+  }
+  .sidenav__row--danger{ color:var(--critical); }
+
+  /* The count beside a label. The console declares .countpill globally and this
+     would inherit it there; the customer build does not, and a component that
+     renders one way in one document and unstyled in the other is not a shared
+     component. Declared here in tokens, so both get the same pill. */
+  .sidenav__row .countpill{
+    flex:none;
+    display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px;
+    border-radius:999px; background:var(--critical); color:#FFFFFF;
+    font-size:11px; line-height:1; font-weight:700; font-variant-numeric:tabular-nums;
+  }
+  /* Red is the only colour either build spends, and it goes on money and on
+     closed courts. A queue length does not earn it. */
+  .sidenav__row .countpill--quiet{
+    background:rgba(var(--ghost-fill),.14); color:var(--text-primary);
+    border:1px solid rgba(var(--ghost-edge),.30);
+  }
+
+  .sidenav__note{
+    margin:0;
+    padding:var(--s4) var(--s4) 0;
+    font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary);
+  }
+
+  /* ---------- COLLAPSED: THE ICON RAIL ----------
+     The label is clipped to nothing rather than removed. display:none would take
+     it out of the accessibility tree along with the layout, and every row would
+     then announce as a link with no name. Clipped, it is still the row's
+     accessible name and still what a screen reader reads, while a sighted reader
+     sees only the glyph. */
+  .sidenav[data-collapsed="true"] .sidenav__label{
+    opacity:0; width:0; flex:0 0 0; margin:0;
+  }
+  .sidenav[data-collapsed="true"] .sidenav__row{ justify-content:center; padding-inline:0; }
+  .sidenav[data-collapsed="true"] .sidenav__id{ opacity:0; width:0; flex:0 0 0; }
+  .sidenav[data-collapsed="true"] .sidenav__head{ padding-inline:var(--s2); justify-content:center; }
+  .sidenav[data-collapsed="true"] .sidenav__toggle{ transform:rotate(180deg); }
+  .sidenav[data-collapsed="true"] .sidenav__note{ display:none; }
+  .sidenav[data-collapsed="true"] .sidenav__row .countpill{ display:none; }
+
+  /* The group heading has nothing to say at this width, so it stops being a word
+     and becomes the rule it was already implying. */
+  .sidenav[data-collapsed="true"] .sidenav__group{
+    padding:0; height:0; overflow:hidden;
+    border-top:1px solid var(--hairline); margin:var(--s3) var(--s3) 0;
+  }
+
+  /* A collapsed row loses its label, so the unread count loses the only thing
+     that gave it a sentence. It comes back as the same dot the app bar's bell
+     uses, which is the console's existing way of saying "something here" without
+     a number. */
+  .sidenav[data-collapsed="true"] .sidenav__row:has(.countpill)::after{
+    content:""; position:absolute; top:8px; right:14px;
+    width:9px; height:9px; border-radius:999px;
+    background:var(--critical); border:2px solid var(--surface-raised);
+  }
+  /* A quiet count keeps its quiet when it becomes a dot. Red here would be the
+     rail inventing an urgency the expanded row does not claim. */
+  .sidenav[data-collapsed="true"] .sidenav__row:has(.countpill--quiet)::after{
+    background:var(--text-secondary);
+  }
+}
+
+/* The rail slides, and a reader who has asked for less movement gets none. The
+   token block at the top of this file already collapses --dur-ui to 0.01ms under
+   prefers-reduced-motion, so both transitions above resolve to an instant swap
+   without a second rule. This one is here for the property that is not on a
+   token: The toggle's rotation, which is decorative either way. */
+@media (prefers-reduced-motion:reduce){
+  .sidenav__toggle{ transition:none; }
+}
+
+/* Readability first when the reader has asked for it. The rail's separator and
+   its current marker both get real weight rather than a tinted wash. */
+@media (min-width:1024px) and (prefers-contrast:more){
+  .sidenav__in{ border-right:1px solid var(--border-strong); }
+  .sidenav__row[aria-current="page"]{ background:var(--surface-sunken); }
+  .sidenav__row[aria-current="page"]::before{ width:4px; }
+}
