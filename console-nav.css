@@ -14,7 +14,7 @@
    This file names no colours. Every value is a token, and both documents already
    declare all of them, which is what makes one stylesheet possible across two
    builds whose palettes differ. It used to say the two were inverses of each
-   other, and they were: the console painted cream type on ink cards over a near
+   other, and they were: The console painted cream type on ink cards over a near
    white page while the customer build painted the other way round. The console's
    light theme was reversed, so both now put cream cards on paper and the sentence
    would be wrong; the rail did not have to change for that, which is the point
@@ -229,7 +229,7 @@
   }
   /* The solid pill counts unread notifications, which is something to attend to
      rather than something lost, so it is --caution. It also stopped being white
-     on the hue: the literal #FFFFFF here was 2.49:1 against the dark theme's
+     on the hue: The literal #FFFFFF here was 2.49:1 against the dark theme's
      coral on all twenty seven console pages, because the light theme's "type on
      a solid fill" value had been written out by hand instead of taken from the
      token that flips with the theme.
@@ -329,7 +329,7 @@
    without a second rule. This one is here for the property that is not on a
    token: The toggle's rotation, which is decorative either way. */
 /* ---------- THE UTILITY STRIP ----------
-   The slim strip of build controls at the very top of the page: the day and
+   The slim strip of build controls at the very top of the page: The day and
    night toggle and the way into the staging harness. Two documents render it
    from the model in console-nav.js; what is here is how it looks, and what is
    NOT here is where it sits. The customer build centres it on its own shell
@@ -347,12 +347,12 @@
     display:flex; align-items:center; justify-content:flex-end; gap:var(--s2);
     min-height:var(--utilbar-h);
   }
-  /* Compact: these are not decisions, so they do not get decision-sized targets.
+  /* Compact: These are not decisions, so they do not get decision-sized targets.
      The 44px minimum belongs to touch, and this strip only exists at widths
      where the pointer is the fine one.
 
      Colour is inherited rather than taken from a token, so the controls follow
-     whatever they are drawn on: cream over the customer build's hero, the
+     whatever they are drawn on: Cream over the customer build's hero, the
      theme's own ink or cream everywhere else. They are held back with opacity
      rather than with a dimmer colour, which is the only way to stay quiet in
      both places at once. */
@@ -396,7 +396,7 @@
    document having to be re-ordered around it.
 
    Reduced motion and more contrast both take it to a plain solid plate, for the
-   same reason: the frost is decoration, and a reader who has asked for less of
+   same reason: The frost is decoration, and a reader who has asked for less of
    anything has not asked for this. */
 .staging[open]{
   display:flex; align-items:center; justify-content:center;
@@ -417,7 +417,7 @@
   box-shadow:0 12px 40px var(--shadow-lift);
 }
 /* The panel is 30rem wide in both shells, so it takes the same room inside in
-   both. Left to the shells it did not: the customer build gives a sheet a 48px
+   both. Left to the shells it did not: The customer build gives a sheet a 48px
    inline gutter and a 28px heading, because its sheets are full width on a phone
    and this one never is, and the same words came out four lines taller there and
    scrolled the button off the bottom of the panel.

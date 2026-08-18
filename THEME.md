@@ -2,7 +2,7 @@
 
 This is the palette, written down before it was spent. Everything in the build
 resolves to one of the names below. If a screen needs a colour that is not here,
-the answer is not a literal in a rule: it is a row added to this file first.
+the answer is not a literal in a rule: It is a row added to this file first.
 
 ## How to read this
 
@@ -44,7 +44,7 @@ surface is one of the two with a little of the other mixed in.
 | `--text-secondary` | Supporting type: subtitles, metadata, notes. Never below 4.5:1. |
 | `--text-inverse` | Type drawn **on** `--surface-inverse` or on chrome. |
 | `--text-inverse-secondary` | Supporting type on the same. |
-| `--border-strong` | The edge of something deliberate: a pressed control, a selected row, a card that is asking to be read first. |
+| `--border-strong` | The edge of something deliberate: A pressed control, a selected row, a card that is asking to be read first. |
 | `--border-default` | The edge that **identifies a control**. Owes 3:1 against every surface it is drawn on, because a reader has to be able to find it. |
 | `--hairline` | A rule. Separates a card from the page and a row from its neighbour. Allowed to be soft, because nothing depends on finding it. |
 | `--focus-ring` | The keyboard focus outline. |
@@ -122,7 +122,7 @@ separately.
   page. The value it replaced, `#A8A695`, reached 2.33:1 and had been failing
   since before this task.
 
-The **card outline** uses neither. It needed no new rule at all: every card
+The **card outline** uses neither. It needed no new rule at all: Every card
 already draws `border:1px solid rgba(var(--ghost-edge),.22)`, and the only
 reason that edge was invisible in the light console is that the old ink-card
 block set `--ghost-edge` to cream *on the card*, so each card outlined itself in
@@ -229,7 +229,7 @@ colour family, because it does not need one.
 |---|---|---|---|---|
 | Available | Seats left | `.chip` | `.st--hold` | Plain pill, filled or dashed edge |
 | Almost full | Filling up, nothing lost | `.chip--almost` | `.st--caution` | Ochre edge and wash, half-filled square glyph |
-| Full | Every seat sold | `.chip--atcapacity` | `.st--atcapacity` | The ink plate: solid, settled |
+| Full | Every seat sold | `.chip--atcapacity` | `.st--atcapacity` | The ink plate: Solid, settled |
 | Closed | Not taking anyone | `.chip--closed` | `.st--off` | Sunken paper under a lock, hatched |
 
 **Full used to be drawn as void.** Both documents gave it the hatched dashed

@@ -63,7 +63,7 @@
      that changes underneath them, which is the opposite of what it is for.
 
      sessionStorage is the lifetime that matches, and its per-tab scope is right
-     for the same reason: a second tab is a second arrival. It goes through this
+     for the same reason: A second tab is a second arrival. It goes through this
      file rather than being read at each call site because that is the rule this
      file exists to enforce, and because there are two documents and there must
      be one answer. */
@@ -256,7 +256,7 @@
     getNavCollapsed: function () { return read().navCollapsed; },
     setNavCollapsed: function (v) { return set("navCollapsed", v === true); },
 
-    /* The staging notice, once per sitting. No subscribers and no emit: nothing
+    /* The staging notice, once per sitting. No subscribers and no emit: Nothing
        repaints when this changes, because the only reader is the one arrival
        that asked. */
     noticeSeen: function () {

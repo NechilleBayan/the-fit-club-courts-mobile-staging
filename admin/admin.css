@@ -96,7 +96,7 @@
   --text-inverse:#F5F3DC;
   --text-inverse-secondary:#B0AE97;
   /* The two outlines carry two different jobs and the review's single "warm soft
-     gray" cannot do both. --hairline is a rule: it separates a card from the page
+     gray" cannot do both. --hairline is a rule: It separates a card from the page
      and a row from its neighbour, and it is allowed to be soft because nothing
      depends on finding it. --border-default identifies a CONTROL, so it owes 3:1
      against everything it is drawn on, and the review's #C9C2AE manages 1.5:1 on
@@ -140,15 +140,15 @@
 
   /* TWO SEMANTIC FAMILIES, AND THE SENTENCE THAT SEPARATES THEM.
 
-     --critical means SOMETHING IS WRONG OR LOST: money not collected, a booking
+     --critical means SOMETHING IS WRONG OR LOST: Money not collected, a booking
      that cannot stand, a job whose deadline has passed, an action that destroys
-     a record. --caution means SOMETHING NEEDS ATTENTION: a gap in cover, a
+     a record. --caution means SOMETHING NEEDS ATTENTION: A gap in cover, a
      message nobody has answered, a session filling up, a count of things still
      to do. The test is whether the club has already lost something. If it has
      not, it is caution.
 
      The split exists because one red was carrying both, and the louder half was
-     drowning the smaller: on the staff screen an unfilled evening shift painted
+     drowning the smaller: On the staff screen an unfilled evening shift painted
      a full-bleed red plate while the day's single overdue task got an eleven
      pixel pill, which is the reverse of the order a manager needs to read them in.
 
@@ -173,12 +173,12 @@
      --caution is an ochre rather than the terracotta the review asked for, and
      the terracotta is worth naming because it was tried first. At the luminance
      4.5:1 on cream demands, a muted terracotta lands within about ten degrees of
-     hue of --critical: two reds of the same weight, which is a second red rather
+     hue of --critical: Two reds of the same weight, which is a second red rather
      than a second family, and it would have left Shift Unfilled exactly as loud
      as the thing it needs to be quieter than. The ochre costs a third hue in a
      two-colour build; what it buys is a distinction a reader can make without
      reading the word first, which is the only reason to add a family at all.
-     Neither family is ever the sole carrier of a state: every use below also
+     Neither family is ever the sole carrier of a state: Every use below also
      carries a word, an icon, and a drawn treatment. */
   --critical:#AC3227;
   --critical-on:#FFFFFF;
@@ -470,7 +470,7 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
 /* Inline count beside a label, for the drawer rows and the task headings.
 
    The solid pill is --caution. Counted across the console it is nearly always a
-   queue rather than a casualty: six still to check in, five pending tasks, four
+   queue rather than a casualty: Six still to check in, five pending tasks, four
    unread, three maintenance jobs open, two unanswered messages. Two of them
    really are counting loss, and those take --countpill--critical explicitly:
    a player's payment issues, and the share of a staff member's tasks that is
@@ -939,24 +939,24 @@ a.row:active, button.row:active{ background:rgba(var(--ghost-fill),.22); border-
 
      Available    .st--hold      dashed edge, the word Open
      Almost full  .st--caution   ochre edge and wash, the word and a count
-     Full         .st--atcapacity  the ink plate: solid, settled, deliberate
+     Full         .st--atcapacity  the ink plate: Solid, settled, deliberate
      Closed       .st--off       sunken paper under a hatch, inert
 
    Full used to be drawn with .st--off, which is the treatment this build gives
-   to things that are GONE: a closed day, a cancelled row, a court out of
+   to things that are GONE: A closed day, a cancelled row, a court out of
    service. A session that sold every seat has not gone anywhere, and drawing it
    as void left Full and Closed reading as one state on a screen whose whole job
    is telling them apart. It takes the ink plate instead, which is already how
    this build says a thing is settled, and which costs no colour.
 
    Almost full is the only new colour in the scale and it is --caution, not a
-   third family: a session with two seats left needs attention and has lost
+   third family: A session with two seats left needs attention and has lost
    nothing, which is the sentence that decides the family. */
 .st--caution{ border:1.5px solid var(--caution-edge); background:var(--caution-surface); color:var(--caution); }
 
 /* A pill inside a row of its own family drops its wash. Both were washing the
    same hue over the same card, and two 10% coats of red under 12px red type cost
-   the pill more than a whole step of the palette: it measured 3.42:1 where the
+   the pill more than a whole step of the palette: It measured 3.42:1 where the
    single coat measures 4.60:1. The row is already saying which family this is,
    and the pill saying it a second time was making it harder to read, not easier. */
 .row--crit .st--crit, .plate--crit .st--crit,
@@ -1056,26 +1056,26 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
    never changes as filters are added and the list below never jumps.
 
    THE PADDING IS THE FOCUS RING'S ROOM. A scroll container cannot have a visible
-   overflow on one axis: setting overflow-x to auto forces overflow-y to auto as
+   overflow on one axis: Setting overflow-x to auto forces overflow-y to auto as
    well, so anything a chip paints outside itself is clipped by this box. A
    focused chip paints a 3px outline at 2px offset and a 5px halo behind it, and
    2px of padding cut the top and bottom off both. Six is what the ring needs.
 
    The rail is therefore 8px taller than it was, 56 rather than 48, and that is
    the honest price. A negative block margin to claw the height back was tried
-   and does not work here: every one of the nine rails carries its own authored
+   and does not work here: Every one of the nine rails carries its own authored
    margin-top in the page, so the compensation only ever landed on the bottom
    half and the rails grew by four instead of zero. A fix that is neutral on some
    pages and not others is worse than one that is the same everywhere.
 
    Measured rather than assumed, and two things the brief expected to find were
    not there. The chip is border-box with a 44px minimum, so a pressed chip
-   measures 44.00px and an unpressed one measures 44.00px: the row does not
+   measures 44.00px and an unpressed one measures 44.00px: The row does not
    twitch. And the first chip already sits at the gutter, which is where the
    cards start, so it is aligned rather than jammed. The inline padding here is a
    full gutter and the negative inline margin is what lets the rail bleed past it.
 
-   Not fixed here, and worth writing down: the pressed chip asks for a 1.5px
+   Not fixed here, and worth writing down: The pressed chip asks for a 1.5px
    border and Chrome renders 1px of it at device pixel ratio 1. The build is
    drawn for a phone, where 1.5px is three device pixels and lands, so the
    1.5px stays; a desktop reader is seeing one pixel less separation than the
@@ -1356,13 +1356,13 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
    WHAT THIS REPLACED. Until this task the section here said:
 
      "The page is the lightest thing in the build now, and the components sit
-      on it as solid ink. That is the inversion: the customer app painted sheer
+      on it as solid ink. That is the inversion: The customer app painted sheer
       ink washes on cream paper, and the console paints cream type on ink cards
       over a near white page. The two colours are unchanged, only which one
       carries the surface and which one carries the type."
 
    That was deliberate and it is deliberately overturned. The ink slabs were
-   internally coherent and read as belonging to a different product: put the two
+   internally coherent and read as belonging to a different product: Put the two
    halves side by side and the customer app is cream paper while the console is
    a stack of black bricks, and nothing about a staff console needs a different
    visual language, only a denser one. Density is a matter of type size, row
@@ -1681,7 +1681,7 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
    because :is() takes the specificity of its heaviest argument and
    .datenav .iconbtn in this list is two classes deep.
 
-   Weighing nothing is only safe because nothing competes: these four custom
+   Weighing nothing is only safe because nothing competes: These four custom
    properties are set in exactly two places, the root and here, and the paper
    reset that has to beat the card list is written after it.
    ============================================================ */
@@ -1698,7 +1698,7 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
     --hatch:rgba(245,243,220,0.16);
     --hatch-strong:rgba(245,243,220,0.26);
   }
-  /* Paper inside the dark theme. The row is deliberately light here: it is the
+  /* Paper inside the dark theme. The row is deliberately light here: It is the
      one place the console still inverts, and it is how a finished thing reads as
      finished on a dark screen. */
   :where(:root:not([data-theme="light"])) :where(.row--muted, .empty){

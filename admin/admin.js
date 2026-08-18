@@ -132,7 +132,7 @@
     key:       '<circle cx="8" cy="14" r="4.5"/><path d="M11.4 11.2 20 3.5M16.5 7l2.5 2.5M14.2 9.2l2.2 2.2"/>',
     download:  '<path d="M12 3.5v11M7.5 10.5l4.5 4.5 4.5-4.5M4 20.5h16"/>',
     /* Day and night, for the utility strip's toggle. Carried over from the
-       customer build's sprite for the same reason the flask below it was: the
+       customer build's sprite for the same reason the flask below it was: The
        strip is one component and its glyph should not change shape depending on
        which half of the product is drawing it. */
     sun:       '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"/>',
@@ -207,7 +207,7 @@
 
     /* The utility strip, above the app bar and therefore inserted before it.
        Built at every width and hidden below 1024 by console-nav.css, exactly as
-       the sidebar is: a breakpoint in script would have to be re-evaluated on
+       the sidebar is: A breakpoint in script would have to be re-evaluated on
        resize and would race the first paint. */
     buildUtilbar(shell);
 
@@ -276,14 +276,15 @@
   }
 
   /* ---------- THE STAGING NOTICE ----------
-     What the Demo control opens, and the same dialog the console will show once
-     per session. One real <dialog>: showModal traps focus and gives Escape for
+     What the Demo control opens, and what firstRunStaging below shows once per
+     sitting. The customer build renders the same markup from the same shared
+     model. One real <dialog>: showModal traps focus and gives Escape for
      free, a click on the element itself is a click on the backdrop because the
      panel does not fill the box, and the close event puts focus back where it
      came from.
 
      It says the three things a reader arriving at a staging build needs and
-     nothing else. The per-page .sandbox note stays: it is a different job, said
+     nothing else. The per-page .sandbox note stays: It is a different job, said
      once per screen about that screen, and a dialog that appears on every route
      would be the banner the note's own comment argues against. */
   var stagingReturn = null;
@@ -305,7 +306,7 @@
 
   /* Where focus goes when this closes. Opened by a click that is the answer;
      opened on arrival there is no answer, and body is not one, so it falls to
-     the control that reopens the notice: the strip's flask on a desktop, the
+     the control that reopens the notice: The strip's flask on a desktop, the
      hamburger that reaches the drawer's copy of it on a phone. Both are checked
      for a box rather than for existence, because the strip is built at every
      width and is display:none below 1024. */
@@ -452,7 +453,7 @@
   }
 
   /* THE PHONE'S ANSWER TO THE UTILITY STRIP.
-     The strip is desktop only and that is a decision, not an omission: it costs
+     The strip is desktop only and that is a decision, not an omission: It costs
      36px of permanent chrome, and this console already spends 118 of a 390x844
      screen's 844 on its app bar and tab bar. A third strip would take the frame
      past 18% of the viewport to carry two controls a reader touches at most once
@@ -794,7 +795,7 @@
 
     /* The utility strip's two controls, and the drawer rows that carry the same
        two on a phone. One handler for both, so the strip and the drawer can
-       never drift: below 1024 only the drawer rows exist and above it only the
+       never drift: Below 1024 only the drawer rows exist and above it only the
        strip does, which is the rule that keeps no width showing two copies. */
     document.addEventListener("click", function(e){
       var t = e.target.closest('[data-action="theme"]');

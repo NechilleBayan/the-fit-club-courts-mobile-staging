@@ -88,12 +88,12 @@
   ];
 
   /* ---------- THE UTILITY STRIP ----------
-     The slim rail of build controls above the app bar: the day and night toggle
+     The slim rail of build controls above the app bar: The day and night toggle
      and the way into the staging harness. It lived in index.html and only there,
      which made it a control the customer half of the prototype had and the staff
      half did not, for no reason anybody had decided.
 
-     It is here for the same reason the destination list is: it is one component
+     It is here for the same reason the destination list is: It is one component
      rendered by two documents, and a second copy is a second place to change it
      and therefore a place to forget to. Same division of labour as the sidebar
      above. The model and the markup are here; the icon function comes from the
@@ -134,7 +134,7 @@
     var dark = opts.theme === "dark";
     return UTIL.map(function (c) {
       if (c.kind === "toggle") {
-        /* aria-pressed rather than role="switch": the control is a button that
+        /* aria-pressed rather than role="switch": The control is a button that
            flips a setting, and its own icon and label already say which way it
            is pointing. The accessible name changes with the state because the
            glyph is the only visible label. */
@@ -154,13 +154,13 @@
 
   /* ---------- THE STAGING NOTICE ----------
      What the strip's Demo control opens, and what both documents show once per
-     sitting. Shared for the same reason the strip above it is: it is one
+     sitting. Shared for the same reason the strip above it is: It is one
      statement about one prototype, and two copies would be two places for it to
      drift out of date. The text is here; the dialog element, the opening, and
      the closing are the document's, because the two shells already have their
      own modal idioms and neither needed a third.
 
-     Three things and no more: that it is staging, that the data is sample, and
+     Three things and no more: That it is staging, that the data is sample, and
      that nothing is a real reservation. The last paragraph says where the signal
      lives after this is dismissed, which is the whole reason the strip and this
      were built next to each other. */
@@ -178,7 +178,7 @@
       "</div>" +
       '<div class="sheet__body">' +
         "<p>This is a staging build of the Fit Club Courts " + esc(half) + ". Everything " +
-          "on it is sample data: the bookings, the players, the payments, and the " +
+          "on it is sample data: The bookings, the players, the payments, and the " +
           "schedule are made up to show how the screens behave.</p>" +
         "<p><b>Nothing here is a real reservation</b>, and nothing you do on these " +
           "screens reaches the club, a customer, or a card.</p>" +

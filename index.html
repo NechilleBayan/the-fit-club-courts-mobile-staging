@@ -769,11 +769,11 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; }
 
      Available    .chip                  plain pill, filled dot glyph
      Almost full  .chip--almost          ochre edge and wash, half-filled square
-     Full         .chip--atcapacity      the ink plate: solid, settled, deliberate
+     Full         .chip--atcapacity      the ink plate: Solid, settled, deliberate
      Closed       .chip--closed          sunken paper under a lock, inert
 
    Full used to be drawn with .chip--full, which is the hatched dashed treatment
-   this build gives to things that are GONE: cancelled, blocked, hold expired.
+   this build gives to things that are GONE: Cancelled, blocked, hold expired.
    A session that sold every seat has not gone anywhere, and drawing it as void
    left Full and Closed reading as one state on the one screen whose job is
    telling them apart. .chip--full keeps its meaning and its four other users;
@@ -781,7 +781,7 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; }
    settled and which costs no colour.
 
    Almost full is the only new colour in the scale and it is --caution, not a
-   third family: a session with two seats left needs attention and has lost
+   third family: A session with two seats left needs attention and has lost
    nothing, which is the sentence that decides the family. */
 /* The fill is an opaque mix rather than the translucent --caution-surface, so
    the pill has the same ground wherever it lands. Left translucent it stacked on
@@ -1589,7 +1589,7 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
    read in grayscale or by a screen reader. */
 :root{
   /* Was #B3261E. Moved toward the dark theme's muted coral as far as the 4.5:1
-     this palette owes small type on cream will allow: the coral itself is 1.6:1
+     this palette owes small type on cream will allow: The coral itself is 1.6:1
      there. The console re-tuned the same token in the same step, and a semantic
      colour that means one thing has to look like one thing across both halves of
      the product, so the value moved here too rather than only there.
@@ -1605,7 +1605,7 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
   /* --caution is the second semantic family: SOMETHING NEEDS ATTENTION, where
      --critical means SOMETHING IS WRONG OR LOST. Nothing in the customer build
      is critical that is not also a form error, so what this document spends it
-     on is capacity: a session that is filling up needs attention and has lost
+     on is capacity: A session that is filling up needs attention and has lost
      nothing. See admin/admin.css for the full argument, including why the ochre
      is not the terracotta that was tried first. */
   --caution:#7B5A12;
@@ -1932,12 +1932,12 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 
   /* ---------- STRIP ONE: utility ----------
      The slim strip at the very top of the page carries the two controls that are
-     about the build rather than about booking anything: the staging harness and
+     about the build rather than about booking anything: The staging harness and
      the day and night toggle. It is a shared shell component now, drawn by
      console-nav.css and built from the model in console-nav.js, because the
      console has exactly the same strip and had no way to reach either control.
 
-     What is left here is placement, which is this document's own business: the
+     What is left here is placement, which is this document's own business: The
      strip is right aligned to the same centred grid the navigation below it
      uses, so the two strips share both edges. */
   .utilbar__inner{
@@ -7928,7 +7928,7 @@ STAGING.subscribe(function(state, changed, origin){
    and which nobody saw unless they went looking for the dials.
 
    Once per sitting is enforced by STAGING rather than here, and that is what
-   makes it correct on this side: this document is one page with hash routes, so
+   makes it correct on this side: This document is one page with hash routes, so
    a flag of its own would still be a flag per load, and a reader who arrived
    through the console has already been told.
 
