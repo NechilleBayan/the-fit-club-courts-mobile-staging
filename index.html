@@ -762,7 +762,10 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; }
 .chip--full{ background:var(--surface-sunken); border:2px dashed var(--border-strong); font-weight:700; background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
 .chip--quiet{ background:var(--surface); border:1px solid var(--hairline); color:var(--text-secondary); font-weight:400; }
 .chip--closed{ background:var(--surface-sunken); border:1px solid var(--border-default); color:var(--text-secondary); }
-.chip--bar{ position:relative; padding-left:16px; }
+/* The chip is a full pill, so the bar has to be clipped to that shape the way the
+   plate clips its own. Without the clip a square 6px slab is painted over the
+   rounded left cap and reads as a detached mark sitting outside the chip. */
+.chip--bar{ position:relative; padding-left:16px; overflow:hidden; }
 .chip--bar::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:var(--bar-w); background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); border-right:1px solid var(--border-default); }
 .chip--barsolid::before{ background:var(--border-strong); background-image:none; }
 .chip__sfx{ font-size:var(--fs-eyebrow); font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding-left:6px; border-left:1px solid var(--border-default); }
@@ -1470,6 +1473,9 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 .card{ border-width:1.5px; }
 .row{ border-width:1.5px; min-height:64px; }
 .chip{ padding:5px 12px; border-width:1.5px; }
+/* The shorthand above resets the gutter the bar was given, so restate it here at
+   the roomier size. Otherwise the word crowds the bar it is meant to sit beside. */
+.chip--bar{ padding-left:18px; }
 .daybtn{ width:68px; min-height:82px; border-width:1.5px; }
 .daybtn small{ letter-spacing:.06em; }
 .daybtn strong{ font-size:25px; }
