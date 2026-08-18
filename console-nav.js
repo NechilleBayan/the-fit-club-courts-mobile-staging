@@ -122,7 +122,11 @@
      this is the console adopting it rather than inventing a second answer. */
   var UTIL = [
     { id: "theme", kind: "toggle" },
-    { id: "demo",  kind: "dialog", icon: "flask", label: "Demo", name: "Staging harness" }
+    /* name is the accessible label and is passed in, because the flask opens
+       the harness sheet in the customer build and the staging notice in the
+       console. Same control, same place, two things to open, and a button whose
+       name is a lie about which one is worse than no name. */
+    { id: "demo",  kind: "dialog", icon: "flask", label: "Demo" }
   ];
 
   function utilbar(opts) {
@@ -143,9 +147,49 @@
          has to share the line, not dropped from the markup. A button whose only
          name is a flask is a button nobody can ask for. */
       return '<button class="iconbtn iconbtn--demo" type="button" data-action="' + c.id + '"' +
-        ' aria-haspopup="dialog" aria-label="' + esc(c.name) + '">' +
+        ' aria-haspopup="dialog" aria-label="' + esc(opts.demoName || "Staging harness") + '">' +
         icon(c.icon) + '<span class="iconbtn__t">' + esc(c.label) + "</span></button>";
     }).join("");
+  }
+
+  /* ---------- THE STAGING NOTICE ----------
+     What the strip's Demo control opens, and what both documents show once per
+     sitting. Shared for the same reason the strip above it is: it is one
+     statement about one prototype, and two copies would be two places for it to
+     drift out of date. The text is here; the dialog element, the opening, and
+     the closing are the document's, because the two shells already have their
+     own modal idioms and neither needed a third.
+
+     Three things and no more: that it is staging, that the data is sample, and
+     that nothing is a real reservation. The last paragraph says where the signal
+     lives after this is dismissed, which is the whole reason the strip and this
+     were built next to each other. */
+  function notice(opts) {
+    var icon = opts.icon;
+    var half = opts.half || "build";
+    return '<div class="sheet__head">' +
+        '<h2 id="staging-title">' + icon("flask") + "<span>Staging build</span></h2>" +
+        /* The close glyph is named by the caller. The two sprites disagree on
+           what it is called, "close" in the console and "x" in the customer
+           build, and reconciling forty icons to settle one name is the thing
+           this file has twice decided not to do. */
+        '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close">' +
+          icon(opts.close || "close") + "</button>" +
+      "</div>" +
+      '<div class="sheet__body">' +
+        "<p>This is a staging build of the Fit Club Courts " + esc(half) + ". Everything " +
+          "on it is sample data: the bookings, the players, the payments, and the " +
+          "schedule are made up to show how the screens behave.</p>" +
+        "<p><b>Nothing here is a real reservation</b>, and nothing you do on these " +
+          "screens reaches the club, a customer, or a card.</p>" +
+        '<p class="legal">' + esc(opts.reopen) + " Every screen carries a note at " +
+          "its foot saying what is sample about that screen in particular.</p>" +
+      "</div>" +
+      /* The dismiss button is outside the scrolling body on purpose. Inside it,
+         on a short window, the one control that closes this can be below the
+         fold of a dialog that is covering the page, and Escape is not something
+         to make a reader guess at. */
+      '<div class="sheet__foot"><button class="btn btn--primary" type="button" data-close>Got it</button></div>';
   }
 
   function esc(s) {
@@ -334,6 +378,7 @@
     sidebar: sidebar,
     wireSidebar: wireSidebar,
     utilbar: utilbar,
+    notice: notice,
     /* The groups this surface is allowed to see. The money area is the
        Operations Manager's, and everything else is everyone's.
 

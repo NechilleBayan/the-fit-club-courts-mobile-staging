@@ -1308,54 +1308,10 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .empty b{ font-size:var(--fs-label); font-weight:700; }
 .empty span{ font-size:var(--fs-legal); line-height:19px; color:var(--text-secondary); max-width:32ch; }
 
-/* ---------- THE STAGING NOTICE ----------
-   A centred dialog rather than the bottom sheet every other modal in this
-   console uses, and the difference is the point. A sheet slides up from the
-   thumb because it is part of the task the reader is in the middle of; this
-   interrupts to say something about the whole build before any task starts, so
-   it sits in the middle of the window and owns it for the moment it is open.
+/* The staging notice's own look lives in console-nav.css, with the utility
+   strip that opens it, because the customer build shows the same dialog.
 
-   Frosted rather than opaque, so the screen it is talking about stays visible
-   behind it. The blur is what makes that legible rather than merely translucent:
-   a sheer panel over a list of bookings is a panel with a list of bookings
-   printed through it. Where the blur is unavailable the mix falls back to a
-   nearly solid panel, which is the safe direction.
-
-   Reduced motion and more contrast both take it to a plain solid plate, for the
-   same reason: the frost is decoration, and a reader who has asked for less of
-   anything has not asked for this. */
-.staging[open]{ justify-content:center; }
-.staging .sheet__panel{
-  margin:auto;
-  width:min(30rem, calc(100% - 2 * var(--gutter)));
-  max-height:min(85svh, 40rem);
-  border-radius:var(--r-sheet);
-  border:1.5px solid var(--border-strong);
-  background:color-mix(in srgb, var(--surface-raised) 86%, transparent);
-  -webkit-backdrop-filter:blur(16px) saturate(1.15);
-  backdrop-filter:blur(16px) saturate(1.15);
-  box-shadow:0 12px 40px var(--shadow-lift);
-}
-.staging .sheet__head h2{ display:flex; align-items:center; gap:var(--s2); }
-.staging .sheet__head h2 svg{ width:20px; height:20px; }
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .staging .sheet__panel{ background:var(--surface-raised); }
-}
-@media (prefers-contrast:more){
-  .staging .sheet__panel{
-    background:var(--surface-raised);
-    -webkit-backdrop-filter:none; backdrop-filter:none;
-    border-width:2px;
-  }
-}
-@media (prefers-reduced-motion:reduce){
-  .staging .sheet__panel{
-    -webkit-backdrop-filter:none; backdrop-filter:none;
-    background:var(--surface-raised);
-  }
-}
-
-/* The two build controls at the foot of the drawer, which is where a phone
+   The two build controls at the foot of the drawer, which is where a phone
    reaches what the desktop keeps in the utility strip. The rule above the group
    is heavier than the hairline between destinations, because what follows it is
    not a destination. */

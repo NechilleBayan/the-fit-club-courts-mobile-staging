@@ -52,6 +52,27 @@
      removed, because the point of this file is that there is one source of
      truth and a mirror is two. */
   var LEGACY_THEME_KEY = "tfc-theme";
+  /* NOT A DIAL, AND DELIBERATELY NOT IN THE RECORD ABOVE.
+     The staging notice is shown once per sitting and then not again, which is a
+     different lifetime from everything else this file holds. The dials are a
+     preference: a reader who chose the night theme this morning wants it this
+     afternoon and on the other half of the product, so they live in
+     localStorage and survive a close. "I have read the notice" is not a
+     preference, it is a fact about this arrival. Persisted, it would mean
+     somebody who saw the notice once in March never sees it again on a build
+     that changes underneath them, which is the opposite of what it is for.
+
+     sessionStorage is the lifetime that matches, and its per-tab scope is right
+     for the same reason: a second tab is a second arrival. It goes through this
+     file rather than being read at each call site because that is the rule this
+     file exists to enforce, and because there are two documents and there must
+     be one answer. */
+  var NOTICE_KEY = "tfc-staging-notice";
+  /* The in-memory half is not a fallback, it is the part that makes the
+     customer build correct. That document is one page with hash routes, so
+     "once per session" there means once per load and not once per route, and a
+     flag in this closure is what says so even where storage is refused. */
+  var noticeSeen = false;
 
   /* The allowed values, which double as the validator. Anything not on these
      lists falls back to the default. */
@@ -235,6 +256,18 @@
     getNavCollapsed: function () { return read().navCollapsed; },
     setNavCollapsed: function (v) { return set("navCollapsed", v === true); },
 
+    /* The staging notice, once per sitting. No subscribers and no emit: nothing
+       repaints when this changes, because the only reader is the one arrival
+       that asked. */
+    noticeSeen: function () {
+      if (noticeSeen) return true;
+      try { return window.sessionStorage.getItem(NOTICE_KEY) === "1"; } catch (e) { return false; }
+    },
+    markNoticeSeen: function () {
+      noticeSeen = true;
+      try { window.sessionStorage.setItem(NOTICE_KEY, "1"); } catch (e) {}
+    },
+
     /* The harness owns the scenario list. Handing it over here lets a stored
        key be validated against the real table without this file keeping a copy
        of it that could fall behind. */
@@ -265,6 +298,11 @@
     reset: function () {
       mem = null;
       if (storageOk) { try { window.localStorage.removeItem(KEY); } catch (e) {} }
+      /* The notice comes back with everything else. Reset all state is offered
+         as the way to a clean demo, and a clean demo is one somebody has not
+         been told about yet. */
+      noticeSeen = false;
+      try { window.sessionStorage.removeItem(NOTICE_KEY); } catch (e) {}
       mem = clone(DEFAULTS);
       emit(["surface", "scenario", "connectivity", "capacity", "clockOffset", "theme", "navCollapsed"]);
       return clone(DEFAULTS);

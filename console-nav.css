@@ -376,6 +376,79 @@
   }
 }
 
+/* ---------- THE STAGING NOTICE ----------
+   A centred dialog rather than the bottom sheet both shells use for everything
+   else, and the difference is the point. A sheet slides up from the thumb
+   because it is part of the task the reader is in the middle of; this interrupts
+   to say something about the whole build before any task starts, so it sits in
+   the middle of the window and owns it for the moment it is open.
+
+   Frosted rather than opaque, so the screen it is talking about stays visible
+   behind it. The blur is what makes that legible rather than merely
+   translucent: a sheer panel over a list of bookings is a panel with a list of
+   bookings printed through it. Where the blur is unavailable the panel falls
+   back to solid, which is the safe direction.
+
+   Every selector here carries two classes. The two shells name their modal
+   panels differently and load this file at different points in their cascade,
+   and .staging .staging__panel is heavier than either .sheet or .sheet__panel in
+   both of them, so the notice looks the same on both sides without either
+   document having to be re-ordered around it.
+
+   Reduced motion and more contrast both take it to a plain solid plate, for the
+   same reason: the frost is decoration, and a reader who has asked for less of
+   anything has not asked for this. */
+.staging[open]{
+  display:flex; align-items:center; justify-content:center;
+  position:fixed; inset:0; width:auto; height:auto;
+  max-width:none; max-height:none;
+  border:0; padding:0; background:none;
+}
+.staging .staging__panel{
+  margin:auto;
+  width:min(30rem, calc(100% - 2 * var(--gutter)));
+  max-height:min(85svh, 40rem);
+  display:flex; flex-direction:column;
+  border:1.5px solid var(--border-strong);
+  border-radius:var(--r-sheet);
+  background:color-mix(in srgb, var(--surface-raised) 86%, transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);
+  backdrop-filter:blur(16px) saturate(1.15);
+  box-shadow:0 12px 40px var(--shadow-lift);
+}
+/* The panel is 30rem wide in both shells, so it takes the same room inside in
+   both. Left to the shells it did not: the customer build gives a sheet a 48px
+   inline gutter and a 28px heading, because its sheets are full width on a phone
+   and this one never is, and the same words came out four lines taller there and
+   scrolled the button off the bottom of the panel.
+
+   min-height:0 is the other half of that. A flex item's minimum size is its own
+   content, so an overflowing body pushes the panel past its max-height instead
+   of scrolling inside it; both shells already set overflow-y here, and what was
+   missing is permission for the element to be shorter than what it holds. */
+.staging .sheet__head{ flex:none; padding:var(--s3) var(--s4); }
+.staging .sheet__head h2{ display:flex; align-items:center; gap:var(--s2); font-size:var(--fs-h3); }
+.staging .sheet__head h2 svg{ width:20px; height:20px; }
+.staging .sheet__body{ min-height:0; padding:var(--s4) var(--s4); gap:var(--s3); }
+.staging .sheet__foot{ flex:none; padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom)); }
+.staging .sheet__foot .btn{ width:100%; max-width:none; margin-inline:0; }
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .staging .staging__panel{ background:var(--surface-raised); }
+}
+@media (prefers-contrast:more){
+  .staging .staging__panel{
+    background:var(--surface-raised);
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+    border-width:2px;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .staging .staging__panel{
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+    background:var(--surface-raised);
+  }
+}
+
 @media (prefers-reduced-motion:reduce){
   .sidenav__toggle{ transition:none; }
 }

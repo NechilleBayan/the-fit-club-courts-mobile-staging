@@ -228,6 +228,7 @@
     if (!back) buildDrawer(shell);
     buildSidebar(shell, nav);
     buildStaging(shell);
+    firstRunStaging();
     buildToast();
     buildLive();
     liftToast();
@@ -253,7 +254,7 @@
   function paintUtilbar(){
     var slot = document.getElementById("bar-util");
     if (!slot || !window.CONSOLE_NAV) return;
-    slot.innerHTML = CONSOLE_NAV.utilbar({ icon: svg, theme: currentTheme() });
+    slot.innerHTML = CONSOLE_NAV.utilbar({ icon: svg, theme: currentTheme(), demoName: "Staging build" });
   }
 
   /* The resolved theme rather than the stored preference: "system" is a real
@@ -291,26 +292,9 @@
     d.className = "sheet staging";
     d.id = "staging";
     d.setAttribute("aria-labelledby", "staging-title");
-    d.innerHTML =
-      '<div class="sheet__panel staging__panel">' +
-        '<div class="sheet__head">' +
-          '<h2 id="staging-title">' + svg("flask") + "<span>Staging build</span></h2>" +
-          '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close">' + svg("close") + "</button>" +
-        "</div>" +
-        '<div class="sheet__body">' +
-          "<p>This is a staging build of the Fit Club Courts console. Everything on " +
-            "it is sample data: the bookings, the players, the payments, and the " +
-            "schedule are made up to show how the screens behave.</p>" +
-          "<p><b>Nothing here is a real reservation</b>, and nothing you do on these " +
-            "screens reaches the club, a customer, or a card.</p>" +
-          '<p class="legal">The flask in the strip at the top of the window opens ' +
-            "this again, and every screen carries a note at its foot saying what is " +
-            "sample about that screen in particular.</p>" +
-          '<div class="btn-col" style="margin-top:var(--s4)">' +
-            '<button class="btn btn--primary" type="button" data-close>Got it</button>' +
-          "</div>" +
-        "</div>" +
-      "</div>";
+    d.innerHTML = '<div class="sheet__panel staging__panel">' +
+      CONSOLE_NAV.notice({ icon: svg, half: "console",
+        reopen: "The flask in the strip at the top of the window opens this again." }) + "</div>";
     shell.appendChild(d);
     d.addEventListener("click", function(e){ if (e.target === d) d.close(); });
     d.addEventListener("close", function(){
@@ -319,11 +303,41 @@
     });
   }
 
+  /* Where focus goes when this closes. Opened by a click that is the answer;
+     opened on arrival there is no answer, and body is not one, so it falls to
+     the control that reopens the notice: the strip's flask on a desktop, the
+     hamburger that reaches the drawer's copy of it on a phone. Both are checked
+     for a box rather than for existence, because the strip is built at every
+     width and is display:none below 1024. */
+  function stagingAnchor(){
+    var a = document.activeElement;
+    if (a && a !== document.body && document.contains(a)) return a;
+    var candidates = [document.querySelector('.utilbar [data-action="demo"]'),
+                      document.getElementById("menuBtn")];
+    for (var i = 0; i < candidates.length; i++){
+      var c = candidates[i];
+      if (c && c.getClientRects().length) return c;
+    }
+    return null;
+  }
+
   function openStaging(){
     var d = document.getElementById("staging");
     if (!d || d.open) return;
-    stagingReturn = document.activeElement;
+    stagingReturn = stagingAnchor();
     d.showModal();
+  }
+
+  /* FIRST ARRIVAL, ONCE. Every console screen is its own document, so without a
+     record this would open on all twenty seven of them, which is the banner the
+     per-page note's own comment argues against wearing a different hat. The
+     record is STAGING's, not this file's, so the customer half of the prototype
+     counts as the same arrival and a reader crossing between them is not told
+     twice. */
+  function firstRunStaging(){
+    if (!window.STAGING || STAGING.noticeSeen()) return;
+    STAGING.markNoticeSeen();
+    openStaging();
   }
 
   /* ---------- THE SIDEBAR ----------
