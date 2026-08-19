@@ -195,13 +195,30 @@
     min-height:var(--tap-row); padding:var(--s2) var(--s4);
     text-decoration:none; color:var(--text-primary);
     font-size:var(--fs-label); line-height:var(--lh-label); font-weight:600;
-    transition:background var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease);
+    /* padding-inline and gap are in here because the row's box is half of what
+       moves when the rail collapses. Left off, they snapped while the rail slid,
+       which is the same jump the label had; see the label rule below. */
+    transition:background var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease),
+               padding-inline var(--dur-ui) var(--ease), gap var(--dur-ui) var(--ease);
   }
   .sidenav__row svg{ flex:none; width:22px; height:22px; opacity:.9; }
+  /* THE JUMP THIS RULE EXISTS TO REMOVE.
+     The label used to collapse with width:0 and flex:0 0 0 while only opacity
+     was transitioned, so it lost its width in a single frame while the rail took
+     200ms to follow. Measured before the fix: the rail walked 264, 210, 166,
+     134, 89, 83, 75, 72 and the label read 0 at every one of them, including the
+     first. The eye reads that as the text being cut off rather than folded away.
+
+     max-width is what animates instead of width, because the open state's width
+     is decided by flex and there is no number there to interpolate FROM. A
+     max-width of 12rem is above anything the rail can show at 264px, so it never
+     truncates a label that would otherwise fit, and it gives the collapse a
+     value to travel to. flex stays 1 1 auto in both states; the cap does the
+     work. */
   .sidenav__label{
-    flex:1 1 auto; min-width:0;
+    flex:1 1 auto; min-width:0; max-width:12rem;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-    transition:opacity var(--dur-ui) var(--ease);
+    transition:opacity var(--dur-ui) var(--ease), max-width var(--dur-ui) var(--ease);
   }
   .sidenav__row:hover{ background:rgba(var(--ghost-fill),.07); }
   .sidenav__row:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:-2px; }
@@ -253,10 +270,17 @@
      then announce as a link with no name. Clipped, it is still the row's
      accessible name and still what a screen reader reads, while a sighted reader
      sees only the glyph. */
-  .sidenav[data-collapsed="true"] .sidenav__label{
-    opacity:0; width:0; flex:0 0 0; margin:0;
+  .sidenav[data-collapsed="true"] .sidenav__label{ opacity:0; max-width:0; }
+  /* The icon is centred by padding rather than by justify-content, because
+     justify-content does not interpolate and switching it would move the glyph
+     in one frame under a rail that is still sliding. The rail is 4.5rem and the
+     glyph is 22px, so half the difference on each side lands it in the middle,
+     and padding-inline animating from --s4 to that number walks it there. gap
+     goes with it: a gap held at 12px beside a label of zero width is 12px of
+     nothing, and it pushes the glyph off centre by six. */
+  .sidenav[data-collapsed="true"] .sidenav__row{
+    gap:0; padding-inline:calc((var(--sidenav-rail) - 22px) / 2);
   }
-  .sidenav[data-collapsed="true"] .sidenav__row{ justify-content:center; padding-inline:0; }
   /* The identity row goes entirely, rather than clipping to nothing the way a
      destination's label does. The distinction is whether the thing left behind
      still works: a clipped row keeps its icon and stays a usable link, while a
@@ -386,6 +410,45 @@
    token: The toggle's rotation, which is decorative either way. */
 @media (prefers-reduced-motion:reduce){
   .sidenav__toggle{ transition:none; }
+  .sidenav__tip{ transition:none; }
+}
+
+/* ---------- THE COLLAPSED RAIL'S TOOLTIP ----------
+   An icon only row has no visible name, and the reader most likely to need one
+   is the reader who cannot hover. So this shows on hover AND on keyboard focus;
+   a hover only tooltip is decoration for people who already know the icons.
+
+   IT IS NOT A SECOND COPY OF THE LABEL, AND IT IS NOT title.
+   The row's accessible name is the .sidenav__label already in the DOM, clipped
+   rather than removed precisely so it keeps that job. This element is painted
+   from that label's text and marked aria-hidden, so a screen reader hears the
+   name once, from the row, exactly as it did before. title was rejected outright:
+   it is unreliable on keyboard focus, it cannot be styled, and it would have put
+   a second copy of the name into the tree beside the first.
+
+   WHY IT IS FIXED AND POSITIONED BY SCRIPT rather than being a ::after on the
+   row. Two ancestors clip it. .sidenav__in is overflow:hidden, and .sidenav__list
+   is overflow-y:auto, which forces overflow-x to auto as well; anything drawn
+   past the rail's right edge from inside either one is cut off at it. A fixed
+   element escapes both, and a fixed element needs a number for top, which CSS
+   has no way to read from the hovered row. One shared node, moved, rather than
+   one per row. */
+.sidenav__tip{
+  position:fixed; z-index:60; left:0; top:0;
+  transform:translateY(-50%);
+  padding:var(--s2) var(--s3);
+  border-radius:var(--r-btn);
+  background:var(--surface-inverse); color:var(--text-inverse);
+  font-size:var(--fs-label); line-height:1.25; font-weight:600;
+  white-space:nowrap; pointer-events:none;
+  opacity:0; visibility:hidden;
+  transition:opacity var(--dur-fast) var(--ease);
+}
+.sidenav__tip[data-on]{ opacity:1; visibility:visible; }
+@media (prefers-contrast:more){
+  /* The tip is the inverse surface, so its edge has to be the thing the page is
+     NOT, which at this contrast is the strong border rather than the hairline. */
+  .sidenav__tip{ border:1px solid var(--border-strong); }
 }
 
 /* ---------- THE STAGING NOTICE ----------

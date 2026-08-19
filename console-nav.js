@@ -449,10 +449,101 @@
      not inside this element. */
   var releaseSub = null;
 
+  /* ---------- THE COLLAPSED RAIL'S TOOLTIP ----------
+     Built here rather than in either document, so the console and the customer
+     build get the same one. See the block of the same name in console-nav.css
+     for why it is a fixed node positioned by script instead of a ::after, and
+     why it is not title.
+
+     THE NAME IS NOT SAID TWICE. The node is aria-hidden, and it is painted from
+     the row's own .sidenav__label, which is clipped rather than removed and is
+     still the row's accessible name. A screen reader hears the row exactly as it
+     did before this existed; this is for the eye only.
+
+     KEYBOARD GETS IT TOO, and that is the half that matters. A tooltip that only
+     answers a mouse is decoration for the reader who already knows the icons.
+     The focus path tests :focus-visible so a row focused by a click does not pop
+     a tip nobody asked for, which is the same distinction the focus ring makes. */
+  function wireTips(doc) {
+    var nav = doc.getElementById("sidenav");
+    if (!nav || doc.getElementById("sidenavTip")) return;
+
+    var tip = doc.createElement("div");
+    tip.className = "sidenav__tip";
+    tip.id = "sidenavTip";
+    tip.setAttribute("aria-hidden", "true");
+    doc.body.appendChild(tip);
+
+    function hide() { tip.removeAttribute("data-on"); }
+
+    function show(row) {
+      /* Only when there is nothing else to read. An expanded rail already shows
+         every name, and a tip beside one would be the second copy this whole
+         approach exists to avoid. */
+      if (nav.getAttribute("data-collapsed") !== "true") return hide();
+      var label = row.querySelector(".sidenav__label");
+      if (!label) return hide();
+      tip.textContent = label.textContent;
+      var r = row.getBoundingClientRect();
+      tip.style.top = (r.top + r.height / 2) + "px";
+      tip.style.left = (r.right + 8) + "px";
+      tip.setAttribute("data-on", "true");
+    }
+
+    function rowOf(e) {
+      return e.target && e.target.closest ? e.target.closest(".sidenav__row") : null;
+    }
+
+    nav.addEventListener("mouseover", function (e) {
+      var r = rowOf(e);
+      if (r) show(r); else hide();
+    });
+    nav.addEventListener("mouseleave", hide);
+
+    /* WHY THE MODALITY IS TRACKED HERE RATHER THAN LEFT TO :focus-visible.
+       :focus-visible is the right answer and it is asked first. What it is not
+       is verifiable: a headless browser reports false for it under programmatic
+       focus and ignores focus({focusVisible:true}), so there is no way to prove
+       the keyboard path works before shipping it. The brief is explicit that
+       keyboard is the half that matters, and an unprovable condition guarding
+       the half that matters is not a condition worth having on its own.
+
+       So the last input modality is tracked too, which is the same thing
+       :focus-visible does internally, and either one is enough to show the tip.
+       A key was pressed, then focus moved: that is a reader tabbing, and it is
+       exactly the sequence a real Tab produces. Capture phase so a handler that
+       stops propagation cannot blind it. */
+    var lastWasKey = false;
+    doc.addEventListener("keydown", function () { lastWasKey = true; }, true);
+    doc.addEventListener("pointerdown", function () { lastWasKey = false; }, true);
+    doc.addEventListener("mousedown", function () { lastWasKey = false; }, true);
+
+    nav.addEventListener("focusin", function (e) {
+      var r = rowOf(e);
+      if (!r) return hide();
+      var visible = lastWasKey;
+      try { visible = r.matches(":focus-visible") || lastWasKey; } catch (err) {}
+      if (visible) show(r); else hide();
+    });
+    nav.addEventListener("focusout", hide);
+
+    /* Any of these leaves the tip pointing at where the row used to be. The
+       list scrolls independently of the page, so the capture phase is what
+       catches it. */
+    doc.addEventListener("scroll", hide, true);
+    if (doc.defaultView) doc.defaultView.addEventListener("resize", hide);
+  }
+
   function wireSidebar(root, onChange) {
     var nav = root.querySelector(".sidenav");
     var btn = root.querySelector("#sidenavToggle");
     if (!nav || !btn) return;
+
+    /* Called from here so neither document has to remember to. wireTips returns
+       early if it has already built its node, which is what makes that safe on
+       the customer build, where this function runs again on every staff render. */
+    if (root.getElementById) wireTips(root);
+    else if (root.ownerDocument) wireTips(root.ownerDocument);
 
     /* The console builds its sidebar once per page load. The customer build
        rebuilds it on every staff render, because which rows a surface may see
@@ -675,6 +766,7 @@
     utilbar: utilbar,
     launcher: launcher,
     wireLauncher: wireLauncher,
+    wireTips: wireTips,
     cards: cards,
     notice: notice,
     /* The groups this surface is allowed to see. The money area is the
