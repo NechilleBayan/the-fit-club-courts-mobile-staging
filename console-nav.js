@@ -216,16 +216,25 @@
      because the strip's whole reason to be shared is that the third build
      control, whenever it arrives, has one place to be added rather than two.
 
-     WHAT THE PHONE GETS, AND WHY IT IS NOT THIS. Below 1024px the strip does not
-     exist, and that is a decision rather than an omission. It costs 36px of
-     permanent vertical space, and on a 390x844 screen the console already spends
-     118 of 844 on its app bar and tab bar; a third strip would take the chrome
-     past 18% of the viewport to carry two controls a reader touches at most once
-     a session. Both are reachable on a phone from the menu the shell already
-     has: the customer build puts them at the foot of its account sheet, and the
-     console now puts them at the foot of its drawer. No width shows two copies
-     of either, which is the rule the customer build's own comment states and
-     this is the console adopting it rather than inventing a second answer. */
+     WHAT THE PHONE GETS, AND WHY IT IS NOW THIS TOO. The strip used to stop at
+     1024px on a real argument: it costs 36px of permanent vertical space, and on
+     a 390x844 screen the console already spends 118 of 844 on its app bar and
+     tab bar, so a third strip took the chrome past 18% of the viewport to carry
+     two controls a reader touches at most once a session. That argument was
+     about a strip inside the product, competing with the product for room.
+
+     It is a frame around the prototype now, fixed to the viewport and running
+     edge to edge over everything both builds paint, and it is present at every
+     width for the reason a frame is: one that appears on a desktop review and
+     vanishes on a phone review is not a frame. See the block at the top of
+     console-nav.css for the drawing of it.
+
+     BOTH MENUS KEEP THEIR COPIES. The rule used to be that no width shows two
+     copies of either control, and the customer build's account sheet and the
+     console's launcher are where the phone reached them. Those rows stay. The
+     rule was about two copies inside one product, and the strip is no longer
+     inside it: it is staging furniture that will be deleted whole, and a
+     product whose theme toggle leaves with it was never complete. */
   var UTIL = [
     { id: "theme", kind: "toggle" },
     /* name is the accessible label and is passed in, because the flask opens

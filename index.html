@@ -428,15 +428,32 @@ svg{ display:block; width:20px; height:20px; flex:none; }
 #shell{ min-height:100svh; display:flex; flex-direction:column; overflow-x:clip; }
 
 /* ---------- HEADER GROUP ----------
-   The utility strip and the navigation strip are one sticky unit. Sticking the
-   group rather than either strip is what guarantees the three things that matter:
-   they cannot separate, they cannot overlap, and neither can scroll while the
-   other holds. Because the group sticks in normal flow it also occupies its own
-   height at the top of the document, so the hero starts below the combined height
-   without anything having to be measured or subtracted. --header-h is that
-   combined height, published for scroll padding and anything else that has to
-   clear the header. */
-:root{ --utilbar-h:0px; --header-h:var(--appbar-h); }
+   The group used to hold two strips, the utility strip above the navigation
+   strip, and sticking the group rather than either one was what guaranteed they
+   could not separate, overlap, or scroll independently.
+
+   It holds one strip now. The utility strip left the group, left #shell, and
+   left the flow: it is a fixed frame across the top of the window at every
+   width, over everything this document paints, because it is staging furniture
+   rather than product. See the block at the top of console-nav.css.
+
+   So the group is the navigation strip and nothing else, and what it has to do
+   is start below the frame rather than at the viewport's edge. It still sticks,
+   it still occupies its own height in flow, and --header-h is still the total a
+   scroll target has to clear: the frame plus the bar.
+
+   --utilbar-bar is the frame's band and --utilbar-h is the room it takes at the
+   top of the window, which is the band plus whatever a notch adds. The two are
+   separate for the reason console-nav.css gives; everything in this document
+   reads --utilbar-h. */
+:root{
+  --utilbar-bar:36px;
+  --utilbar-h:calc(var(--utilbar-bar) + max(0px,env(safe-area-inset-top)));
+  --header-h:calc(var(--utilbar-h) + var(--appbar-h));
+}
+/* The room the fixed strip needs, opened by the shell because the strip is out
+   of flow and reserves nothing for itself. */
+#shell{ padding-top:var(--utilbar-h); }
 /* GHOST NAVIGATION.
    There is no navbar rectangle. The two strips carry no background and no border of
    their own; the group behind them fades from a thin wash at the very top to nothing
@@ -467,7 +484,10 @@ svg{ display:block; width:20px; height:20px; flex:none; }
    the page at desktop width while the navigation strip under it is ink: exactly
    the arrangement the console renders. */
 .headergroup{
-  position:sticky; top:0; z-index:40;
+  /* Sticks under the frame, not at the window's edge. The frame is fixed and
+     cannot be scrolled out of the way, so a bar that stuck at zero would spend
+     the whole page half underneath it. */
+  position:sticky; top:var(--utilbar-h); z-index:40;
   border:0;
   background:var(--surface);
 }
@@ -481,7 +501,10 @@ svg{ display:block; width:20px; height:20px; flex:none; }
 .appbar{
   display:grid; grid-template-columns:minmax(64px,1fr) auto minmax(64px,1fr);
   align-items:center; gap:var(--s2);
-  min-height:var(--appbar-h); padding:max(0px,env(safe-area-inset-top)) var(--s3) 0;
+  /* No safe area inset. This bar stopped being the top of the viewport when the
+     frame went over it, and the frame carries the notch now; padding it here
+     would indent the bar below a strip that had already cleared it. */
+  min-height:var(--appbar-h); padding:0 var(--s3);
   background:var(--chrome-surface); color:var(--text-inverse);
   border:0; border-bottom:1px solid #3A3A36;
   --text-inverse:#F5F3DC;
@@ -1231,7 +1254,10 @@ dialog[open]{ display:flex; flex-direction:column; justify-content:flex-end; pos
    this sheet. All that is needed here is that the app bar keeps step with the
    content gutter as the gutter grows. */
 @media (min-width:600px){
-  .appbar, .utilbar__inner{ padding-inline:var(--gutter); }
+  /* The strip used to be in this rule. It is a frame around the document now
+     and takes its own gutter from console-nav.css at every width, because a
+     frame aligned to the grid it frames stops reading as separate. */
+  .appbar{ padding-inline:var(--gutter); }
 }
 
 /* ============================================================
@@ -1503,12 +1529,19 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
    is just a dark band with an edge on it, which is the rectangle the whole treatment
    exists to remove. The hero pays for the overlap in padding, so nothing inside it is
    ever hidden: the mark clears the header at the top and the headline is bottom
-   aligned anyway. */
+   aligned anyway.
+
+   THE APP BAR, NOT --header-h. The hero runs up behind the navigation and stops
+   at the foot of the staging frame, which is the top of everything this product
+   draws. --header-h is the frame plus the bar and is what a scroll target has to
+   clear; what the hero has to clear is the bar alone. Running it the full
+   --header-h would put its first 36px behind an opaque band it can never be
+   seen through, which is 36px of photograph paid for and thrown away. */
 .hero{
   position:relative; isolation:isolate;
   margin-inline:calc(-1 * var(--bleed));
-  margin-top:calc(-1 * (var(--pad-top) + var(--header-h)));
-  padding:calc(var(--header-h) + 20px) var(--bleed) 24px;
+  margin-top:calc(-1 * (var(--pad-top) + var(--appbar-h)));
+  padding:calc(var(--appbar-h) + 20px) var(--bleed) 24px;
   min-height:70svh; display:flex; flex-direction:column; justify-content:flex-end;
   background:#171717; color:#F5F3DC;
   border:0; outline:0; box-shadow:none; border-radius:0; overflow:hidden;
@@ -2038,7 +2071,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
     --block-gap:26px; --section-gap:40px;
   }
   .tabbar{ padding-inline:max(0px, calc((100% - 34rem) / 2)); }
-  .hero{ min-height:64svh; padding:calc(var(--header-h) + var(--s6)) var(--bleed) var(--s7); }
+  .hero{ min-height:64svh; padding:calc(var(--appbar-h) + var(--s6)) var(--bleed) var(--s7); }
   .hero .duo{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width:768px){
@@ -2058,28 +2091,24 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   :root{
     --gutter:48px; --card-pad:28px; --pad-top:32px;
     --shell-max:1280px; --content-max:44rem; --measure:40rem;
-    --appbar-h:68px; --utilbar-h:36px; --tabbar-h:0px;
-    --header-h:calc(var(--utilbar-h) + var(--appbar-h));
+    /* --utilbar-h and --header-h used to be restated here, because the strip
+       only existed from this width up. It is the same band at every width now
+       and both are declared once with the header group. */
+    --appbar-h:68px; --tabbar-h:0px;
     --block-gap:28px; --section-gap:64px;
     --fs-h1:38px; --lh-h1:44px;
     --fs-h2:28px; --lh-h2:34px;
   }
 
-  /* ---------- STRIP ONE: utility ----------
-     The slim strip at the very top of the page carries the two controls that are
-     about the build rather than about booking anything: The staging harness and
-     the day and night toggle. It is a shared shell component now, drawn by
-     console-nav.css and built from the model in console-nav.js, because the
-     console has exactly the same strip and had no way to reach either control.
+  /* ---------- THE UTILITY STRIP IS NOT DRAWN HERE ANY MORE ----------
+     It used to be right aligned to the same centred grid the navigation below
+     it uses, so the two strips shared both edges. That was the correct answer
+     while it was strip one of a two strip header. It is a frame around the
+     whole prototype now, edge to edge at every width, and sharing an edge with
+     the navigation is the one thing it must not do. Placement went back to
+     console-nav.css with the rest of it. */
 
-     What is left here is placement, which is this document's own business: The
-     strip is right aligned to the same centred grid the navigation below it
-     uses, so the two strips share both edges. */
-  .utilbar__inner{
-    padding-inline:calc(max(0px, (100% - var(--shell-max)) / 2) + var(--gutter));
-  }
-
-  /* ---------- STRIP TWO: navigation ----------
+  /* ---------- THE NAVIGATION STRIP ----------
      logo left, destinations right, the one prominent action at the far right.
      The inline padding lands the header content on the same line as the body
      content, so the wordmark and the hero headline share a left edge while the
@@ -2096,14 +2125,13 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
     display:flex; align-items:center; gap:0;
     padding-inline:calc(max(0px, (100% - var(--shell-max)) / 2) + var(--gutter));
   }
-  /* The strip sits on the page and the navigation under it is the plate, which
-     is the arrangement the console renders at this width. The rule that painted
-     the strip's controls cream is gone with the fade that used to be under them.
-     At prefers-contrast:more the bar was already a solid plate before this
-     setting was consulted, so all that is left to ask for is a divider under the
-     strip. */
+  /* The frame sits on the page and the navigation under it is the plate, which
+     is the arrangement the console renders too. At prefers-contrast:more the bar
+     was already a solid plate before this setting was consulted, so the only
+     thing left to ask for is a harder edge on it. The strip's own divider is not
+     asked for here any more: it carries one at every width now, and
+     console-nav.css strengthens it under this same setting. */
   @media (prefers-contrast:more){
-    .utilbar{ border-bottom:1px solid var(--hairline); }
     .appbar{ border-bottom-color:var(--text-inverse); }
   }
   .appbar--ends{ grid-template-columns:none; }
@@ -2194,7 +2222,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   /* HERO: full viewport width, square cornered, composed to the left */
   .hero{
     min-height:min(86svh, 820px);
-    padding:calc(var(--header-h) + var(--s9)) var(--bleed) var(--s9);
+    padding:calc(var(--appbar-h) + var(--s9)) var(--bleed) var(--s9);
     border-radius:0;
   }
   /* A wide band shows more of the frame's width and less of its height, so the
@@ -2304,10 +2332,18 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
    slot, holding whichever of the account and the booking action applies, and the
    menu. Below 420px the swap slot tightens its padding, which is the difference
    between "Book Court" fitting beside the mark at 320px and not.
+
+   NOT INSIDE THE FRAME. Both rules below are about a bar with a wordmark, two
+   controls, and no room; the staging strip has two 26px controls on an
+   otherwise empty line and none of that pressure. The label is what makes the
+   flask askable for, and hiding it on the only widths where the strip is the
+   reader's whole view of the harness is the wrong half to drop. These rules
+   used to reach it because the demo button was in this bar; it is in the frame
+   now and the frame is the only thing left that draws one.
    ============================================================ */
 @media (max-width:419px){
-  .iconbtn__t{ position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
-  .iconbtn--demo{ min-width:var(--tap-min); padding:0; }
+  .appbar .iconbtn__t{ position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .appbar .iconbtn--demo{ min-width:var(--tap-min); padding:0; }
   .appbar__slot--end{ gap:2px; }
   .nav-book-cta, .btn-login{ padding-inline:var(--s3); font-size:15px; }
   .acct__btn{ padding-inline:var(--s2); }
@@ -2815,7 +2851,10 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
     transition:padding-inline-start var(--dur-ui) var(--ease);
   }
   body.has-sidenav #sidenav{
-    position:fixed; inset-block:0; inset-inline-start:0; z-index:60;
+    /* Starts under the frame rather than at the window's edge. The rail is the
+       product and the strip is not, so the strip runs over the top of it the
+       way it runs over everything else. */
+    position:fixed; inset-block:var(--utilbar-h) 0; inset-inline-start:0; z-index:60;
     width:var(--sidenav-w);
     transition:width var(--dur-ui) var(--ease);
   }
@@ -2906,15 +2945,20 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/></symbol>
 </defs></svg>
 
+<!-- THE FRAME, and it is outside #shell on purpose. It is fixed to the viewport
+     and runs edge to edge over everything below it, and #shell clips its
+     overflow, which would make #shell the containing block for anything fixed
+     inside it. First in the document, so the reading order and the tab order
+     both start with the thing that says this is a staging build. -->
+<div class="utilbar" id="utilbar">
+  <div class="utilbar__inner" id="bar-util"></div>
+</div>
 <div id="shell">
-  <!-- One sticky unit, two strips. The group is what sticks, so the strips can
-       never detach, overlap, or scroll independently of one another, and the space
-       the page reserves at the top is the group's own height because the group is
-       in normal flow rather than fixed over it. -->
+  <!-- The group was two strips and is one. The utility strip left it for the
+       frame above; what is left sticks under the frame and reserves its own
+       height in flow, which is what keeps the hero starting below it without
+       anything having to be measured. -->
   <div class="headergroup" id="headergroup">
-    <div class="utilbar" id="utilbar">
-      <div class="utilbar__inner" id="bar-util"></div>
-    </div>
     <header class="appbar">
       <div class="appbar__slot" id="bar-start"></div>
       <div id="bar-mid"></div>
@@ -3856,7 +3900,10 @@ function syncOverHero(){
   const hero = document.querySelector(".hero");
   if (!hero){ root.classList.remove("over-hero"); return; }
   const group = document.getElementById("headergroup");
-  const h = group ? group.getBoundingClientRect().height : 0;
+  /* bottom, not height. The group no longer starts at the top of the window: it
+     sticks under the fixed staging frame, so its height is 36px short of where
+     its lower edge actually falls and the hero would swap treatments early. */
+  const h = group ? group.getBoundingClientRect().bottom : 0;
   /* The header is over the photograph for as long as any of the photograph is still
      under the header's bottom edge. */
   root.classList.toggle("over-hero", hero.getBoundingClientRect().bottom > h);
@@ -3880,7 +3927,8 @@ function syncNavCta(){
   const duo = document.querySelector(".hero .duo");
   if (!duo){ root.classList.add("nav-cta"); return; }
   const group = document.getElementById("headergroup");
-  const h = group ? group.getBoundingClientRect().height : 0;
+  /* bottom rather than height, for the reason syncOverHero gives. */
+  const h = group ? group.getBoundingClientRect().bottom : 0;
   root.classList.toggle("nav-cta", duo.getBoundingClientRect().bottom <= h);
 }
 /* Called on every render so a route change lands in the right state on the first
@@ -8583,15 +8631,23 @@ function openAppMenu(){
       b += '<button class="menurow" data-action="acctnav" data-to="/signin">' + icon("person") + "<span>Log in</span></button>";
     }
   }
-  /* The build controls, last. Neither is a customer task, and from 1024px up they
-     are in the utility strip instead, so no width shows two copies of either. */
+  /* The theme toggle, last. It is not a customer task, which is why it is under
+     everything that is.
+
+     THE STAGING HARNESS ROW IS GONE FROM HERE. It used to sit beside this one,
+     because below 1024px the utility strip did not exist and this menu was the
+     only way to reach the harness. The strip is a fixed frame at every width
+     now and its flask is on screen on every route, so this row was a second
+     copy of a control the reader can already see, one tap further away. The
+     theme toggle stays: it is the one build control a reader actually reaches
+     for more than once, and a phone reader should not have to aim at a 26px
+     target in the frame to change it. */
   /* No aria-pressed. The label names the theme this row switches TO, which is
      an action, and "Day theme, pressed" says the opposite of what it does. The
-     strip and the console's drawer carry the same control and made the same
-     change; see console-nav.js for the argument. */
+     strip carries the same control and made the same change; see console-nav.js
+     for the argument. */
   b += '<button class="menurow" data-action="theme">' +
     icon(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>";
-  b += '<button class="menurow" data-action="demo">' + icon("flask") + "<span>Staging harness</span></button>";
   b += "</div>";
   dlg.innerHTML = '<div class="sheet"><div class="sheet__head"><h2 id="sheet-title">' +
     (staff ? "This shift" : "Menu") + "</h2>" +

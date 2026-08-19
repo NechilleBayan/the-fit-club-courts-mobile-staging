@@ -355,12 +355,16 @@
      the foot of every docked screen, which is a layout change no finding in
      this sweep asked for. */
   --toast-lift:0px;
-  /* The utility strip's height, zero until the width where the strip exists.
-     Declared here rather than only inside the desktop query so that --header-h
-     is one expression at every width: a token that appears halfway up the scale
-     is a token something below it has to remember not to read. Same shape the
-     customer build already uses. */
-  --utilbar-h:0px;
+  /* The utility strip's height, one value at every width now that the strip is
+     a fixed frame around the prototype rather than a desktop control. It was
+     0px below 1024 and 36px above; the desktop query no longer restates it.
+     Everything that has to clear the top of the window reads this: the app bar
+     sticks at it, the shell opens it as padding, and --header-h adds it to the
+     bar's own height for scroll-padding. Same shape the customer build uses.
+     --utilbar-bar is the band, --utilbar-h is the room it takes; see the strip's
+     own block in console-nav.css for why they are two numbers. */
+  --utilbar-bar:36px;
+  --utilbar-h:calc(var(--utilbar-bar) + max(0px,env(safe-area-inset-top)));
   --header-h:calc(var(--utilbar-h) + var(--appbar-h));
 }
 @media (max-width:359px){ :root{ --card-pad:14px; --gutter:14px; } }
@@ -434,8 +438,14 @@ svg{ display:block; width:20px; height:20px; flex:none; }
 .hatch{ background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
 .hatch-strong{ background-image:repeating-linear-gradient(45deg,var(--hatch-strong) 0 4px,transparent 4px 10px); }
 
-/* ---------- SHELL ---------- */
-#shell{ min-height:100svh; display:flex; flex-direction:column; overflow-x:clip; position:relative; z-index:1; }
+/* ---------- SHELL ----------
+   padding-top is the room the fixed utility strip needs. The strip is out of
+   flow and out of #shell entirely, so nothing reserves that space for it and
+   the app bar would start under it; this is the console's own answer to the
+   question console-nav.css leaves to each shell. box-sizing is border-box
+   everywhere on this build, so min-height:100svh still resolves to the viewport
+   rather than to the viewport plus the strip. */
+#shell{ min-height:100svh; padding-top:var(--utilbar-h); display:flex; flex-direction:column; overflow-x:clip; position:relative; z-index:1; }
 main{ flex:1 1 auto; width:100%; max-width:var(--shell-max); margin:0 auto; padding:var(--pad-top) var(--gutter) calc(var(--tabbar-h) + var(--s8)); }
 main:focus{ outline:none; }
 body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--s8)); }
@@ -452,13 +462,14 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
    third, and a title that truncates to nothing is worse than a missing avatar
    that is one tap away inside the launcher. */
 .appbar{
-  /* Below the utility strip rather than at the viewport's edge. --utilbar-h is
-     0px until the width where the strip exists, so this is the same rule at
-     every size. */
+  /* Below the utility strip rather than at the viewport's edge, at every width
+     now that the strip is a frame around the prototype rather than a desktop
+     control. The safe area inset went with it: this bar is no longer the thing
+     the notch overlaps, and padding it here would have indented the app bar
+     below a strip that had already cleared the notch. */
   position:sticky; top:var(--utilbar-h); z-index:40;
   background:var(--surface-inverse); color:var(--text-inverse);
   border-bottom:1px solid var(--border-strong);
-  padding-top:max(0px,env(safe-area-inset-top));
 }
 .appbar__in{
   width:100%; max-width:var(--shell-max); margin:0 auto;
@@ -1639,9 +1650,8 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
     --shell-max:none;
     --content-max:44rem;
     --block-gap:24px; --section-gap:36px;
-    /* The strip appears, and --header-h picks it up without being restated,
-       which is what declaring it as a calc at the top buys. */
-    --utilbar-h:36px;
+    /* --utilbar-h used to appear here, because the strip did. It is the same
+       36px at every width now and is declared once at the top of the sheet. */
   }
 
   /* The shell stops being a column and becomes two. The sidebar spans both rows
@@ -1653,31 +1663,19 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
   #shell{
     display:grid;
     grid-template-columns:var(--sidenav-w) minmax(0,1fr);
-    grid-template-rows:auto auto 1fr;
+    grid-template-rows:auto 1fr;
     transition:grid-template-columns var(--dur-ui) var(--ease);
   }
   .sidenav{ grid-column:1; grid-row:1 / -1; min-width:0; }
-  /* The strip is a third row above the app bar rather than a full width band
-     across the top, so the rail still spans everything and still reads as the
-     frame. The customer build makes the opposite choice for the same reason:
-     there the strip IS the top of the page because there is no rail beside it. */
-  /* Sticky, like the customer build's, and for a reason beyond symmetry:
-     --header-h is declared as the strip plus the app bar, and the only thing
-     that reads it is scroll-padding-top. A strip that scrolls away makes that
-     36px of reserved space a lie, and an in-page anchor lands 36px short. It
-     takes the page's own colour so content passes under it rather than through
-     it, and sits above the app bar in the stack for the same reason. */
-  .utilbar{
-    grid-column:2; grid-row:1;
-    position:sticky; top:0; z-index:41;
-    background:var(--surface);
-  }
-  .appbar{ grid-column:2; grid-row:2; }
-  #main{ grid-column:2; grid-row:3; }
-  /* Placement, which console-nav.css deliberately leaves to each shell. The
-     strip lines up with the app bar's own inline padding so the toggle sits
-     directly above the avatar rather than a gutter off it. */
-  .utilbar__inner{ padding-inline:var(--gutter); }
+  /* THE STRIP IS NOT IN THIS GRID AND IS NOT IN THIS DOCUMENT'S SHELL AT ALL.
+     It used to be a third row above the app bar in the content column, which
+     put the rail beside it and let the rail read as the frame. The rail is not
+     the frame any more; the strip is, and a frame that stops where the sidebar
+     starts is a header with an indent. It is fixed to the viewport, edge to
+     edge, over the rail as well, and #shell reserves its height as padding.
+     What is left here is the two rows it used to make three. */
+  .appbar{ grid-column:2; grid-row:1; }
+  #main{ grid-column:2; grid-row:2; }
 
   /* The phone's navigation, gone rather than hidden behind the content. The
      rail says the same five things and says them permanently. */

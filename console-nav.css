@@ -20,22 +20,118 @@
    would be wrong; the rail did not have to change for that, which is the point
    of naming no colours.
 
-   Everything is behind a min-width:1024px query or is inert because .sidenav is
-   display:none until that width. Nothing here changes what a phone renders,
-   which is the point: both mobile layouts were reviewed and signed off, and a
-   wider window is a different problem, not a licence to redraw the small one.
+   The rail is behind a min-width:1024px query or is inert because .sidenav is
+   display:none until that width: both mobile layouts were reviewed and signed
+   off, and a wider window is a different problem, not a licence to redraw the
+   small one. The utility strip is the one thing here that is NOT behind that
+   query, and the block below says why.
 
    1024 is the customer build's breakpoint, adopted rather than invented. The
    console's stylesheet had no min-width query at all before this, only three
    max-width ones, so there was no competing value to reconcile.
    ============================================================ */
 .sidenav{ display:none; }
-/* Both shell components are desktop only, and both are hidden by the stylesheet
-   rather than by a breakpoint in script. display:none takes them out of the tab
-   order and out of the accessibility tree, so a phone never meets a control it
-   cannot see, and a reader dragging a window across the threshold gets the right
-   answer without anything having to be rebuilt. */
-.utilbar{ display:none; }
+
+/* ---------- THE UTILITY STRIP AS A FRAME ----------
+   THE STRIP IS NOT PART OF THE PRODUCT, and this block is what makes that
+   legible rather than merely true. It carries the two controls that are about
+   the staging build rather than about the club: the day and night toggle and
+   the way into the harness. Neither will exist when this ships.
+
+   So it is drawn the way a frame around a demo is drawn, not the way a header
+   is. Fixed to the viewport at the very top, edge to edge, over everything the
+   product itself paints, including the rail: nothing in the product's own
+   layout reaches the top eight pixels of the window any more, and a reviewer
+   scrolling any screen on either build sees the same band in the same place.
+   It is the one piece of chrome that does not belong to the page under it.
+
+   AT EVERY WIDTH NOW. It used to be desktop only, on the argument that 36px of
+   permanent vertical space is too much to spend on a phone for two controls
+   touched once a session, with both reachable from the menu each shell already
+   has. That trade was about a strip inside the product. This one is outside it:
+   the point of a frame is that it does not move or disappear, and a frame that
+   is present on a desktop review and absent on a phone review is not a frame,
+   it is a fourth thing to explain. The product's own menus keep their copies of
+   both controls, because the product has to be complete without the frame.
+
+   IT IS FIXED, SO IT IS OUT OF FLOW, and every shell has to open the same 36px
+   at the top of the document for it. Each does that in its own sheet, because
+   how a shell reflows is that shell's own business; what is shared is that
+   --utilbar-h is the number and that the shell's own sticky header sits at
+   top:var(--utilbar-h) rather than at zero.
+
+   BOTH DOCUMENTS PUT THE ELEMENT DIRECTLY IN <body>, ahead of the shell. Both
+   shells clip their overflow, and a fixed element inside a clipping ancestor is
+   positioned against that ancestor rather than against the viewport, which is
+   exactly the edge to edge behaviour this block exists to get. */
+.utilbar{
+  position:fixed; inset-inline:0; top:0; z-index:90;
+  /* The page's own surface, not the inverse. Both builds paint their app bar
+     with the inverse surface, and an ink band directly above an ink app bar is
+     one tall header rather than a frame and a header. This reads as the sheet
+     the product is sitting on. */
+  background:var(--surface); color:var(--text-primary);
+  /* The one hard edge in the arrangement, and the thing that says where the
+     frame stops and the product starts. It is the hairline rather than the
+     strong border because it separates two of the page's own surfaces. */
+  border-bottom:1px solid var(--hairline);
+  /* The strip is what the notch now overlaps, so the safe area inset is its to
+     carry. Both app bars gave it up when they stopped being the top of the
+     viewport.
+
+     TWO TOKENS RATHER THAN ONE, and this padding is why. --utilbar-bar is the
+     band the controls sit in and --utilbar-h is the room the strip takes at the
+     top of the window, which is the band plus whatever the notch adds. Every
+     shell offset reads --utilbar-h; only the line below reads --utilbar-bar.
+     One token would have to be both, and under a notch the shells would reserve
+     36px for something 36px plus an inset tall. */
+  padding-top:max(0px,env(safe-area-inset-top));
+}
+.utilbar__inner{
+  display:flex; align-items:center; justify-content:flex-end; gap:var(--s2);
+  min-height:var(--utilbar-bar);
+  /* Placement is here rather than in each shell, which is the reversal this
+     change forces and is the whole point of it: the strip used to line its
+     controls up with whatever grid the document below it kept, and a frame that
+     is aligned to the thing it frames is not reading as separate. The gutter is
+     the only inset, on both edges, at every width. */
+  padding-inline:var(--gutter);
+}
+/* Compact: These are not decisions, so they do not get decision-sized targets.
+   The 44px minimum belongs to touch and this is the one control cluster on a
+   phone that is deliberately not a product control, so it stays the size it is
+   on a desktop rather than growing to meet the thumb it is not for.
+
+   Colour is inherited rather than taken from a token, so the controls follow
+   whatever the strip is painted. They are held back with opacity rather than
+   with a dimmer colour, which keeps them quiet in both themes at once. */
+.utilbar .iconbtn{
+  min-width:0; min-height:26px; padding:0 var(--s2);
+  border-color:transparent; color:inherit; opacity:.72;
+  font-size:12px; letter-spacing:.08em;
+  transition:opacity var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+/* The strip is a flat surface, so this button's edge is drawn straight onto the
+   page rather than onto a card. At rgba(--ghost-edge,.30) that measured 1.94:1
+   in light and 2.56:1 in dark, the same wash-on-a-control mistake the
+   stylesheet's ghost-glass block names, and here it was the only thing marking
+   the one control in the strip that has a boundary at all. */
+.utilbar .iconbtn--demo{ border-style:solid; border-color:var(--border-default); border-radius:var(--r-btn); }
+.utilbar .iconbtn svg{ width:16px; height:16px; }
+.utilbar .iconbtn--bare{ min-width:26px; }
+.utilbar .iconbtn--bare svg{ width:17px; height:17px; }
+@media (hover:hover) and (pointer:fine){
+  .utilbar .iconbtn:hover{ color:inherit; opacity:1; }
+}
+/* Quiet is a choice this reader has already declined. */
+@media (prefers-contrast:more){
+  .utilbar{ border-bottom-color:var(--border-strong); }
+  .utilbar .iconbtn{ opacity:1; }
+  /* --border-strong, because --border-default is what the button already wears
+     at rest now and a strong reading that repeats the default does nothing.
+     Same move as the control list in admin.css. */
+  .utilbar .iconbtn--demo{ border-color:var(--border-strong); }
+}
 
 @media (min-width:1024px){
   :root{
@@ -56,9 +152,15 @@
   /* ---------- THE RAIL ITSELF ----------
      Sticky rather than fixed, and full viewport height, so a long page scrolls
      past a navigation that stays put while the navigation's own overflow scrolls
-     independently when the window is short. */
+     independently when the window is short.
+
+     It stops at the foot of the utility strip rather than at the top of the
+     viewport. The strip is fixed over everything, so a rail that ran the full
+     100svh would put its own top edge, and in the console its brand mark,
+     underneath a band the reader cannot scroll out of the way. The rail is
+     inside the frame like everything else the product draws. */
   .sidenav__in{
-    position:sticky; top:0; height:100svh;
+    position:sticky; top:var(--utilbar-h); height:calc(100svh - var(--utilbar-h));
     display:flex; flex-direction:column;
     background:var(--surface-raised);
     border-right:1px solid var(--hairline);
@@ -347,61 +449,9 @@
   }
 }
 
-/* ---------- THE UTILITY STRIP ----------
-   The slim strip of build controls at the very top of the page: The day and
-   night toggle and the way into the staging harness. Two documents render it
-   from the model in console-nav.js; what is here is how it looks, and what is
-   NOT here is where it sits. The customer build centres it on its own shell
-   width and the console hangs it off the rail's column, so each document keeps
-   the padding-inline in its own sheet, exactly as each keeps its own grid.
-
-   No background and no rule of its own. In the customer build the header group's
-   fade is at its darkest up here, which is what separates this strip from the
-   navigation, and a divider would put back the rectangle the fade exists to
-   remove. In the console the page shows through and the app bar's own ink edge
-   below does the separating. */
-@media (min-width:1024px){
-  .utilbar{ display:block; background:none; border:0; }
-  .utilbar__inner{
-    display:flex; align-items:center; justify-content:flex-end; gap:var(--s2);
-    min-height:var(--utilbar-h);
-  }
-  /* Compact: These are not decisions, so they do not get decision-sized targets.
-     The 44px minimum belongs to touch, and this strip only exists at widths
-     where the pointer is the fine one.
-
-     Colour is inherited rather than taken from a token, so the controls follow
-     whatever they are drawn on: Cream over the customer build's hero, the
-     theme's own ink or cream everywhere else. They are held back with opacity
-     rather than with a dimmer colour, which is the only way to stay quiet in
-     both places at once. */
-  .utilbar .iconbtn{
-    min-width:0; min-height:26px; padding:0 var(--s2);
-    border-color:transparent; color:inherit; opacity:.72;
-    font-size:12px; letter-spacing:.08em;
-    transition:opacity var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
-  }
-  /* The strip is transparent, so this button's edge is drawn straight onto the
-     page rather than onto a card. At rgba(--ghost-edge,.30) that measured
-     1.94:1 in light and 2.56:1 in dark — the same wash-on-a-control mistake the
-     stylesheet's ghost-glass block now names, and here it was the only thing
-     marking the one control in the strip that has a boundary at all. */
-  .utilbar .iconbtn--demo{ border-style:solid; border-color:var(--border-default); border-radius:var(--r-btn); }
-  .utilbar .iconbtn svg{ width:16px; height:16px; }
-  .utilbar .iconbtn--bare{ min-width:26px; }
-  .utilbar .iconbtn--bare svg{ width:17px; height:17px; }
-  @media (hover:hover) and (pointer:fine){
-    .utilbar .iconbtn:hover{ color:inherit; opacity:1; }
-  }
-  /* Quiet is a choice this reader has already declined. */
-  @media (prefers-contrast:more){
-    .utilbar .iconbtn{ opacity:1; }
-    /* --border-strong, because --border-default is what the button already
-       wears at rest now and a strong reading that repeats the default does
-       nothing. Same move as the control list in admin.css. */
-    .utilbar .iconbtn--demo{ border-color:var(--border-strong); }
-  }
-}
+/* The utility strip used to be drawn from here, inside this query, because it
+   was a desktop control. It is a frame around the whole prototype now and its
+   block is at the top of this file, outside every query. */
 
 /* The rail slides, and a reader who has asked for less movement gets none. The
    token block at the top of this file already collapses --dur-ui to 0.01ms under

@@ -222,11 +222,12 @@
     var shell = document.getElementById("shell");
     shell.insertBefore(bar, shell.firstChild);
 
-    /* The utility strip, above the app bar and therefore inserted before it.
-       Built at every width and hidden below 1024 by console-nav.css, exactly as
-       the sidebar is: A breakpoint in script would have to be re-evaluated on
-       resize and would race the first paint. */
-    buildUtilbar(shell);
+    /* The utility strip, fixed over the top of the window at every width. It
+       does not go in the shell at all now; see buildUtilbar for where it goes
+       and why. Built unconditionally, exactly as the sidebar is: A breakpoint in
+       script would have to be re-evaluated on resize and would race the first
+       paint. */
+    buildUtilbar();
 
     /* The tab bar, appended last so it is the final thing in the tab order
        before the page ends. */
@@ -262,14 +263,22 @@
   /* ---------- THE UTILITY STRIP ----------
      Markup from console-nav.js, which the customer build renders too. This side
      passes its own icon function and wires its own two actions; see the model
-     there for why the click is not wired in the shared file. */
-  function buildUtilbar(shell){
+     there for why the click is not wired in the shared file.
+
+     IT HANGS OFF <body>, NOT OFF #shell, and that is the same reason the toast
+     below does: #shell is overflow-x:clip, which makes it the containing block
+     for any position:fixed descendant, and a strip fixed inside it would be
+     positioned against the shell rather than against the viewport. The whole
+     point of the strip now is that it runs to the window's edges over the rail,
+     so it has to be outside the thing it is drawn over. First child of body, so
+     the reading order and the tab order both start with it. */
+  function buildUtilbar(){
     if (!window.CONSOLE_NAV) return;
     var el = document.createElement("div");
     el.className = "utilbar";
     el.id = "utilbar";
     el.innerHTML = '<div class="utilbar__inner" id="bar-util"></div>';
-    shell.insertBefore(el, shell.firstChild);
+    document.body.insertBefore(el, document.body.firstChild);
     paintUtilbar();
   }
 
@@ -339,10 +348,11 @@
 
   /* Where focus goes when this closes. Opened by a click that is the answer;
      opened on arrival there is no answer, and body is not one, so it falls to
-     the control that reopens the notice: The strip's flask on a desktop, the
-     hamburger that reaches the drawer's copy of it on a phone. Both are checked
-     for a box rather than for existence, because the strip is built at every
-     width and is display:none below 1024. */
+     the control that reopens the notice, which is the strip's flask at every
+     width now that the strip is on screen at every width. The rest of the list
+     is the fallback it has always been, and every candidate is still checked for
+     a box rather than for existence: a control the CSS has hidden is not
+     somewhere to hand focus. */
   function stagingAnchor(){
     var a = document.activeElement;
     if (a && a !== document.body && document.contains(a)) return a;
@@ -536,11 +546,24 @@
      So they sit at the foot of the launcher, under a heading, after every real
      place the reader can go. That is exactly where the drawer put them and for
      the same stated reason, and it is where the customer build puts the same two
-     at the same widths. No width shows two copies of either: the strip is above
-     1024, this is the menu, and they are never both on screen.
+     at the same widths.
 
-     They are markup rather than model, unlike everything above them, because
-     they are not destinations and CONSOLE_NAV is a list of places. */
+     THERE IS ONE ROW HERE NOW, NOT TWO. The rule was that no width shows two
+     copies of either control, and these rows were the phone's only way to reach
+     them while the utility strip stopped at 1024px. The strip is a fixed frame
+     at every width now and its flask is on screen on every screen of the
+     console, so the harness row was a second copy of a control already in view
+     and it is gone.
+
+     The theme toggle is not, and the difference is which of the two a reader
+     uses more than once. Day and night is a real preference someone changes
+     when the light in the room changes; the harness is a dialog you open once a
+     session. The frame's 26px targets are deliberately not touch sized, because
+     the frame is not product, and that is a reason to keep the product's own
+     full sized toggle rather than to send a phone reader up to the frame for it.
+
+     It is markup rather than model, unlike everything above it, because it is
+     not a destination and CONSOLE_NAV is a list of places. */
   function launcherBuildRows(){
     var dark = currentTheme() === "dark";
     return '<div class="launcher__foot">' +
@@ -551,8 +574,6 @@
          build's menu; see console-nav.js for the argument. */
       '<button class="lfoot" type="button" data-action="theme" id="launcherTheme">' +
         svg(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>" +
-      '<button class="lfoot" type="button" data-action="demo" aria-haspopup="dialog">' +
-        svg("flask") + "<span>Staging build</span></button>" +
       "</div>";
   }
 
