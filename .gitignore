@@ -26,3 +26,8 @@ PROMPT-console-launcher.md
 # The local screenshot runner and its capture frame. Regenerate baselines with
 # "python _shots.py"; neither file is part of the build.
 _shots.py
+
+# Freezes the no-script list in more.html from the model. The page renders from
+# CONSOLE_NAV at runtime and carries a generated copy for readers without
+# script; see the header of the script for why it needs both.
+_gen_more.py
