@@ -317,33 +317,116 @@
     toast(next === "dark" ? "Night theme." : "Day theme.");
   }
 
-  /* ---------- THE STAGING NOTICE ----------
-     What the Demo control opens, and what firstRunStaging below shows once per
-     sitting. The customer build renders the same markup from the same shared
-     model. One real <dialog>: showModal traps focus and gives Escape for
-     free, a click on the element itself is a click on the backdrop because the
-     panel does not fill the box, and the close event puts focus back where it
-     came from.
+  /* ---------- THE STAGING DIALOG ----------
+     ONE ELEMENT, TWO THINGS IN IT. The flask opens the harness. First arrival
+     opens the notice. They were the same thing until now, and that was the bug:
+     the console's flask opened a three paragraph modal saying this is a staging
+     build, which is a greeting rather than a harness, and the customer build's
+     flask opened real dials. One control, two answers, depending on which half
+     of the prototype you were standing in.
 
-     It says the three things a reader arriving at a staging build needs and
-     nothing else. The per-page .sandbox note stays: It is a different job, said
-     once per screen about that screen, and a dialog that appears on every route
-     would be the banner the note's own comment argues against. */
+     They stay one <dialog> because they are one modal idiom and the panel, the
+     frost, the head, and the foot are the same on both. showModal traps focus
+     and gives Escape for free, a click on the element itself is a click on the
+     backdrop because the panel does not fill the box, and the close event puts
+     focus back where it came from. What changes between the two is the contents
+     and one class on the dialog, which is what widens the panel for the harness.
+
+     The notice keeps its job and its wording: three things a reader arriving at
+     a staging build needs, said once per sitting. The per-page .sandbox note
+     also stays. It is a third job, said once per screen about that screen. */
   var stagingReturn = null;
   function buildStaging(shell){
     var d = document.createElement("dialog");
     d.className = "sheet staging";
     d.id = "staging";
     d.setAttribute("aria-labelledby", "staging-title");
-    d.innerHTML = '<div class="sheet__panel staging__panel">' +
-      CONSOLE_NAV.notice({ icon: svg, half: "console",
-        reopen: "The flask in the strip at the top of the window opens this again." }) + "</div>";
+    d.innerHTML = '<div class="sheet__panel staging__panel"></div>';
     shell.appendChild(d);
     d.addEventListener("click", function(e){ if (e.target === d) d.close(); });
     d.addEventListener("close", function(){
       if (stagingReturn && document.contains(stagingReturn)) stagingReturn.focus();
       stagingReturn = null;
     });
+    /* The dials, delegated on the dialog rather than bound per button, because
+       the body is replaced wholesale on every change and bound handlers would
+       have to be rebound with it. */
+    d.addEventListener("click", function(e){
+      var b = e.target.closest("[data-h]");
+      if (!b || !window.STAGING) return;
+      var what = b.getAttribute("data-h");
+      if (what === "surface"){ STAGING.setSurface(b.getAttribute("data-v")); paintHarness(); return; }
+      if (what === "scenario"){
+        /* An empty value is the None row. setScenario normalises anything that
+           is not a registered key to null, so this needs no branch of its own. */
+        STAGING.setScenario(b.getAttribute("data-v") || null);
+        /* applyScenario runs from the subscription in bridge(), which is where
+           it belongs: a scenario armed in another tab has to redraw this page
+           too. All this has to do is repaint its own pressed states. */
+        paintHarness();
+        return;
+      }
+      if (what === "reset"){
+        STAGING.reset();
+        STAGING.applyTheme("system");
+        paintUtilbar();
+        paintLauncherTheme();
+        paintHarness();
+        toast("Sandbox: Every dial is back to its default, theme included.");
+      }
+    });
+  }
+
+  /* THE SCENARIO'S CONSEQUENCE ON THIS SCREEN, which is the one line of the
+     harness only the console can write. It is the same lookup applyScenario
+     makes and the same fallback sentence, because the harness saying one thing
+     about this screen while the marker at the top of it says another would be
+     two answers to one question. */
+  function scenarioHere(){
+    if (!window.STAGING || !window.SCENARIO_BY_KEY) return "";
+    var scn = SCENARIO_BY_KEY[STAGING.getScenario()];
+    if (!scn || scn.natural) return "";
+    var page = (location.pathname.split("/").pop() || "index").replace(/\.html$/, "");
+    var here = ((scn.admin || {}).pages || {})[page];
+    return here && here.says
+      ? here.says
+      : "No consequence on this screen. The sample data is unchanged and still true.";
+  }
+
+  /* Repainting replaces every control, so focus is restored the way the utility
+     strip restores it: by the identity of the control rather than by the node,
+     which does not survive the rebuild. A reader arming a scenario with the
+     keyboard lands back on the row they pressed rather than on the body. */
+  function paintHarness(){
+    var d = document.getElementById("staging");
+    if (!d || !window.CONSOLE_NAV) return;
+    var a = document.activeElement;
+    var had = a && d.contains(a) && a.getAttribute("data-h")
+      ? a.getAttribute("data-h") + "|" + (a.getAttribute("data-v") || "") : null;
+    d.classList.add("staging--harness");
+    d.querySelector(".staging__panel").innerHTML = CONSOLE_NAV.harness({
+      icon: svg,
+      state: window.STAGING ? STAGING.get() : {},
+      scenarios: window.SCENARIOS || [],
+      here: scenarioHere(),
+      build: "../index.html"
+    });
+    hydrateIcons(d);
+    if (had){
+      var parts = had.split("|");
+      var back = d.querySelector('[data-h="' + parts[0] + '"][data-v="' + parts[1] + '"]');
+      if (back) back.focus();
+    }
+  }
+
+  function paintNotice(){
+    var d = document.getElementById("staging");
+    if (!d || !window.CONSOLE_NAV) return;
+    d.classList.remove("staging--harness");
+    d.querySelector(".staging__panel").innerHTML = CONSOLE_NAV.notice({
+      icon: svg, half: "console",
+      reopen: "The flask in the strip at the top of the window opens the staging harness, where the dials are." });
+    hydrateIcons(d);
   }
 
   /* Where focus goes when this closes. Opened by a click that is the answer;
@@ -380,10 +463,22 @@
     return null;
   }
 
+  /* Both openers fill the panel before showing it rather than at build time. The
+     harness is a readout as much as a control and every value in it can have
+     moved since the page loaded, in this tab or in the customer build's. */
+  function openHarness(){
+    var d = document.getElementById("staging");
+    if (!d || d.open) return;
+    stagingReturn = stagingAnchor();
+    paintHarness();
+    d.showModal();
+  }
+
   function openStaging(){
     var d = document.getElementById("staging");
     if (!d || d.open) return;
     stagingReturn = stagingAnchor();
+    paintNotice();
     d.showModal();
   }
 
@@ -878,11 +973,14 @@
       if (t){ toggleTheme(); return; }
       var m = e.target.closest('[data-action="demo"]');
       if (m){
-        /* The harness row lives in the launcher now, so the launcher is what
-           has to get out of the way before the harness opens over it. */
+        /* The harness, not the notice. The flask means the same thing on both
+           halves of the prototype now: it opens the dials. The notice is the
+           arrival greeting and firstRunStaging is the only thing that shows it.
+           The launcher gets out of the way first, since it is a full screen
+           dialog and two of those cannot be open at once. */
         var d = document.getElementById("launcher");
         if (d && d.open) d.close();
-        openStaging();
+        openHarness();
       }
     });
 
@@ -1068,6 +1166,13 @@
         paintLauncherTheme();
       }
       if (changed.indexOf("scenario") >= 0) applyScenario();
+      /* The harness is a readout of these dials, so it repaints when they move,
+         including when they move in another tab. Only while it is open and only
+         while it is showing the harness rather than the notice: repainting a
+         closed dialog is work nobody sees, and repainting the notice would
+         replace the greeting somebody is still reading. */
+      var d = document.getElementById("staging");
+      if (d && d.open && d.classList.contains("staging--harness")) paintHarness();
     });
   }
 

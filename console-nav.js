@@ -320,6 +320,201 @@
       '<div class="sheet__foot"><button class="btn btn--primary" type="button" data-close>Got it</button></div>';
   }
 
+  /* ---------- THE SURFACES ----------
+     Every user mode the harness can put the prototype into, with a sentence
+     saying who each one is. The keys match staging-state.js's own ALLOWED list,
+     which is what validates them; this adds the two things a reader needs that a
+     validator has no use for, a name and a description.
+
+     scenarios.js names the same four plus "admin", which is not a fifth mode: it
+     is the console view of opsmanager. It is a door rather than a role and it is
+     not in this list for that reason. Both files say so; see the comment on ALL
+     in scenarios.js. */
+  var SURFACES = [
+    { id: "visitor", label: "Visitor",
+      who: "Nobody signed in. Prices, availability, and the booking flow up to the point where an account is asked for." },
+    { id: "player", label: "Signed-in player",
+      who: "A customer with an account: their bookings, their passes, and their saved details." },
+    { id: "frontdesk", label: "Front Desk",
+      who: "Joy Mendoza, on shift. Arrivals, check-in, and the shift view. No money screens." },
+    { id: "opsmanager", label: "Operations Manager",
+      who: "Rea Salvador, Club Manager. Everything the back office holds, payments, staff, and rates included." }
+  ];
+
+  function surfaceOf(id) {
+    for (var i = 0; i < SURFACES.length; i++) if (SURFACES[i].id === id) return SURFACES[i];
+    return SURFACES[0];
+  }
+
+  /* ---------- WHAT IS SHOWING ----------
+     The block at the top of the harness on both sides, and the reason the
+     harness is worth opening rather than remembering. It answers two questions
+     and nothing else: which user mode this prototype is currently in, and which
+     scenario is armed on top of it.
+
+     BOTH BUILDS DRAW THIS, which is why it is here rather than in either of
+     them. The surface and the scenario are one pair of dials with one value,
+     shared across the boundary by staging-state.js, and two renderings of one
+     value is two chances to describe it differently.
+
+     It names its own classes rather than borrowing each shell's, and that is
+     deliberate in a file whose rule is to name no colours: .hnow is four
+     elements and a token palette, and the alternative was picking between the
+     console's .setrow and the customer build's .h for a block that is neither.
+
+     opts.state      the STAGING snapshot, or nothing
+     opts.scenarios  window.SCENARIOS, or nothing
+     opts.showing    the surface this document ACTUALLY renders, when that is
+                     not simply whatever the dial says. The console passes
+                     opsmanager; the customer build passes nothing because it
+                     honours the dial.
+     opts.here       a sentence about what the armed scenario does on THIS
+                     screen, which only the console can answer */
+  function nowShowing(opts) {
+    var icon = opts.icon;
+    var st = opts.state || {};
+    var dial = surfaceOf(st.surface);
+    var sf = opts.showing ? surfaceOf(opts.showing) : dial;
+    var list = opts.scenarios || [];
+    var armed = null;
+    for (var i = 0; i < list.length; i++) if (list[i].key === st.scenario) armed = list[i];
+
+    var h = '<div class="hnow">';
+
+    /* THE MODE ON SCREEN, NOT THE MODE ON THE DIAL, and the two are not always
+       the same thing. This block answers "what am I looking at", so it has to
+       name what the document is drawing. The console draws the Operations
+       Manager's view whatever the dial says, because it IS that view; a console
+       that redrew itself as a visitor would be a fifth surface nobody designed.
+       Reading the dial here would have put "Visitor" over a screen showing every
+       payment in the club, which is the quiet kind of lie the sandbox-honesty
+       rule is about. The dial is still a real value and still decides what the
+       customer build opens as, so where they disagree, both are said. */
+    h += '<div class="hnow__row"><span class="hnow__k">Surface</span>' +
+      '<span class="hnow__v">' + esc(sf.label) + "</span></div>" +
+      '<p class="hnow__note">' + esc(sf.who) + "</p>";
+
+    if (sf.id !== dial.id) {
+      h += '<p class="hnow__warn">' + icon("alert") +
+        "<span>The dial is set to <b>" + esc(dial.label) + "</b>, which is what the customer build " +
+        "will open as. This back office draws the Operations Manager's view either way.</span></p>";
+    }
+
+    h += '<div class="hnow__row"><span class="hnow__k">Scenario</span>' +
+      '<span class="hnow__v">' + (armed ? esc(armed.label) : "None armed") + "</span></div>";
+
+    if (armed) {
+      h += '<p class="hnow__note">' + esc(armed.blurb || "") + "</p>";
+      /* A scenario declares the surfaces it means anything on. Today every one
+         of them says all of them, so this never fires; it is here because the
+         field is real and a scenario added for one mode should not silently
+         look armed in another. */
+      if (armed.surfaces && armed.surfaces.indexOf(sf.id) < 0) {
+        h += '<p class="hnow__warn">' + icon("alert") +
+          "<span>This scenario means nothing on the " + esc(sf.label) +
+          " surface. Nothing on this screen has been changed by it.</span></p>";
+      } else if (opts.here) {
+        h += '<p class="hnow__note"><b>On this screen.</b> ' + esc(opts.here) + "</p>";
+      }
+    } else {
+      h += '<p class="hnow__note">Nothing is forced. Every screen is showing its ' +
+        "resting state, which is the product behaving normally on sample data.</p>";
+    }
+
+    return h + "</div>";
+  }
+
+  /* ---------- THE HARNESS ----------
+     What the flask opens in the console. The customer build keeps its own, which
+     is a much longer sheet: it has orders, token links, a simulated clock, and a
+     route index, none of which exist on this side. What the two share is the
+     block above and the pair of dials this one carries.
+
+     WHY THE CONSOLE OFFERS TWO DIALS AND NOT SIX. It reads two. Scenario is live
+     here: admin.js hydrates every screen from it. Surface is not honoured by the
+     console itself, for the reason nowShowing states, but it is the thing that
+     decides what the customer build opens as and it is the question this harness
+     exists to answer. Connectivity, capacity, and the simulated clock are read
+     by the customer build and by nothing here, and a control that does nothing
+     on the screen it is drawn on is the thing this prototype keeps deciding not
+     to draw. The last paragraph says where they are instead.
+
+     opts.scenarios  window.SCENARIOS
+     opts.state      the STAGING snapshot
+     opts.here       what the armed scenario does on this screen
+     opts.build      href of the customer build, for the door out */
+  function harness(opts) {
+    var icon = opts.icon;
+    var st = opts.state || {};
+    var list = opts.scenarios || [];
+
+    var b = nowShowing({ icon: icon, state: st, scenarios: list,
+                         /* The console is this view and nothing else, which is
+                            why it is a literal rather than a read of the dial.
+                            See nowShowing for the argument. */
+                         showing: "opsmanager", here: opts.here });
+
+    b += '<section class="hsec"><h3>Surface</h3><div class="hgrid hgrid--2">' +
+      SURFACES.map(function (s) {
+        return '<button class="hbtn" type="button" data-h="surface" data-v="' + s.id + '"' +
+          ' aria-pressed="' + (st.surface === s.id) + '">' + esc(s.label) + "</button>";
+      }).join("") +
+      "</div>" +
+      '<p class="legal">Simulated role. The real system enforces this on the server; hiding a control is not the security boundary. ' +
+      "Setting it here decides what the customer build opens as, and it survives the trip.</p>";
+    if (opts.build) {
+      b += '<a class="hbtn hbtn--wide" href="' + esc(opts.build) + '">Open the customer build in this mode</a>';
+    }
+    b += "</section>";
+
+    b += '<section class="hsec"><h3>Scenario</h3><div class="hgrid">' +
+      '<button class="hbtn" type="button" data-h="scenario" data-v=""' +
+      ' aria-pressed="' + (!st.scenario) + '">None, resting state</button>' +
+      list.map(function (s) {
+        /* Two things a reader has to be able to tell apart at a glance: which
+           scenario is armed, and which of them this console has anything to say
+           about. A scenario with no admin block still arms and still crosses to
+           the customer build; what it does not do is change a console screen,
+           and every console screen says so where it is armed.
+
+           The happy path has no admin block either and is not the same case.
+           It is what the console already shows on every screen, so there is
+           nothing to add rather than nothing to say, and labelling it "customer
+           build only" would be the opposite of true. `natural` is the flag that
+           separates the two and it is on the scenario for exactly this reason. */
+        var note = s.natural ? "The console's resting state"
+                 : !s.admin  ? "Customer build only"
+                 : "";
+        return '<button class="hbtn" type="button" data-h="scenario" data-v="' + esc(s.key) + '"' +
+          ' aria-pressed="' + (st.scenario === s.key) + '">' + esc(s.label) +
+          (note ? '<span class="hbtn__t">' + note + "</span>" : "") + "</button>";
+      }).join("") +
+      "</div>" +
+      '<p class="legal">Arming one redraws every console screen from the scenario\'s own data in scenarios.js and arms the same one in the customer build. ' +
+      "What crosses is the key, never a booking: each build draws its own sample, so there is no shared object graph to fall out of step.</p></section>";
+
+    b += '<section class="hsec"><h3>This build</h3>' +
+      "<p>Everything on it is sample data: The bookings, the players, the payments, and the " +
+      "schedule are made up to show how the screens behave. <b>Nothing here is a real reservation</b>, " +
+      "and nothing you do on these screens reaches the club, a customer, or a card.</p>" +
+      '<p class="legal">The simulated clock, connectivity, and Open Play capacity are dials the customer build reads and this one does not, ' +
+      "so they are in its harness rather than duplicated here as controls that would do nothing. Every screen also carries a note at its foot " +
+      "saying what is sample about that screen in particular.</p></section>";
+
+    return '<div class="sheet__head">' +
+        '<h2 id="staging-title">' + icon("flask") + "<span>Staging harness</span></h2>" +
+        '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close the staging harness">' +
+          icon(opts.close || "close") + "</button>" +
+      "</div>" +
+      '<div class="sheet__body" id="harness-body">' + b + "</div>" +
+      /* Reset is outside the scrolling body for the reason the notice's dismiss
+         is: on a short window the one control that matters must not be below the
+         fold of a dialog covering the page. It is also the one destructive
+         control here, and keeping it apart from twelve scenario buttons is how
+         somebody aiming at the last scenario does not clear the demo. */
+      '<div class="sheet__foot"><button class="btn btn--ghost" type="button" data-h="reset">Reset all state</button></div>';
+  }
+
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -792,6 +987,10 @@
     wireTips: wireTips,
     cards: cards,
     notice: notice,
+    SURFACES: SURFACES,
+    surfaceOf: surfaceOf,
+    nowShowing: nowShowing,
+    harness: harness,
     /* The groups this surface is allowed to see. The money area is the
        Operations Manager's, and everything else is everyone's.
 

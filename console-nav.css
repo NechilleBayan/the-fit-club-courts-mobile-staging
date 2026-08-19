@@ -574,6 +574,105 @@
   }
 }
 
+/* ---------- THE HARNESS PANEL ----------
+   The same dialog as the notice, holding a great deal more. The notice is three
+   paragraphs and fits a 30rem card; the harness carries two dial lists and
+   sixteen controls, so it takes the width the panel can spare and the height it
+   can reach. It is the same element, the same frost, and the same head and foot,
+   because the flask opening two differently shaped dialogs at two moments would
+   read as two features. */
+.staging--harness .staging__panel{
+  width:min(34rem, calc(100% - 2 * var(--gutter)));
+  max-height:min(88svh, 46rem);
+}
+
+/* ---------- WHAT IS SHOWING ----------
+   The block at the top of the harness in both builds, answering which mode the
+   prototype is in and which scenario is armed on it. Sunken rather than raised:
+   it is the one part of the harness that is a readout rather than a control, and
+   a panel of buttons is easier to read if the statement above them is not
+   wearing the same surface they are. */
+.hnow{
+  padding:var(--s3);
+  border:1px solid var(--border-default);
+  border-radius:var(--r-card);
+  background:var(--surface-sunken);
+}
+.hnow__row{
+  display:flex; align-items:baseline; justify-content:space-between; gap:var(--s3);
+  padding-top:var(--s2);
+}
+.hnow__row:first-child{ padding-top:0; }
+/* The label is the quiet half and the value is the answer, which is the reverse
+   of how a form reads and is correct here: nobody opens this to find the word
+   "Surface". */
+.hnow__k{
+  flex:none;
+  font-size:var(--fs-legal); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-secondary);
+}
+.hnow__v{
+  min-width:0; text-align:right;
+  font-size:var(--fs-label); font-weight:700;
+}
+.hnow__note{
+  margin-top:4px;
+  font-size:var(--fs-legal); line-height:var(--lh-legal);
+  color:var(--text-secondary);
+}
+.hnow__note b{ color:var(--text-primary); }
+/* Said in the marker's own language, because that is what it is: a line
+   admitting that what the dial says and what the screen draws are not the same
+   thing. The customer build and the console both paint forced state this way. */
+.hnow__warn{
+  display:flex; gap:var(--s2); margin-top:var(--s2);
+  font-size:var(--fs-legal); line-height:var(--lh-legal);
+}
+.hnow__warn svg{ flex:none; width:15px; height:15px; margin-top:2px; }
+
+/* ---------- A DIAL LIST ----------
+   One section per dial: a heading, a grid of choices, and the sentence that says
+   what moving it does. .hbtn is a choice rather than an action, so the pressed
+   state is the whole point of it and aria-pressed is what carries that to a
+   reader who cannot see the fill. */
+.hsec{ display:grid; gap:var(--s2); }
+.hsec h3{
+  font-size:var(--fs-legal); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-secondary);
+}
+.hsec .legal{ margin-top:2px; }
+.hgrid{ display:grid; gap:6px; }
+.hgrid--2{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+@media (max-width:399px){ .hgrid--2{ grid-template-columns:1fr; } }
+.hbtn{
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px;
+  width:100%; min-height:var(--tap-min); padding:var(--s2) var(--s3);
+  border:1px solid var(--border-default); border-radius:var(--r-btn);
+  background:var(--surface); color:var(--text-primary);
+  font-size:var(--fs-label); font-weight:600; line-height:1.25;
+  text-align:left; text-decoration:none;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.hbtn__t{
+  font-size:var(--fs-legal); font-weight:400; color:var(--text-secondary);
+}
+/* The inverse surface, which is what both builds already use to say "this one".
+   A tint would have had to be a colour, and this file names none. */
+.hbtn[aria-pressed="true"]{
+  background:var(--surface-inverse); color:var(--text-inverse);
+  border-color:var(--border-strong); font-weight:700;
+}
+.hbtn[aria-pressed="true"] .hbtn__t{ color:var(--text-inverse-secondary); }
+.hbtn--wide{ align-items:center; text-align:center; }
+@media (hover:hover) and (pointer:fine){
+  .hbtn:hover{ border-color:var(--border-strong); }
+}
+.hbtn:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:2px; }
+@media (prefers-contrast:more){
+  .hbtn{ border-color:var(--border-strong); }
+  .hnow{ border-color:var(--border-strong); border-width:1.5px; }
+}
+
 /* Readability first when the reader has asked for it. The rail's separator and
    its current marker both get real weight rather than a tinted wash. */
 @media (min-width:1024px) and (prefers-contrast:more){

@@ -7521,6 +7521,21 @@ function openDemo(){
      thing anyone reads in here, and it stopped being true when the dials moved
      into shared storage, so it now separates the two halves by name rather than
      by promising the simpler thing. */
+  /* WHAT IS SHOWING, FIRST. Everything under it is a control; this is the one
+     block that is an answer. It says which user mode the prototype is in and
+     which scenario is armed on top of it, and it is drawn by console-nav.js
+     because the console's harness opens with the same block reading the same
+     pair of dials. Two renderings of one value is two chances to word it
+     differently, which is the mistake the shared shell file exists to stop. */
+  if (window.CONSOLE_NAV && CONSOLE_NAV.nowShowing){
+    b += CONSOLE_NAV.nowShowing({
+      icon: icon,
+      state: STAGING.get(),
+      scenarios: window.SCENARIOS || [],
+      half: "build"
+    });
+  }
+
   b += '<p class="legal">Staging harness, not part of the product. Nothing here reaches a real customer, a real court, or a real payment. ' +
        'The dials below are remembered: Surface, scenario, connectivity, capacity, the simulated clock, and the theme survive a refresh and carry into the admin console. ' +
        'Bookings are not: An order, its hold deadline, and its passes live in memory only and are gone the moment you reload. ' +
