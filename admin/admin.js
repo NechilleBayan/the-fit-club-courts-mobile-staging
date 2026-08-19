@@ -325,11 +325,22 @@
     var a = document.activeElement;
     if (a && a !== document.body && document.contains(a)) return a;
     var candidates = [document.querySelector('.utilbar [data-action="demo"]'),
-                      document.getElementById("menuBtn")];
+                      document.getElementById("menuBtn"),
+                      /* A detail screen declares data-back, which means it has a
+                         back arrow instead of a hamburger and builds no drawer,
+                         so on a phone neither of the two above is on the page and
+                         focus was being dropped on the body. The back arrow is
+                         the one thing every such screen has. */
+                      document.querySelector(".appbar__start a, .appbar__start button")];
     for (var i = 0; i < candidates.length; i++){
       var c = candidates[i];
       if (c && c.getClientRects().length) return c;
     }
+    /* And if even that is missing, the page's own title, made focusable for the
+       moment it is needed. Landing on the heading of the screen you are on is a
+       poor answer; landing on the body is not an answer. */
+    var t = document.getElementById("barTitle");
+    if (t){ t.setAttribute("tabindex", "-1"); return t; }
     return null;
   }
 
@@ -478,7 +489,10 @@
   function drawerBuildRows(){
     var dark = currentTheme() === "dark";
     return '<div class="drawer__group drawer__group--build"><span>This build</span></div>' +
-      '<button class="navrow" type="button" data-action="theme" id="drawerTheme" aria-pressed="' + dark + '">' +
+      /* No aria-pressed; see the note in console-nav.js. The visible label here
+         is the theme this row switches TO, which is an action, and a pressed
+         state on top of it says the opposite of what the label says. */
+      '<button class="navrow" type="button" data-action="theme" id="drawerTheme">' +
         svg(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>" +
       '<button class="navrow" type="button" data-action="demo" aria-haspopup="dialog">' +
         svg("flask") + "<span>Staging build</span></button>";
@@ -488,7 +502,6 @@
     var b = document.getElementById("drawerTheme");
     if (!b) return;
     var dark = currentTheme() === "dark";
-    b.setAttribute("aria-pressed", dark);
     b.innerHTML = svg(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span>";
   }
 

@@ -415,7 +415,10 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
    third, and a title that truncates to nothing is worse than a missing avatar
    that is one tap away inside the drawer. */
 .appbar{
-  position:sticky; top:0; z-index:40;
+  /* Below the utility strip rather than at the viewport's edge. --utilbar-h is
+     0px until the width where the strip exists, so this is the same rule at
+     every size. */
+  position:sticky; top:var(--utilbar-h); z-index:40;
   background:var(--surface-inverse); color:var(--text-inverse);
   border-bottom:1px solid var(--border-strong);
   padding-top:max(0px,env(safe-area-inset-top));
@@ -932,7 +935,16 @@ a.row:active, button.row:active{ background:rgba(var(--ghost-fill),.22); border-
 .st--ok{ border:1.5px solid var(--border-strong); background:rgba(var(--ghost-fill),.10); }
 .st--hold{ border:1.5px dashed var(--border-strong); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
 .st--live{ border:2px dotted var(--border-strong); background:rgba(var(--ghost-fill),.14); }
-.st--off{ border:1.5px dashed var(--border-default); background:var(--surface-sunken); color:var(--text-secondary); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+/* No colour of its own. The dashed edge, the sunken fill, and the hatch already
+   say inert three times over, and the muted type was a fourth saying it in the
+   one way that costs legibility: --text-secondary over a hatch measures 3.85:1
+   in the light theme, under the 4.5:1 a 12px bold pill owes. It was 4.57:1
+   before the palette moved, so this is a cost of the inversion and not an old
+   fault. Nothing else could pay it. Reverting --text-secondary reaches 4.26:1
+   and reverting --surface-sunken as well reaches 4.24:1, because the hatch is
+   what takes the last of the headroom either way. Dropping the colour reaches
+   10.23:1 and loses nothing, since the state was never being carried by it. */
+.st--off{ border:1.5px dashed var(--border-default); background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
 .st--work{ border:3px double var(--border-strong); background:rgba(var(--ghost-fill),.10); }
 .st--crit{ border:1.5px solid var(--critical-edge); background:var(--critical-surface); color:var(--critical); }
 /* Priority is not a status and must not borrow one of the six treatments above,
@@ -1538,7 +1550,12 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
    being a wash and becomes the token that identifies a control, because that is
    the point at which a reader has said the soft rule is not enough. */
 @media (prefers-contrast:more){
-  .card, .sumcard, .plate, .fig, .row{ border-color:var(--border-default); }
+  /* --border-strong rather than --border-default, and for a reason found by
+     measuring: this list is a bare one-class selector placed after every variant
+     rule on the same elements, so it overrides them all. With --border-default
+     it took .plate--work's three pixel double rule DOWN from --border-strong,
+     which is a contrast reduction inside the block that exists to raise it. */
+  .card, .sumcard, .plate, .fig, .row{ border-color:var(--border-strong); }
   /* And every control, which is the half that matters more. A boundary drawn
      from the --ghost-edge wash lands between 1.8:1 and 2.6:1 on a cream card,
      under the 3:1 WCAG asks of anything you can press. That is an idiom older
@@ -1554,7 +1571,8 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
      pressed states stay distinguishable because they go to 2px here, and a
      pressed chip carries a fill as well. */
   .btn, .filter, .search input, .field input, .field select, .field textarea,
-  .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn, .qact{
+  .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn, .qact,
+  .pick span{
     border-color:var(--border-strong);
   }
 }
@@ -1663,7 +1681,17 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
      across the top, so the rail still spans everything and still reads as the
      frame. The customer build makes the opposite choice for the same reason:
      there the strip IS the top of the page because there is no rail beside it. */
-  .utilbar{ grid-column:2; grid-row:1; }
+  /* Sticky, like the customer build's, and for a reason beyond symmetry:
+     --header-h is declared as the strip plus the app bar, and the only thing
+     that reads it is scroll-padding-top. A strip that scrolls away makes that
+     36px of reserved space a lie, and an in-page anchor lands 36px short. It
+     takes the page's own colour so content passes under it rather than through
+     it, and sits above the app bar in the stack for the same reason. */
+  .utilbar{
+    grid-column:2; grid-row:1;
+    position:sticky; top:0; z-index:41;
+    background:var(--surface);
+  }
   .appbar{ grid-column:2; grid-row:2; }
   #main{ grid-column:2; grid-row:3; }
   /* Placement, which console-nav.css deliberately leaves to each shell. The

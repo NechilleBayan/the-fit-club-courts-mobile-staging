@@ -134,12 +134,19 @@
     var dark = opts.theme === "dark";
     return UTIL.map(function (c) {
       if (c.kind === "toggle") {
-        /* aria-pressed rather than role="switch": The control is a button that
-           flips a setting, and its own icon and label already say which way it
-           is pointing. The accessible name changes with the state because the
-           glyph is the only visible label. */
+        /* NO aria-pressed, and the previous sweep put one here deliberately, so
+           the reversal owes a reason. aria-pressed says a control is IN a state;
+           this control's accessible name says what pressing it will DO. Together
+           a screen reader announces "Switch to the day theme, pressed", and
+           there is no reading of that sentence which tells you which theme is
+           on. One of the two has to go.
+
+           The name stays and the state goes, because the name is the half a
+           reader can act on and because this control is phrased as an action
+           everywhere it appears, in the strip and in both menus. What the theme
+           currently is stays discoverable the way it always was: by looking at
+           the page, which is the thing the control changes. */
         return '<button class="iconbtn iconbtn--bare" type="button" data-action="' + c.id + '"' +
-          ' aria-pressed="' + dark + '"' +
           ' aria-label="' + (dark ? "Switch to the day theme" : "Switch to the night theme") + '">' +
           icon(dark ? "sun" : "moon") + "</button>";
       }

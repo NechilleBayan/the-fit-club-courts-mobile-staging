@@ -37,7 +37,7 @@ surface is one of the two with a little of the other mixed in.
 | Token | What it is for |
 |---|---|
 | `--surface` | The page. The thing everything else is drawn on top of. |
-| `--surface-raised` | A plane that sits **above** the page: A card, a panel, the sidebar. Redeclared locally inside a console card so a nested panel keeps rising. |
+| `--surface-raised` | A plane that sits **above** the page: A card, a panel, the sidebar. |
 | `--surface-sunken` | A plane that sits **below** the page: A meter track, an inert row, the ground under a hatch. |
 | `--surface-inverse` | The ink plate. Used when a thing is settled or selected and needs to be the heaviest object in view. |
 | `--text-primary` | Body and headings. The default reading colour. |
@@ -256,12 +256,27 @@ neither, which is what keeps that file renderable under both documents.
 | `--chrome-surface` | `#171717` | `#0D0D0D` | The app bar, the tab bar, the drawer head, the rail's brand block. **Ink in both themes.** In the dark theme it drops *below* the page, because a frame lighter than what it frames stops reading as a frame. |
 | `--card-surface` | `#F2EEDD` | `#1F1F1F` | The fill of a card, row, or button, **as the theme declares it**. |
 
-`--card-surface` and `--surface-raised` hold the same value in both themes and
-are still two tokens rather than one name and an alias. The difference is not
-the colour, it is the scope: A console card **redeclares `--surface-raised`
-locally** so that a panel nested inside it keeps rising above it. A card that
-painted itself with `var(--surface-raised)` would therefore paint itself with
-its own children's value. `--card-surface` is the one that stays put.
+`--card-surface` and `--surface-raised` hold the same value at `:root` in both
+themes and are still two tokens rather than one name and an alias, because they
+are overridden in different places.
+
+A console card **redeclares `--surface`** locally, so that anything nested inside
+it resolves against the card rather than against the page. That is why the card
+cannot paint itself with `var(--surface)`: It would be painting itself with its
+own children's value.
+
+The dark theme's paper island (`.row--muted`, `.empty`) **redeclares
+`--card-surface`** to `#FAF9F2` and leaves `--surface-raised` at `#1F1F1F`, so
+that a button or a chip inside a light row on a dark screen paints as paper too.
+Merge the two names and that override goes with them, and the Contact button in
+a no-show row goes back to 1.09:1. The two tokens verifiably diverge on
+`check-in.html` and `court-details.html` in the dark theme; that divergence is
+the reason both exist.
+
+An earlier draft of this section said the card redeclares `--surface-raised`.
+It did, before this task: The card block carried `--surface-raised:#262626` and
+nothing read it, so the declaration was deleted as dead. The sentence outlived
+the code by three commits.
 
 ---
 

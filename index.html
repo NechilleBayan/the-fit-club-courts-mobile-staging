@@ -7523,7 +7523,11 @@ function openAppMenu(){
   }
   /* The build controls, last. Neither is a customer task, and from 1024px up they
      are in the utility strip instead, so no width shows two copies of either. */
-  b += '<button class="menurow" data-action="theme" aria-pressed="' + dark + '">' +
+  /* No aria-pressed. The label names the theme this row switches TO, which is
+     an action, and "Day theme, pressed" says the opposite of what it does. The
+     strip and the console's drawer carry the same control and made the same
+     change; see console-nav.js for the argument. */
+  b += '<button class="menurow" data-action="theme">' +
     icon(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>";
   b += '<button class="menurow" data-action="demo">' + icon("flask") + "<span>Staging harness</span></button>";
   b += "</div>";
