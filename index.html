@@ -2438,6 +2438,175 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   }
   .qrm__arrow:not([disabled]):hover{ transform:translateY(-2px); }
 }
+
+/* ============================================================
+   THE INVOICE PREVIEW
+   A document, not a screen, and the difference decides every value below.
+
+   Everything inside .inv pins its own colour. It does not read a single theme
+   token, which is the opposite of the rule the rest of this file follows and is
+   deliberate: An invoice is dark ink on white paper, in both themes, on a
+   projector, and in print. A document that changes colour with a dial is not a
+   document. .pass__qr already makes this argument about the white quiet zone
+   around a code; this is the same argument one element larger.
+
+   The chrome around the paper is the one part that is allowed to be app: the
+   backdrop and the sheet radius come from tokens, because those belong to the
+   window the paper is being shown in rather than to the paper.
+   ============================================================ */
+#invmodal{ padding:0; border:0; background:transparent; max-width:100%; max-height:100%; }
+#invmodal::backdrop{ background:var(--overlay); }
+#invmodal[open]{ display:flex; position:fixed; inset:0; width:auto; height:auto;
+  align-items:flex-end; justify-content:center; }
+
+.invm{
+  display:flex; flex-direction:column; width:100%; max-width:100%; max-height:96svh;
+  background:#EDEAE3; color:#16181A;
+  border-radius:var(--r-sheet) var(--r-sheet) 0 0; overflow:hidden;
+}
+@media (min-width:600px){
+  #invmodal[open]{ align-items:center; }
+  .invm{ max-width:46rem; max-height:92svh; border-radius:var(--r-card); }
+}
+
+/* The toolbar is the viewer, not the document. Two controls and a name, which is
+   what the brief asked for: A download that is an icon on its own, and an X. */
+.invm__bar{
+  flex:none; display:flex; align-items:center; gap:8px;
+  padding:8px 10px; background:#FFFFFF; border-bottom:1px solid #D9D6CF;
+}
+.invm__name{
+  margin-right:auto; padding-left:6px;
+  font-family:var(--mono); font-size:12px; line-height:16px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; color:#5C6169;
+}
+.invm__ico{
+  flex:none; display:grid; place-items:center; width:var(--tap-min); height:var(--tap-min);
+  border:1px solid #C9C5BC; border-radius:var(--r-btn); background:#FFFFFF; color:#16181A;
+  transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
+}
+.invm__ico svg{ width:20px; height:20px; }
+@media (hover:hover) and (pointer:fine){
+  .invm__ico:hover{ background:#F3F1EA; border-color:#8E8B84; }
+}
+.invm__ico:focus-visible{ outline:3px solid #16181A; outline-offset:2px; }
+
+/* Pressed, not decorative. The download control cannot write a file on this
+   build, so what it does is say so, here, where the reader is looking. */
+.invm__note{
+  flex:none; display:flex; align-items:flex-start; gap:8px;
+  padding:10px 14px; background:#FDF6DB; border-bottom:1px solid #E4D9A6;
+  font-family:var(--mono); font-size:13px; line-height:19px; font-weight:500; color:#4A4326;
+}
+.invm__note svg{ width:17px; height:17px; flex:none; margin-top:1px; }
+
+.invm__scroll{ flex:1 1 auto; overflow-y:auto; padding:14px 14px calc(20px + max(0px, env(safe-area-inset-bottom))); }
+
+/* ---------- the paper ---------- */
+.inv{
+  position:relative; overflow:hidden;
+  max-width:40rem; margin-inline:auto;
+  background:#FFFFFF; color:#16181A;
+  border:1px solid #E2DFD8; box-shadow:0 1px 3px rgba(20,22,24,.16);
+  font-family:var(--mono); font-size:12px; line-height:18px; font-weight:500;
+}
+.inv p{ margin:0; }
+
+/* The strip is the first thing on the paper rather than in the toolbar above it,
+   so it survives a screenshot of the document on its own. Stripes rather than a
+   flat fill for the same reason the harness banner is hatched: A flat coloured
+   bar reads as branding, and a hazard pattern does not. */
+.inv__demo{
+  position:relative; z-index:2;
+  display:flex; align-items:flex-start; gap:9px; padding:9px 14px;
+  background:repeating-linear-gradient(135deg,#A32218 0 13px,#87180F 13px 26px);
+  color:#FFFFFF;
+}
+.inv__demo svg{ width:16px; height:16px; flex:none; margin-top:2px; }
+.inv__demo b{ display:block; font-size:12px; line-height:17px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+.inv__demo span{ display:block; font-size:11px; line-height:16px; font-weight:500; color:#F4D7D3; }
+
+/* The mark, large and faint, under the type rather than over it. aria-hidden
+   because the same name is already printed at the top of the document in words. */
+.inv__mark{ position:absolute; inset:0; z-index:0; display:grid; place-items:center; pointer-events:none; }
+.inv__mark i{
+  display:block; width:min(74%, 380px); aspect-ratio:640 / 337;
+  background:var(--img-logo) center/contain no-repeat;
+  opacity:.07; transform:rotate(-9deg);
+}
+.inv__paper{ position:relative; z-index:1; padding:18px 14px 22px; }
+@media (min-width:600px){ .inv__paper{ padding:26px 30px 30px; } }
+
+.inv__top{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.inv__title{ font-family:var(--font-display); font-size:26px; line-height:28px; letter-spacing:-.01em; }
+.inv__sub{ margin-top:5px; font-size:12px; line-height:17px; color:#5C6169; }
+.inv__logo{
+  flex:none; width:112px; height:59px;
+  background:var(--img-logo) right center/contain no-repeat;
+}
+
+.inv__rule{ height:1px; background:#D9D6CF; border:0; margin:16px 0; }
+.inv__rule--tear{ height:0; border:0; border-top:1.5px dashed #C4C0B7; margin:22px 0 16px; }
+
+.inv__cols{ display:grid; gap:16px; }
+@media (min-width:600px){ .inv__cols{ grid-template-columns:1fr 1fr; gap:22px 30px; } }
+.inv__lbl{ font-size:10px; line-height:14px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#7A776F; }
+.inv__who{ margin-top:5px; font-size:14px; line-height:20px; font-weight:700; }
+.inv__party p + p{ margin-top:2px; }
+.inv__party .inv__line{ color:#4A4E55; }
+
+/* The meta pairs are a definition list because that is what they are, and they
+   are laid out as rows rather than as a grid so a long value wraps under its own
+   label instead of pushing the column. */
+.inv__meta{ display:grid; gap:0; }
+.inv__meta > div{ display:flex; justify-content:space-between; gap:14px; padding:5px 0; border-bottom:1px solid #EBE8E1; }
+.inv__meta > div:last-child{ border-bottom:0; }
+.inv__meta dt{ color:#5C6169; }
+.inv__meta dd{ margin:0; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
+
+.inv__tblwrap{ overflow-x:auto; }
+.inv__tbl{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.inv__tbl th{
+  padding:0 0 7px; text-align:left; border-bottom:1.5px solid #16181A;
+  font-size:10px; line-height:14px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#16181A;
+}
+.inv__tbl td{ padding:9px 0; border-bottom:1px solid #EBE8E1; vertical-align:top; }
+.inv__tbl th + th, .inv__tbl td + td{ padding-left:10px; text-align:right; }
+.inv__tbl .inv__desc{ font-weight:700; }
+.inv__tbl .inv__descsub{ display:block; margin-top:2px; font-weight:500; color:#5C6169; }
+
+.inv__sums{ margin-top:14px; margin-left:auto; max-width:20rem; }
+.inv__sums > div{ display:flex; justify-content:space-between; gap:14px; padding:5px 0; }
+.inv__sums dt{ color:#5C6169; }
+.inv__sums dd{ margin:0; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
+.inv__sums .inv__grand{ margin-top:4px; padding-top:8px; border-top:1.5px solid #16181A; }
+.inv__sums .inv__grand dt{ color:#16181A; font-weight:800; letter-spacing:.02em; text-transform:uppercase; font-size:11px; align-self:center; }
+.inv__sums .inv__grand dd{ font-family:var(--font-display); font-size:22px; line-height:24px; }
+.inv__sums .inv__due dd{ font-weight:800; }
+
+.inv__box{ margin-top:16px; padding:12px 13px; border:1px solid #E2DFD8; background:#FAF8F4; }
+.inv__box p + p{ margin-top:5px; }
+.inv__note{ margin-top:14px; font-size:11px; line-height:17px; font-weight:400; color:#6B6F76; }
+
+/* The tear-off. A real invoice carries one so the payer can return the bottom
+   half with a cheque, and it is here because its absence is one of the things
+   that makes a mock invoice read as a mock. */
+.inv__advice .inv__lbl{ font-size:11px; letter-spacing:.16em; }
+.inv__advice .inv__meta{ margin-top:9px; }
+.inv__advice .inv__blank{ min-height:26px; border-bottom:1px solid #C4C0B7; }
+
+.inv__samp{
+  display:inline-flex; align-items:center; gap:4px; padding:0 6px; margin-left:5px;
+  border:1px dashed #A9A59C; border-radius:999px;
+  font-size:9px; line-height:15px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#6B6F76;
+  white-space:nowrap; vertical-align:middle;
+}
+.inv__foot{ margin-top:18px; padding-top:12px; border-top:1px solid #EBE8E1; font-size:11px; line-height:17px; font-weight:400; color:#6B6F76; }
+
+@media (prefers-reduced-motion: no-preference){
+  #invmodal[open] .invm{ animation:qrm-in 190ms var(--ease) both; }
+  #invmodal[open]::backdrop{ animation:qrm-fade 190ms var(--ease) both; }
+}
 @media (prefers-reduced-motion:reduce){
   .qrm__close, .qrm__arrow{ transition:none; }
   .qrm__arrow:not([disabled]):hover{ transform:none; }
@@ -2766,6 +2935,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 <dialog id="sheet" aria-labelledby="sheet-title"></dialog>
 <dialog id="staging" class="staging" aria-labelledby="staging-title"></dialog>
 <dialog id="qrmodal" aria-labelledby="qrm-title"></dialog>
+<dialog id="invmodal" aria-labelledby="invm-title"></dialog>
 
 <script>
 /* ============================================================
@@ -2825,6 +2995,8 @@ const S = {
   mbTab: "upcoming",                // My Bookings group: upcoming | past | cancelled
   lastScan: null,                   // last door-scan result, staff scanner only
   qr: null,                         // { orderId, index } while the pass modal is open
+  inv: null,                        // { orderId } while the invoice preview is open
+  invSaved: null,                   // filename of the PNG this preview last wrote
   toast: null,
   formErrors: {},
   forms: {},                        // last typed value of every field, by id
@@ -4909,6 +5081,25 @@ function scrBooking(params){
       "<p>No pass exists yet. Passes are generated only once the venue has verified payment.</p></div>";
   }
 
+  /* INVOICE.
+     Offered only where money actually moved, which is what invoiceable() decides,
+     so a held order does not grow a billing document it has no basis for. The
+     label says Download and what it opens is a preview, with the download itself
+     one press further in. That indirection is deliberate: An invoice is a document
+     a reader wants to look at before keeping, unlike a QR pass, which is a picture
+     of one code and is already on screen by the time Download QR is offered. The
+     line under the button says where the file comes from, because a reader who has
+     saved a pass from this same screen expects a second Download to save something
+     immediately. */
+  if (invoiceable(o)){
+    html += '<div class="section"><h2 class="sec">Invoice</h2>' +
+      "<p>An itemised record of what this booking cost and what the venue received for it.</p>" +
+      '<div class="btn-col" style="margin-top:var(--s4)">' +
+      '<button class="btn btn--secondary" data-action="openinvoice" data-id="' + esc(o.id) + '">' +
+      icon("draft") + "Download invoice</button></div>" +
+      '<p class="legal" style="margin-top:var(--s3)">Opens the invoice on screen. The download inside it saves a PNG, banded and watermarked as a demo.</p></div>';
+  }
+
   html += '<div class="section"><h2 class="sec">Managing this booking</h2><div class="card">' +
     "<p>Cancellation and refund policy: To be confirmed. Contact the venue.</p>" +
     '<p class="legal" style="margin-top:var(--s2)">The rules are not approved, so this build states none. What it does implement is what cancelling has to do to the passes.</p>';
@@ -4953,6 +5144,594 @@ function scrBooking(params){
 
   return { id:"pub-booking", shell:"task", title:"Booking " + o.bookingCode, html:html,
     back:{ label:"Back", to: S.account ? "/me" : "/find" }, dock:dock };
+}
+
+/* ============================================================
+   THE INVOICE PREVIEW
+   A DOCUMENT SHOWN OVER THE APP, NOT A SCREEN INSIDE IT.
+
+   The first pass made this a route, /booking/:code/invoice, rendered in the task
+   shell like any other screen. That is overturned here rather than deleted, and
+   the reason is the brief's own list: White paper, a watermark, a mark at the
+   top, and an X to close it. Those are the properties of a document being shown
+   IN something, and the app shell is not a viewer. Rendered as a screen the paper
+   had to argue with the header, the dock, and the theme on every value.
+
+   The pass modal is the precedent and this is built on it deliberately: A native
+   <dialog>, which brings the focus trap, Escape, and the inert background for
+   free, a head that carries the close, and a body that scrolls. What differs is
+   that this one's body pins its own palette. See the stylesheet for why an
+   invoice is not allowed to follow the theme.
+
+   The download control does now write a file, which the first two passes refused.
+   What changed is not the appetite for it, it is the document: A PNG carrying the
+   striped demo band across its head and the mark watermarked through its middle
+   cannot be mistaken for a business record once it leaves the app, and that was
+   the whole of the objection. Both marks are painted into the image rather than
+   layered over the preview, so neither can be cropped off by saving. The file is
+   named for it too. See renderInvoiceCanvas().
+   ============================================================ */
+
+/* Derived, never stored, for the reason orderTotal() is derived: A stored copy is
+   a second place for one fact to live, and the two disagree the first time an
+   order is seeded by the harness rather than made by a reader. */
+function invoiceNumber(o){ return "INV-" + String(o.bookingCode || o.id).replace(/[^A-Za-z0-9]/g, ""); }
+
+/* Money has actually moved. That is the only condition under which this build
+   puts the word invoice on a screen. A held order is not a debt: The product's own
+   rule is that a hold is not a booking, and billing somebody for one would
+   contradict the screen next door. A cancelled booking that was paid still has an
+   invoice, because the payment happened; the refund is a separate line that
+   changes none of the figures above it. */
+function invoiceable(o){ return o.paymentStatus === "paid" || o.paymentStatus === "in_person"; }
+
+const INV_DATE = new Intl.DateTimeFormat("en-PH", { month:"short", day:"numeric", year:"numeric", timeZone:TZ });
+
+/* THE INVENTED HALF, IN ONE OBJECT.
+   An invoice carries fields this build has no source for: A tax registration, a
+   customer number, a billing address, payment terms, a remittance account. The
+   brief asks for made up business and client detail, so it is made up, and it is
+   made up HERE rather than inline in the markup, so the invented half of the
+   document is countable and can be replaced in one place the day real values
+   exist. Everything not in this object is read from the order. */
+const INV_MADEUP = {
+  tin:        "009-482-771-000",
+  reg:        "DTI 04471-2019",
+  terms:      "Due on receipt",
+  account:    "Maya Business 5391 0042 8817",
+  clientNo:   "TFC-C-0148",
+  clientAddr: "Blk 7 Lot 12, Rizal Street, Polomolok",
+  clientName: "Maria Santos",
+  clientMob:  "0917 555 0142",
+  clientMail: "maria.santos@example.com",
+  issuedBy:   "Rea Salvador, Operations Manager"
+};
+
+function invSamp(){ return '<span class="inv__samp">Sample</span>'; }
+function invRow(dt, dd){ return "<div><dt>" + dt + "</dt><dd>" + dd + "</dd></div>"; }
+
+/* ---------- the paper ---------- */
+function invoiceMarkup(o){
+  const total = orderTotal(o);
+  const received = o.paidAmount != null ? o.paidAmount : total;
+  const outstanding = total - received;
+  const inPerson = o.paymentStatus === "in_person";
+  const M = INV_MADEUP;
+
+  /* The order's own organizer where there is one, the made up customer where
+     there is not. A booking made through the app always has a name and a mobile,
+     so the fallback is for a seeded order rather than for a real reader. */
+  const client = {
+    name:   (o.organizer && o.organizer.name)   || M.clientName,
+    mobile: (o.organizer && o.organizer.mobile) || M.clientMob,
+    email:  (o.organizer && o.organizer.email)  || M.clientMail
+  };
+
+  let h = '<article class="inv">';
+
+  h += '<p class="inv__demo">' + icon("flask") +
+    "<span><b>This is a demo invoice only</b>" +
+    "<span>Not a bill, not a receipt, and not valid for tax. No money is owed on it.</span></span></p>";
+
+  h += '<div class="inv__mark" aria-hidden="true"><i></i></div>';
+
+  h += '<div class="inv__paper">';
+
+  h += '<header class="inv__top"><div>' +
+    '<p class="inv__title">INVOICE</p>' +
+    '<p class="inv__sub">' + esc(invoiceNumber(o)) + invSamp() + "</p></div>" +
+    '<span class="inv__logo" role="img" aria-label="' + esc(VENUE.name) + '"></span></header>';
+
+  h += '<hr class="inv__rule">';
+
+  h += '<div class="inv__cols">';
+
+  h += '<section class="inv__party"><p class="inv__lbl">From</p>' +
+    '<p class="inv__who">' + esc(VENUE.name) + "</p>" +
+    '<p class="inv__line">' + esc(VENUE.area) + "</p>" +
+    '<p class="inv__line">' + esc(VENUE.email) + "</p>" +
+    '<p class="inv__line">' + esc(VENUE.phone) + "</p>" +
+    '<p class="inv__line">TIN ' + esc(M.tin) + invSamp() + "</p>" +
+    '<p class="inv__line">' + esc(M.reg) + invSamp() + "</p></section>";
+
+  h += '<section class="inv__party"><p class="inv__lbl">Bill to</p>' +
+    '<p class="inv__who">' + esc(client.name) + "</p>" +
+    '<p class="inv__line">' + esc(M.clientAddr) + invSamp() + "</p>" +
+    '<p class="inv__line">' + esc(client.mobile) + "</p>" +
+    '<p class="inv__line">' + esc(client.email) + "</p>" +
+    '<p class="inv__line">Customer ' + esc(M.clientNo) + invSamp() + "</p></section>";
+
+  h += '<section><p class="inv__lbl">Invoice</p><dl class="inv__meta" style="margin-top:9px">' +
+    invRow("Invoice date", esc(INV_DATE.format(new Date(o.createdAt)))) +
+    invRow("Booking code", esc(o.bookingCode)) +
+    invRow("Terms", esc(M.terms) + invSamp()) +
+    invRow("Status", esc(humanState(o.paymentStatus))) +
+    "</dl></section>";
+
+  h += '<section><p class="inv__lbl">Session</p><dl class="inv__meta" style="margin-top:9px">' +
+    invRow("Booking", esc(bookingTypeLabel(o))) +
+    invRow(o.product === "court" ? "When" : "Window", esc(o.meta.when)) +
+    invRow("Venue", esc(VENUE.name)) +
+    invRow("People", String(participantsOf(o).length)) +
+    "</dl></section>";
+
+  h += "</div>";
+
+  h += '<hr class="inv__rule">';
+
+  /* Every line item, not lineItems[0]. itemisation() reads the first one only
+     because the checkout screens sell exactly one thing at a time; a document
+     that claims to itemise a booking has to survive the day that stops being
+     true, and it costs one map rather than one index. */
+  h += '<div class="inv__tblwrap"><table class="inv__tbl"><thead><tr>' +
+    "<th>Description</th><th>Qty</th><th>Unit price</th><th>Amount</th>" +
+    "</tr></thead><tbody>" +
+    o.lineItems.map(function(li){
+      return "<tr><td>" +
+        '<span class="inv__desc">' + esc(li.label) + "</span>" +
+        '<span class="inv__descsub">' + esc(o.meta.when) + "</span></td>" +
+        "<td>" + li.qty + " " + esc(plural(li.qty, li.unitNoun, li.unitNounPlural)) + "</td>" +
+        "<td>" + esc(peso(li.unitPrice)) + "</td>" +
+        "<td>" + esc(peso(li.unitPrice * li.qty)) + "</td></tr>";
+    }).join("") +
+    "</tbody></table></div>";
+
+  h += '<dl class="inv__sums">' +
+    invRow("Subtotal", esc(peso(total))) +
+    invRow("Fees", "None") +
+    invRow("Tax", "To be confirmed" + invSamp()) +
+    '<div class="inv__grand"><dt>Total</dt><dd>' + esc(peso(total)) + "</dd></div>" +
+    invRow(inPerson ? "Received in person" : "Received", esc(peso(received))) +
+    '<div class="inv__due"><dt>Amount due</dt><dd>' +
+      esc(outstanding === 0 ? "Nothing outstanding" : peso(outstanding)) + "</dd></div>" +
+    (o.refund
+      ? invRow("Refund", esc(o.refund === "pending" ? "In progress" : o.refund === "done" ? "Refunded" : "Failed"))
+      : "") +
+    "</dl>";
+
+  h += '<div class="inv__box"><p class="inv__lbl">Payment</p>' +
+    "<p>" + esc(inPerson ? "Settled in person at the venue." : "Settled online through the venue's payment provider.") + "</p>" +
+    "<p>" + esc(M.account) + invSamp() + "</p>" +
+    "<p>Issued by " + esc(M.issuedBy) + invSamp() + "</p></div>";
+
+  if (o.refund){
+    h += '<p class="inv__note">A refund is a separate movement of money. It changes none of the figures above, which are what was charged and what was received at the time.</p>';
+  }
+  if (displayStatus(o).key === "cancelled"){
+    h += '<p class="inv__note">This booking is cancelled and its passes are invalidated. The payment still happened, so the record of it stands.</p>';
+  }
+
+  h += '<hr class="inv__rule inv__rule--tear">';
+
+  h += '<section class="inv__advice"><p class="inv__lbl">Payment advice</p>' +
+    '<dl class="inv__meta">' +
+    invRow("Customer", esc(client.name)) +
+    invRow("Invoice number", esc(invoiceNumber(o))) +
+    invRow("Amount due", esc(outstanding === 0 ? "Nothing outstanding" : peso(outstanding))) +
+    invRow("Amount enclosed", '<span class="inv__blank" style="display:block;min-width:5rem"></span>') +
+    "</dl>" +
+    '<p class="inv__note">Return this half with a payment made by post. Quote the booking code, ' +
+    esc(o.bookingCode) + ", in any message about this charge.</p></section>";
+
+  h += '<p class="inv__foot">Rendered by the Fit Club Courts staging build from the booking it belongs to. ' +
+    "The invoice number is worked out from the booking code and is not an accounting series. " +
+    "The date of issue, the tax registration, and the tax treatment are not settled, so the fields marked Sample carry made up values.</p>";
+
+  h += "</div></article>";
+  return h;
+}
+
+/* ---------- the viewer ---------- */
+var invOpener = null;      /* the control that opened it, so focus can go back */
+
+function invOrder(){ return S.inv ? S.orders[S.inv.orderId] : null; }
+
+function paintInvoiceModal(){
+  const d = document.getElementById("invmodal");
+  const o = invOrder();
+  if (!o) return;
+
+  let h = '<div class="invm">';
+  h += '<div class="invm__bar"><h2 class="invm__name" id="invm-title">Invoice preview</h2>' +
+    '<button type="button" class="invm__ico invm__dl" data-action="invdownload" aria-label="Download this invoice">' +
+      icon("download") + "</button>" +
+    '<button type="button" class="invm__ico" data-action="invclose" aria-label="Close the invoice preview">' +
+      icon("x") + "</button></div>";
+
+  if (S.invSaved){
+    h += '<p class="invm__note">' + icon("info") +
+      "<span>Saved as <b>" + esc(S.invSaved) + "</b>. The demo band and the watermark are painted into the image, " +
+      "so the file cannot pass as a real invoice once it leaves this app.</span></p>";
+  }
+
+  h += '<div class="invm__scroll">' + invoiceMarkup(o) + "</div>";
+  h += "</div>";
+  d.innerHTML = h;
+}
+
+/* The opener is passed in rather than read from document.activeElement. A press
+   focuses the button in every browser this build targets, but a press is not the
+   only way in: a programmatic click leaves the focus on <body>, and focus would
+   then have nowhere to return to when the preview closes. The caller knows which
+   control it was, so it says so. */
+function openInvoiceModal(orderId, opener){
+  const o = S.orders[orderId];
+  if (!o || !invoiceable(o)) return;
+  invOpener = opener || document.activeElement;
+  S.inv = { orderId:orderId };
+  S.invSaved = null;
+  const d = document.getElementById("invmodal");
+  paintInvoiceModal();
+  if (!d.open) d.showModal();
+  const c = d.querySelector('[data-action="invclose"]');
+  if (c) c.focus();
+}
+
+function closeInvoiceModal(){
+  const d = document.getElementById("invmodal");
+  if (d.open) d.close();
+}
+
+/* ---------- the saved invoice ----------
+   The same document the preview shows, painted rather than laid out, for the
+   reason downloadPass() paints a pass: This build fetches nothing and carries no
+   renderer, so a file it hands over has to be drawn here or not exist.
+
+   THE TWO MARKS ARE THE REASON THIS IS ALLOWED TO EXIST AT ALL.
+   The first two passes refused to write a file, and the objection was never the
+   drawing: It was that a plausible invoice PNG, carrying an invented number and
+   no issue date, is a thing that looks like a business record after it leaves the
+   app, where nothing marks it as staging. The striped band across the head and
+   the mark watermarked through the middle answer exactly that, and they are
+   painted INTO the image rather than layered over the preview, so saving cannot
+   crop either one off. The filename says DEMO as well, for the reader who sees
+   the file before the picture.
+
+   Height is measured before anything is drawn. An invoice is not a fixed page:
+   Line items vary, and a refund or a cancellation adds a paragraph. Laying out
+   twice, once into a scratch context for the measurement and once for real, is
+   what lets the watermark be centred on the page the document actually needs
+   rather than on a guess. The pass has no such problem, which is why PASS_H is a
+   constant one screen up and this is not. */
+var INV_W = 1240;                     /* A4 at 150dpi is 1240 x 1754 */
+var INV_MIN_H = 1754;
+
+function invoiceFilename(o){ return "TFC-DEMO-INVOICE-" + slugPart(o.bookingCode) + ".png"; }
+
+function renderInvoiceCanvas(o, cb){
+  /* Plex first because the document on screen is set in it and the file should
+     not be a different document; the rest of the stack is there because a canvas
+     silently falls back, and every fallback named is monospaced, so the columns
+     stay columns whichever one answers. */
+  const F = '"IBM Plex Mono", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace';
+  const M = 92;
+  const INK = "#16181A", DIM = "#5C6169", FAINT = "#7A776F", RULE = "#D9D6CF";
+  const RIGHT = INV_W - M;
+  const MADE = INV_MADEUP;
+
+  const total = orderTotal(o);
+  const received = o.paidAmount != null ? o.paidAmount : total;
+  const outstanding = total - received;
+  const inPerson = o.paymentStatus === "in_person";
+  const client = {
+    name:   (o.organizer && o.organizer.name)   || MADE.clientName,
+    mobile: (o.organizer && o.organizer.mobile) || MADE.clientMob,
+    email:  (o.organizer && o.organizer.email)  || MADE.clientMail
+  };
+  const cancelled = displayStatus(o).key === "cancelled";
+  const dueLabel = outstanding === 0 ? "Nothing outstanding" : peso(outstanding);
+
+  /* One pass over the document. Called twice: Once against a scratch context to
+     learn how tall the page has to be, once against the real one to paint it.
+     Every drawing call is behind `draw`, so the measuring run costs no pixels. */
+  function layout(x, draw){
+    function font(size, weight){ x.font = (weight || 500) + " " + size + "px " + F; }
+    function put(s, px, y, size, weight, color, align){
+      font(size, weight);
+      if (!draw) return;
+      x.fillStyle = color || INK;
+      x.textAlign = align || "left";
+      x.textBaseline = "alphabetic";
+      x.fillText(String(s), px, y);
+    }
+    function width(s, size, weight){ font(size, weight); return x.measureText(String(s)).width; }
+    function wrap(s, size, weight, maxW){
+      font(size, weight);
+      const words = String(s).split(" ");
+      const out = [];
+      let line = "";
+      for (let i = 0; i < words.length; i++){
+        const next = line ? line + " " + words[i] : words[i];
+        if (x.measureText(next).width > maxW && line){ out.push(line); line = words[i]; }
+        else line = next;
+      }
+      if (line) out.push(line);
+      return out;
+    }
+    function para(s, px, y, size, weight, color, maxW, lh){
+      const lines = wrap(s, size, weight, maxW);
+      for (let i = 0; i < lines.length; i++) put(lines[i], px, y + i * lh, size, weight, color);
+      return y + lines.length * lh;
+    }
+    function rule(y, from, to, color){
+      if (!draw) return;
+      x.fillStyle = color || RULE;
+      x.fillRect(from == null ? M : from, y, (to == null ? RIGHT : to) - (from == null ? M : from), 1);
+    }
+    function eyebrow(s, px, y){ put(String(s).toUpperCase(), px, y, 19, 800, FAINT); }
+    /* A label on the left and its value hard against a right edge, which is the
+       shape every meta pair, every total, and every advice row shares. */
+    function pair(label, value, y, leftX, rightX, size){
+      put(label, leftX, y, size || 23, 500, DIM);
+      put(value, rightX, y, size || 23, 700, INK, "right");
+    }
+
+    /* ---- the demo band, full bleed across the head ---- */
+    const bandH = 116;
+    if (draw){
+      x.fillStyle = "#87180F";
+      x.fillRect(0, 0, INV_W, bandH);
+      x.save();
+      x.beginPath(); x.rect(0, 0, INV_W, bandH); x.clip();
+      x.fillStyle = "#A32218";
+      for (let sx = -bandH; sx < INV_W + bandH; sx += 52){
+        x.beginPath();
+        x.moveTo(sx, bandH); x.lineTo(sx + bandH, 0);
+        x.lineTo(sx + bandH + 26, 0); x.lineTo(sx + 26, bandH);
+        x.closePath(); x.fill();
+      }
+      x.restore();
+      put("THIS IS A DEMO INVOICE ONLY", M, 52, 26, 800, "#FFFFFF");
+      put("Not a bill, not a receipt, and not valid for tax. No money is owed on it.",
+          M, 88, 21, 500, "#F4D7D3");
+    }
+
+    let y = bandH + 92;
+
+    /* ---- title and mark ---- */
+    put("INVOICE", M, y, 58, 800, INK);
+    put(invoiceNumber(o) + "   (SAMPLE)", M, y + 34, 22, 500, DIM);
+    y += 82;
+
+    rule(y); y += 58;
+
+    /* ---- the four blocks, two columns ---- */
+    const colR = M + 560;
+    const lh = 33;
+
+    /* Wrapped, not clipped. The billing address and the issuing officer are made
+       up strings that outrun their column at this size, and a canvas does not fold
+       for you: an unwrapped line runs past the page edge and off the file. */
+    function party(label, lines, px, y0, maxW){
+      eyebrow(label, px, y0);
+      let yy = y0 + 40;
+      put(lines[0], px, yy, 27, 700, INK); yy += 38;
+      for (let i = 1; i < lines.length; i++){
+        const parts = wrap(lines[i], 22, 500, maxW);
+        for (let k = 0; k < parts.length; k++){ put(parts[k], px, yy, 22, 500, "#4A4E55"); yy += 30; }
+      }
+      return yy;
+    }
+
+    const yFrom = party("From", [
+      VENUE.name, VENUE.area, VENUE.email, VENUE.phone,
+      "TIN " + MADE.tin + "  (SAMPLE)", MADE.reg + "  (SAMPLE)"
+    ], M, y, colR - M - 40);
+    const yBill = party("Bill to", [
+      client.name, MADE.clientAddr + "  (SAMPLE)", client.mobile, client.email,
+      "Customer " + MADE.clientNo + "  (SAMPLE)"
+    ], colR, y, RIGHT - colR);
+
+    y = Math.max(yFrom, yBill) + 26;
+
+    /* A value too wide to sit beside its label drops to its own line, still hard
+       against the right edge. The alternative is the two overprinting each other,
+       which is what a session window does at this column width: "Friday, August 21,
+       6:00 AM to 8:00 AM" is wider than the space left after the word When. */
+    function metaBlock(label, rows, px, rightX, y0){
+      eyebrow(label, px, y0);
+      let yy = y0 + 38;
+      for (let i = 0; i < rows.length; i++){
+        const lw = width(rows[i][0], 22, 500), vw = width(rows[i][1], 22, 700);
+        if (lw + vw + 24 > rightX - px){
+          put(rows[i][0], px, yy, 22, 500, DIM);
+          yy += 30;
+          put(rows[i][1], rightX, yy, 22, 700, INK, "right");
+        } else {
+          pair(rows[i][0], rows[i][1], yy, px, rightX, 22);
+        }
+        rule(yy + 13, px, rightX, "#EBE8E1");
+        yy += lh + 8;
+      }
+      return yy;
+    }
+
+    const yMeta = metaBlock("Invoice", [
+      ["Invoice date", INV_DATE.format(new Date(o.createdAt))],
+      ["Booking code", o.bookingCode],
+      ["Terms", MADE.terms + " (SAMPLE)"],
+      ["Status", humanState(o.paymentStatus)]
+    ], M, M + 500, y);
+    const ySess = metaBlock("Session", [
+      ["Booking", bookingTypeLabel(o)],
+      [o.product === "court" ? "When" : "Window", o.meta.when],
+      ["Venue", VENUE.name],
+      ["People", String(participantsOf(o).length)]
+    ], colR, RIGHT, y);
+
+    y = Math.max(yMeta, ySess) + 30;
+
+    /* ---- the charges ---- */
+    const cQty = 780, cUnit = 990;
+    put("DESCRIPTION", M, y, 19, 800, INK);
+    put("QTY", cQty, y, 19, 800, INK, "right");
+    put("UNIT PRICE", cUnit, y, 19, 800, INK, "right");
+    put("AMOUNT", RIGHT, y, 19, 800, INK, "right");
+    y += 14; rule(y, M, RIGHT, INK); rule(y + 1, M, RIGHT, INK); y += 46;
+
+    o.lineItems.forEach(function(li){
+      put(li.label, M, y, 23, 700, INK);
+      put(li.qty + " " + plural(li.qty, li.unitNoun, li.unitNounPlural), cQty, y, 23, 500, INK, "right");
+      put(peso(li.unitPrice), cUnit, y, 23, 500, INK, "right");
+      put(peso(li.unitPrice * li.qty), RIGHT, y, 23, 700, INK, "right");
+      const sub = wrap(o.meta.when, 21, 500, cQty - M - 40);
+      for (let i = 0; i < sub.length; i++) put(sub[i], M, y + 30 + i * 28, 21, 500, DIM);
+      y += 34 + sub.length * 28 + 16;
+      rule(y - 14, M, RIGHT, "#EBE8E1");
+    });
+
+    /* ---- the totals, right half ---- */
+    y += 20;
+    const tL = 700;
+    pair("Subtotal", peso(total), y, tL, RIGHT); y += 34;
+    pair("Fees", "None", y, tL, RIGHT); y += 34;
+    pair("Tax", "To be confirmed (SAMPLE)", y, tL, RIGHT); y += 22;
+    rule(y, tL, RIGHT, INK); rule(y + 1, tL, RIGHT, INK); y += 50;
+    put("TOTAL", tL, y, 22, 800, INK);
+    put(peso(total), RIGHT, y + 4, 42, 800, INK, "right"); y += 44;
+    pair(inPerson ? "Received in person" : "Received", peso(received), y, tL, RIGHT); y += 34;
+    pair("Amount due", dueLabel, y, tL, RIGHT); y += 34;
+    if (o.refund){
+      pair("Refund", o.refund === "pending" ? "In progress" : o.refund === "done" ? "Refunded" : "Failed",
+           y, tL, RIGHT);
+      y += 34;
+    }
+
+    /* ---- payment ----
+       The panel is four fixed rows, so its height is arithmetic rather than
+       measured. That matters because the fill has to go down before the type or it
+       covers it, and a measured height would mean laying the type out twice. */
+    y += 26;
+    const boxTop = y, boxH = 174, bx = M + 26;
+    if (draw){
+      x.fillStyle = "#FAF8F4";
+      x.fillRect(M, boxTop, RIGHT - M, boxH);
+      x.strokeStyle = "#E2DFD8"; x.lineWidth = 1;
+      x.strokeRect(M + 0.5, boxTop + 0.5, RIGHT - M - 1, boxH - 1);
+    }
+    let by = boxTop + 42;
+    eyebrow("Payment", bx, by); by += 38;
+    put(inPerson ? "Settled in person at the venue."
+                 : "Settled online through the venue's payment provider.", bx, by, 23, 500, INK); by += 34;
+    put(MADE.account + "  (SAMPLE)", bx, by, 23, 500, INK); by += 34;
+    put("Issued by " + MADE.issuedBy + "  (SAMPLE)", bx, by, 23, 500, INK);
+    y = boxTop + boxH + 40;
+
+    if (o.refund){
+      y = para("A refund is a separate movement of money. It changes none of the figures above, which are what was charged and what was received at the time.",
+               M, y, 21, 500, DIM, RIGHT - M, 30) + 16;
+    }
+    if (cancelled){
+      y = para("This booking is cancelled and its passes are invalidated. The payment still happened, so the record of it stands.",
+               M, y, 21, 500, DIM, RIGHT - M, 30) + 16;
+    }
+
+    /* ---- the tear-off ---- */
+    y += 24;
+    if (draw){
+      x.save();
+      x.strokeStyle = "#C4C0B7"; x.lineWidth = 2; x.setLineDash([14, 11]);
+      x.beginPath(); x.moveTo(M, y); x.lineTo(RIGHT, y); x.stroke();
+      x.restore();
+    }
+    y += 56;
+
+    eyebrow("Payment advice", M, y); y += 44;
+    [["Customer", client.name],
+     ["Invoice number", invoiceNumber(o)],
+     ["Amount due", dueLabel]].forEach(function(r){
+      pair(r[0], r[1], y, M, RIGHT);
+      rule(y + 13, M, RIGHT, "#EBE8E1");
+      y += 42;
+    });
+    put("Amount enclosed", M, y, 23, 500, DIM);
+    rule(y + 13, RIGHT - 260, RIGHT, "#C4C0B7");
+    y += 52;
+    y = para("Return this half with a payment made by post. Quote the booking code, " +
+             o.bookingCode + ", in any message about this charge.",
+             M, y, 21, 500, DIM, RIGHT - M, 30);
+
+    /* ---- the footer ---- */
+    y += 40;
+    rule(y, M, RIGHT, "#EBE8E1"); y += 38;
+    y = para("Rendered by the Fit Club Courts staging build from the booking it belongs to. " +
+             "The invoice number is worked out from the booking code and is not an accounting series. " +
+             "The date of issue, the tax registration, and the tax treatment are not settled, so the " +
+             "fields marked SAMPLE carry made up values.",
+             M, y, 20, 400, FAINT, RIGHT - M, 29);
+
+    return y + M;
+  }
+
+  /* The measuring run. A scratch canvas one pixel tall is enough: nothing is
+     painted on it, it exists to answer measureText() with the same fonts. */
+  const probe = document.createElement("canvas");
+  probe.width = INV_W; probe.height = 1;
+  const needed = layout(probe.getContext("2d"), false);
+
+  const c = document.createElement("canvas");
+  c.width = INV_W;
+  c.height = Math.max(INV_MIN_H, Math.ceil(needed));
+  const x = c.getContext("2d");
+
+  x.fillStyle = "#FFFFFF";
+  x.fillRect(0, 0, c.width, c.height);
+
+  function paintRest(){
+    layout(x, true);
+    cb(c);
+  }
+
+  /* The watermark goes down before the document and after the paper, which is the
+     only order that leaves it under the type and over the white. Centred on the
+     measured page rather than on the minimum one, or a short invoice would carry
+     its mark low and a long one high. */
+  const src = logoDataUrl();
+  if (!src){ paintRest(); return; }
+  const img = new Image();
+  img.onload = function(){
+    const w = INV_W * 0.62, h = w * (img.height / img.width);
+    x.save();
+    x.globalAlpha = 0.07;
+    x.translate(INV_W / 2, c.height / 2);
+    x.rotate(-9 * Math.PI / 180);
+    x.drawImage(img, -w / 2, -h / 2, w, h);
+    x.restore();
+    /* The mark at the head is the same asset at full strength, drawn here so the
+       one decode serves both. 250 rather than 300, and higher: at 300 the wordmark
+       is 158 tall and its foot crossed the rule under the title, which reads as a
+       misprint rather than as a layer. */
+    const lw = 250, lh2 = lw * (img.height / img.width);
+    x.drawImage(img, RIGHT - lw, 146, lw, lh2);
+    paintRest();
+  };
+  img.onerror = function(){ paintRest(); };
+  img.src = src;
+}
+
+function downloadInvoice(o){
+  renderInvoiceCanvas(o, function(c){ saveCanvas(c, invoiceFilename(o)); });
+  announce("Saving the invoice for " + o.bookingCode + " as a PNG.");
 }
 
 
@@ -7099,6 +7878,25 @@ const ACTIONS = {
     downloadPass(o, passesOf(o)[S.qr.index]);
   },
   qrdownloadall: function(){ const o = qrOrder(); if (o) downloadAllPasses(o); },
+
+  /* ---------- invoice preview ---------- */
+  openinvoice: function(el){ openInvoiceModal(el.getAttribute("data-id"), el); },
+  invclose: function(){ closeInvoiceModal(); },
+  /* Writes a PNG, and then says which file it wrote. Download QR next door names
+     nothing, because a pass is a picture of one code and there is only ever one
+     of them on screen; an invoice lands in a downloads folder among a reader's
+     real ones, so the name is the thing that has to be findable, and it carries
+     the word DEMO. The focus is put back on the button by hand because the
+     repaint that draws the note replaced it. */
+  invdownload: function(){
+    const o = invOrder();
+    if (!o) return;
+    S.invSaved = invoiceFilename(o);
+    paintInvoiceModal();
+    const b = document.querySelector("#invmodal .invm__dl");
+    if (b) b.focus();
+    downloadInvoice(o);
+  },
   gotobookings: function(el){
     /* My Bookings sits behind the account. A reader who paid as a visitor does not
        have one yet, so they go through the existing save-my-details screen rather
@@ -7863,6 +8661,25 @@ window.addEventListener("resize", anchorMenu, { passive:true });
     qrStep(dx < 0 ? 1 : -1, null);
   });
   d.addEventListener("pointercancel", function(){ id = null; });
+})();
+
+/* ============================================================
+   INVOICE PREVIEW INTERACTION
+   Less than the pass modal needs, because there is nothing to page through. The
+   <dialog> brings Escape and the focus trap; what is added is the backdrop press
+   and putting focus back where it came from.
+   ============================================================ */
+(function(){
+  const d = document.getElementById("invmodal");
+  if (!d) return;
+  d.addEventListener("close", function(){
+    S.inv = null;
+    S.invSaved = null;
+    d.innerHTML = "";
+    if (invOpener && document.contains(invOpener)) invOpener.focus();
+    invOpener = null;
+  });
+  d.addEventListener("click", function(ev){ if (ev.target === d) closeInvoiceModal(); });
 })();
 
 /* ============================================================
