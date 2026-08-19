@@ -598,24 +598,38 @@
   function wireLauncher(doc) {
     var d = doc.getElementById("launcher");
     if (!d || !d.showModal) return null;
-    var triggers = [].slice.call(doc.querySelectorAll("[data-launcher]"));
-    var from = null;
-
+    /* CALLED AGAIN ON EVERY REPAINT, ON PURPOSE.
+       The console builds its chrome once per page load and could get away with
+       binding once. The customer build is a router: it repaints the tab bar on
+       every route change, which destroys the trigger and builds a new one. So
+       this has to be safe to call repeatedly, and "safe" means two different
+       things for the two kinds of listener. The dialog is the same element every
+       time, so its listeners are bound once behind a flag; the triggers are new
+       elements, so each is bound the first time it is seen and flagged. Without
+       the flags a shift spent moving between five routes would leave five close
+       handlers on one dialog. */
     function mark(v) {
-      triggers.forEach(function (t) { t.setAttribute("aria-expanded", v); });
+      [].forEach.call(doc.querySelectorAll("[data-launcher]"), function (t) {
+        t.setAttribute("aria-expanded", v);
+      });
     }
 
-    triggers.forEach(function (t) {
-      t.setAttribute("aria-expanded", "false");
+    [].forEach.call(doc.querySelectorAll("[data-launcher]"), function (t) {
       t.setAttribute("aria-haspopup", "dialog");
+      if (t.getAttribute("aria-expanded") === null) t.setAttribute("aria-expanded", "false");
+      if (t.dataset.launcherWired === "1") return;
+      t.dataset.launcherWired = "1";
       t.addEventListener("click", function (e) {
         e.preventDefault();
         if (d.open) { d.close(); return; }
-        from = t;
+        d.__from = t;
         mark("true");
         d.showModal();
       });
     });
+
+    if (d.dataset.launcherWired === "1") return d;
+    d.dataset.launcherWired = "1";
 
     /* A click on the backdrop is a click on the dialog element itself. Same test
        the drawer uses, and the only line of this the platform does not give. */
@@ -627,7 +641,7 @@
 
     d.addEventListener("close", function () {
       mark("false");
-      if (from && from.focus) from.focus();
+      if (d.__from && d.__from.focus) d.__from.focus();
     });
 
     return d;

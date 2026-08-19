@@ -3269,9 +3269,26 @@ function currentPath(){ const h = location.hash.slice(1); return h && h[0] === "
    most of them under other names and, since the seven it was missing were added
    to it, all of them somewhere. One table, so no caller has to know that a
    calendar is called cal in here. */
+/* The two documents keep separate sprites on purpose: the console holds its
+   glyphs as path strings and this build holds them as <symbol> elements, and
+   console-nav.js's header says reconciling them is a separate question from
+   sharing a destination list. This map is the seam that lets that stay true.
+
+   The second block is what the launcher added. Five of its names had no symbol
+   here and rendered as dangling <use href="#i-..."> references, which is an
+   empty box rather than an error: the Check-in, Open Play, and Messages cards
+   drew nothing, and the launcher's close control was an invisible 44px button.
+   Found by resolving every name in GROUPS against the sprite rather than by
+   looking, because four of the five are below the fold on a phone.
+
+   play has no true match here. circle-dot is the nearest thing to the console's
+   play-in-a-circle, and it is a substitution rather than an equivalence; the
+   honest fix is one sprite, which is still a separate question. */
 const NAV_GLYPH = {
   calendar:"cal", user:"person", hours:"clock", help:"info", chevL:"chev-l",
-  logout:"return", grid:"square-half"
+  logout:"return", grid:"square-half",
+  checkc:"check-ring", play:"circle-dot", message:"mail", arrowR:"arrow-r",
+  close:"x"
 };
 function navIcon(name){ return icon(NAV_GLYPH[name] || name); }
 
@@ -3319,33 +3336,15 @@ function paintSidenav(view, path){
     document.body.insertBefore(el, shell);
   }
 
-  const isOps = S.surface === "opsmanager";
-  /* Two groups are dropped here, for two unrelated reasons.
-
-     Session, because there is no session in this document to end: the surface is
-     a harness dial, not a login, and a Log Out row here would be the first
-     control in the build that does nothing. The console keeps its own, where it
-     at least has an identity to sign out.
-
-     Daily Operations, because it is the console's own primary set and this
-     document has its own. The group exists in the model so the launcher can be a
-     complete view of the console; this rail is not that view and never was. Its
-     five shift routes are the primary above, and dropping six console pages in
-     under them would put Dashboard and Bookings on a rail whose own first row is
-     Today, saying two different things about where a shift starts.
-
-     What this rail DOES gain from the regroup is Maintenance, Blocked Dates and
-     Closures, and Messages, which were markup in more.html and reachable from
-     this document at no width at all. That is the reachability fix arriving here
-     as a side effect of the model being one list.
-
-     This is still a fifteen row secondary list, which is the same shape the
-     console's rail was just relieved of. It gets the same treatment when the
-     launcher is built, and it is left long here rather than trimmed by guess. */
-  const groups = CONSOLE_NAV.groupsFor(S.surface).filter(function(g){
-    return g.group !== "Session" && g.group !== "Daily Operations";
-  });
-
+  /* NO GROUPS, the same omission the console's rail made and for the same
+     reason. This carried sixteen rows: five shift routes and eleven console
+     pages under them, which is a list you read looking for a word rather than a
+     navigation you aim at. All of it is in the launcher now, and the launcher
+     holds more than this rail ever did, because the phone could not reach any of
+     it at all. Below 1024 this rail is display:none, the menu sheet carries
+     customer destinations, and a Front Desk reader on a phone had no route to
+     the console from this document at any point. That is what the fifth tab
+     fixes. */
   el.innerHTML = CONSOLE_NAV.sidebar({
     icon: navIcon,
     prefix: "admin/",
@@ -3355,13 +3354,10 @@ function paintSidenav(view, path){
        the top of the shift is the shift's own first screen. */
     home: "#/staff/today",
     brandLabel: VENUE.name + ", shift home",
-    primary: STAFF_TABS.map(function(t){
-      return { href:"#" + tabHref(t), label:t.label, icon:t.glyph, current:t.match.indexOf(path) >= 0 };
+    primary: staffPrimary(path).map(function(it){
+      return { href:it.href, label:it.t.label, icon:it.t.glyph, current:it.cur };
     }),
-    groups: groups,
-    note: isOps
-      ? "The management console is a separate build. These open it in this tab."
-      : "The management console is a separate build. These open it in this tab. The money area is the Operations Manager's, so it is absent here. The server denies it too."
+    note: "Console opens every destination there is, this shift's and the management console's both."
   });
   CONSOLE_NAV.wireSidebar(document);
 }
@@ -3390,13 +3386,98 @@ const PUBLIC_NAV = [
   { to:"/visit",    label:"Visit",       aria:"Visit / Contact",        glyph:"pin",    match:["/visit"], menuOnly:true },
   { to:null,        label:"My Bookings", aria:"My Bookings",            glyph:"person", match:["/find","/me","/signin"], dyn:true, authHide:true }
 ];
+/* The five real destinations of a shift. All five are still here; what changed
+   is that only four of them hold a permanent slot in the bar, because the fifth
+   slot now opens the launcher. Exceptions is the one that gave its slot up and
+   it lives in the launcher's "This shift" group, which is the whole of this
+   list, so nothing was lost by moving it.
+
+   desc is the card's supporting line in the launcher, same job and same register
+   as the console's: what the destination is FOR, six words or fewer. */
 const STAFF_TABS = [
-  { to:"/staff/today",      label:"Today",      aria:"Today",           glyph:"cal",    match:["/staff/today"] },
-  { to:"/staff/scan",       label:"Scan",       aria:"Scan a pass",     glyph:"scan",   match:["/staff/scan"] },
-  { to:"/staff/walkin",     label:"Walk-in",    aria:"Walk-in",         glyph:"plus",   match:["/staff/walkin"] },
-  { to:"/staff/openplay/w1",label:"Open Play",  aria:"Open Play",       glyph:"users",  match:["/staff/openplay/w1"] },
-  { to:"/staff/exceptions", label:"Exceptions", aria:"Exceptions",      glyph:"alert",  match:["/staff/exceptions"] }
+  { to:"/staff/today",      label:"Today",      aria:"Today",           glyph:"cal",    match:["/staff/today"],
+    desc:"The shift, hour by hour" },
+  { to:"/staff/scan",       label:"Scan",       aria:"Scan a pass",     glyph:"scan",   match:["/staff/scan"],
+    desc:"Check a pass at the door" },
+  { to:"/staff/walkin",     label:"Walk-in",    aria:"Walk-in",         glyph:"plus",   match:["/staff/walkin"],
+    desc:"Add someone without a booking" },
+  { to:"/staff/openplay/w1",label:"Open Play",  aria:"Open Play",       glyph:"users",  match:["/staff/openplay/w1"],
+    desc:"Tonight's session and its roster" },
+  { to:"/staff/exceptions", label:"Exceptions", aria:"Exceptions",      glyph:"alert",  match:["/staff/exceptions"],
+    desc:"Problems that need a decision" }
 ];
+
+/* THE FIFTH SLOT. Not a shift route: it carries a real href into the console so
+   a reader without script still lands somewhere, and data-launcher is what
+   wireLauncher binds the click to. Same shape and same trade as the console's
+   own fifth tab. */
+const STAFF_CONSOLE_TAB = {
+  label:"Console", aria:"Console, every destination", glyph:"dots",
+  href:"admin/more.html", launcher:true, match:[]
+};
+
+/* Four shift routes and the launcher. The bar is still five, which is the cap
+   the model enforces and the reason Exceptions moved rather than being added to. */
+function staffPrimary(path){
+  return STAFF_TABS.slice(0, 4).concat([STAFF_CONSOLE_TAB]).map(function(t){
+    return {
+      t: t,
+      href: t.launcher ? t.href : "#" + tabHref(t),
+      cur: (t.match || []).indexOf(path) >= 0
+    };
+  });
+}
+
+/* What the launcher shows here: this document's own shift, then the console's
+   groups through the permission gate. Session is dropped for the reason it has
+   always been dropped, that there is no session in this document to end.
+
+   The shift routes are marked absolute so the "admin/" prefix stays off them.
+   They are hash routes into this document's router and prefixing one would
+   produce admin/#/staff/today, which is a path to nowhere. */
+function staffLauncherGroups(){
+  const shift = { group:"This shift", items: STAFF_TABS.map(function(t){
+    return { label:t.label, href:"#" + tabHref(t), icon:t.glyph, desc:t.desc, absolute:true };
+  }) };
+  return [shift].concat(
+    CONSOLE_NAV.groupsFor(S.surface).filter(function(g){ return g.group !== "Session"; })
+  );
+}
+
+/* Built once and refreshed on every repaint, because which card is current
+   changes with the route. The dialog is a sibling of the shell for the same
+   reason the rail is: #shell carries overflow-x:clip and a top layer element
+   under a clipping ancestor is a bet on which browser is reading the spec. */
+function paintStaffLauncher(path){
+  if (!window.CONSOLE_NAV || !CONSOLE_NAV.launcher) return;
+  let d = document.getElementById("launcher");
+  if (!d){
+    d = document.createElement("dialog");
+    d.className = "launcher";
+    d.id = "launcher";
+    d.setAttribute("aria-labelledby", "launcherTitle");
+    document.body.appendChild(d);
+  }
+  const isOps = S.surface === "opsmanager";
+  d.innerHTML = CONSOLE_NAV.launcher({
+    icon: navIcon,
+    prefix: "admin/",
+    groups: staffLauncherGroups(),
+    tabs: staffPrimary(path).map(function(it){ return { id: it.t.launcher ? "console" : it.t.label, label: it.t.label, icon: it.t.glyph, href: it.href }; }),
+    currentTab: "console",
+    title: "Console",
+    /* The trim is stated here now rather than on the rail, because this is where
+       the money area would have been if the reader were allowed it. Hiding a
+       group is not the security boundary and this is the sentence that says so. */
+    note: isOps
+      ? "The management console is a separate build. These open it in this tab."
+      : "The management console is a separate build. These open it in this tab. The money area is the Operations Manager's, so it is absent here. The server denies it too.",
+    isCurrent: function(item){ return item.absolute && item.href === "#" + path; }
+  });
+  const row = document.querySelector('#sidenav .sidenav__row[href="admin/more.html"]');
+  if (row) row.setAttribute("data-launcher", "");
+  CONSOLE_NAV.wireLauncher(document);
+}
 function tabHref(t){
   if (!t.dyn) return t.to;
   return S.account ? "/me" : "/find";
@@ -3529,18 +3610,21 @@ function render(){
   const tabhost = document.getElementById("tabhost");
   const topnav = document.getElementById("bar-nav");
   if (view.shell === "staff"){
-    const items = STAFF_TABS.map(function(t){
-      return { href: tabHref(t), cur: t.match.indexOf(path) >= 0, t: t };
-    });
+    const items = staffPrimary(path);
     tabhost.className = "tabbar";
     tabhost.innerHTML = items.map(function(it){
-      return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
+      return '<a href="' + esc(it.href) + '"' + (it.t.launcher ? " data-launcher" : "") +
+        ' aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
         '<span class="tabpill">' + icon(it.t.glyph) + "</span><span>" + esc(it.t.label) + "</span></a>";
     }).join("");
     topnav.innerHTML = items.map(function(it){
-      return '<a href="#' + esc(it.href) + '" aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
+      return '<a href="' + esc(it.href) + '"' + (it.t.launcher ? " data-launcher" : "") +
+        ' aria-label="' + esc(it.t.aria) + '"' + (it.cur ? ' aria-current="page"' : "") + ">" +
         esc(it.t.label) + "</a>";
     }).join("");
+    /* After the bar exists, so the triggers it just drew are the ones that get
+       bound. wireLauncher is idempotent; see its comment for what that costs. */
+    paintStaffLauncher(path);
   } else if (view.shell === "browse"){
     tabhost.className = "";
     tabhost.innerHTML = "";
