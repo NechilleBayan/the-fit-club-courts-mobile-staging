@@ -714,10 +714,15 @@
       '<button class="iconbtn iconbtn--bare launcher__x" type="button" data-close' +
       ' aria-label="Close the console list">' + icon("close") + "</button>" +
       "</div>" +
-      '<div class="launcher__body">' + sections +
+      /* Two elements rather than one. The outer is the scroller and takes the
+         whole width; the inner is the reading column and takes the cap. They
+         used to be the same element, which put the scrollport's right edge
+         195px in from the window on a wide monitor and drew the scroll cue
+         there. See THE BODY in console-nav.css. */
+      '<div class="launcher__body"><div class="launcher__col">' + sections +
       (opts.foot || "") +
       (opts.note ? '<p class="launcher__note">' + esc(opts.note) + "</p>" : "") +
-      "</div>" +
+      "</div></div>" +
       (tabs ? '<nav class="launcher__tabs" aria-label="Main">' + tabs + "</nav>" : "");
   }
 

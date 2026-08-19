@@ -690,12 +690,27 @@
 
 /* ---------- THE BODY ----------
    The only thing that scrolls. The bar and the tab strip are pinned, so the
-   reader never loses the way out while moving through twenty two cards. */
+   reader never loses the way out while moving through twenty two cards.
+
+   THE SCROLLER IS THE WHOLE WIDTH AND THE COLUMN INSIDE IT IS NOT. Both used to
+   be this one element: it scrolled AND it carried the 1200px cap, so on a wide
+   monitor the scrollport stopped 195px short of each edge. Nothing about the
+   reading looked wrong, because the cards were centred either way, but every
+   edge a scroller owns was in the wrong place: the scroll cue drew itself at the
+   column's edge, floating in the middle of the screen, and a platform that
+   paints a real scrollbar would put one there too.
+
+   So the scrolling and the capping are two elements now. This one takes the full
+   width and owns the overflow; .launcher__col takes the cap, the centring, and
+   the padding. The cards land where they always did. */
 .launcher__body{
   flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  width:100%;
+}
+.launcher__col{
   /* Capped so the grid stops widening on a large monitor. Without it the auto
      fill keeps adding columns and the five row desktop layout becomes seven. */
-  width:100%; max-width:1200px; margin-inline:auto;
+  max-width:1200px; margin-inline:auto;
   padding:var(--s5) var(--s4) var(--s8);
 }
 
