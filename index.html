@@ -3320,11 +3320,31 @@ function paintSidenav(view, path){
   }
 
   const isOps = S.surface === "opsmanager";
-  /* Session is dropped rather than filtered by permission. There is no session
-     in this document to end: the surface is a harness dial, not a login, and a
-     Log Out row here would be the first control in the build that does nothing.
-     The console keeps its own, where it at least has an identity to sign out. */
-  const groups = CONSOLE_NAV.groupsFor(S.surface).filter(function(g){ return g.group !== "Session"; });
+  /* Two groups are dropped here, for two unrelated reasons.
+
+     Session, because there is no session in this document to end: the surface is
+     a harness dial, not a login, and a Log Out row here would be the first
+     control in the build that does nothing. The console keeps its own, where it
+     at least has an identity to sign out.
+
+     Daily Operations, because it is the console's own primary set and this
+     document has its own. The group exists in the model so the launcher can be a
+     complete view of the console; this rail is not that view and never was. Its
+     five shift routes are the primary above, and dropping six console pages in
+     under them would put Dashboard and Bookings on a rail whose own first row is
+     Today, saying two different things about where a shift starts.
+
+     What this rail DOES gain from the regroup is Maintenance, Blocked Dates and
+     Closures, and Messages, which were markup in more.html and reachable from
+     this document at no width at all. That is the reachability fix arriving here
+     as a side effect of the model being one list.
+
+     This is still a fifteen row secondary list, which is the same shape the
+     console's rail was just relieved of. It gets the same treatment when the
+     launcher is built, and it is left long here rather than trimmed by guess. */
+  const groups = CONSOLE_NAV.groupsFor(S.surface).filter(function(g){
+    return g.group !== "Session" && g.group !== "Daily Operations";
+  });
 
   el.innerHTML = CONSOLE_NAV.sidebar({
     icon: navIcon,

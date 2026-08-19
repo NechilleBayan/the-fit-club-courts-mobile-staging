@@ -59,7 +59,15 @@
     admin:  STAFF[0],
     staff:  STAFF,
     unassigned: UNASSIGNED,
-    unread: 4
+    unread: 4,
+    /* These two were literals in more.html's markup, a 6 on Check-in and a 2 on
+       Messages, typed into the page because the page was the only thing that
+       drew them. The launcher and more.html now draw the same rows from the same
+       model, so a number in one place and not the other would be two answers to
+       one question. They are counts of the same shape as unread and they live
+       where unread lives. */
+    checkins: 6,
+    messages: 2
   };
   /* 5 pending: Two of Joy's, one of Rea's, two with no owner. The overdue one is
      counted where it is, in progress, not here. */
@@ -218,7 +226,7 @@
     tabs.setAttribute("aria-label", "Main");
     tabs.innerHTML = '<div class="tabbar__in">' + TABS.map(function(t){
       var cur = (t.id === nav);
-      var badge = (t.id === "more" && DATA.pendingTasks) ? '<span class="badge" aria-hidden="true"></span>' : "";
+      var badge = (t.id === "console" && DATA.pendingTasks) ? '<span class="badge" aria-hidden="true"></span>' : "";
       return '<a href="' + t.href + '"' + (cur ? ' aria-current="page"' : "") + (badge ? ' class="hasbadge"' : "") + '>' +
              '<span class="tabpill">' + svg(t.icon) + '</span>' + badge +
              '<span>' + t.label + '</span></a>';
@@ -392,7 +400,8 @@
       icon: svg,
       prefix: "",
       counts: DATA,
-      badgeNoun: { unread:"unread", pendingTasks:"pending tasks" },
+      badgeNoun: { unread:"unread", pendingTasks:"pending tasks",
+                   checkins:"due to arrive", messages:"unread" },
       collapsed: !!(window.STAGING && STAGING.getNavCollapsed()),
       /* Role only, not role plus club. The drawer can afford both because its
          panel is 19rem of a phone screen with nothing beside it; the rail is
@@ -407,10 +416,19 @@
       brandLabel: DATA.club.name + ", console home",
       primary: TABS.map(function(t){
         return { href:t.href, label:t.label, icon:t.icon, current:(t.id === nav),
-                 badge:(t.id === "more" ? "pendingTasks" : null), quiet:true };
+                 badge:(t.id === "console" ? "pendingTasks" : null), quiet:true };
       }),
-      groups: NAV.GROUPS,
-      note: "Customer Build, in the System group, is the way back to the other half of this prototype. It carries the theme and the armed scenario across.",
+      /* No groups. The rail draws the five primary rows and nothing under them,
+         which is the whole of this task in one omitted argument. It used to pass
+         NAV.GROUPS and draw eighteen rows, and eighteen rows is a list you read
+         top to bottom looking for a word rather than a navigation you aim at.
+         sidebar() takes (opts.groups || []) so leaving it off is the supported
+         way to say none, not an oversight the function tolerates.
+
+         Everything that came out is in the launcher, which is the Console row,
+         and the launcher holds more than the rail ever did: the five
+         destinations that were stranded in more.html are in the model now too. */
+      note: "Console opens every destination in this back office, including Customer Build, which is the way back to the other half of this prototype and carries the theme and the armed scenario across.",
       isCurrent: function(item){ return item.href === here; }
     });
 
@@ -1070,7 +1088,7 @@
     if (scn.natural) return;
 
     /* The filename is the page identity. data-nav cannot be: Settings and Tasks
-       both declare data-nav="more", and a scenario has different things to say
+       both declare data-nav="console", and a scenario has different things to say
        about each. */
     var page = (location.pathname.split("/").pop() || "index").replace(/\.html$/, "");
     var admin = scn.admin || {};

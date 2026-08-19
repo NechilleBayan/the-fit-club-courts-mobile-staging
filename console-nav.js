@@ -11,15 +11,33 @@
    therefore a place to forget to. The list lives here; admin.js and index.html
    render it.
 
-   The two renderings are the bottom tab bar and the sidebar, not the two
-   documents. Below 1024px the console draws five tabs and a drawer dialog, from
-   this model. From 1024px up both documents draw a sidebar, from this model. The
-   drawer stops being necessary at that width because everything it held is
-   already on screen.
+   THREE RENDERINGS, AND ONE OF THEM IS DELIBERATELY INCOMPLETE.
+   The renderings are the rail, the bottom tab bar, and the launcher. The rail and
+   the tab bar both draw TABS, five destinations, at every width. The launcher
+   draws all of GROUPS, which is every destination there is, in a full screen
+   dialog over whatever page you were already on.
+
+   This paragraph used to say something else, and the something else is worth
+   quoting because it was true when it was written and this file is what made it
+   false: "The drawer stops being necessary at that width because everything it
+   held is already on screen." Everything it held WAS on screen, because the rail
+   drew all five groups under the five tabs, eighteen rows of it. That is a list
+   you scan, not a navigation you aim at, and it still did not hold Check-in,
+   Open Play, Maintenance, Blocked Dates and Closures, or Messages, which lived
+   in more.html and in no rail at all. A rail can be complete or it can be
+   aimable and at eighteen rows it was neither.
+
+   So the rail stopped trying to be complete and the launcher started being the
+   thing that is. The five destinations that earn permanent space are not the
+   same set as the twenty two that need to exist, and pretending they were is
+   what put five of them behind a leaf page for as long as it did. The drawer is
+   still what a phone gets below 1024px; above it the launcher is what the
+   Console row opens, and it is the only complete view of the console at any
+   width.
 
    WHAT IS NOT SHARED, AND WHY.
    The PRIMARY section differs between the two documents on purpose. The console's
-   primary section is TABS: Dashboard, Bookings, Courts, Staff, More. The staff
+   primary section is TABS: Dashboard, Bookings, Courts, Staff, Console. The staff
    shell's primary section is its own five shift destinations, which live in
    index.html because they are hash routes into that document's router and mean
    nothing here. What both documents share is GROUPS, the secondary and system
@@ -34,44 +52,122 @@
 (function () {
   "use strict";
 
-  /* The bottom bar is capped at five and this array is the enforcement: there is
-     nowhere to put a sixth. Anything that does not earn a permanent slot lives
-     in More or in the groups below. */
+  /* THE FIVE THAT EARN PERMANENT SPACE.
+     Capped at five and this array is the enforcement: there is nowhere to put a
+     sixth. What changed is what the cap means. It used to be a bottom bar limit
+     that the desktop rail was free to ignore, and the rail did ignore it,
+     drawing eighteen rows. Now it is the whole of both: the tab bar and the rail
+     draw this array and nothing else, at every width.
+
+     The fifth entry was More and is now Console, and the rename is the point
+     rather than a tidy up. More is a shrug; it names the leftovers by saying
+     they are leftovers, which is what they were while it was a page holding nine
+     rows that had not earned a tab. Console names a thing: The whole of this
+     back office, every destination in it, one screen. It opens the launcher
+     instead of navigating.
+
+     It keeps more.html as its href anyway, because that is the no-JS path and
+     because a reader who hits the URL should land somewhere real. The launcher
+     handler cancels the navigation when it runs. */
   var TABS = [
     { id: "dashboard", label: "Dashboard", href: "dashboard.html", icon: "grid" },
     { id: "bookings",  label: "Bookings",  href: "bookings.html",  icon: "calendar" },
     { id: "courts",    label: "Courts",    href: "courts.html",    icon: "court" },
     { id: "staff",     label: "Staff",     href: "staff.html",     icon: "users" },
-    { id: "more",      label: "More",      href: "more.html",      icon: "dots" }
+    { id: "console",   label: "Console",   href: "more.html",      icon: "dots" }
   ];
 
-  /* The secondary and system areas. None of the five tab bar destinations is
-     repeated here: "Staff Management" is the roles, accounts, and pay area, which
-     is a different job from the Staff tab's question of who is on shift right
-     now, and it has its own screen.
+  /* EVERY DESTINATION THERE IS. THE LAUNCHER DRAWS ALL OF IT.
+     This array used to be the secondary and system areas, the part of the
+     console that was not a tab, and it deliberately did not repeat the five tab
+     destinations. It does now, in Daily Operations, and the repetition is what
+     makes it usable: the launcher is the one complete view of the console, and a
+     complete view that omits the Dashboard because the Dashboard happens to also
+     be a tab is a map with a hole where the front door is.
+
+     Nothing renders both this and TABS in the same list, so nothing shows a
+     destination twice. The rail and the tab bar draw TABS. The launcher and
+     more.html draw this.
+
+     FIVE DESTINATIONS JOINED HERE THAT WERE IN NO MODEL AT ALL. Check-in, Open
+     Play, Maintenance, Blocked Dates and Closures, and Messages were markup in
+     more.html and nowhere else, which meant they appeared in no rail and no
+     drawer at any width on either build, and the only way to reach Check-in on a
+     laptop was to notice that a tab called More existed and guess it was in
+     there. That is the gap this whole task exists to close.
+
+     desc is a card's supporting line, six words or fewer, saying what the
+     destination is FOR rather than what it is called. Eight of them are lifted
+     verbatim from more.html, which already had them and had them right; the rest
+     are written to match that register, which is a comma list of the nouns you
+     would find on the screen.
 
      ops:true marks a group the Operations Manager sees and Front Desk does not.
      It is honoured where a surface is known, which today is the staff shell in
      the customer build; the console itself is signed in as the Club Manager and
-     shows everything. As everywhere else in this prototype, hiding a row is not
-     the security boundary, and the sidebar says so where it trims one. */
+     shows everything. It is an allow list rather than a deny list on purpose, so
+     a surface added later is refused by default rather than admitted by default.
+     The launcher goes through groupsFor() like every other rendering does. As
+     everywhere else in this prototype, hiding a row is not the security
+     boundary, and every rendering says so where it trims one. */
   var GROUPS = [
-    { group: "Club", items: [
-      { label: "Club Profile",        href: "club-profile.html", icon: "building" },
-      { label: "Staff Management",    href: "staff-manage.html", icon: "key" },
-      { label: "Players / Customers", href: "players.html",      icon: "user" }
+    { group: "Daily Operations", items: [
+      { label: "Dashboard",   href: "dashboard.html", icon: "grid",
+        desc: "Today at a glance" },
+      { label: "Bookings",    href: "bookings.html",  icon: "calendar",
+        desc: "Reservations, changes, and conflicts" },
+      { label: "Courts",      href: "courts.html",    icon: "court",
+        desc: "Surfaces, status, and availability" },
+      { label: "Staff",       href: "staff.html",     icon: "users",
+        desc: "Who is on shift right now" },
+      { label: "Check-in",    href: "check-in.html",  icon: "checkc",
+        desc: "Arrivals for today, court by court", badge: "checkins", quiet: true },
+      { label: "Open Play",   href: "open-play.html", icon: "play",
+        desc: "Sessions, rosters, and capacity" }
     ] },
-    { group: "Money", ops: true, items: [
-      { label: "Payments",            href: "payments.html",     icon: "card" },
-      { label: "Reports & Analytics", href: "reports.html",      icon: "chart" },
-      { label: "Rates & Promotions",  href: "rates.html",        icon: "tag" }
+    { group: "Club", items: [
+      { label: "Club Profile",        href: "club-profile.html", icon: "building",
+        desc: "Name, address, and contact details" },
+      /* Not the Staff tab. That one asks who is on shift right now; this is the
+         roles, accounts, and pay area, and it has its own screen. */
+      { label: "Staff Management",    href: "staff-manage.html", icon: "key",
+        desc: "Roles, accounts, and pay" },
+      { label: "Players / Customers", href: "players.html",      icon: "user",
+        desc: "Members, guests, and history" },
+      { label: "Maintenance",         href: "maintenance.html",  icon: "wrench",
+        desc: "Court work, logs, and inspections" },
+      { label: "Blocked Dates & Closures", href: "closures.html", icon: "lock",
+        desc: "Rest days, holidays, and full day blocks" }
+    ] },
+    { group: "Money & Insights", ops: true, items: [
+      { label: "Payments",            href: "payments.html", icon: "card",
+        desc: "Balances, refunds, and receipts" },
+      { label: "Reports & Analytics", href: "reports.html",  icon: "chart",
+        desc: "Bookings, revenue, and utilization" },
+      { label: "Rates & Promotions",  href: "rates.html",    icon: "tag",
+        desc: "Pricing, discounts, and offers" }
+    ] },
+    /* Notifications moved here from System, and it moved because of the badge.
+       It is the one row carrying unread, and a count sitting in a group called
+       System reads as "a system event occurred", which is a thing you deal with
+       later. Next to Messages it reads as "someone is trying to reach you",
+       which is the same number meaning the more urgent of its two possible
+       things. The group is the sentence the badge is read inside. */
+    { group: "Communication", items: [
+      { label: "Messages",      href: "messages.html",      icon: "message",
+        desc: "Conversations with customers", badge: "messages", quiet: true },
+      { label: "Notifications", href: "notifications.html", icon: "bell",
+        desc: "System alerts and reminders", badge: "unread" }
     ] },
     { group: "System", items: [
-      { label: "Operating Hours", href: "hours.html",         icon: "hours" },
-      { label: "Notifications",   href: "notifications.html", icon: "bell", badge: "unread" },
-      { label: "Activity Log",    href: "activity.html",      icon: "activity" },
-      { label: "Settings",        href: "settings.html",      icon: "settings" },
-      { label: "Help / Support",  href: "help.html",          icon: "help" },
+      { label: "Operating Hours", href: "hours.html",    icon: "hours",
+        desc: "Opening times, day by day" },
+      { label: "Activity Log",    href: "activity.html", icon: "activity",
+        desc: "Who changed what, and when" },
+      { label: "Settings",        href: "settings.html", icon: "settings",
+        desc: "Console preferences and defaults" },
+      { label: "Help / Support",  href: "help.html",     icon: "help",
+        desc: "Guides, contacts, and this build" },
       /* The way back to the customer build. It used to be a button on the
          console's contact sheet, which was the only page that had one and which
          no longer exists; without a home here, the console would be a folder you
@@ -79,11 +175,18 @@
          the prefix off it, since it is already relative to admin/, and
          consoleOnly keeps it out of the staff shell's rail, where a link to the
          document you are already reading would be furniture. */
-      { label: "Customer Build",  href: "../index.html",      icon: "arrowR",
+      { label: "Customer Build",  href: "../index.html", icon: "arrowR",
+        desc: "The other half of this prototype",
         absolute: true, consoleOnly: true }
     ] },
+    /* Its own group rather than a sixth row of System, which is where it would
+       go if the only question were tidiness. Log Out is the one destructive
+       destination in the model and danger:true is how every rendering knows to
+       draw it apart; folding it into a five row System list is how somebody
+       aiming at Settings lands on it. */
     { group: "Session", items: [
-      { label: "Log Out", href: "#logout", icon: "logout", danger: true }
+      { label: "Log Out", href: "#logout", icon: "logout", danger: true,
+        desc: "End this session" }
     ] }
   ];
 
