@@ -488,12 +488,159 @@
     }
   }
 
+  /* ---------- THE LAUNCHER ----------
+     The full screen view of every destination there is, opened by the Console
+     row in the rail and the Console tab in the bottom bar. It is the rendering
+     that lets the other two be short.
+
+     A REAL <dialog>, OPENED WITH showModal. The drawer already is one and the
+     reasons are the same: backdrop, Escape, the background scroll lock, and the
+     focus trap are all native, and a hand rolled trap is a well known way to
+     ship a keyboard cage. Nothing here manages focus except returning it to the
+     trigger on close, which is what the drawer already does.
+
+     WHAT showModal COSTS, AND WHY THE BAR AND THE TABS ARE DRAWN AGAIN INSIDE.
+     The brief asks for the app bar and the trigger to stay visible AND operable
+     so that the same control closes the launcher. Those two cannot both be
+     literally true: showModal puts the dialog in the top layer and makes
+     everything outside it inert, so the real tab bar is visible through a
+     transparent backdrop but cannot be clicked. The alternatives were a
+     positioned <div>, which means hand rolling the trap, Escape, and the scroll
+     lock, and is exactly what the drawer decided against; or leaving the reader
+     with no control where they last pressed one. So the launcher draws its own
+     bar and its own tab strip, from the same TABS array the real ones use, in
+     the same places. The Console tab is drawn pressed and closes the launcher.
+     To the reader it is the control they pressed, unmoved. To the accessibility
+     tree it is a dialog with its own close control, which is the honest
+     description of what it is. What it costs is one duplicated strip of markup,
+     rendered from the shared array so it cannot say anything the real one does
+     not.
+
+     opts.icon        function(name) -> an <svg> string, the caller's own sprite
+     opts.prefix      path prepended to every group href ("" or "admin/")
+     opts.groups      the GROUPS subset this surface may see, from groupsFor()
+     opts.counts      { unread: 4 } resolves a card's badge
+     opts.badgeNoun   { unread: "unread" } names it for a screen reader
+     opts.tabs        TABS, for the strip the phone keeps at the foot
+     opts.currentTab  the id of the tab that opened this, drawn pressed
+     opts.title       the heading, and the dialog's accessible name
+     opts.note        the permission sentence, where a group was trimmed
+     opts.isCurrent   function(item) -> is this the page underneath */
+  function launcher(opts) {
+    var icon = opts.icon;
+    var prefix = opts.prefix || "";
+    var counts = opts.counts || {};
+    var groups = opts.groups || [];
+    var isCurrent = opts.isCurrent || function () { return false; };
+
+    function card(item) {
+      var href = item.absolute ? item.href : prefix + item.href;
+      var current = isCurrent(item);
+      var n = item.badge ? counts[item.badge] : 0;
+      /* Same rule the rail follows. Red is spent on money and on closed courts;
+         a queue length asks for the quiet pill instead. */
+      var count = n ? '<span class="countpill' + (item.quiet ? " countpill--quiet" : "") +
+                      '" aria-hidden="true">' + n + "</span>" : "";
+      var noun = (opts.badgeNoun && opts.badgeNoun[item.badge]) || "";
+      var aria = count ? ' aria-label="' + esc(item.label + ", " + n + (noun ? " " + noun : "")) + '"' : "";
+      /* aria-current already announces this one as the current page, so the
+         visible chip is hidden from the tree rather than said twice. It is
+         visible because a fill alone is not a state a reader can be sure of, and
+         it stays a link because a card you cannot click is a card you will try
+         to click. */
+      var cur = current ? '<span class="lcard__cur" aria-hidden="true">Current</span>' : "";
+      return '<a class="lcard' + (item.danger ? " lcard--danger" : "") + '" href="' + esc(href) + '"' +
+        (current ? ' aria-current="page"' : "") + aria + ">" +
+        '<span class="lcard__i">' + icon(item.icon) + "</span>" +
+        '<span class="lcard__t">' + esc(item.label) + "</span>" +
+        '<span class="lcard__d">' + esc(item.desc || "") + "</span>" +
+        count + cur + "</a>";
+    }
+
+    var sections = groups.map(function (g, i) {
+      var id = "lsec-" + i;
+      /* A real heading, and a section that points at it. Six labelled groups a
+         screen reader can jump between is the difference between this and a
+         flat list of twenty two links. */
+      return '<section class="lsec" aria-labelledby="' + id + '">' +
+        '<h3 class="lsec__h" id="' + id + '">' + esc(g.group) + "</h3>" +
+        '<div class="lgrid">' + g.items.map(card).join("") + "</div></section>";
+    }).join("");
+
+    var tabs = (opts.tabs || []).map(function (t) {
+      var on = t.id === opts.currentTab;
+      /* The one that opened this is the one that closes it. The rest are real
+         links out, which is what they are on the bar underneath. */
+      if (on) {
+        return '<button class="ltab ltab--on" type="button" data-close aria-expanded="true">' +
+          '<span class="ltab__i">' + icon(t.icon) + "</span>" +
+          "<span>" + esc(t.label) + "</span></button>";
+      }
+      return '<a class="ltab" href="' + esc(prefix + t.href) + '">' +
+        '<span class="ltab__i">' + icon(t.icon) + "</span>" +
+        "<span>" + esc(t.label) + "</span></a>";
+    }).join("");
+
+    return '<div class="launcher__bar">' +
+      '<h2 class="launcher__t" id="launcherTitle">' + esc(opts.title || "Console") + "</h2>" +
+      '<button class="iconbtn iconbtn--bare launcher__x" type="button" data-close' +
+      ' aria-label="Close the console list">' + icon("close") + "</button>" +
+      "</div>" +
+      '<div class="launcher__body">' + sections +
+      (opts.note ? '<p class="launcher__note">' + esc(opts.note) + "</p>" : "") +
+      "</div>" +
+      (tabs ? '<nav class="launcher__tabs" aria-label="Main">' + tabs + "</nav>" : "");
+  }
+
+  /* Opening does not navigate and does not move the page underneath. The Console
+     control carries a real href so a reader without JS lands on more.html, which
+     is why the click is cancelled here rather than the href being left off. */
+  function wireLauncher(doc) {
+    var d = doc.getElementById("launcher");
+    if (!d || !d.showModal) return null;
+    var triggers = [].slice.call(doc.querySelectorAll("[data-launcher]"));
+    var from = null;
+
+    function mark(v) {
+      triggers.forEach(function (t) { t.setAttribute("aria-expanded", v); });
+    }
+
+    triggers.forEach(function (t) {
+      t.setAttribute("aria-expanded", "false");
+      t.setAttribute("aria-haspopup", "dialog");
+      t.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (d.open) { d.close(); return; }
+        from = t;
+        mark("true");
+        d.showModal();
+      });
+    });
+
+    /* A click on the backdrop is a click on the dialog element itself. Same test
+       the drawer uses, and the only line of this the platform does not give. */
+    d.addEventListener("click", function (e) {
+      if (e.target === d) { d.close(); return; }
+      var c = e.target.closest && e.target.closest("[data-close]");
+      if (c && d.contains(c)) d.close();
+    });
+
+    d.addEventListener("close", function () {
+      mark("false");
+      if (from && from.focus) from.focus();
+    });
+
+    return d;
+  }
+
   window.CONSOLE_NAV = {
     TABS: TABS,
     GROUPS: GROUPS,
     sidebar: sidebar,
     wireSidebar: wireSidebar,
     utilbar: utilbar,
+    launcher: launcher,
+    wireLauncher: wireLauncher,
     notice: notice,
     /* The groups this surface is allowed to see. The money area is the
        Operations Manager's, and everything else is everyone's.
@@ -508,10 +655,22 @@
        passes the whole list. As everywhere else in this build, hiding a row is
        not the security boundary, and the rail says so where it trims one. */
     groupsFor: function (surface) {
-      var allowed = surface === "opsmanager" ? GROUPS : GROUPS.filter(function (g) { return !g.ops; });
-      /* consoleOnly rows are dropped for every caller of this function, because
-         the only caller is the customer build. The console reaches for GROUPS
-         directly and keeps them. */
+      /* An allow list, not a deny list, and that is the whole point of the
+         shape: a surface added later and not named here is refused the money
+         area by default rather than admitted to it by default. */
+      var full = surface === "opsmanager" || surface === "console";
+      var allowed = full ? GROUPS : GROUPS.filter(function (g) { return !g.ops; });
+      /* "console" is the back office reading its own list, and it is a surface
+         here rather than a caller that skips this function. The launcher has to
+         go through the permission gate like every other rendering; letting it
+         reach for GROUPS directly would have been one rendering deciding for
+         itself what it may see, which is the habit this function exists to stop.
+
+         What the console keeps that nobody else does is consoleOnly rows. There
+         is exactly one, Customer Build, and it is the way back out of the back
+         office. Every other surface IS the customer build, where a link to the
+         document you are already reading is furniture. */
+      if (surface === "console") return allowed;
       return allowed.map(function (g) {
         var items = g.items.filter(function (it) { return !it.consoleOnly; });
         return items.length === g.items.length ? g : { group: g.group, ops: g.ops, items: items };

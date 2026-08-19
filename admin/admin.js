@@ -172,7 +172,12 @@
      structure and never pretended to. */
   var NAV = window.CONSOLE_NAV;
   var TABS = NAV.TABS;
-  var DRAWER = NAV.GROUPS.reduce(function(list, g){
+  /* Through groupsFor rather than at GROUPS directly. The console sees
+     everything, which is what the "console" surface means, but it says so by
+     asking rather than by helping itself. */
+  var CONSOLE_GROUPS = NAV.groupsFor("console");
+
+  var DRAWER = CONSOLE_GROUPS.reduce(function(list, g){
     list.push({ group: g.group });
     return list.concat(g.items);
   }, []);
@@ -227,7 +232,11 @@
     tabs.innerHTML = '<div class="tabbar__in">' + TABS.map(function(t){
       var cur = (t.id === nav);
       var badge = (t.id === "console" && DATA.pendingTasks) ? '<span class="badge" aria-hidden="true"></span>' : "";
-      return '<a href="' + t.href + '"' + (cur ? ' aria-current="page"' : "") + (badge ? ' class="hasbadge"' : "") + '>' +
+      /* The Console tab keeps its href, which is the no-JS path to more.html,
+         and gains the attribute wireLauncher looks for. With script running the
+         click is cancelled and the launcher opens instead. */
+      var opens = (t.id === "console") ? ' data-launcher' : "";
+      return '<a href="' + t.href + '"' + opens + (cur ? ' aria-current="page"' : "") + (badge ? ' class="hasbadge"' : "") + '>' +
              '<span class="tabpill">' + svg(t.icon) + '</span>' + badge +
              '<span>' + t.label + '</span></a>';
     }).join("") + '</div>';
@@ -235,6 +244,7 @@
 
     if (!back) buildDrawer(shell);
     buildSidebar(shell, nav);
+    buildLauncher(shell, nav);
     buildStaging(shell);
     firstRunStaging();
     buildToast();
@@ -445,6 +455,43 @@
       var cls = el.getAttribute("data-icon-class") || "";
       el.outerHTML = svg(name, cls);
     });
+  }
+
+  /* THE LAUNCHER, AND THE ROW THAT OPENS IT.
+     The markup is console-nav.js's, because it is the same list the rail and the
+     tab bar draw and a second copy is a second place to forget. What belongs
+     here is the sprite, the counts, and which page is underneath.
+
+     The rail's Console row is marked as a trigger after the fact rather than
+     through sidebar(), which takes a fixed row shape on purpose. Reaching for
+     the row by its href keeps that shape unchanged and keeps the knowledge that
+     Console opens something in one file rather than two. */
+  function buildLauncher(shell, nav){
+    var here = location.pathname.split("/").pop();
+    var d = document.createElement("dialog");
+    d.className = "launcher";
+    d.id = "launcher";
+    d.setAttribute("aria-labelledby", "launcherTitle");
+    d.innerHTML = NAV.launcher({
+      icon: svg,
+      prefix: "",
+      counts: DATA,
+      badgeNoun: { unread:"unread", pendingTasks:"pending tasks",
+                   checkins:"due to arrive", messages:"unread" },
+      groups: CONSOLE_GROUPS,
+      tabs: TABS,
+      currentTab: "console",
+      title: "Console",
+      /* No note. The console is the one surface that is shown every group, so
+         there is nothing trimmed here to be honest about. The staff shell passes
+         its own sentence when it draws the same list without the money area. */
+      isCurrent: function(item){ return item.href === here; }
+    });
+    shell.appendChild(d);
+
+    var row = shell.querySelector('#sidenav .sidenav__row[href="more.html"]');
+    if (row) row.setAttribute("data-launcher", "");
+    NAV.wireLauncher(document);
   }
 
   function buildDrawer(shell){

@@ -468,3 +468,225 @@
   .sidenav__row[aria-current="page"]{ background:var(--surface-sunken); }
   .sidenav__row[aria-current="page"]::before{ width:4px; }
 }
+
+/* ============================================================
+   THE LAUNCHER
+   The full screen list of every destination, opened by the Console row in the
+   rail and the Console tab in the bottom bar. The rail carries five; this
+   carries all twenty two, and it is the only complete view of the console at
+   any width.
+
+   It is a real <dialog> opened with showModal, so the backdrop, Escape, the
+   background scroll lock, and the focus trap are the platform's. Nothing below
+   reimplements any of them; see the comment on launcher() in console-nav.js for
+   what showModal costs and why the bar and the tab strip are drawn again inside.
+   ============================================================ */
+
+.launcher{
+  /* The dialog's own box is the whole viewport. A dialog defaults to a centred
+     shrink-to-fit box with a margin and a border, and every one of those has to
+     be undone before it can be a screen rather than a panel. */
+  position:fixed; inset:0;
+  width:100%; max-width:100%; height:100%; max-height:100%;
+  margin:0; padding:0; border:0;
+  background:var(--surface); color:var(--text-primary);
+  display:flex; flex-direction:column;
+}
+
+/* MOTION. 200ms is --dur-ui, inside the 180 to 250 the brief asks for, so no new
+   token was needed. The scale is small on purpose: a launcher that zooms reads
+   as a photo viewer, and this is navigation.
+
+   display and overlay are transitioned with allow-discrete, and the opening
+   values come from @starting-style. Without those two the dialog would animate
+   out and snap in, because until it is open there is no previous style to
+   interpolate from. */
+.launcher{
+  opacity:0; transform:scale(.985);
+  transition:opacity var(--dur-ui) var(--ease),
+             transform var(--dur-ui) var(--ease),
+             overlay var(--dur-ui) var(--ease) allow-discrete,
+             display var(--dur-ui) var(--ease) allow-discrete;
+}
+.launcher[open]{ opacity:1; transform:none; }
+@starting-style{ .launcher[open]{ opacity:0; transform:scale(.985); } }
+
+.launcher::backdrop{
+  background:var(--overlay);
+  opacity:0;
+  transition:opacity var(--dur-ui) var(--ease),
+             overlay var(--dur-ui) var(--ease) allow-discrete,
+             display var(--dur-ui) var(--ease) allow-discrete;
+}
+.launcher[open]::backdrop{ opacity:1; }
+@starting-style{ .launcher[open]::backdrop{ opacity:0; } }
+
+/* --dur-ui already collapses to 0.01ms under reduce, which makes the fade
+   instant. The transform is killed outright as well, because a scale that
+   completes in a hundredth of a second is still a scale, and the brief asks for
+   an instant swap with no scale rather than a fast one. */
+@media (prefers-reduced-motion:reduce){
+  .launcher, .launcher[open]{ transform:none; }
+  @starting-style{ .launcher[open]{ transform:none; } }
+}
+
+/* ---------- THE BAR ----------
+   Ink, like the app bar it stands in for, and in the same place. */
+.launcher__bar{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between; gap:var(--s3);
+  padding:var(--s3) var(--s4);
+  background:var(--chrome-surface); color:var(--text-inverse);
+  border-bottom:1px solid var(--hairline);
+  /* The chrome is ink in BOTH themes, so the "on inverse" pair has to be pinned
+     rather than read from the theme. Left to the theme, --text-inverse flips to
+     near black in the dark theme and paints this title, the close control, and
+     the tab labels in near black on near black. admin.css pins the same three on
+     .appbar and .tabbar and says the same thing there; this is the launcher's
+     own chrome adopting that rule rather than discovering it again. */
+  --text-inverse:#F5F3DC;
+  --text-inverse-secondary:#B0AE97;
+  --border-default:#7A7A6D;
+}
+.launcher__t{
+  margin:0; font-size:1rem; font-weight:var(--fw-med,600);
+  letter-spacing:.08em; text-transform:uppercase; color:var(--text-inverse);
+}
+.launcher__x{
+  min-width:44px; min-height:44px;
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--text-inverse);
+}
+
+/* ---------- THE BODY ----------
+   The only thing that scrolls. The bar and the tab strip are pinned, so the
+   reader never loses the way out while moving through twenty two cards. */
+.launcher__body{
+  flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  /* Capped so the grid stops widening on a large monitor. Without it the auto
+     fill keeps adding columns and the five row desktop layout becomes seven. */
+  width:100%; max-width:1200px; margin-inline:auto;
+  padding:var(--s5) var(--s4) var(--s8);
+}
+
+.lsec + .lsec{ margin-top:var(--s7); }
+.lsec__h{
+  margin:0 0 var(--s3);
+  font-size:.72rem; font-weight:var(--fw-med,600);
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-secondary);
+}
+
+/* ---------- THE GRID ----------
+   auto-fill with a minimum, so the column count follows the width rather than a
+   guess about the device. The floor is a token rather than a literal because a
+   SINGLE floor provably cannot land on the counts this task asks for: two at
+   390 needs a floor at or under 173px, three at 834 needs one over 191px, and
+   those two ranges do not overlap. So the floor moves once per band and the
+   grid still fills itself; what is avoided is three hardcoded column counts,
+   which would stop responding to the width between the bands. */
+.lgrid{
+  --lcard-min:150px;
+  display:grid; gap:var(--s3);
+  grid-template-columns:repeat(auto-fill, minmax(min(100%, var(--lcard-min)), 1fr));
+}
+@media (min-width:640px){ .lgrid{ --lcard-min:220px; } }
+@media (min-width:1024px){ .lgrid{ --lcard-min:210px; } }
+
+/* ---------- THE CARD ----------
+   One <a> around the lot. A link inside a card leaves most of the card dead to
+   a pointer that is aiming at the whole thing, which is what a card is for. */
+.lcard{
+  position:relative;
+  display:grid; grid-template-columns:auto 1fr; grid-auto-rows:min-content;
+  gap:var(--s1) var(--s3); align-content:start;
+  min-height:104px; padding:var(--s4);
+  background:var(--card-surface); color:var(--text-primary);
+  border:1px solid var(--hairline); border-radius:var(--r-card);
+  text-decoration:none;
+  transition:border-color var(--dur-fast) var(--ease),
+             transform var(--dur-fast) var(--ease);
+}
+.lcard__i{ grid-column:1; grid-row:1; display:inline-flex; color:var(--text-secondary); }
+.lcard__t{ grid-column:2; grid-row:1; font-weight:var(--fw-med,600); }
+.lcard__d{
+  grid-column:2; grid-row:2;
+  font-size:.82rem; color:var(--text-secondary); line-height:1.35;
+}
+
+/* Restrained on purpose: a border that firms up and a single pixel of lift. No
+   shadow bloom and no fill change, because twenty two cards all reacting is a
+   surface that shimmers rather than one that answers. */
+.lcard:hover{ border-color:var(--border-default); transform:translateY(-1px); }
+.lcard:active{ transform:none; }
+@media (prefers-reduced-motion:reduce){
+  .lcard, .lcard:hover{ transform:none; }
+}
+
+.lcard:focus-visible{
+  outline:2px solid var(--focus-ring); outline-offset:2px;
+  border-color:var(--border-default);
+}
+
+/* The page underneath. Marked, still a link, and not relying on fill: the border
+   goes to full strength and a small word says which one it is. */
+.lcard[aria-current="page"]{ border-color:var(--border-strong); border-width:2px; padding:calc(var(--s4) - 1px); }
+.lcard__cur{
+  grid-column:2; grid-row:3;
+  justify-self:start; margin-top:var(--s2);
+  padding:2px var(--s2);
+  font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--text-secondary);
+  border:1px solid var(--hairline); border-radius:var(--r-pill);
+}
+
+.lcard--danger .lcard__t{ color:var(--critical); }
+.lcard--danger:hover{ border-color:var(--critical); }
+
+/* The badge sits with the title rather than floating in a corner, so a long
+   label pushes it instead of colliding with it. */
+.lcard .countpill{ grid-column:2; grid-row:1; justify-self:end; align-self:center; }
+
+.launcher__note{
+  margin:var(--s7) 0 0;
+  font-size:.82rem; color:var(--text-secondary); line-height:1.5;
+}
+
+/* ---------- THE TAB STRIP ----------
+   The bottom bar, drawn again inside the dialog because showModal makes the real
+   one inert. Below 1024 only, which is exactly where the real one exists. */
+.launcher__tabs{ display:none; }
+@media (max-width:1023px){
+  .launcher__tabs{
+    flex:0 0 auto;
+    display:grid; grid-auto-flow:column; grid-auto-columns:1fr;
+    background:var(--chrome-surface);
+    border-top:1px solid var(--hairline);
+    padding-bottom:env(safe-area-inset-bottom, 0px);
+    /* The chrome is ink in BOTH themes, so the "on inverse" pair has to be pinned
+       rather than read from the theme. Left to the theme, --text-inverse flips to
+       near black in the dark theme and paints this title, the close control, and
+       the tab labels in near black on near black. admin.css pins the same three on
+       .appbar and .tabbar and says the same thing there; this is the launcher's
+       own chrome adopting that rule rather than discovering it again. */
+    --text-inverse:#F5F3DC;
+    --text-inverse-secondary:#B0AE97;
+    --border-default:#7A7A6D;
+  }
+  .ltab{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2px; min-height:56px; padding:var(--s2) var(--s1);
+    font-size:.66rem; text-decoration:none;
+    color:var(--text-inverse-secondary); background:none; border:0;
+    font-family:inherit; cursor:pointer;
+  }
+  .ltab__i{ display:inline-flex; }
+  .ltab--on{ color:var(--text-inverse); }
+  .ltab:focus-visible{ outline:2px solid var(--text-inverse); outline-offset:-3px; }
+}
+
+@media (prefers-contrast:more){
+  .lcard{ border-color:var(--border-strong); }
+  .lcard[aria-current="page"]{ border-width:3px; padding:calc(var(--s4) - 2px); }
+  .launcher__bar{ border-bottom-color:var(--border-strong); }
+}
