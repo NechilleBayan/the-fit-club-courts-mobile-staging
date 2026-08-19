@@ -357,7 +357,12 @@
     font-size:12px; letter-spacing:.08em;
     transition:opacity var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
   }
-  .utilbar .iconbtn--demo{ border-style:solid; border-color:rgba(var(--ghost-edge),.30); border-radius:var(--r-btn); }
+  /* The strip is transparent, so this button's edge is drawn straight onto the
+     page rather than onto a card. At rgba(--ghost-edge,.30) that measured
+     1.94:1 in light and 2.56:1 in dark — the same wash-on-a-control mistake the
+     stylesheet's ghost-glass block now names, and here it was the only thing
+     marking the one control in the strip that has a boundary at all. */
+  .utilbar .iconbtn--demo{ border-style:solid; border-color:var(--border-default); border-radius:var(--r-btn); }
   .utilbar .iconbtn svg{ width:16px; height:16px; }
   .utilbar .iconbtn--bare{ min-width:26px; }
   .utilbar .iconbtn--bare svg{ width:17px; height:17px; }
@@ -367,7 +372,10 @@
   /* Quiet is a choice this reader has already declined. */
   @media (prefers-contrast:more){
     .utilbar .iconbtn{ opacity:1; }
-    .utilbar .iconbtn--demo{ border-color:var(--border-default); }
+    /* --border-strong, because --border-default is what the button already
+       wears at rest now and a strong reading that repeats the default does
+       nothing. Same move as the control list in admin.css. */
+    .utilbar .iconbtn--demo{ border-color:var(--border-strong); }
   }
 }
 

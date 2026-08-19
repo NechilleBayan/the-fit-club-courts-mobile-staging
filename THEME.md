@@ -6,13 +6,38 @@ the answer is not a literal in a rule: It is a row added to this file first.
 
 ## How to read this
 
-**Two documents, one vocabulary.** `index.html` is the customer build and
-`admin/admin.css` is the staff console. They declare the **same token names**
-and their **own values**. That is the point: A card in the customer build sits
-on photography and a card in the console sits on a work surface, and the same
-name can carry both readings. A third file, `console-nav.css`, names no colour
-at all and is rendered under both, so a name that exists on one side and not the
-other is a rule that silently resolves to nothing wherever it is missing.
+**Two documents, one vocabulary, and now one set of values.** `index.html` is the
+customer build and `admin/admin.css` is the staff console. They declare the
+**same token names**, and every neutral in the two tables below now holds the
+**same value** as well. A third file, `console-nav.css`, names no colour at all
+and is rendered under both, so a name that exists on one side and not the other
+is a rule that silently resolves to nothing wherever it is missing.
+
+That agreement is new, and what it replaced is worth naming, because this file
+used to argue for the opposite. It said the two documents declared their own
+values on purpose: "A card in the customer build sits on photography and a card
+in the console sits on a work surface, and the same name can carry both
+readings." The premise was true of the landing page and false of everything
+after it. The customer build is twenty-six screens and exactly one of them has a
+photograph on it; the other twenty-five were paying for the hero in sheer washes
+over a page with nothing behind it, which is a weaker card and a `backdrop-filter`
+that filters the page colour through itself. Two products that share a palette, a
+pair of typefaces, a component set, and half their screens were reading as two
+products, and the only thing making them read that way was the surface mechanism.
+
+So the mechanism is one mechanism. **The photograph keeps its glass**: everything
+scoped to `.hero` still draws the sheer treatment, because there the wash is doing
+the job it was invented for. Away from the hero a card is the console's card.
+
+**The chrome is ink in both documents.** The customer build used to carry a
+"ghost navigation": no navigation rectangle at all, two strips over a group that
+faded from a thin wash to nothing, so the photograph stayed the dominant layer.
+It is a good treatment and it was the one component in this build with no
+counterpart on the staff side, where the same product is framed top and bottom by
+an ink plate. One product cannot hold two answers to *what is a header*, so the
+fade gives way to the plate. The bar is `--chrome-surface` on every route, in
+every theme, for every surface, and the four conditional rules that used to invert
+the wordmark are one unconditional rule.
 
 **Two themes per document.** Light and dark, each declared twice: Once under
 `@media (prefers-color-scheme: dark)` guarded with `:root:not([data-theme="light"])`,
@@ -59,28 +84,39 @@ surface is one of the two with a little of the other mixed in.
 
 | Token | Light | Dark |
 |---|---|---|
-| `--surface` | `#F5F3DC` | `#171717` |
-| `--surface-raised` | `#FAF9EA` | `#1F1F1F` |
-| `--surface-sunken` | `#E9E6CB` | `#101010` |
+| `--surface` | `#F8F7F2` | `#171717` |
+| `--surface-raised` | `#F2EEDD` | `#1F1F1F` |
+| `--surface-sunken` | `#E4E0CE` | `#101010` |
 | `--surface-inverse` | `#171717` | `#F5F3DC` |
 | `--text-primary` | `#171717` | `#F5F3DC` |
-| `--text-secondary` | `#57574E` | `#A9A794` |
+| `--text-secondary` | `#605B52` | `#A9A794` |
 | `--text-inverse` | `#F5F3DC` | `#171717` |
 | `--text-inverse-secondary` | `#B0AE97` | `#4A4A42` |
 | `--border-strong` | `#171717` | `#F5F3DC` |
-| `--border-default` | `#9A9887` | `#6F6F63` |
-| `--hairline` | `#DCD9BE` | `#2F2F2C` |
+| `--border-default` | `#837E6F` | `#7A7A6D` |
+| `--hairline` | `#C9C2AE` | `#2F2F2C` |
 | `--focus-ring` | `#171717` | `#F5F3DC` |
-| `--focus-halo` | `#F5F3DC` | `#171717` |
+| `--focus-halo` | `#F8F7F2` | `#171717` |
+| `--chrome-surface` | `#171717` | `#0D0D0D` |
+| `--card-surface` | `#F2EEDD` | `#1F1F1F` |
 | `--ghost-fill` | `23,23,23` | `8,8,8` |
 | `--ghost-edge` | `23,23,23` | `246,244,221` |
 | `--hatch` | `rgba(23,23,23,0.14)` | `rgba(245,243,220,0.18)` |
 | `--hatch-strong` | `rgba(23,23,23,0.22)` | `rgba(245,243,220,0.28)` |
 | `--overlay` | `rgba(15,15,15,0.66)` | `rgba(8,8,8,0.80)` |
 
-The customer light theme is unchanged by this task. It is cream cards on cream
-paper, it is signed off, and the only tokens that moved under it are the two
-semantic families in section 2.
+Every row above is the console's value. An earlier draft of this section said
+"the customer light theme is unchanged by this task. It is cream cards on cream
+paper, it is signed off." Cream cards on cream paper was the problem: the card
+was a seventh of a step from the page, `#F2EEDD` against `#F5F3DC` reads
+**1.09:1**, and the only thing separating the two was a sheer ink wash printed
+over the card. The console had already solved it in the other direction, by
+lifting the page off the card rather than the card off the page, and adopting
+that solution was cheaper and more honest than deriving a second one that would
+have landed in the same place.
+
+The dark theme moved by two tokens and both are additions. It agreed with the
+console already.
 
 ### Console (`admin/admin.css`)
 
@@ -95,10 +131,12 @@ semantic families in section 2.
 | `--text-inverse` | `#F5F3DC` | `#171717` |
 | `--text-inverse-secondary` | `#B0AE97` | `#4A4A42` |
 | `--border-strong` | `#171717` | `#F5F3DC` |
-| `--border-default` | `#8E8878` | `#6F6F63` |
+| `--border-default` | `#837E6F` | `#7A7A6D` |
 | `--hairline` | `#C9C2AE` | `#2F2F2C` |
 | `--focus-ring` | `#171717` | `#F5F3DC` |
 | `--focus-halo` | `#F8F7F2` | `#171717` |
+| `--chrome-surface` | `#171717` | `#0D0D0D` |
+| `--card-surface` | `#F2EEDD` | `#1F1F1F` |
 | `--ghost-fill` | `23,23,23` | `8,8,8` |
 | `--ghost-edge` | `23,23,23` | `246,244,221` |
 | `--hatch` | `rgba(23,23,23,0.14)` | `rgba(245,243,220,0.18)` |
@@ -118,17 +156,42 @@ separately.
 - `--border-default` did not. It identifies **controls** (a day button, a field
   at rest, a secondary button), which owe 3:1 under WCAG 1.4.11. `#C9C2AE`
   manages **1.53:1** on the new cream card. It was warmed at its own weight
-  instead: `#8E8878`, which reaches **3.04:1** on the card and **3.29:1** on the
-  page. The value it replaced, `#A8A695`, reached 2.33:1 and had been failing
-  since before this task.
+  instead. `#8E8878` was the first attempt and it was solved against two of the
+  three grounds a control is drawn on: 3.04:1 on the card and 3.29:1 on the page,
+  and **2.67:1** on `--surface-sunken`, which is the closed day button. `#837E6F`
+  is the same warmth taken down until the worst of the three clears rather than
+  the best two: **3.78 / 3.49 / 3.06**. The value both replaced, `#A8A695`,
+  reached 2.33:1 and had been failing since before either task.
 
-The **card outline** uses neither. It needed no new rule at all: Every card
-already draws `border:1px solid rgba(var(--ghost-edge),.22)`, and the only
-reason that edge was invisible in the light console is that the old ink-card
-block set `--ghost-edge` to cream *on the card*, so each card outlined itself in
-its own fill. With that override gone the same rule resolves to ink at 22% over
-cream, which lands within a shade of the warm gray the review asked for. At
-`prefers-contrast:more` the card family switches to `--border-default`.
+The **card outline** uses neither, and this is the one thing about a card the
+customer build did **not** change when it took the rest of this table. It needed
+no new rule at all: Every card in both documents already draws
+`border:1px solid rgba(var(--ghost-edge),.22)`, and the only reason that edge was
+invisible in the light console is that the old ink-card block set `--ghost-edge`
+to cream *on the card*, so each card outlined itself in its own fill. With that
+override gone the same rule resolves to ink at 22% over cream, which lands within
+a shade of the warm gray the review asked for.
+
+`--hairline` is **not** a substitute for it, and the port tried. The two are a
+shade apart in the light theme, which is what makes the swap look free; in the
+dark theme the wash is cream and `--hairline` is *darker than the card it
+outlines*, so every card and every row dropped from **1.98:1** to **1.23:1**
+against the page on the one theme where the fill is doing least. The wash went
+back. A hairline is for a rule between two things that are already distinct; the
+card edge is what makes the card distinct.
+
+An earlier draft closed this section by saying the card family switches to
+`--border-default` at `prefers-contrast:more`. The block is real and the token is
+wrong: it sends **both** families to `--border-strong`, and row 169 of
+`DECISIONS.md` is why. `--border-default` is a bare one-class list placed after
+every variant rule on the same elements, so it overrode them all and took a three
+pixel double rule *down* from `--border-strong`, which is a contrast reduction
+inside the block that exists to raise it.
+
+`index.html` carries the same block now. It did not before, because it had
+nothing this shape to raise: its cards were washes over a page and its three
+button weights were ranked by edge alpha. Both are gone, so the rule that goes
+with them came across with the rest.
 
 ---
 
@@ -245,11 +308,15 @@ order.
 
 ---
 
-## 4. The console's two pinned surfaces
+## 4. The two pinned surfaces
 
-Two console tokens have no counterpart in the customer build, because the
-customer build has nothing that does their job. `console-nav.css` references
-neither, which is what keeps that file renderable under both documents.
+Both documents declare these now. The heading used to read "the console's two
+pinned surfaces" and the paragraph under it said they had no counterpart in the
+customer build "because the customer build has nothing that does their job".
+That was true of a build whose header was a fade and whose cards were washes, and
+it stopped being true the moment the customer build took the ink bar and the
+solid card. `console-nav.css` still references neither, which is what keeps that
+file renderable under both documents.
 
 | Token | Light | Dark | What it is for |
 |---|---|---|---|
@@ -260,10 +327,16 @@ neither, which is what keeps that file renderable under both documents.
 themes and are still two tokens rather than one name and an alias, because they
 are overridden in different places.
 
-A console card **redeclares `--surface`** locally, so that anything nested inside
-it resolves against the card rather than against the page. That is why the card
-cannot paint itself with `var(--surface)`: It would be painting itself with its
-own children's value.
+A card **redeclares `--surface`** locally, in both documents, so that anything
+nested inside it resolves against the card rather than against the page. That is
+why the card cannot paint itself with `var(--surface)`: It would be painting
+itself with its own children's value.
+
+That redeclaration has a consequence worth stating, because the port walked into
+it: a component whose fill is `var(--surface)` and which is drawn **inside** a
+card paints the card's colour on the card's colour. `.chip--quiet` did exactly
+that and came out as an outline with no fill at all. Anything meant to step
+*below* whatever it lands on wants `--surface-sunken`, which nothing redeclares.
 
 The dark theme's paper island (`.row--muted`, `.empty`) **redeclares
 `--card-surface`** to `#FAF9F2` and leaves `--surface-raised` at `#1F1F1F`, so
@@ -284,7 +357,18 @@ the code by three commits.
 
 Cream is the type colour **on ink**: The app bar, the tab bar, the drawer head,
 the rail's brand row, the whole dark theme, and the selected pill. It is also
-right for small accents on those surfaces.
+right for small accents on those surfaces. In the customer build that list grew
+rather than changed: its app bar is ink on every route now, so the wordmark, the
+destinations, the login button, and the account control are all cream, all the
+time, instead of only over the photograph.
+
+Where a control sits on the ink plate, the four "on inverse" tokens are **pinned
+in the rule that paints the plate** rather than read from the theme. Read from
+the theme, `--text-inverse` flips to ink in the dark theme and prints near black
+type on a near black bar. `.appbar` and `.tabbar` in `index.html` pin the same
+four the console's chrome block pins, and they pin `--ghost-fill` and
+`--ghost-edge` to cream as well, because the three header controls are still
+ghost controls and a ghost control on an ink plate washes toward the cream.
 
 It is **never the primary reading colour on a light page.** If a rule sets a
 cream `color` on anything sitting on `--surface`, that is the mistake this

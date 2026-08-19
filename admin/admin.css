@@ -114,10 +114,21 @@
      depends on finding it. --border-default identifies a CONTROL, so it owes 3:1
      against everything it is drawn on, and the review's #C9C2AE manages 1.5:1 on
      a cream card. So the review's value went to the hairline, where it is right,
-     and --border-default was warmed at its own weight instead: #8E8878 reads
-     warmer than the #A8A695 it replaces and reaches 3.04:1 on the card and
-     3.29:1 on the page, where the old value reached 2.33:1 and failed. */
-  --border-default:#8E8878;
+     and --border-default was warmed at its own weight instead.
+
+     #8E8878 stood here and was checked against two of the three grounds a
+     control is actually drawn on: 3.04:1 on the card and 3.29:1 on the page,
+     against the 2.33:1 the value before it managed. The third ground was
+     missed. --surface-sunken is #E4E0CE, and #8E8878 reads 2.67:1 on it, which
+     is the closed day button — a control, drawn with this token, under the mark
+     the token's own sentence above promises. The sweep that cleared this file
+     did not catch it because it measured the day button open.
+
+     #837E6F is the same warmth taken down until the WORST of the three clears,
+     rather than the best two: 3.78:1 on the page, 3.49:1 on the card, 3.06:1 on
+     the sunken panel. A token that owes 3:1 against everything it is drawn on
+     has to be solved against the darkest of those things, not the lightest. */
+  --border-default:#837E6F;
   --border-strong:#171717;
   --hairline:#C9C2AE;
   --focus-ring:#171717;
@@ -214,7 +225,7 @@
     --surface:#171717; --surface-raised:#1F1F1F; --surface-sunken:#101010;
     --surface-inverse:#F5F3DC; --text-primary:#F5F3DC; --text-secondary:#A9A794;
     --text-inverse:#171717; --text-inverse-secondary:#4A4A42;
-    --border-default:#6F6F63; --border-strong:#F5F3DC; --hairline:#2F2F2C;
+    --border-default:#7A7A6D; --border-strong:#F5F3DC; --hairline:#2F2F2C;
     --focus-ring:#F5F3DC; --focus-halo:#171717;
     --ghost-fill:8,8,8; --ghost-edge:246,244,221;
     --overlay:rgba(8,8,8,0.80); --hatch:rgba(245,243,220,0.18);
@@ -242,7 +253,7 @@
   --surface:#171717; --surface-raised:#1F1F1F; --surface-sunken:#101010;
   --surface-inverse:#F5F3DC; --text-primary:#F5F3DC; --text-secondary:#A9A794;
   --text-inverse:#171717; --text-inverse-secondary:#4A4A42;
-  --border-default:#6F6F63; --border-strong:#F5F3DC; --hairline:#2F2F2C;
+  --border-default:#7A7A6D; --border-strong:#F5F3DC; --hairline:#2F2F2C;
   --focus-ring:#F5F3DC; --focus-halo:#171717;
   --ghost-fill:8,8,8; --ghost-edge:246,244,221;
   --overlay:rgba(8,8,8,0.80); --hatch:rgba(245,243,220,0.18);
@@ -299,7 +310,33 @@
 
   /* GHOST GLASS. Two tint directions as rgb triples, so the opacity is chosen at
      each use. --ghost-fill is the wash inside a surface, --ghost-edge is the
-     hairline around it. */
+     hairline around it.
+
+     WHAT THIS WASH IS NO LONGER ALLOWED TO DRAW, and it is worth stating here
+     rather than at each of the eleven call sites: the boundary of a control.
+
+     The wash is a good rule and a bad edge, and the arithmetic says why. A rule
+     only has to be findable, so any alpha that separates two surfaces will do.
+     A control boundary owes 3:1, and on this palette the ink needs alpha .47
+     before it gets there on ANY light ground — .28 on a cream card is 1.83:1,
+     .30 is 1.92:1, .42 is 2.62:1. There is no value in the .22 to .42 band the
+     idiom actually uses that clears the mark, so the band could not be tuned
+     into compliance; it had to stop carrying controls. An alpha high enough to
+     pass is not a wash any more, and it would have printed a second control
+     gray a shade off the one --border-default already defines.
+
+     So: rules, cards, rows, figures, and every press and hover state keep the
+     wash. Rest boundaries on things you can press take --border-default, which
+     is the token whose whole sentence is that it identifies a control. The day
+     button was already drawn that way and was the only control in the light
+     console holding 3:1; this makes the rest of them agree with it rather than
+     making it the exception.
+
+     The dark theme was moved with it. Its control edges were never measured —
+     the sweep that cleared this file read text pairs in both themes and control
+     boundaries in light only — and the cream wash lands at 1.97:1 on a segment
+     and a picker, 2.40:1 on a filter, 2.56:1 on search, a field, and the date
+     navigator. One idiom, one failure, one fix. */
   --ghost-fill:23,23,23;
   --ghost-edge:23,23,23;
   --ghost-blur:1px;
@@ -720,7 +757,7 @@ dialog::backdrop{ background:var(--overlay); }
 .btn{
   display:flex; align-items:center; justify-content:center; gap:var(--s2); width:100%;
   min-height:var(--tap-decision); padding:var(--s3) var(--s4);
-  border-radius:var(--r-btn); border:1px solid rgba(var(--ghost-edge),.35);
+  border-radius:var(--r-btn); border:1px solid var(--border-default);
   font-size:var(--fs-h3); font-weight:700; line-height:1.25; text-align:center;
   color:var(--text-primary); background:rgba(var(--ghost-fill),.08);
   -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
@@ -730,13 +767,13 @@ dialog::backdrop{ background:var(--overlay); }
 .btn small{ display:block; font-size:var(--fs-legal); font-weight:600; opacity:.92; }
 .btn svg{ width:20px; height:20px; flex:none; transition:transform var(--dur-ui) var(--ease); }
 .btn--primary{ background:rgba(var(--ghost-edge),.08); color:var(--text-primary); border-color:rgba(var(--ghost-edge),.42); }
-.btn--secondary{ background:rgba(var(--ghost-fill),.08); color:var(--text-primary); border-color:rgba(var(--ghost-edge),.35); }
-.btn--ghost{ background:rgba(var(--ghost-fill),.05); border-width:1px; border-style:dashed; border-color:rgba(var(--ghost-edge),.32); min-height:var(--tap-min); font-size:var(--fs-label); }
+.btn--secondary{ background:rgba(var(--ghost-fill),.08); color:var(--text-primary); border-color:var(--border-default); }
+.btn--ghost{ background:rgba(var(--ghost-fill),.05); border-width:1px; border-style:dashed; border-color:var(--border-default); min-height:var(--tap-min); font-size:var(--fs-label); }
 .btn--sm{ min-height:var(--tap-min); font-size:var(--fs-label); padding:0 var(--s4); }
 /* Destructive actions carry the red edge and nothing else. The word is the
    warning; the colour only makes it findable in a column of eight buttons. */
 .btn--danger{ border-color:var(--critical-edge); color:var(--critical); background:var(--critical-surface); }
-.btn[disabled]{ cursor:not-allowed; border-style:dashed; background:rgba(var(--ghost-fill),.04); color:var(--text-secondary); }
+.btn[disabled]{ cursor:not-allowed; border-style:dashed; border-color:var(--border-default); background:rgba(var(--ghost-fill),.04); color:var(--text-secondary); }
 /* PRESS, and this is not behind a pointer query, because a touch screen has no
    hover to lead into it. A press is the only feedback a finger gets: the wash
    steps up, the edge firms, and the control sits down onto a short shadow. */
@@ -749,7 +786,7 @@ dialog::backdrop{ background:var(--overlay); }
 .btn--primary:active{ background:rgba(var(--ghost-edge),.34); border-color:rgba(var(--ghost-edge),.90); }
 .btn--ghost:active{ background:rgba(var(--ghost-fill),.24); border-color:rgba(var(--ghost-edge),.70); }
 .btn--danger:active{ background:var(--critical-glow); border-color:var(--critical); }
-.btn[disabled]:active{ transform:none; background:rgba(var(--ghost-fill),.04); border-color:rgba(var(--ghost-edge),.35); box-shadow:none; }
+.btn[disabled]:active{ transform:none; background:rgba(var(--ghost-fill),.04); border-color:var(--border-default); box-shadow:none; }
 .btn-col{ display:grid; gap:var(--s3); }
 .btn-stack{ display:grid; gap:var(--s2); }
 .btn-row{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
@@ -837,7 +874,7 @@ h3.sub{ font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:600; text-
 .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
 .qact{
   display:flex; align-items:center; gap:var(--s2); min-height:var(--tap-decision); padding:var(--s2) var(--s3);
-  border-radius:var(--r-btn); border:1px dashed rgba(var(--ghost-edge),.32);
+  border-radius:var(--r-btn); border:1px dashed var(--border-default);
   background:rgba(var(--ghost-fill),.05); color:var(--text-primary); text-decoration:none;
   font-size:var(--fs-label); line-height:19px; font-weight:700;
   transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
@@ -1057,14 +1094,14 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .datenav__date{
   flex:1 1 auto; display:flex; align-items:center; justify-content:center; gap:var(--s2);
   min-height:var(--tap-row); padding:0 var(--s3);
-  border:1px solid rgba(var(--ghost-edge),.30); border-radius:var(--r-btn);
+  border:1px solid var(--border-default); border-radius:var(--r-btn);
   background:rgba(var(--ghost-fill),.08);
   font-size:var(--fs-label); font-weight:700; font-variant-numeric:tabular-nums;
   transition:background var(--dur-ui) var(--ease);
 }
 .datenav__date:active{ background:rgba(var(--ghost-fill),.24); }
 .datenav__date svg{ width:17px; height:17px; }
-.datenav .iconbtn{ border-color:rgba(var(--ghost-edge),.30); border-radius:var(--r-btn); min-height:var(--tap-row); }
+.datenav .iconbtn{ border-color:var(--border-default); border-radius:var(--r-btn); min-height:var(--tap-row); }
 .datenav .iconbtn:active{ background:rgba(var(--ghost-fill),.24); }
 
 /* ---------- DATE STRIP ---------- */
@@ -1095,7 +1132,7 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .search svg{ position:absolute; left:var(--s3); width:18px; height:18px; opacity:.6; pointer-events:none; }
 .search input{
   width:100%; min-height:var(--tap-row); padding:0 var(--s3) 0 42px;
-  border:1px solid rgba(var(--ghost-edge),.30); border-radius:var(--r-input);
+  border:1px solid var(--border-default); border-radius:var(--r-input);
   background:rgba(var(--ghost-fill),.06); font-size:var(--fs-label); font-weight:500;
 }
 .search input::placeholder{ color:var(--text-secondary); }
@@ -1135,7 +1172,7 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .filter{
   flex:none; display:inline-flex; align-items:center; gap:5px;
   min-height:var(--tap-min); padding:0 var(--s3);
-  border:1px solid rgba(var(--ghost-edge),.28); border-radius:var(--r-chip);
+  border:1px solid var(--border-default); border-radius:var(--r-chip);
   background:rgba(var(--ghost-fill),.06);
   font-size:var(--fs-legal); font-weight:600; white-space:nowrap;
   transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
@@ -1193,7 +1230,7 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
    count beside it shrinks with it. */
 .seg button, .seg a{
   flex:1 1 0; min-width:0; min-height:var(--tap-row); padding:0 6px;
-  border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-btn);
+  border:1px solid var(--border-default); border-radius:var(--r-btn);
   background:rgba(var(--ghost-fill),.07); text-decoration:none; color:var(--text-primary);
   font-size:13px; line-height:17px; font-weight:600; text-align:center; white-space:nowrap;
   display:flex; align-items:center; justify-content:center; gap:4px;
@@ -1286,7 +1323,7 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .field > label{ font-size:var(--fs-legal); line-height:18px; font-weight:700; }
 .field input, .field select, .field textarea{
   width:100%; min-height:var(--tap-row); padding:var(--s2) var(--s3);
-  border:1px solid rgba(var(--ghost-edge),.30); border-radius:var(--r-input);
+  border:1px solid var(--border-default); border-radius:var(--r-input);
   background:rgba(var(--ghost-fill),.06); font-size:var(--fs-label); font-weight:500;
 }
 .field textarea{ min-height:84px; resize:vertical; line-height:21px; }
@@ -1301,7 +1338,7 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .pick span{
   display:flex; align-items:center; justify-content:center; gap:5px;
   min-height:var(--tap-row); padding:0 var(--s2);
-  border:1px solid rgba(var(--ghost-edge),.22); border-radius:var(--r-btn);
+  border:1px solid var(--border-default); border-radius:var(--r-btn);
   background:rgba(var(--ghost-fill),.07);
   font-size:var(--fs-legal); font-weight:600; text-align:center; cursor:pointer;
   transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
@@ -1500,18 +1537,31 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
    The three weights are told apart the way they always were, by fill weight and
    border, never by a hue. Primary carries a wash toward the type colour and a
    full strength edge, secondary is the bare card with a mid edge, ghost keeps
-   its dashed hairline. The edges were literal cream and are now the --ghost-edge
-   triple, which is the token that already carried "the tint of a hairline on
-   this surface" and which resolves to the same cream in the dark theme. */
+   its dashed hairline. The edges were literal cream, then the --ghost-edge
+   triple, and the three that are not primary are now --border-default.
+
+   THE THREE WEIGHTS NO LONGER SEPARATE BY EDGE ALPHA, and they did not need to.
+   Ranking secondary above ghost by running .42 against .34 spent the only axis
+   that carries a WCAG obligation on a distinction the fill and the stroke style
+   were already making: primary is the only one with a wash toward the type
+   colour, ghost is the only one drawn dashed, and secondary is the bare card
+   between them. Read the three side by side with every edge at the same weight
+   and they are still three. Read them with the alphas restored and secondary is
+   at 2.62:1 and ghost at 2.13:1, which is a hierarchy drawn in a range where
+   neither of them is reliably visible at all.
+
+   Primary keeps its wash edge, unchanged, because .85 is far above the mark in
+   both themes and it is the one weight whose edge is meant to be louder than
+   the token. */
 .btn--primary{ background:color-mix(in srgb, var(--text-primary) 14%, var(--card-surface)); border-color:rgba(var(--ghost-edge),.85); }
-.btn--secondary{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.42); }
-.btn--ghost{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.34); }
+.btn--secondary{ background:var(--card-surface); border-color:var(--border-default); }
+.btn--ghost{ background:var(--card-surface); border-color:var(--border-default); }
 .btn--danger{ background:color-mix(in srgb, var(--critical) 12%, var(--card-surface)); border-color:var(--critical-edge); color:var(--critical); }
-.btn[disabled]{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.22); }
+.btn[disabled]{ background:var(--card-surface); border-color:var(--border-default); }
 .btn:active{ background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface)); border-color:rgba(var(--ghost-edge),.95); }
 .btn--primary:active{ background:color-mix(in srgb, var(--text-primary) 34%, var(--card-surface)); }
 .btn--danger:active{ background:color-mix(in srgb, var(--critical) 26%, var(--card-surface)); }
-.btn[disabled]:active{ background:var(--card-surface); border-color:rgba(var(--ghost-edge),.22); }
+.btn[disabled]:active{ background:var(--card-surface); border-color:var(--border-default); }
 @media (hover:hover) and (pointer:fine){
   .btn--primary:hover{ background:color-mix(in srgb, var(--text-primary) 22%, var(--card-surface)); }
   .btn--secondary:hover,
@@ -1556,20 +1606,28 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
      it took .plate--work's three pixel double rule DOWN from --border-strong,
      which is a contrast reduction inside the block that exists to raise it. */
   .card, .sumcard, .plate, .fig, .row{ border-color:var(--border-strong); }
-  /* And every control, which is the half that matters more. A boundary drawn
-     from the --ghost-edge wash lands between 1.8:1 and 2.6:1 on a cream card,
-     under the 3:1 WCAG asks of anything you can press. That is an idiom older
-     than this task and shared with the customer build, so changing it at rest
-     is not this branch's to make; what IS this branch's is that the reader who
-     has already said the soft reading is not enough gets a real edge.
+  /* And every control, which is the half that matters more.
 
-     --border-strong rather than --border-default, and the first attempt used
-     the latter. It reads as the milder choice and is not: in the dark theme the
-     cream wash at 42% is already lighter than --border-default, so pinning that
-     token took the secondary button DOWN from 2.67:1 to 2.33:1 while claiming
-     to raise it. --border-strong cannot do that in either direction. The
-     pressed states stay distinguishable because they go to 2px here, and a
-     pressed chip carries a fill as well. */
+     WHAT THIS BLOCK USED TO BE CARRYING. It said the wash-drawn boundary landed
+     between 1.8:1 and 2.6:1 on a cream card, that this was an idiom older than
+     the task and shared with the customer build, and so "changing it at rest is
+     not this branch's to make" — leaving this block as the only place a control
+     had a real edge. That reasoning was sound about ownership and wrong about
+     consequence: it left the default reading of every console screen failing
+     1.4.11, and 1.4.11 is not a preference. The rest state is fixed now, in
+     both documents, and this block went back to being what it should always
+     have been: the stronger reading for a reader who asked for one, not the
+     only correct one.
+
+     --border-strong rather than --border-default still stands, and the reason
+     has changed. It used to be that pinning --border-default took the dark
+     secondary button DOWN from 2.67:1 to 2.33:1. That trap is gone, because
+     --border-default is now solved against the darkest ground each theme uses
+     rather than the lightest. What keeps --border-strong here is simpler: this
+     block exists to be louder than the default, and now that the default is a
+     real edge, repeating it would make the block do nothing. The pressed states
+     stay distinguishable because they go to 2px here, and a pressed chip
+     carries a fill as well. */
   .btn, .filter, .search input, .field input, .field select, .field textarea,
   .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn, .qact,
   .pick span{
@@ -1596,7 +1654,7 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
      line in near black on near black. */
   --text-inverse:#F5F3DC;
   --text-inverse-secondary:#B0AE97;
-  --border-default:#6F6F63;
+  --border-default:#7A7A6D;
 }
 .appbar .iconbtn:focus-visible{ box-shadow:0 0 0 5px var(--chrome-surface); }
 .badge{ border-color:var(--chrome-surface); }
@@ -1792,7 +1850,11 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
     --text-primary:#171717;
     --text-secondary:#57574E;
     --border-strong:#171717;
-    --border-default:#A8A695;
+    /* Solved against this island's own two grounds, not the theme's. #A8A695
+       stood here and reads 2.05:1 on the #FAF9F2 the island paints, because it
+       was inherited from a light theme whose surfaces were lighter than these.
+       #888678 clears on both: 3.47:1 on the island, 3.06:1 on its sunken step. */
+    --border-default:#888678;
     --hairline:#D9D6C5;
     --surface:#FAF9F2;
     --surface-sunken:#EDEBDE;
@@ -1833,7 +1895,11 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
   --text-primary:#171717;
   --text-secondary:#57574E;
   --border-strong:#171717;
-  --border-default:#A8A695;
+  /* Solved against this island's own two grounds, not the theme's. #A8A695
+     stood here and reads 2.05:1 on the #FAF9F2 the island paints, because it
+     was inherited from a light theme whose surfaces were lighter than these.
+     #888678 clears on both: 3.47:1 on the island, 3.06:1 on its sunken step. */
+  --border-default:#888678;
   --hairline:#D9D6C5;
   --surface:#FAF9F2;
   --surface-sunken:#EDEBDE;
