@@ -22,3 +22,7 @@ PROMPT-console-launcher.md
 # diffed locally; a hundred-odd PNGs in the history would bury the diffs this
 # branch actually needs to be readable.
 .baseline/
+
+# The local screenshot runner and its capture frame. Regenerate baselines with
+# "python _shots.py"; neither file is part of the build.
+_shots.py
