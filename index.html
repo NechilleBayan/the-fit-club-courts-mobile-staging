@@ -1226,7 +1226,21 @@ dialog[open]{ display:flex; flex-direction:column; justify-content:flex-end; pos
 
 /* ---------- DEMO HARNESS ---------- */
 .harness{ font-size:var(--fs-label); }
-.harness .sheet__head{ background:var(--surface-sunken); background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px); }
+/* The head is the only child of the sheet that paints a background, and the
+   sheet's own top corners are rounded, so without a radius of its own the hatch
+   was a square rectangle printing over both of them. .sheet has no overflow
+   clip and should not get one: it holds a scrolling body and focus rings on the
+   controls at its edges, and hiding the overflow to fix a background is the
+   sort of fix that takes something else with it.
+
+   One pixel less than the sheet's radius, because the head sits inside the
+   sheet's 1px border and an inner radius that matches the outer one leaves the
+   hatch riding up onto the border it is meant to stop under. */
+.harness .sheet__head{
+  background:var(--surface-sunken);
+  background-image:repeating-linear-gradient(45deg,var(--hatch) 0 3px,transparent 3px 8px);
+  border-radius:calc(var(--r-sheet) - 1px) calc(var(--r-sheet) - 1px) 0 0;
+}
 .harness h3{ font-size:var(--fs-label); font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:var(--s2); }
 .harness .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
 .harness .grid1{ display:grid; gap:var(--s2); }
@@ -8381,11 +8395,21 @@ const ACTIONS = {
   /* The one control that clears both halves. STAGING.reset() removes the key
      outright, which takes the theme with it, so the console is back to its own
      default the next time it is opened rather than still wearing a choice made
-     in here. Its subscriber repaints this document. */
+     in here.
+
+     IT LANDS ON THE PLAIN index.html, not on the route you happened to be
+     standing on. This used to close the sheet and go("/"), which is the landing
+     route inside this document and looks like the front page without being a
+     fresh arrival: the address bar still carried a hash, the router still held
+     the render it had, and anything a screen had put in module scope was still
+     there. A reset offered as the way back to a clean demo has to give one, and
+     a real navigation to the document with no fragment is the only thing that
+     does. The console's harness does exactly this with ../index.html, so the
+     control means the same thing from either half. */
   resetall: function(){
     resetRuntime();
     STAGING.reset();
-    closeSheet(); go("/");
+    location.href = "index.html";
   },
   scenario: function(el){ loadScenario(el.getAttribute("data-v")); }
 };

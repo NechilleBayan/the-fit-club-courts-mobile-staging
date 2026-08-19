@@ -368,11 +368,13 @@
       }
       if (what === "reset"){
         STAGING.reset();
-        STAGING.applyTheme("system");
-        paintUtilbar();
-        paintLauncherTheme();
-        paintHarness();
-        toast("Sandbox: Every dial is back to its default, theme included.");
+        /* And then out of the back office, onto the plain index.html. A reset
+           is offered as the way back to a clean demo, and a clean demo starts
+           at the front door of the thing being demonstrated rather than on
+           whichever console screen somebody happened to be reading. The write
+           to localStorage is synchronous, so it has landed before the
+           navigation begins. The customer build's own Reset does the same. */
+        location.href = "../index.html";
       }
     });
   }

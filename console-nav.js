@@ -499,7 +499,9 @@
       "and nothing you do on these screens reaches the club, a customer, or a card.</p>" +
       '<p class="legal">The simulated clock, connectivity, and Open Play capacity are dials the customer build reads and this one does not, ' +
       "so they are in its harness rather than duplicated here as controls that would do nothing. Every screen also carries a note at its foot " +
-      "saying what is sample about that screen in particular.</p></section>";
+      "saying what is sample about that screen in particular.</p>" +
+      "<p class=\"legal\">Reset all state clears every dial, the theme included, and leaves the back office for the customer build&rsquo;s front page. " +
+      "A reset is the way back to a clean demo, and a clean demo starts at the front door rather than on whichever screen you were reading.</p></section>";
 
     return '<div class="sheet__head">' +
         '<h2 id="staging-title">' + icon("flask") + "<span>Staging harness</span></h2>" +
