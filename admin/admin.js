@@ -3,7 +3,7 @@
    Shared shell, loaded by every page in this folder.
 
    The chrome is built here rather than pasted into each page. There are more
-   than twenty screens in this sandbox and the app bar, the drawer, and the tab
+   than twenty screens in this sandbox and the app bar, the launcher, and the tab
    bar are identical on all of them, so they live in one place: change a
    destination once and every screen follows. Each page declares what it is
    through data attributes on <body> and this file does the rest.
@@ -21,7 +21,7 @@
 
   /* ---------- DEMO STATE ----------
      One source for the numbers that appear in more than one place, so the badge
-     on the bell, the count in the drawer, and the figure on the dashboard
+     on the bell, the count in the launcher, and the figure on the dashboard
      cannot disagree with each other.
 
      THE CAST IS TWO PEOPLE.
@@ -36,7 +36,7 @@
 
      The roster is here rather than only in the markup because the counts have to
      agree in five places. pendingTasks is derived from it rather than typed
-     beside it, so a task moved between people cannot leave the bell, the drawer,
+     beside it, so a task moved between people cannot leave the bell, the launcher,
      and the dashboard saying three different numbers. */
   var STAFF = [
     { name:"Rea Salvador", role:"Club Manager", initials:"RS",
@@ -164,23 +164,18 @@
      here, which was right while the console was the only thing that had one; the
      staff shell in the customer build now draws the same sidebar, and two copies
      of a destination list is one place too many to remember to add a screen. The
-     five tab bar items and the drawer's groups both come from there.
+     five tab bar items and the launcher's groups both come from there.
 
      Kept as locals under the old names so the rest of this file reads as it did.
-     The drawer flattens the grouped model back into the single sequence it has
-     always rendered, because a dialog on a phone has no room to be a two level
-     structure and never pretended to. */
+     The flattened copy that used to sit here went with the drawer: it existed
+     because a drawer on a phone had no room to be a two level structure, and the
+     launcher is a full screen that does. */
   var NAV = window.CONSOLE_NAV;
   var TABS = NAV.TABS;
   /* Through groupsFor rather than at GROUPS directly. The console sees
      everything, which is what the "console" surface means, but it says so by
      asking rather than by helping itself. */
   var CONSOLE_GROUPS = NAV.groupsFor("console");
-
-  var DRAWER = CONSOLE_GROUPS.reduce(function(list, g){
-    list.push({ group: g.group });
-    return list.concat(g.items);
-  }, []);
 
   /* ---------- BUILD THE CHROME ---------- */
   function build(){
@@ -189,12 +184,21 @@
     var nav   = body.getAttribute("data-nav") || "";
     var back  = body.getAttribute("data-back");
 
-    /* The app bar. The left slot is either the hamburger or a back arrow, never
-       both: a screen that is one level down does not also need the drawer,
-       which is always two taps away from wherever it lands. */
+    /* The app bar's left slot holds a back arrow or nothing. It used to hold a
+       hamburger when there was no back arrow, and the hamburger opened a drawer
+       that listed every destination. Both are gone: the Console tab opens the
+       launcher, which is the same list, at every width. Two controls a thumb's
+       width apart opening the same twenty two destinations is a reader being
+       asked which of two identical menus they meant.
+
+       The slot is kept rather than collapsed, and it is kept empty rather than
+       filled. The title is centred against the controls on the right, so a start
+       slot that vanishes shifts the title; an empty one of the same width holds
+       the line where it was. aria-hidden because it is a spacer and announcing
+       one is worse than not drawing it. */
     var left = back
       ? '<a class="iconbtn iconbtn--bare" href="' + back + '" aria-label="Back">' + svg("chevL") + '</a>'
-      : '<button class="iconbtn iconbtn--bare" type="button" id="menuBtn" aria-label="Open menu" aria-haspopup="dialog">' + svg("menu") + '</button>';
+      : '<span class="appbar__spacer" aria-hidden="true"></span>';
 
     var bellLabel = DATA.unread
       ? "Notifications, " + DATA.unread + " unread"
@@ -242,7 +246,6 @@
     }).join("") + '</div>';
     shell.appendChild(tabs);
 
-    if (!back) buildDrawer(shell);
     buildSidebar(shell, nav);
     buildLauncher(shell, nav);
     buildMoreList();
@@ -344,12 +347,16 @@
     var a = document.activeElement;
     if (a && a !== document.body && document.contains(a)) return a;
     var candidates = [document.querySelector('.utilbar [data-action="demo"]'),
-                      document.getElementById("menuBtn"),
-                      /* A detail screen declares data-back, which means it has a
-                         back arrow instead of a hamburger and builds no drawer,
-                         so on a phone neither of the two above is on the page and
-                         focus was being dropped on the body. The back arrow is
-                         the one thing every such screen has. */
+                      /* Was the hamburger, which reached the drawer's copy of
+                         the harness row. The drawer is gone and the Console tab
+                         is what reaches that row now, so it is the phone's
+                         answer to the same question. */
+                      document.querySelector('.tabbar [data-launcher]'),
+                      /* A detail screen declares data-back, so it has a back
+                         arrow and, on a phone, no tab bar either; neither of the
+                         two above is on the page and focus was being dropped on
+                         the body. The back arrow is the one thing every such
+                         screen has. */
                       document.querySelector(".appbar__start a, .appbar__start button")];
     for (var i = 0; i < candidates.length; i++){
       var c = candidates[i];
@@ -390,9 +397,9 @@
      none also takes it out of the tab order and out of the accessibility tree, so
      a phone never meets a navigation it cannot see.
 
-     Unlike the drawer, this is built even on a screen that declares data-back.
-     The drawer is skipped there because a screen one level down does not need a
-     dialog it can reach in two taps; a sidebar is not a dialog, it is the frame,
+     It is built even on a screen that declares data-back, which the drawer that
+     used to live here was not: a screen one level down did not need a dialog it
+     could reach in two taps; a sidebar is not a dialog, it is the frame,
      and a detail screen missing the frame would be the only page in the console
      with no way out but the browser.
 
@@ -414,8 +421,8 @@
       badgeNoun: { unread:"unread", pendingTasks:"pending tasks",
                    checkins:"due to arrive", messages:"unread" },
       collapsed: !!(window.STAGING && STAGING.getNavCollapsed()),
-      /* Role only, not role plus club. The drawer can afford both because its
-         panel is 19rem of a phone screen with nothing beside it; the rail is
+      /* Role only, not role plus club. The drawer used to afford both because
+         its panel was 19rem with nothing beside it; the rail is
          narrower than that and the club name is the half that truncates, which
          leaves "Club Manager, The F..." saying less than "Club Manager" does. */
       head: { title: DATA.admin.name, sub: DATA.admin.role },
@@ -486,6 +493,7 @@
       /* No note. The console is the one surface that is shown every group, so
          there is nothing trimmed here to be honest about. The staff shell passes
          its own sentence when it draws the same list without the money area. */
+      foot: launcherBuildRows(),
       isCurrent: function(item){ return item.href === here; }
     });
     shell.appendChild(d);
@@ -518,77 +526,38 @@
     });
   }
 
-  function buildDrawer(shell){
-    var d = document.createElement("dialog");
-    d.className = "drawer";
-    d.id = "drawer";
-    d.setAttribute("aria-label", "Admin menu");
+  /* THE TWO BUILD CONTROLS, AND WHY THEY ARE HERE NOW.
+     The utility strip carries them from 1024px up and is display:none below it,
+     so on a phone they lived at the foot of the drawer. The drawer is gone, and
+     without a new home both would have become unreachable on a phone: the theme
+     toggle and the way into the staging harness, neither of which is a
+     destination and neither of which has any other control.
 
-    var rows = DRAWER.map(function(item){
-      if (item.group) return '<div class="drawer__group"><span>' + item.group + '</span></div>';
-      var here = location.pathname.split("/").pop() === item.href;
-      var count = item.badge && DATA[item.badge]
-        ? '<span class="countpill" aria-hidden="true">' + DATA[item.badge] + '</span>' : "";
-      var label = item.label + (count ? ", " + DATA[item.badge] + " unread" : "");
-      return '<a class="navrow' + (item.danger ? " navrow--danger" : "") + '" href="' + item.href + '"' +
-             (here ? ' aria-current="page"' : "") + (count ? ' aria-label="' + label + '"' : "") + '>' +
-             svg(item.icon) + '<span>' + item.label + '</span>' + count +
-             (item.danger ? "" : svg("chevR", "row__chev")) + '</a>';
-    }).join("");
+     So they sit at the foot of the launcher, under a heading, after every real
+     place the reader can go. That is exactly where the drawer put them and for
+     the same stated reason, and it is where the customer build puts the same two
+     at the same widths. No width shows two copies of either: the strip is above
+     1024, this is the menu, and they are never both on screen.
 
-    d.innerHTML =
-      '<div class="drawer__panel">' +
-        /* The brand takes the top of the panel and the close button sits beside
-           it, which is the same two-row shape the desktop rail uses: mark first,
-           then who is signed in. It is also where the close button already was,
-           so nothing about reaching it changed.
-
-           The mark is a picture of the club's name, so it is painted on an empty
-           span and named in a visually hidden sibling rather than given an alt.
-           The row below names the club again in full, and an alt here would have
-           a screen reader read it twice before reaching a single destination. */
-        '<div class="drawer__brand">' +
-          '<a class="drawer__mark" href="dashboard.html">' +
-            '<span class="drawer__markimg" aria-hidden="true"></span>' +
-            '<span class="vh">' + DATA.club.name + ', console home</span>' +
-          '</a>' +
-          '<button class="iconbtn iconbtn--bare" type="button" data-close aria-label="Close menu">' + svg("close") + '</button>' +
-        '</div>' +
-        '<div class="drawer__head">' +
-          '<span class="avatar avatar--lg" aria-hidden="true">' + DATA.admin.initials + '</span>' +
-          '<span class="drawer__id"><b>' + DATA.admin.name + '</b><span>' + DATA.admin.role + ' &middot; ' + DATA.club.name + '</span></span>' +
-        '</div>' +
-        '<div class="drawer__body">' + rows + drawerBuildRows() + '</div>' +
-      '</div>';
-    shell.appendChild(d);
-  }
-
-  /* THE PHONE'S ANSWER TO THE UTILITY STRIP.
-     The strip is desktop only and that is a decision, not an omission: It costs
-     36px of permanent chrome, and this console already spends 118 of a 390x844
-     screen's 844 on its app bar and tab bar. A third strip would take the frame
-     past 18% of the viewport to carry two controls a reader touches at most once
-     a session.
-
-     So they go where a phone already looks for things that are not destinations:
-     the foot of the drawer, under a rule, after every real place the reader can
-     go. That is where the customer build put the same two controls at the same
-     widths, and its comment says why, so this is the console adopting an answer
-     rather than inventing a second one. No width shows two copies of either. */
-  function drawerBuildRows(){
+     They are markup rather than model, unlike everything above them, because
+     they are not destinations and CONSOLE_NAV is a list of places. */
+  function launcherBuildRows(){
     var dark = currentTheme() === "dark";
-    return '<div class="drawer__group drawer__group--build"><span>This build</span></div>' +
-      /* No aria-pressed; see the note in console-nav.js. The visible label here
-         is the theme this row switches TO, which is an action, and a pressed
-         state on top of it says the opposite of what the label says. */
-      '<button class="navrow" type="button" data-action="theme" id="drawerTheme">' +
+    return '<div class="launcher__foot">' +
+      '<h3 class="lsec__h" id="lsec-build">This build</h3>' +
+      /* No aria-pressed. The visible label names the theme this switches TO,
+         which is an action, and a pressed state on top of it says the opposite
+         of what the label says. Same decision as the strip and the customer
+         build's menu; see console-nav.js for the argument. */
+      '<button class="lfoot" type="button" data-action="theme" id="launcherTheme">' +
         svg(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>" +
-      '<button class="navrow" type="button" data-action="demo" aria-haspopup="dialog">' +
-        svg("flask") + "<span>Staging build</span></button>";
+      '<button class="lfoot" type="button" data-action="demo" aria-haspopup="dialog">' +
+        svg("flask") + "<span>Staging build</span></button>" +
+      "</div>";
   }
 
-  function paintDrawerTheme(){
-    var b = document.getElementById("drawerTheme");
+  function paintLauncherTheme(){
+    var b = document.getElementById("launcherTheme");
     if (!b) return;
     var dark = currentTheme() === "dark";
     b.innerHTML = svg(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span>";
@@ -864,36 +833,8 @@
 
   /* ---------- BEHAVIOUR ---------- */
   function wire(){
-    var drawer = document.getElementById("drawer");
-    var menuBtn = document.getElementById("menuBtn");
-
     if (window.CONSOLE_NAV) CONSOLE_NAV.wireSidebar(document);
 
-    /* The drawer and the sidebar are the same navigation at two widths, and they
-       must never both be present. Below 1024 the sidebar is display:none and the
-       drawer is the answer; from 1024 up the sidebar is the frame and the
-       hamburger that opens the drawer is hidden. The one gap either stylesheet
-       leaves is a reader who opens the drawer on a narrow window and then widens
-       it, which would leave a modal dialog sitting over a navigation that already
-       says the same thing. Closing it on the way past is the whole fix. */
-    if (window.matchMedia){
-      var wide = matchMedia("(min-width:1024px)");
-      var onWide = function(e){
-        if (e.matches && drawer && drawer.open) drawer.close();
-      };
-      if (wide.addEventListener) wide.addEventListener("change", onWide);
-      else if (wide.addListener) wide.addListener(onWide);
-    }
-
-    if (menuBtn && drawer){
-      menuBtn.addEventListener("click", function(){ drawer.showModal(); });
-      /* A click on the backdrop is a click on the dialog element itself, since
-         the panel does not cover the whole box. That is the whole test. */
-      drawer.addEventListener("click", function(e){
-        if (e.target === drawer) drawer.close();
-      });
-      drawer.addEventListener("close", function(){ menuBtn.focus(); });
-    }
     document.addEventListener("click", function(e){
       var c = e.target.closest("[data-close]");
       if (c){ var dlg = c.closest("dialog"); if (dlg) dlg.close(); }
@@ -906,23 +847,26 @@
       if (s && e.target === s) s.close();
     });
 
-    /* The utility strip's two controls, and the drawer rows that carry the same
-       two on a phone. One handler for both, so the strip and the drawer can
-       never drift: Below 1024 only the drawer rows exist and above it only the
-       strip does, which is the rule that keeps no width showing two copies. */
+    /* The utility strip's two controls, and the launcher rows that carry the
+       same two on a phone. One handler for both, so the strip and the launcher
+       can never drift: Below 1024 only the launcher's rows exist and above it
+       only the strip does, which is the rule that keeps no width showing two
+       copies of either. */
     document.addEventListener("click", function(e){
       var t = e.target.closest('[data-action="theme"]');
       if (t){ toggleTheme(); return; }
       var m = e.target.closest('[data-action="demo"]');
       if (m){
-        var d = document.getElementById("drawer");
+        /* The harness row lives in the launcher now, so the launcher is what
+           has to get out of the way before the harness opens over it. */
+        var d = document.getElementById("launcher");
         if (d && d.open) d.close();
         openStaging();
       }
     });
 
-    /* Log Out is the one drawer row that is not a destination. In the sandbox it
-       says what it would do rather than pretending to do it. */
+    /* Log Out is the one card in the launcher that is not a destination. In the
+       sandbox it says what it would do rather than pretending to do it. */
     document.addEventListener("click", function(e){
       var a = e.target.closest('a[href="#logout"]');
       if (!a) return;
@@ -1100,7 +1044,7 @@
            fires for their own tap and for a theme set in the customer build in
            another tab, and both end here. */
         paintUtilbar();
-        paintDrawerTheme();
+        paintLauncherTheme();
       }
       if (changed.indexOf("scenario") >= 0) applyScenario();
     });

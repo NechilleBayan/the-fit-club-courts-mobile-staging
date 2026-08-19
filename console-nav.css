@@ -710,6 +710,25 @@
    label pushes it instead of colliding with it. */
 .lcard .countpill{ grid-column:2; grid-row:1; justify-self:end; align-self:center; }
 
+/* ---------- THE FOOT ----------
+   Things that are not destinations, after every place the reader can go. The
+   console's two build controls live here now that the drawer that used to hold
+   them on a phone is gone. Rows rather than cards, because a card says "a place
+   to go" and neither of these is one. */
+.launcher__foot{ margin-top:var(--s7); }
+.launcher__foot .lsec__h{ margin-bottom:var(--s2); }
+.lfoot{
+  display:flex; align-items:center; gap:var(--s3);
+  width:100%; min-height:var(--tap-row, 48px);
+  padding:var(--s2) var(--s3);
+  background:none; border:0; border-radius:var(--r-btn);
+  font:inherit; font-weight:600; color:var(--text-primary);
+  text-align:left; cursor:pointer;
+}
+.lfoot svg{ flex:none; width:22px; height:22px; opacity:.9; }
+.lfoot:hover{ background:var(--surface-sunken); }
+.lfoot:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:-2px; }
+
 .launcher__note{
   margin:var(--s7) 0 0;
   font-size:.82rem; color:var(--text-secondary); line-height:1.5;

@@ -31,9 +31,12 @@
    thing that is. The five destinations that earn permanent space are not the
    same set as the twenty two that need to exist, and pretending they were is
    what put five of them behind a leaf page for as long as it did. The drawer is
-   still what a phone gets below 1024px; above it the launcher is what the
-   Console row opens, and it is the only complete view of the console at any
-   width.
+   gone. It was retired once the launcher existed at every width, because the
+   two of them below 1024px were the same twenty two destinations reached two
+   ways, and a hamburger next to a Console tab is a reader being asked which of
+   two identical menus they meant. The launcher is what the Console row and the
+   Console tab both open, at every width, and it is the only complete view of
+   the console there is.
 
    WHAT IS NOT SHARED, AND WHY.
    The PRIMARY section differs between the two documents on purpose. The console's
@@ -616,6 +619,11 @@
      opts.currentTab  the id of the tab that opened this, drawn pressed
      opts.title       the heading, and the dialog's accessible name
      opts.note        the permission sentence, where a group was trimmed
+     opts.foot        markup after the groups, for things that are not
+                      destinations. The console puts its two build controls here
+                      now that the drawer that used to hold them is gone; the
+                      customer build passes nothing, because its own menu still
+                      carries them and no width may show two copies of either.
      opts.isCurrent   function(item) -> is this the page underneath */
   /* THE CARDS THEMSELVES, RENDERED APART FROM THE DIALOG THAT USUALLY HOLDS THEM.
      Two things draw this grid: the launcher, and more.html, which is the page a
@@ -698,6 +706,7 @@
       ' aria-label="Close the console list">' + icon("close") + "</button>" +
       "</div>" +
       '<div class="launcher__body">' + sections +
+      (opts.foot || "") +
       (opts.note ? '<p class="launcher__note">' + esc(opts.note) + "</p>" : "") +
       "</div>" +
       (tabs ? '<nav class="launcher__tabs" aria-label="Main">' + tabs + "</nav>" : "");

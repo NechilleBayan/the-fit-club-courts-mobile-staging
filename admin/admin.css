@@ -134,7 +134,7 @@
   --focus-ring:#171717;
   --focus-halo:#F8F7F2;
 
-  /* --chrome-surface is the app bar, the tab bar, the drawer head, and the
+  /* --chrome-surface is the app bar, the tab bar, the launcher's bar, and the
      rail's brand block, and it is ink in BOTH themes: A frame lighter than what
      it frames stops reading as a frame, so in the dark theme it drops below the
      page rather than inverting.
@@ -450,7 +450,7 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
    the bell and the avatar share the right. Below 340px the avatar is dropped
    rather than squeezed: two 44px targets and a centred title do not fit beside a
    third, and a title that truncates to nothing is worse than a missing avatar
-   that is one tap away inside the drawer. */
+   that is one tap away inside the launcher. */
 .appbar{
   /* Below the utility strip rather than at the viewport's edge. --utilbar-h is
      0px until the width where the strip exists, so this is the same rule at
@@ -471,6 +471,13 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 .appbar__end{ display:flex; align-items:center; gap:2px; }
+/* The empty start slot on a screen with no back arrow. It is the width of the
+   control that used to sit there, because the title is centred in the column
+   between the two clusters and a start slot of zero drags it 45px to the left
+   of where it has always been. A spacer rather than a wider title column, so
+   the back arrow and the nothing occupy the same geometry and no screen's
+   title moves depending on whether it is one level down. */
+.appbar__spacer{ display:block; width:var(--tap-min); height:1px; }
 .appbar .iconbtn{ color:var(--text-inverse); border-color:transparent; }
 .appbar .iconbtn:active{ background:rgba(var(--ghost-edge),.18); }
 .appbar .iconbtn:focus-visible{ outline-color:var(--text-inverse); box-shadow:0 0 0 5px var(--surface-inverse); }
@@ -520,7 +527,7 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
 /* On a page surface rather than on the inverse app bar the ring has to match the
    page, or the badge carries a dark halo on cream. */
 .badge--onpage{ border-color:var(--surface); }
-/* Inline count beside a label, for the drawer rows and the task headings.
+/* Inline count beside a label, for the launcher's cards and the task headings.
 
    The solid pill is --caution. Counted across the console it is nearly always a
    queue rather than a casualty: Six still to check in, five pending tasks, four
@@ -537,91 +544,18 @@ body.has-dock main{ padding-bottom:calc(var(--tabbar-h) + var(--dock-h) + var(--
 .countpill--critical{ background:var(--critical); color:var(--critical-on); }
 .countpill--quiet{ background:rgba(var(--ghost-fill),.14); color:var(--text-primary); border:1px solid rgba(var(--ghost-edge),.30); }
 
-/* ---------- DRAWER ----------
-   A left edge panel, because the button that opens it is on the left edge. It is
-   a real <dialog>, so the focus trap, the Escape key, and the inert background
-   are the platform's and are worth keeping. Only the geometry is authored. */
+/* ---------- DIALOGS ----------
+   The base every dialog in the console sits on: the launcher, the staging
+   notice, and the harness sheet. A real <dialog> in each case, so the focus
+   trap, the Escape key, and the inert background are the platform's. Only the
+   geometry is ever authored, and each one authors its own.
+
+   A left edge drawer used to be authored here, opened by a hamburger in the app
+   bar. Both are gone. Below 1024 it listed the same twenty two destinations the
+   launcher lists, reached from a control a thumb's width from the Console tab,
+   which is a reader being asked which of two identical menus they meant. */
 dialog{ padding:0; border:0; background:transparent; max-width:100%; max-height:100%; color:var(--text-primary); }
 dialog::backdrop{ background:var(--overlay); }
-.drawer[open]{
-  display:flex; position:fixed; inset:0; width:auto; height:auto;
-  justify-content:flex-start; align-items:stretch;
-}
-.drawer__panel{
-  width:min(19rem, calc(100% - 48px)); height:100%;
-  display:flex; flex-direction:column;
-  background:var(--surface-raised); border-right:1px solid var(--border-strong);
-  box-shadow:12px 0 40px var(--shadow-print);
-}
-@media (prefers-reduced-motion:no-preference){
-  .drawer[open] .drawer__panel{ animation:drawer-in 200ms var(--ease) both; }
-  .drawer[open]::backdrop{ animation:fade-in 200ms var(--ease) both; }
-}
-@keyframes drawer-in{ from{ transform:translateX(-100%); } to{ transform:translateX(0); } }
-@keyframes fade-in{ from{ opacity:0; } to{ opacity:1; } }
-
-/* THE BRAND ROW.
-   The phone menu is the only navigation a reader sees at this width, and until
-   now it opened onto a name and a role with nothing saying whose club this was.
-   The mark takes the top of the panel, above the identity, and carries the
-   safe-area padding that used to sit on the head, since it is the row that now
-   touches the notch.
-
-   Sized from height with the file's own 640x337 ratio on the box, the same way
-   the rail and the customer header size it: background-size:contain fits by the
-   tighter axis, so any other ratio paints a small mark inside a wide empty box.
-   The source is the shared token with the file as its fallback, and the path
-   resolves against this stylesheet in admin/, hence the step up. */
-.drawer__brand{
-  display:flex; align-items:center; gap:var(--s3);
-  padding:calc(var(--s4) + env(safe-area-inset-top)) var(--s4) var(--s3);
-  background:var(--surface-inverse); color:var(--text-inverse);
-}
-.drawer__mark{ flex:1 1 auto; min-width:0; display:flex; align-items:center; border-radius:var(--r-btn); }
-.drawer__markimg{
-  display:block; width:auto; height:30px;
-  aspect-ratio:640 / 337;
-  background:var(--img-logo, url("../v2/assets/logo.png")) left center/contain no-repeat;
-  /* The file is black on transparency and this block is the inverse surface in
-     both themes, so the inversion is unconditional rather than theme-keyed. */
-  filter:invert(1);
-}
-.drawer__mark:focus-visible{ outline:2px solid var(--text-inverse); outline-offset:2px; }
-.drawer__mark:hover .drawer__markimg{ opacity:.82; }
-
-/* The identity row keeps the inverse surface so the brand and the person read as
-   one block, but it gives up the top padding to the row above it. */
-.drawer__head{
-  display:flex; align-items:center; gap:var(--s3);
-  padding:0 var(--s4) var(--s4);
-  background:var(--surface-inverse); color:var(--text-inverse);
-}
-.drawer__id{ min-width:0; flex:1 1 auto; }
-.drawer__id b{ display:block; font-size:var(--fs-h3); line-height:var(--lh-h3); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.drawer__id span{ display:block; font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-inverse-secondary); }
-.drawer__head .iconbtn{ color:var(--text-inverse); border-color:transparent; }
-.drawer__body{ flex:1 1 auto; overflow-y:auto; padding:var(--s3) 0 calc(var(--s4) + env(safe-area-inset-bottom)); }
-.drawer__group{ padding:var(--s3) var(--s4) var(--s2); }
-.drawer__group span{ font-size:var(--fs-eyebrow); line-height:var(--lh-eyebrow); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-secondary); }
-
-/* Rows separated by a hairline, not boxed. This is a list of destinations, and
-   drawing twelve cards for twelve one line rows would be the heaviest thing on
-   the screen. */
-.navrow{
-  display:flex; align-items:center; gap:var(--s3); width:100%;
-  min-height:var(--tap-row); padding:var(--s2) var(--s4);
-  border-top:1px solid var(--hairline); text-decoration:none;
-  font-size:var(--fs-label); line-height:var(--lh-label); font-weight:600;
-  transition:background var(--dur-ui) var(--ease);
-}
-.navrow:first-of-type{ border-top:0; }
-.navrow span{ flex:1 1 auto; min-width:0; }
-.navrow svg{ width:20px; height:20px; opacity:.9; }
-.navrow:active{ background:rgba(var(--ghost-fill),.10); }
-.navrow[aria-current="page"]{ background:rgba(var(--ghost-fill),.12); font-weight:700; }
-.navrow[aria-current="page"] span::after{ content:""; }
-.navrow--danger{ color:var(--critical); }
-
 /* ---------- BOTTOM TAB BAR ----------
    Five items, and five is the ceiling. The inverse fill matches the app bar, so
    the console is framed top and bottom by the same surface. */
@@ -1399,12 +1333,6 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 /* The staging notice's own look lives in console-nav.css, with the utility
    strip that opens it, because the customer build shows the same dialog.
 
-   The two build controls at the foot of the drawer, which is where a phone
-   reaches what the desktop keeps in the utility strip. The rule above the group
-   is heavier than the hairline between destinations, because what follows it is
-   not a destination. */
-.drawer__group--build{ border-top:1px solid var(--border-strong); margin-top:var(--s3); }
-
 /* ---------- SANDBOX MARK ----------
    Every page in this folder is a prototype and says so once, quietly, at the
    bottom. It is not a banner, because a banner that appears on twenty four
@@ -1490,7 +1418,7 @@ a.plate:active{ background:rgba(var(--ghost-fill),.22); transform:scale(.99); }
 .card, .row, .btn, .sumcard, .qact, .plate, .fig,
 .filter, .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn,
 .search input, .field input, .field select, .field textarea, .pick span,
-.drawer__panel, .sheet__panel{
+.sheet__panel{
   background:var(--card-surface);
 
   /* A card is its own ground. Anything nested inside it resolves against the
@@ -1640,13 +1568,7 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
    they drop below the page rather than inverting to cream, because a frame that
    is lighter than what it frames stops reading as a frame. */
 .appbar,
-.tabbar,
-/* The brand row is the same block of chrome as the identity row under it, so it
-   takes the same pinned pair. Left on --surface-inverse it would flip with the
-   theme while the row it is welded to did not, and the panel would open with a
-   pale strip above a dark one. */
-.drawer__brand,
-.drawer__head{
+.tabbar{
   background:var(--chrome-surface); color:var(--text-inverse); border-color:#3A3A36;
   /* The chrome is ink in both themes, so the "on inverse" pair has to be
      pinned rather than left to the theme. Read from the theme it flips to dark
@@ -1701,12 +1623,12 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
    the part that is not: how this shell reflows around it, and which of the
    phone's two navigations it replaces.
 
-   IT REPLACES BOTH OF THEM.
-   Below 1024 the console navigates with a five item bottom bar plus a drawer
-   dialog behind a hamburger. Above it, both go: The bar because a fixed strip
-   across the foot of a 1440px window is a phone control stranded on a desk, and
-   the drawer because everything it held now fits on screen permanently. A drawer
-   is a way to borrow space that does not exist, and at this width it does.
+   IT REPLACES THE BAR.
+   Below 1024 the console navigates with a five item bottom bar whose last tab
+   opens the launcher. Above it the bar goes, because a fixed strip across the
+   foot of a 1440px window is a phone control stranded on a desk, and the same
+   five destinations become the rail. The launcher stays at both widths: it is
+   the only complete view of the console and the rail is deliberately not one.
    ============================================================ */
 @media (min-width:1024px){
   :root{
@@ -1757,11 +1679,9 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
      directly above the avatar rather than a gutter off it. */
   .utilbar__inner{ padding-inline:var(--gutter); }
 
-  /* Both of the phone's navigations, gone rather than hidden behind the content.
-     The hamburger goes with the drawer: A button that opens a dialog nobody
-     needs is worse than no button. */
+  /* The phone's navigation, gone rather than hidden behind the content. The
+     rail says the same five things and says them permanently. */
   .tabbar{ display:none; }
-  #menuBtn{ display:none; }
 
   /* The tab bar was holding the foot of every screen open. With it gone, the
      padding it reserved is a hole. */
@@ -1831,7 +1751,7 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
   :where(:root:not([data-theme="light"])) :where(.card, .row, .btn, .sumcard, .qact, .plate, .fig,
   .filter, .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn,
   .search input, .field input, .field select, .field textarea, .pick span,
-  .drawer__panel, .sheet__panel){
+  .sheet__panel){
     /* The washes and hairlines above tint toward cream here, because they are
        being painted on a dark card rather than on paper. */
     --ghost-fill:246,244,221;
@@ -1881,7 +1801,7 @@ a.plate:active{ background:color-mix(in srgb, var(--text-primary) 14%, var(--car
 :where(:root[data-theme="dark"]) :where(.card, .row, .btn, .sumcard, .qact, .plate, .fig,
 .filter, .seg button, .seg a, .daybtn, .datenav__date, .datenav .iconbtn,
 .search input, .field input, .field select, .field textarea, .pick span,
-.drawer__panel, .sheet__panel){
+.sheet__panel){
   --ghost-fill:246,244,221;
   --hairline:#3A3A36;
   --hatch:rgba(245,243,220,0.16);
