@@ -7736,26 +7736,54 @@ function openAppMenu(){
   const dlg = document.getElementById("sheet");
   const dark = currentTheme() === "dark";
   const path = currentPath();
+  /* TWO MENUS, BECAUSE TWO APPLICATIONS SHARE THIS BUTTON.
+     The staff shell is a different application wearing the same chrome, and this
+     menu was handing a reader on a shift the visitor's list: Rates, Visit, My
+     Bookings, and a Log in that offers a customer account to somebody who is not
+     a customer. None of the four is a thing to do during a shift.
+
+     So a staff route gets the shift's own destinations and nothing else. The
+     account block goes with the visitor list: the account this document knows
+     about is a player's, and a Front Desk reader signing into one from the till
+     is not a flow this product has.
+
+     WHAT THIS DUPLICATES, AND WHAT IT DOES NOT. Four of the five are also in the
+     bottom bar at this width, which is usually the thing to avoid. Exceptions is
+     not: it gave its permanent slot to Console, so outside the launcher this
+     menu is the only place it appears. The rule the rest of the build follows is
+     that a width may fold destinations away and may never lose one, and a menu
+     that listed four of five would be losing one to avoid a repetition nobody
+     has complained about. */
+  const staff = document.body.classList.contains("shell-staff");
   let b = '<div class="menusheet">';
-  if (S.account){
-    b += '<p class="acct__who" style="border:0;padding:0 0 var(--s3)">Signed in as<strong>' +
-      esc(S.account.name || S.account.mobile) + "</strong></p>";
-  }
-  /* The same list the navigation strip is built from, unfiltered: a width is a
-     reason to fold destinations away, never a reason to lose one. My Bookings
-     resolves against the account exactly as it does up there, so signed out it
-     lands on Find My Booking rather than on an unexplained sign-in wall. */
-  PUBLIC_NAV.forEach(function(t){
-    const href = tabHref(t);
-    b += '<button class="menurow" data-action="acctnav" data-to="' + esc(href) + '"' +
-      (t.match.indexOf(path) >= 0 ? ' aria-current="page"' : "") + ">" +
-      icon(t.glyph) + "<span>" + esc(t.label) + "</span></button>";
-  });
-  if (S.account){
-    b += '<button class="menurow" data-action="acctnav" data-to="/me/profile">' + icon("person") + "<span>Profile</span></button>";
-    b += '<button class="menurow" data-action="signout">' + icon("return") + "<span>Log out</span></button>";
+  if (staff){
+    STAFF_TABS.forEach(function(t){
+      const href = tabHref(t);
+      b += '<button class="menurow" data-action="acctnav" data-to="' + esc(href) + '"' +
+        (t.match.indexOf(path) >= 0 ? ' aria-current="page"' : "") + ">" +
+        icon(t.glyph) + "<span>" + esc(t.label) + "</span></button>";
+    });
   } else {
-    b += '<button class="menurow" data-action="acctnav" data-to="/signin">' + icon("person") + "<span>Log in</span></button>";
+    if (S.account){
+      b += '<p class="acct__who" style="border:0;padding:0 0 var(--s3)">Signed in as<strong>' +
+        esc(S.account.name || S.account.mobile) + "</strong></p>";
+    }
+    /* The same list the navigation strip is built from, unfiltered: a width is a
+       reason to fold destinations away, never a reason to lose one. My Bookings
+       resolves against the account exactly as it does up there, so signed out it
+       lands on Find My Booking rather than on an unexplained sign-in wall. */
+    PUBLIC_NAV.forEach(function(t){
+      const href = tabHref(t);
+      b += '<button class="menurow" data-action="acctnav" data-to="' + esc(href) + '"' +
+        (t.match.indexOf(path) >= 0 ? ' aria-current="page"' : "") + ">" +
+        icon(t.glyph) + "<span>" + esc(t.label) + "</span></button>";
+    });
+    if (S.account){
+      b += '<button class="menurow" data-action="acctnav" data-to="/me/profile">' + icon("person") + "<span>Profile</span></button>";
+      b += '<button class="menurow" data-action="signout">' + icon("return") + "<span>Log out</span></button>";
+    } else {
+      b += '<button class="menurow" data-action="acctnav" data-to="/signin">' + icon("person") + "<span>Log in</span></button>";
+    }
   }
   /* The build controls, last. Neither is a customer task, and from 1024px up they
      are in the utility strip instead, so no width shows two copies of either. */
@@ -7767,7 +7795,8 @@ function openAppMenu(){
     icon(dark ? "sun" : "moon") + "<span>" + (dark ? "Day theme" : "Night theme") + "</span></button>";
   b += '<button class="menurow" data-action="demo">' + icon("flask") + "<span>Staging harness</span></button>";
   b += "</div>";
-  dlg.innerHTML = '<div class="sheet"><div class="sheet__head"><h2 id="sheet-title">Menu</h2>' +
+  dlg.innerHTML = '<div class="sheet"><div class="sheet__head"><h2 id="sheet-title">' +
+    (staff ? "This shift" : "Menu") + "</h2>" +
     '<button class="sheet__close" data-action="closesheet" aria-label="Close the menu">' + icon("x") + "</button></div>" +
     '<div class="sheet__body">' + b + "</div></div>";
   dlg.classList.add("is-anchored");
