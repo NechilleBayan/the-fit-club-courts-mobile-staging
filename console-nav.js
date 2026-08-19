@@ -526,12 +526,26 @@
      opts.title       the heading, and the dialog's accessible name
      opts.note        the permission sentence, where a group was trimmed
      opts.isCurrent   function(item) -> is this the page underneath */
-  function launcher(opts) {
+  /* THE CARDS THEMSELVES, RENDERED APART FROM THE DIALOG THAT USUALLY HOLDS THEM.
+     Two things draw this grid: the launcher, and more.html, which is the page a
+     reader lands on by typing the URL. They have to agree about every label,
+     description, badge, and permission trim, and the only way to guarantee that
+     is for there to be one function rather than two that look alike. This is
+     that function; launcher() wraps it in a dialog and more.html drops it into a
+     page.
+
+     opts.headingLevel exists because the two callers sit at different depths.
+     The dialog's own title is the h2, so its groups are h3. more.html's own
+     title is the h1, so its groups are h2. Hardcoding either would leave one of
+     them with a hole in its heading order, which is a real cost to a reader
+     moving by headings and an invisible one to everybody else. */
+  function cards(opts) {
     var icon = opts.icon;
     var prefix = opts.prefix || "";
     var counts = opts.counts || {};
     var groups = opts.groups || [];
     var isCurrent = opts.isCurrent || function () { return false; };
+    var h = opts.headingLevel || "h3";
 
     function card(item) {
       var href = item.absolute ? item.href : prefix + item.href;
@@ -557,15 +571,21 @@
         count + cur + "</a>";
     }
 
-    var sections = groups.map(function (g, i) {
-      var id = "lsec-" + i;
+    return groups.map(function (g, i) {
+      var id = (opts.idPrefix || "lsec-") + i;
       /* A real heading, and a section that points at it. Six labelled groups a
          screen reader can jump between is the difference between this and a
          flat list of twenty two links. */
       return '<section class="lsec" aria-labelledby="' + id + '">' +
-        '<h3 class="lsec__h" id="' + id + '">' + esc(g.group) + "</h3>" +
+        "<" + h + ' class="lsec__h" id="' + id + '">' + esc(g.group) + "</" + h + ">" +
         '<div class="lgrid">' + g.items.map(card).join("") + "</div></section>";
     }).join("");
+  }
+
+  function launcher(opts) {
+    var icon = opts.icon;
+    var prefix = opts.prefix || "";
+    var sections = cards(opts);
 
     var tabs = (opts.tabs || []).map(function (t) {
       var on = t.id === opts.currentTab;
@@ -655,6 +675,7 @@
     utilbar: utilbar,
     launcher: launcher,
     wireLauncher: wireLauncher,
+    cards: cards,
     notice: notice,
     /* The groups this surface is allowed to see. The money area is the
        Operations Manager's, and everything else is everyone's.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>More - Admin - The Fit Club Courts</title>
+<title>Console - Admin - The Fit Club Courts</title>
 <meta name="color-scheme" content="light dark">
 <!-- The staging bridge, shared with the customer build one level up. Synchronous
      and ahead of the stylesheet because the first thing it does is settle the
@@ -20,110 +20,54 @@
      name with. -->
 <link rel="stylesheet" href="../console-nav.css">
 </head>
-<body data-title="More" data-nav="console">
+<body data-title="Console" data-nav="console">
 <div id="shell">
 <main id="main">
 
-  <h1 class="screen" tabindex="-1">More</h1>
-  <p class="legal">Operational tools that do not need a permanent slot in the bottom bar.</p>
+  <h1 class="screen" tabindex="-1">Console</h1>
+  <p class="legal">Every destination in this console, in one list.</p>
 
-  <!-- ---------- WHY THIS PAGE EXISTS ----------
-       The bottom bar is capped at five, and these eight are all real daily
-       tools: they are used often enough to belong in the operational half of the
-       app rather than behind the menu, but not often enough to displace
-       Dashboard, Bookings, Courts, or Staff. The menu behind the hamburger is a
-       different thing again: that is where the club's settings live, not its
-       shift work. -->
-  <section class="section" aria-labelledby="s-daily">
-    <h2 class="sec" id="s-daily">Daily Tools</h2>
-    <div class="rows">
+  <!-- ---------- WHY THIS PAGE STILL EXISTS ----------
+       It used to be the place the bottom bar's fifth tab went, holding the eight
+       tools that were used often enough to matter and not often enough to earn a
+       tab. That is not what it is any more. The fifth tab opens the launcher now,
+       which draws this same list over whatever page the reader was already on,
+       and this page is what is left when that does not happen: a reader who typed
+       the URL, a bookmark, a link from somewhere else.
 
-      <a class="row" href="check-in.html">
-        <span data-icon="checkc"></span>
-        <span class="row__main">
-          <span class="row__title">Check-in</span>
-          <span class="row__sub">Arrivals for today, court by court</span>
-        </span>
-        <span class="countpill">6</span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
+       IT IS RENDERED, NOT WRITTEN. The list below comes from CONSOLE_NAV, the
+       same array the rail, the tab bar, and the launcher draw. It used to be
+       markup, and being markup is how five destinations ended up living here and
+       in no navigation at all. A hand written copy of a list that exists
+       elsewhere is a copy that will disagree with it, and this page is the proof:
+       it disagreed for long enough that Check-in was unreachable from a laptop.
 
-      <a class="row" href="open-play.html">
-        <span data-icon="play"></span>
-        <span class="row__main">
-          <span class="row__title">Open Play</span>
-          <span class="row__sub">Sessions, rosters, and capacity</span>
-        </span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
+       WHAT WOULD HAVE TO BE TRUE TO DELETE IT. Three things, and none of them is
+       true today. The Console control would have to be reachable on every screen
+       a reader can land on, including the ones that draw a back arrow instead of
+       a menu. Nothing would have to link here, which means the tab bar's href
+       and the rail row's href both stop being real URLs and become buttons.
+       And the launcher would have to be the answer for a reader whose script did
+       not run, which it cannot be, because it is script. Until then this URL
+       resolves to something rather than to a 404. -->
+  <div id="moreList"></div>
 
-      <a class="row" href="payments.html">
-        <span data-icon="card"></span>
-        <span class="row__main">
-          <span class="row__title">Payments</span>
-          <span class="row__sub">Balances, refunds, and receipts</span>
-        </span>
-        <span class="countpill">4</span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
-
-      <a class="row" href="maintenance.html">
-        <span data-icon="wrench"></span>
-        <span class="row__main">
-          <span class="row__title">Maintenance</span>
-          <span class="row__sub">Court work, logs, and inspections</span>
-        </span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
-
-      <a class="row" href="closures.html">
-        <span data-icon="lock"></span>
-        <span class="row__main">
-          <span class="row__title">Blocked Dates and Closures</span>
-          <span class="row__sub">Rest days, holidays, and full day blocks</span>
-        </span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
-
-      <a class="row" href="messages.html">
-        <span data-icon="message"></span>
-        <span class="row__main">
-          <span class="row__title">Messages</span>
-          <span class="row__sub">Conversations with customers</span>
-        </span>
-        <span class="countpill">2</span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
-
-      <a class="row" href="reports.html">
-        <span data-icon="chart"></span>
-        <span class="row__main">
-          <span class="row__title">Reports</span>
-          <span class="row__sub">Bookings, revenue, and utilization</span>
-        </span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
-
-      <a class="row" href="activity.html">
-        <span data-icon="activity"></span>
-        <span class="row__main">
-          <span class="row__title">Activity Log</span>
-          <span class="row__sub">Who changed what, and when</span>
-        </span>
-        <span data-icon="chevR" data-icon-class="row__chev"></span>
-      </a>
-
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="s-else">
-    <h2 class="sec" id="s-else">Elsewhere</h2>
+  <!-- The honest version of the no-script story. The list above needs script,
+       because it is drawn from the model rather than typed out, and the whole
+       reason it is drawn from the model is that the typed out version drifted.
+       Saying so is better than a silently empty page, and better than a second
+       hand written list that would drift again. -->
+  <noscript>
     <div class="card card--sunken">
-      <p class="lede">Club settings, staff accounts, rates, and operating hours live
-      in the menu behind the hamburger, top left on any main screen.</p>
-      <a class="textbtn" href="settings.html" style="margin-top:8px;">Open Settings <span data-icon="arrowR"></span></a>
+      <p class="lede">This list is drawn from the console's navigation model,
+      which needs script to render. With script off it cannot draw itself, and a
+      second copy written by hand is the thing this page was changed to stop
+      being.</p>
+      <p class="lede">Every screen is still a real page in this folder. The
+      dashboard is the way in.</p>
+      <a class="textbtn" href="dashboard.html" style="margin-top:8px;">Open the Dashboard <span data-icon="arrowR"></span></a>
     </div>
-  </section>
+  </noscript>
 
   <p class="sandbox">
     <span data-icon="info"></span>

@@ -245,6 +245,7 @@
     if (!back) buildDrawer(shell);
     buildSidebar(shell, nav);
     buildLauncher(shell, nav);
+    buildMoreList();
     buildStaging(shell);
     firstRunStaging();
     buildToast();
@@ -492,6 +493,29 @@
     var row = shell.querySelector('#sidenav .sidenav__row[href="more.html"]');
     if (row) row.setAttribute("data-launcher", "");
     NAV.wireLauncher(document);
+  }
+
+  /* more.html is the launcher as a page rather than as a dialog, for a reader who
+     typed the URL or followed a bookmark. Same cards(), same groups, same counts,
+     same permission surface: the two cannot disagree because there is only one
+     function drawing them.
+
+     Its groups are h2 rather than the dialog's h3, because this document's own
+     title is the h1 and the dialog's is an h2. Skipping a level is invisible to
+     most readers and a hole in the outline to anyone moving by headings. */
+  function buildMoreList(){
+    var host = document.getElementById("moreList");
+    if (!host || !NAV.cards) return;
+    host.innerHTML = NAV.cards({
+      icon: svg,
+      prefix: "",
+      counts: DATA,
+      badgeNoun: { unread:"unread", pendingTasks:"pending tasks",
+                   checkins:"due to arrive", messages:"unread" },
+      groups: CONSOLE_GROUPS,
+      headingLevel: "h2",
+      idPrefix: "more-"
+    });
   }
 
   function buildDrawer(shell){
