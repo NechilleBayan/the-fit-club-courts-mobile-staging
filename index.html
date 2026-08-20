@@ -198,6 +198,20 @@
   --border-interactive:var(--border-default);
   --border-info:var(--hairline);
 
+  /* ---------- THE INTERACTION GLOW ----------
+     An rgb triple so each use picks its own alpha, and a triple that comes out of
+     the palette rather than beside it: in the light theme it is --ink-200, the
+     warm grey the paper darkens to, and in the dark theme it is the cream. There
+     is still no third hue.
+
+     WHY LIGHT NEEDS THE DARKER OF THE TWO. A glow is only a glow if it is
+     brighter than its ground, and on a near white page nothing is. So the light
+     theme's halo is the warm shade rather than a light one: it reads as the card
+     bleeding warmth into the page, which is the same gesture the dark theme gets
+     from a cream bloom on near black. Same idea, opposite direction, because the
+     ground is opposite. */
+  --glow:201,199,178;
+
   /* THE TWO PINNED SURFACES, carried over from the console so that a card and a
      bar mean the same thing in both halves of the product.
 
@@ -213,6 +227,15 @@
      would paint itself with its own children's value. */
   --chrome-surface:#171717;
   --card-surface:#F2EEDD;
+  /* THE CARD, ONE STEP BRIGHTER, and it is a token because "brighter" is not a
+     direction you can reach for with a colour mix that works in both themes.
+     The build's idiom for a hover is to wash --text-primary into the fill, which
+     is correct in the dark theme, where the ink IS the cream and the card
+     lightens, and wrong in the light theme, where it is near black and a cream
+     card turns tan. That is the same tan the resting state was just rescued
+     from, so a hover built that way undoes the fix on contact. Naming the lifted
+     value per theme is what lets one rule brighten in both. */
+  --card-hi:#FAF9EA;
 
   --overlay:rgba(15,15,15,0.66);
   --hatch:rgba(23,23,23,0.14);
@@ -241,8 +264,8 @@
     --text-inverse:#171717; --text-inverse-secondary:#4A4A42;
     --border-default:#7A7A6D; --border-strong:#F5F3DC; --hairline:#2F2F2C;
     --focus-ring:#F5F3DC; --focus-halo:#171717;
-    --chrome-surface:#0D0D0D; --card-surface:#1F1F1F;
-    --ghost-fill:8,8,8; --ghost-edge:246,244,221;
+    --chrome-surface:#0D0D0D; --card-surface:#1F1F1F; --card-hi:#2C2C2C;
+    --glow:245,243,220; --ghost-fill:8,8,8; --ghost-edge:246,244,221;
     --overlay:rgba(8,8,8,0.80); --hatch:rgba(245,243,220,0.18);
     --hatch-strong:rgba(245,243,220,0.28); --shadow-print:rgba(0,0,0,0.55);
     --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
@@ -255,8 +278,8 @@
   --text-inverse:#171717; --text-inverse-secondary:#4A4A42;
   --border-default:#7A7A6D; --border-strong:#F5F3DC; --hairline:#2F2F2C;
   --focus-ring:#F5F3DC; --focus-halo:#171717;
-  --chrome-surface:#0D0D0D; --card-surface:#1F1F1F;
-  --ghost-fill:8,8,8; --ghost-edge:246,244,221;
+  --chrome-surface:#0D0D0D; --card-surface:#1F1F1F; --card-hi:#2C2C2C;
+  --glow:245,243,220; --ghost-fill:8,8,8; --ghost-edge:246,244,221;
   --overlay:rgba(8,8,8,0.80); --hatch:rgba(245,243,220,0.18);
   --hatch-strong:rgba(245,243,220,0.28); --shadow-print:rgba(0,0,0,0.55);
   --shadow-dock:rgba(0,0,0,0.45); --shadow-card:rgba(0,0,0,0.35);
@@ -1528,16 +1551,49 @@ body::before{
    be the chosen one, so it keeps the fill and the edge and gives back the scale
    and the press shadow. aria-pressed is matched alongside the class so a card
    that reports its state to assistive technology is painted by the same rule. */
-.duocard:focus-visible{ background:color-mix(in srgb, var(--text-primary) 10%, var(--card-surface)); }
+.duocard:focus-visible{ background:var(--card-hi); }
+/* ---------- THE GLOW ----------
+   Two layers on one shadow, and neither of them is decoration sitting on a
+   resting control: this arrives on hover and on press and is gone the rest of the
+   time, which is what makes it feedback rather than an effect.
+
+     layer 1  the halo. 0 offset, wide blur, small spread, --glow at a low alpha.
+              It bleeds warmth out past the edge and has no direction, which is
+              what separates a glow from a shadow.
+     layer 2  the seat. A short directional shadow so the card still reads as
+              sitting on something. Without it the halo alone floats.
+
+   IT IS ON HOVER AND PRESS, NEVER AT REST, and it never replaces the focus ring:
+   the block further down gives :focus-visible the halo outright, on the same
+   specificity and later in the sheet, so a focused card keeps the ring whatever
+   the pointer is doing. That ordering was already load bearing and this does not
+   disturb it.
+
+   --dur-ui is already zeroed under prefers-reduced-motion and box-shadow is in
+   this component's transition list, so the reduced-motion reader gets the same
+   states with no fade rather than a second rule saying so. */
+/* PRESS SETTLES BACK DOWN rather than washing further toward the ink. It used to
+   take 26% of --text-primary, which is the build's press idiom and is right for a
+   button whose resting fill is already a wash; on a card whose resting fill is
+   the cream it lands on a dark tan, and pressing would have looked like a
+   different component. The sequence now reads as one movement: the card brightens
+   and rises under the pointer, then returns to its own colour and sits down as
+   the finger lands, keeping the halo throughout. On a touch screen, which has no
+   hover to rise from, that is still a legible press, because the scale and the
+   halo both arrive at once. */
 .duocard:active{
-  background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface));
+  background:var(--card-surface);
   border-color:var(--border-strong); transform:scale(.985);
-  box-shadow:0 1px 2px var(--shadow-press);
+  box-shadow:0 0 20px 2px rgba(var(--glow),.62), 0 1px 2px var(--shadow-press);
 }
+/* Selected is hover held: the brighter fill and the halo, minus the lift, plus a
+   2px edge that stays. Nothing in the build sets this on a duocard yet; it is
+   here so the component has the state rather than acquiring it later by accident. */
 .duocard.is-on, .duocard[aria-pressed="true"]{
-  background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface));
+  background:var(--card-hi);
   border-color:var(--border-strong); border-width:2px;
-  transform:none; box-shadow:0 1px 2px var(--shadow-card);
+  transform:none;
+  box-shadow:0 0 18px 1px rgba(var(--glow),.50), 0 1px 2px var(--shadow-card);
 }
 
 /* ---------- THE CARD PAIR OVER THE PHOTOGRAPH ----------
@@ -1576,7 +1632,8 @@ body::before{
   border:1px solid rgba(246,244,221,.48);
 }
 .hero .duo .duocard:active, .hero .duo .duocard.is-on{
-  background:rgba(246,244,221,.28); border-color:rgba(246,244,221,.78); color:#F5F3DC; }
+  background:rgba(246,244,221,.28); border-color:rgba(246,244,221,.78); color:#F5F3DC;
+  box-shadow:0 0 20px 2px rgba(246,244,221,.24), 0 1px 2px rgba(8,8,8,.5); }
 .hero .duo .duocard:active .per, .hero .duo .duocard.is-on .per{ color:#DFDCC2; }
 @media (prefers-reduced-motion:reduce){ .hero .duocard{ transition:none; } }
 @media (prefers-contrast:more){
@@ -2167,9 +2224,10 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 
   .duocard:hover{
     transform:translateY(-3px);
-    background:color-mix(in srgb, var(--text-primary) 12%, var(--card-surface));
+    background:var(--card-hi);
     border-color:var(--border-default);
-    box-shadow:0 12px 26px -10px var(--shadow-lift), 0 3px 8px -3px var(--shadow-lift);
+    box-shadow:0 0 22px 2px rgba(var(--glow),.70),
+               0 12px 26px -10px var(--shadow-lift), 0 3px 8px -3px var(--shadow-lift);
   }
   /* Over the photograph the shadow is its own heavier value rather than the token.
      The token is mixed for the page surface, and on a dark photograph it would not
@@ -2177,14 +2235,25 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   /* Over the photograph the shadow is its own heavier value rather than the token.
      The token is mixed for the page surface and would not be visible at all on a
      dark photograph. One rule for both panels, matching their resting treatment. */
+  /* The same gesture on a different ground. Over a dark photograph the halo is
+     the cream at a low alpha rather than the theme token, for the reason the
+     shadow beside it is its own heavier value: both are mixed for the picture,
+     not for the page. */
   .hero .duo .duocard:hover{
     background:rgba(246,244,221,.28); border-color:rgba(246,244,221,.88);
-    transform:translateY(-3px); box-shadow:0 14px 30px -10px rgba(8,8,8,.72);
+    transform:translateY(-3px);
+    box-shadow:0 0 24px 2px rgba(246,244,221,.26), 0 14px 30px -10px rgba(8,8,8,.72);
   }
   /* The detailed pair sets its own resting fill, so its hover has to out-specify
-     it. One rule for both, because the two panels rank equally. */
+     it. One rule for both, because the two panels rank equally.
+     The hover fill is a light step rather than the 16% ink it used to take. The
+     resting card is the cream now, and washing 16% of the ink into it on hover
+     put back exactly the tan the resting state was just rescued from, which would
+     have made hovering look like a mistake. It lifts toward the lightest paper
+     instead, so the card BRIGHTENS under the pointer and the halo around it reads
+     as coming from the card rather than landing on it. */
   .duo--detail .duocard:hover{
-    background:color-mix(in srgb, var(--text-primary) 16%, var(--card-surface));
+    background:var(--card-hi);
     border-color:var(--border-strong);
   }
   .duocard:active{ transform:translateY(0) scale(.985); box-shadow:0 1px 2px var(--shadow-press); }
@@ -2313,13 +2382,22 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
    a reader sees when they touch one is caused by them rather than by which one it
    was.
 
-   The resting fill is one step off the card, and the edge is --border-default,
-   which is the interactive weight in the border rule. These are the loudest
-   interactive elements in the build, so they are allowed the stronger edge the
-   rule permits: 2px rather than the 1px a button carries. */
+   THE RESTING FILL IS THE CREAM ITSELF, not the cream with ink stirred into it.
+   It was `color-mix(--text-primary 6%, --card-surface)`, which on the light theme
+   resolves to about #E5E1D1: a tan that reads as a cream card with a grey wash
+   over it, because that is exactly what it was. The 6% was there to lift the
+   panel off the page, and it was solving a problem the page had already solved.
+   The page is #F8F7F2 and the card token is #F2EEDD, which is a difference a
+   reader sees before they read anything on it, and it is the same separation
+   every other card in the build gets. So the mix goes and the card is the cream.
+
+   The edge is --border-interactive, the control weight in the border rule. These
+   are the loudest interactive elements in the build, so they take the stronger
+   edge the rule permits: 2px rather than the 1px a button carries. Cream fill,
+   real outline, nothing between them. */
 .duo--detail .duocard{
-  background:color-mix(in srgb, var(--text-primary) 6%, var(--card-surface));
-  border-width:2px; border-color:var(--border-default);
+  background:var(--card-surface);
+  border-width:2px; border-color:var(--border-interactive);
 }
 
 /* ---------- TABLET ----------
