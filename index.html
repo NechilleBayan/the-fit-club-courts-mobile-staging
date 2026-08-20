@@ -4195,41 +4195,49 @@ function syncOverHero(){
      under the header's bottom edge. */
   root.classList.toggle("over-hero", hero.getBoundingClientRect().bottom > h);
 }
-/* ---------- THE HEADER'S PLAY CONTROL ----------
-   Present from the first frame on every browse route, including the top of the
-   landing page while the hero's own two cards are on screen.
+/* ---------- THE SCROLLED PLAY CONTROL ----------
+   The header offers Play only once the hero's own two cards have gone. While they
+   are on screen the reader is already looking at the two ways in and a third
+   control naming the same subject in the bar above them is noise; once they are
+   past it, the bar is the only way back to the choice without scrolling up.
 
-   THE SCROLL GATE IS RETIRED, and it is retired deliberately rather than by
-   accident, which is why the measurement it used is gone from this function
-   instead of being left to evaluate to true. The gate offered Book Court only
-   once the hero's cards had scrolled away, on the argument that a third copy of a
-   choice the reader is already looking at is noise. Two things changed under that
-   argument.
+   THE GATE IS BACK, having been retired for one commit, and the argument it was
+   retired on is answered rather than forgotten. That argument had two halves.
 
-   FIRST, IT IS NOT A THIRD COPY OF THE SAME THING ANY MORE. The cards start
-   flows: one begins a court reservation, the other opens the Open Play schedule.
-   Play is a destination, /play, which is where the two are compared. A reader who
-   knows which they want takes a card; a reader who does not takes Play. Hiding
-   the second of those while the first is on screen hides the one control that
-   serves the undecided reader at the exact moment they are deciding.
+   The first was that the cards and the control are no longer the same offer: a
+   card starts a flow, Play opens the page where the two are compared. True, and
+   it does not matter while the cards are visible. A reader looking at Reserve a
+   court and Join Open Play, each with its price, has the comparison in front of
+   them. The page they would be sent to is the page they are already reading.
 
-   SECOND, THE NAVIGATION IS SPECIFIED. The system design draws the bar as Rates,
-   My Bookings, Play, Log In, and a bar whose primary action is absent above the
-   fold is a different bar. It matters most on a phone, where the swap slot shows
-   Play or the account and not both: with the gate, a phone reader at the top of
-   the landing page had no Play in the chrome at all.
+   The second was that a phone reader at the top of the landing page has no Play
+   in the chrome, because the swap slot shows Play or the account and not both.
+   Also true, and also answered by what is on screen: the swap slot is empty of
+   Play exactly and only while the hero's pair is in view, so nothing is
+   unreachable at any scroll position. The moment the pair leaves, Play arrives in
+   the slot it vacated.
 
-   THE COST, STATED. At the very top of the landing page the word Play now sits
-   about 200 pixels above two cards that are also ways to play. That is the trade,
-   and it is accepted rather than unnoticed.
+   WHAT THE GATE DOES NOT REACH. Every route that is not the landing page has no
+   hero cards at all, so the second branch returns immediately and Play is present
+   from the first frame there, including on /play itself. Booking paused withholds
+   the pair, which leaves no `.hero .duo` to wait for, so the control is present
+   for the whole of that page too.
 
-   syncOverHero next door still does its rectangle read, and still does it as a
-   rectangle read rather than as an IntersectionObserver: an observer constructed
-   in this document never delivers a callback, not even the initial one.
+   The geometry is a rectangle read rather than an IntersectionObserver, which is
+   the same choice syncOverHero makes and for the same reason: an observer
+   constructed in this document never delivers a callback, not even the initial
+   one, so the control would never arrive. Both reads happen on a frame that is
+   already being laid out for the back-to-top button.
    A task route has no header nav and no button to find, and the class comes off. */
 function syncNavCta(){
   const root = document.documentElement;
-  root.classList.toggle("nav-cta", !!document.querySelector(".nav-book-cta"));
+  if (!document.querySelector(".nav-book-cta")){ root.classList.remove("nav-cta"); return; }
+  const duo = document.querySelector(".hero .duo");
+  if (!duo){ root.classList.add("nav-cta"); return; }
+  const group = document.getElementById("headergroup");
+  /* bottom rather than height, for the reason syncOverHero gives. */
+  const h = group ? group.getBoundingClientRect().bottom : 0;
+  root.classList.toggle("nav-cta", duo.getBoundingClientRect().bottom <= h);
 }
 /* Called on every render so a route change lands in the right state on the first
    frame rather than on the first scroll. A control created already in its final
