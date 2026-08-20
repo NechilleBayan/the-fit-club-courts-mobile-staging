@@ -292,7 +292,7 @@
     if (!slot || !window.CONSOLE_NAV) return;
     var had = document.activeElement && slot.contains(document.activeElement)
       ? document.activeElement.getAttribute("data-action") : null;
-    slot.innerHTML = CONSOLE_NAV.utilbar({ icon: svg, theme: currentTheme(), demoName: "Demo, the staging build" });
+    slot.innerHTML = CONSOLE_NAV.utilbar({ icon: svg, theme: currentTheme(), demoOpens: "the staging notice" });
     if (had){
       var back = slot.querySelector('[data-action="' + had + '"]');
       if (back) back.focus();
@@ -427,7 +427,7 @@
     d.classList.remove("staging--harness");
     d.querySelector(".staging__panel").innerHTML = CONSOLE_NAV.notice({
       icon: svg, half: "console",
-      reopen: "The flask in the strip at the top of the window opens the staging harness, where the dials are." });
+      reopen: "The DEMO indicator at the top left of the window opens the staging harness, where the dials are." });
     hydrateIcons(d);
   }
 

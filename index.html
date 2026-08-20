@@ -176,6 +176,28 @@
   --focus-ring:#171717;
   --focus-halo:#F8F7F2;
 
+  /* ---------- THE BORDER HIERARCHY, NAMED ----------
+     One rule, stated here so a component does not have to re-derive it:
+
+       INTERACTIVE  = a visible border.  --border-interactive
+       INFORMATIONAL = a faint border, or none. --border-info
+
+     Both are aliases rather than new values, and that is deliberate. The two
+     weights already existed and were already solved: --border-default is the
+     control weight and clears 3:1 against all three grounds a control is drawn
+     on, and --hairline is the rule weight, which separates two of the page's own
+     surfaces and may be soft because nothing depends on finding it. What was
+     missing was a name saying WHICH of the two a component should reach for, and
+     the absence of that name is why the build accumulated outlines around things
+     nobody can click. A component that reads --border-interactive is declaring
+     what it is, not picking a colour.
+
+     Naming them rather than replacing them also means the contrast work does not
+     have to be redone and cannot drift: change --border-default once and every
+     interactive edge in both themes follows. */
+  --border-interactive:var(--border-default);
+  --border-info:var(--hairline);
+
   /* THE TWO PINNED SURFACES, carried over from the console so that a card and a
      bar mean the same thing in both halves of the product.
 
@@ -489,7 +511,31 @@ svg{ display:block; width:20px; height:20px; flex:none; }
      the whole page half underneath it. */
   position:sticky; top:var(--utilbar-h); z-index:40;
   border:0;
-  background:var(--surface);
+  /* TRANSPARENT, and this is the other half of the gradient. The group used to
+     paint the page surface so the bar had something opaque behind it; a fade
+     over an opaque plate is a plate. What is behind the header now is whatever
+     the page has scrolled under it, which is the point. */
+  background:transparent;
+}
+/* The readability half of the treatment. A short dark shadow on the content
+   rather than a plate behind it, so the type survives the moment a light frame
+   of the photograph passes under the bar's clear lower half. Same shadow the
+   hero's own copy carries over the same picture. */
+.appbar #bar-mid, .appbar .topnav, .appbar .appbar__slot{
+  text-shadow:0 1px 8px rgba(8,8,8,.62);
+}
+.appbar .wordmark__img{ filter:drop-shadow(0 1px 6px rgba(8,8,8,.55)); }
+.appbar svg{ filter:drop-shadow(0 1px 4px rgba(8,8,8,.5)); }
+/* Quiet is a choice this reader has already declined: the fade goes back to a
+   plate and the divider comes back with it. */
+@media (prefers-contrast:more){
+  .appbar{
+    background:var(--chrome-surface);
+    border-bottom:1px solid var(--text-inverse);
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+  }
+  .appbar #bar-mid, .appbar .topnav, .appbar .appbar__slot{ text-shadow:none; }
+  .appbar .wordmark__img, .appbar svg{ filter:none; }
 }
 /* THE BAR IS INK IN BOTH THEMES, and the four tokens below are pinned rather
    than left to the theme for the reason the console pins them: read from the
@@ -498,6 +544,44 @@ svg{ display:block; width:20px; height:20px; flex:none; }
    black. --ghost-fill and --ghost-edge are pinned to cream for the same reason,
    because the three header controls are still ghost controls and a ghost control
    on an ink plate washes toward the cream, not toward the ink. */
+/* ---------- THE BAR IS A GRADIENT, NOT A PLATE ----------
+   The system design asks for a navigation that is dark and near opaque at its
+   top edge, progressively more transparent toward its bottom edge, with no
+   dividing line between it and the page, and readable over both light and dark
+   imagery at every scroll position. Four things do that work and each is doing
+   one job.
+
+   1. THE GRADIENT ITSELF runs .96 to 0 over four stops rather than two. A linear
+      two stop fade puts its half-strength point exactly halfway down the bar,
+      which lands it on the type; the stops below hold near full opacity through
+      the first 55% of the height, where the labels and the mark sit, and spend
+      the whole fade on the bottom 45%, which is empty. So the content is on the
+      opaque part and the transparency is where the reader can see through it.
+
+   2. THE FADE HAS NO END. The last stop is 0, so there is nothing to draw a
+      bottom edge with. The 1px #3A3A36 border-bottom that used to be here is
+      gone for the same reason: it was the dividing line the design says must
+      not exist.
+
+   3. A SHORT BACKDROP BLUR under it. --ghost-blur is 1px, the value the rest of
+      the build uses over the photograph, and it is the same trade: enough to
+      settle type over a busy frame, far short of frosting out the picture the
+      transparency exists to show.
+
+   4. A TEXT SHADOW ON THE CONTENT, not on the bar. Over a light photograph the
+      lower half of the bar is nearly clear and the cream type has no plate under
+      it; a short dark shadow is what keeps it legible without putting the plate
+      back. It is the same treatment .hero .duocard already uses over the same
+      photograph, so this is the build's existing answer applied one level up.
+
+   WHY IT IS SAFE TO DO THIS TO A BAR THAT WAS DELIBERATELY MADE SOLID. The
+   previous sweep replaced a fade with a plate because the customer build and the
+   staff console disagreed about what a header is. They still agree: this rule is
+   inside the customer stylesheet and the staff shell's own bar is painted by the
+   block at the foot of this sheet, so the console is untouched. What changed is
+   that the customer product's header now sits under a fixed staging frame that
+   is itself a solid band, so the header is no longer the top edge of anything
+   and does not have to behave like one. */
 .appbar{
   display:grid; grid-template-columns:minmax(64px,1fr) auto minmax(64px,1fr);
   align-items:center; gap:var(--s2);
@@ -505,8 +589,14 @@ svg{ display:block; width:20px; height:20px; flex:none; }
      frame went over it, and the frame carries the notch now; padding it here
      would indent the bar below a strip that had already cleared it. */
   min-height:var(--appbar-h); padding:0 var(--s3);
-  background:var(--chrome-surface); color:var(--text-inverse);
-  border:0; border-bottom:1px solid #3A3A36;
+  background:linear-gradient(180deg,
+    rgba(13,13,13,.96) 0%,
+    rgba(13,13,13,.92) 42%,
+    rgba(13,13,13,.62) 74%,
+    rgba(13,13,13,0) 100%);
+  color:var(--text-inverse);
+  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  border:0;
   --text-inverse:#F5F3DC;
   --text-inverse-secondary:#B0AE97;
   --ghost-fill:246,244,221;
@@ -526,7 +616,6 @@ svg{ display:block; width:20px; height:20px; flex:none; }
 .wordmark{ display:flex; align-items:center; gap:8px; min-height:var(--tap-min); font-size:13px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; line-height:1.1; }
 .appbar .clock{ font-size:var(--fs-label); font-weight:600; letter-spacing:.02em; }
 .iconbtn{ display:inline-flex; flex:none; align-items:center; justify-content:center; gap:6px; min-width:var(--tap-min); min-height:var(--tap-min); padding:0 var(--s2); border:1px solid var(--border-default); border-radius:var(--r-btn); font-size:var(--fs-eyebrow); font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
-.iconbtn--demo{ border-style:dashed; }
 /* Borderless, so the two account controls do not compete with the Demo button. */
 .iconbtn--bare{ border-color:transparent; padding:0; min-width:var(--tap-min); }
 .iconbtn--bare svg{ width:22px; height:22px; }
@@ -596,25 +685,30 @@ svg{ display:block; width:20px; height:20px; flex:none; }
              visibility 0s linear var(--dur-ui);
 }
 
-/* The one prominent action in the header, and it is prominent by being the only
-   bordered thing up there rather than by being a filled block. Ghost like the rest:
-   a 4% wash and a thin edge. The colour is inherited, and what it inherits is the
-   bar's cream, because the bar is ink on every route now rather than a fade whose
-   darkness depended on what was under it.
-   THE THREE HEADER CONTROLS SHARE ONE EDGE WEIGHT. They used to rank .42 / .35 /
-   .28, which was a hierarchy drawn on the one axis a control boundary owes 3:1 on:
-   against the plate the account control read 2.47:1 and this one 3.02:1, so the
-   ranking was spending legibility to say something the fill and the label already
-   say. All three are .42 now, which is 3.82:1 on the ink, and the hierarchy is
-   carried by the wash: the booking action washes toward the cream, this one at a
-   twentieth of it, and the account control washes the other way. */
+/* ---------- ONE STRONG BUTTON IN THE HEADER ----------
+   The system design ranks the four header items: Rates and My Bookings are plain
+   text, Play is the one bordered translucent action, and Log In is quieter than
+   Play. The previous sweep gave all three controls the same .42 edge, on the
+   argument that a ranking drawn in edge alpha puts two of the three under the 3:1
+   a control boundary owes and therefore spends legibility to say what the label
+   already says. That argument was right and it is why the ranking is NOT redrawn
+   in edge alpha here.
+
+   Log In gives up its border entirely instead. A bordered control owes 3:1 on its
+   boundary because the boundary is what identifies it; a text control owes
+   nothing on a boundary it does not have, and is identified the way the two
+   destinations beside it are identified, by being a word in a navigation bar. So
+   there is no faint edge to fail the ratio: there is a strong edge on Play and no
+   edge on Log In, which is a ranking a reader can see and a ratio that is not
+   being fudged. The type itself is unaffected and still reads cream on the bar.
+   The target keeps its full 40px height and its padding, so nothing shrinks; only
+   the box goes. */
 .btn-login{
   display:inline-flex; align-items:center; gap:8px;
-  min-height:40px; padding:0 var(--s5);
-  background:rgba(var(--ghost-edge),.04); color:inherit;
-  border:1px solid rgba(var(--ghost-edge),.42); border-radius:var(--r-btn);
-  font-size:var(--fs-label); line-height:1; font-weight:700; white-space:nowrap;
-  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
+  min-height:40px; padding:0 var(--s3);
+  background:transparent; color:inherit;
+  border:1px solid transparent; border-radius:var(--r-btn);
+  font-size:var(--fs-label); line-height:1; white-space:nowrap;
   transition:background var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
 }
 
@@ -622,18 +716,23 @@ svg{ display:block; width:20px; height:20px; flex:none; }
    this build and a grey circle with initials in it is a placeholder pretending to
    be content. */
 .acct{ position:relative; }
+/* The signed-in half of the same slot, and it is ranked the same way Log In is:
+   below Play, and below it by not being a box. Signed in, the header reads Rates,
+   My Bookings, Play, Account, and Account is the one of the four that must not
+   compete with Play. It keeps its chevron, which is what says it opens something,
+   and it grows an edge when it is open because an open menu's trigger has to look
+   attached to the menu under it. */
 .acct__btn{
   display:inline-flex; align-items:center; gap:8px;
   min-height:40px; padding:0 var(--s3);
-  background:rgba(var(--ghost-fill),.06);
-  border:1px solid rgba(var(--ghost-edge),.42); border-radius:var(--r-btn);
+  background:transparent;
+  border:1px solid transparent; border-radius:var(--r-btn);
   font-size:var(--fs-label); line-height:1; font-weight:600; white-space:nowrap;
-  -webkit-backdrop-filter:blur(var(--ghost-blur)); backdrop-filter:blur(var(--ghost-blur));
   transition:border-color var(--dur-ui) var(--ease), background var(--dur-ui) var(--ease);
 }
 .acct__btn svg{ width:18px; height:18px; }
 .acct__btn .chev{ transition:transform var(--dur-ui) var(--ease); }
-.acct.is-open .acct__btn{ background:rgba(var(--ghost-fill),.18); border-color:rgba(var(--ghost-edge),.6); }
+.acct.is-open .acct__btn{ background:rgba(var(--ghost-fill),.22); border-color:rgba(var(--ghost-edge),.42); }
 .acct.is-open .acct__btn .chev{ transform:rotate(180deg); }
 /* The one place a sheer surface is wrong. A dropdown has to be read against whatever
    it happens to land on, which on this page is a moving photograph, so it keeps an
@@ -731,7 +830,7 @@ main:focus{ outline:none; }
 .btn{
   display:flex; align-items:center; justify-content:center; gap:var(--s2); width:100%;
   min-height:var(--tap-decision); padding:var(--s3) var(--s4);
-  border-radius:var(--r-btn); border:1px solid var(--border-default);
+  border-radius:var(--r-btn); border:1px solid var(--border-interactive);
   font-size:var(--fs-h3); font-weight:700; line-height:1.25; text-align:center;
   color:var(--text-primary); background:var(--card-surface);
   --surface:var(--card-surface);
@@ -744,7 +843,7 @@ main:focus{ outline:none; }
    Primary is the only one washed toward the edge colour, ghost is the only one
    drawn dashed, secondary is the bare card between them. Ranking them by
    running .42 against .35 against .32 put the whole hierarchy inside the band
-   where the ink wash measures 2.0 to 2.6:1 on this paper — under the 3:1 that
+   where the ink wash measures 2.0 to 2.6:1 on this paper, under the 3:1 that
    1.4.11 asks of a control boundary, which is to say it ranked three edges a
    reader could not reliably find. The edges are --border-default now and the
    ranking is carried by the two things that were already carrying it. */
@@ -752,8 +851,8 @@ main:focus{ outline:none; }
   background:color-mix(in srgb, var(--text-primary) 14%, var(--card-surface));
   color:var(--text-primary); border-color:rgba(var(--ghost-edge),.85);
 }
-.btn--secondary{ background:var(--card-surface); color:var(--text-primary); border-color:var(--border-default); }
-.btn--ghost{ background:var(--card-surface); border-width:1px; border-style:dashed; border-color:var(--border-default); min-height:var(--tap-min); font-size:var(--fs-label); }
+.btn--secondary{ background:var(--card-surface); color:var(--text-primary); border-color:var(--border-interactive); }
+.btn--ghost{ background:var(--card-surface); border-width:1px; border-style:dashed; border-color:var(--border-interactive); min-height:var(--tap-min); font-size:var(--fs-label); }
 .btn--sm{ min-height:var(--tap-min); font-size:var(--fs-label); }
 .btn[disabled]{ cursor:not-allowed; border-style:dashed; background:var(--card-surface); color:var(--text-secondary); }
 .btn-col{ display:grid; gap:var(--s3); }
@@ -1363,7 +1462,10 @@ body::before{
 @media (max-width:339px){ .duo{ grid-template-columns:1fr; } }
 .duocard{
   display:flex; flex-direction:column; gap:8px; min-height:138px; padding:16px 14px 14px;
-  border-radius:var(--r-card); border:1px solid rgba(var(--ghost-edge),.22);
+  /* --border-interactive, not the .22 wash the card block uses. A duocard is a
+     control and the border rule says a control wears a visible edge; the wash was
+     the informational weight worn by the loudest interactive thing on the page. */
+  border-radius:var(--r-card); border:1px solid var(--border-interactive);
   background:var(--card-surface);
   --surface:var(--card-surface);
   color:var(--text-primary);
@@ -1381,41 +1483,49 @@ body::before{
   margin-top:10px; font-size:15px; line-height:21px; font-weight:400;
   color:var(--text-secondary); max-width:42ch; text-wrap:pretty;
 }
+/* ---------- THE INTERACTIVE CARD'S FOUR STATES ----------
+   An interactive card is a control, so it owes the full set and each state is
+   made of the same two things: how much ink is washed into the fill, and how firm
+   the edge is. No hue moves, because there is no second hue; no glow, no frost,
+   no gradient. Hover is in the pointer block further down, because a touch screen
+   has no hover to lead into.
+
+     rest      the component's own fill, --border-interactive
+     hover     +16% wash, edge to --border-strong, a 3px lift    (pointer only)
+     focus     +10% wash, plus the build's focus ring and halo
+     pressed   +26% wash, edge to --border-strong, sits down onto a short shadow
+     selected  the pressed fill, held, plus a 2px edge that stays
+
+   SELECTED IS NOT PRESSED HELD DOWN. .is-on used to share the press rule
+   outright, which meant a chosen card looked like a finger was on it: scaled
+   down, sitting in a press shadow. A selection is a resting state that happens to
+   be the chosen one, so it keeps the fill and the edge and gives back the scale
+   and the press shadow. aria-pressed is matched alongside the class so a card
+   that reports its state to assistive technology is painted by the same rule. */
 .duocard:focus-visible{ background:color-mix(in srgb, var(--text-primary) 10%, var(--card-surface)); }
-.duocard:active, .duocard.is-on{
-  background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface)); border-color:var(--border-strong); transform:scale(.985);
+.duocard:active{
+  background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface));
+  border-color:var(--border-strong); transform:scale(.985);
   box-shadow:0 1px 2px var(--shadow-press);
 }
-
-/* Over the photograph both panels carry cream text, because the hero gradient is at
-   its darkest exactly where they sit. Blur is 1.5px: enough to settle the type, far
-   short of frosting the picture out. The text shadow does the readability work that
-   an opaque fill used to do, which is what lets the surface drop to a tenth. */
-.hero .duocard{
-  color:#F5F3DC; opacity:1;
-  -webkit-backdrop-filter:blur(1.5px); backdrop-filter:blur(1.5px);
-  text-shadow:0 1px 10px rgba(8,8,8,.72);
+.duocard.is-on, .duocard[aria-pressed="true"]{
+  background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface));
+  border-color:var(--border-strong); border-width:2px;
+  transform:none; box-shadow:0 1px 2px var(--shadow-card);
 }
-.hero .duocard .per, .hero .duocard .note{ color:#DFDCC2; }
 
-/* Two sheer surfaces with opposite tint directions, not a black card and a white one.
-   Reserve a Court washes toward near black, Open Play washes toward the cream, and at
-   a tenth of opacity the photograph reads straight through both. What separates them
-   is the direction of the tint and the weight of the edge; the palette rule still
-   forbids doing it with a hue. */
-.hero .duo .duocard:nth-child(1){ background:rgba(8,8,8,.10); border:1px solid rgba(246,244,221,.38); }
-.hero .duo .duocard:nth-child(2){ background:rgba(246,244,221,.10); border:1px solid rgba(246,244,221,.48); }
-.hero .duo .duocard:nth-child(1):active, .hero .duo .duocard:nth-child(1).is-on{
-  background:rgba(8,8,8,.28); border-color:rgba(246,244,221,.70); color:#F5F3DC; }
-.hero .duo .duocard:nth-child(2):active, .hero .duo .duocard:nth-child(2).is-on{
-  background:rgba(246,244,221,.28); border-color:rgba(246,244,221,.78); color:#F5F3DC; }
-.hero .duo .duocard:active .per, .hero .duo .duocard.is-on .per{ color:#DFDCC2; }
-@media (prefers-reduced-motion:reduce){ .hero .duocard{ transition:none; } }
-@media (prefers-contrast:more){
-  .hero .duocard{ -webkit-backdrop-filter:none; backdrop-filter:none; text-shadow:none; }
-  .hero .duo .duocard:nth-child(1){ background:rgba(8,8,8,.88); border-color:#F5F3DC; }
-  .hero .duo .duocard:nth-child(2){ background:rgba(8,8,8,.72); border-color:#F5F3DC; }
-}
+/* THE HERO'S OWN CARD PAIR HAS NO RULES HERE ANY MORE.
+   Twenty lines used to sit at this point: cream ink over the photograph, a 1.5px
+   backdrop blur, a text shadow doing the work an opaque fill used to do, and two
+   sheer surfaces tinted in opposite directions so the picture read through both.
+   All of it described a composition that no longer exists. The landing hero is a
+   photograph, a headline, a supporting line, and the map link; the two choices
+   live on /play, on the page surface, where the ordinary .duocard rules above are
+   the correct treatment and the ones over a photograph would be wrong.
+
+   Kept as a note rather than deleted silently, because the treatment was solved
+   rather than guessed and whoever puts a card back over this photograph should
+   start from git history rather than from scratch. */
 
 /* ---------- community marquee ----------
    Edge to edge in the app column, the same break out the hero uses. The track, the
@@ -1599,7 +1709,6 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
   text-decoration-color:rgba(218,215,208,.45); text-underline-offset:4px;
 }
 .hero .maplink svg{ width:19px; height:19px; }
-.hero .duo{ margin-top:22px; }
 
 /* ---------- photography, colour except the hero ---------- */
 /* Photography is square cornered everywhere. A rounded photograph reads as a card
@@ -1611,34 +1720,71 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
 .photo__cap{ position:absolute; left:0; right:0; bottom:0; padding:16px; color:#F5F3DC; font-weight:800; font-size:19px;
   background:linear-gradient(180deg, rgba(26,26,26,0) 0%, rgba(26,26,26,.88) 72%); }
 
-/* ---------- proof row ---------- */
-/* ---------- editorial: schedule, facts, steps ----------
+/* ---------- editorial: availability, facts, steps ----------
    Typography, rules, and alignment instead of boxes. Nothing here draws a card, a
    pill, or an outline: the only strokes are hairline rules between things. */
-.sched{ border-top:1px solid var(--hairline); }
-.sched > li{ border-bottom:1px solid var(--hairline); }
-.sched__row{
-  display:flex; align-items:center; gap:14px; width:100%;
-  min-height:var(--tap-decision); padding:var(--s3) 0;
-  background:none; border:0; text-align:left; color:inherit; font:inherit;
+/* ---------- AVAILABILITY ROWS ----------
+   The system's live-fact row, and the block that replaced .sched and .facts. It
+   is INFORMATIONAL by the border rule: hairlines between rows, no box around the
+   list, no outline on the row itself. The one interactive thing in it is the
+   button, and the button is therefore the only thing in it wearing an edge.
+
+   Three parts on a phone, stacked so nothing is squeezed: the fact, the status,
+   the control. From 600px up the status moves onto the title line and the control
+   moves to the end of the row, because at that width all three fit on one line
+   and a row that reads across is faster to scan than one that reads down. */
+.avlist{ border-top:1px solid var(--border-info); }
+.avrow{
+  display:grid; gap:var(--s3);
+  grid-template-columns:1fr auto;
+  align-items:center;
+  padding:var(--s4) 0; border-bottom:1px solid var(--border-info);
 }
-.sched__row > svg:first-child{ width:24px; height:24px; flex:none; color:var(--text-secondary); }
-.sched__main{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
-.sched__t{ font-size:17px; line-height:22px; font-weight:700; }
-.sched__s{ font-size:14px; line-height:18px; color:var(--text-secondary); }
-.sched__chev{ width:18px; height:18px; flex:none; color:var(--text-secondary); }
+.avrow__b{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+/* The title is the answer to the question the section heading asks, so it is set
+   in the UI role rather than in the mono: it names a thing. */
+.avrow__t{ font-size:20px; line-height:25px; letter-spacing:-.01em; }
+/* Metadata, so mono, and one step lighter than body copy. */
+/* Wrapping, on purpose. The line is "the hours, a dot, the capacity phrase", and
+   at a narrow column the capacity phrase drops to its own line whole rather than
+   the phrase breaking across two. */
+.avrow__m{
+  display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2);
+  font-size:15px; line-height:21px; color:var(--text-secondary);
+}
+/* nowrap, so the hours never break across lines and the dot never leaves them. */
+.avrow__hrs{ white-space:nowrap; }
+.avrow__sep{ opacity:.55; margin-inline-start:var(--s2); }
+/* The status inherits the meta line's size and colour rather than the .stat
+   default, so it reads as part of the sentence it is in. */
+.avrow__m .stat{ font-size:inherit; line-height:inherit; color:inherit; }
+/* The control spans both columns on a phone and sits at the end of the row from
+   600px up. Full width down here, because a 48px target beside a status word is
+   the one thing in the row a thumb actually has to hit. */
+.avrow__a{ grid-column:1 / -1; }
+.avrow__a .btn{ width:100%; max-width:none; margin-inline:0; }
+@media (min-width:600px){
+  .avrow{ column-gap:var(--s5); }
+  .avrow__a{ grid-column:auto; }
+  .avrow__a .btn{ width:auto; }
+}
+
+/* ---------- THE VENUE FEATURE STRIP ----------
+   What the four large statistics became. Standing facts about the building, so
+   they are support: one mono line, secondary colour, no rules and no boxes, sat
+   under the rows it supports rather than in a column beside them. */
+.featstrip{
+  display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2);
+  font-size:var(--fs-legal); line-height:var(--lh-legal); color:var(--text-secondary);
+}
+.featstrip > span{ white-space:nowrap; }
+.featstrip__sep{ opacity:.6; margin-inline-start:var(--s2); }
 
 .stat{ display:inline-flex; align-items:center; gap:8px; flex:none; font-size:14px; line-height:18px; font-weight:700; }
 .dot{ width:9px; height:9px; border-radius:50%; flex:none; }
 .dot--on{ background:var(--text-primary); }
 .dot--half{ background:linear-gradient(90deg, var(--text-primary) 0 50%, transparent 50% 100%); box-shadow:inset 0 0 0 1.5px var(--text-primary); }
 .dot--off{ box-shadow:inset 0 0 0 1.5px var(--border-default); }
-
-.facts{ display:flex; align-items:stretch; }
-.facts li{ flex:1 1 0; min-width:0; text-align:center; padding:0 var(--s2); }
-.facts li + li{ border-left:1px solid var(--hairline); }
-.facts b{ display:block; font-size:24px; line-height:28px; font-weight:800; letter-spacing:-.02em; }
-.facts span{ display:block; margin-top:2px; font-size:13px; line-height:17px; color:var(--text-secondary); font-weight:600; }
 
 /* The spine is the content column's left edge, so it connects every step without
    ever running through the numbers. */
@@ -1967,15 +2113,15 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   /* Over the photograph the shadow is its own heavier value rather than the token.
      The token is mixed for the page surface, and on a dark photograph it would not
      be visible at all. */
-  .hero .duo .duocard:nth-child(1):hover{ background:rgba(8,8,8,.30); border-color:rgba(246,244,221,.80); transform:translateY(-3px); box-shadow:0 14px 30px -10px rgba(8,8,8,.72); }
-  .hero .duo .duocard:nth-child(2):hover{ background:rgba(246,244,221,.28); border-color:rgba(246,244,221,.88); transform:translateY(-3px); box-shadow:0 14px 30px -10px rgba(8,8,8,.72); }
-  /* the panelled pair sets its own fills, so its hover has to out-specify them */
-  .duo--detail .duocard:nth-child(1):hover{ background:color-mix(in srgb, var(--text-primary) 20%, var(--card-surface)); border-color:var(--border-strong); }
-  .duo--detail .duocard:nth-child(2):hover{ background:color-mix(in srgb, var(--text-primary) 10%, var(--card-surface)); border-color:var(--border-default); }
+  /* The detailed pair sets its own resting fill, so its hover has to out-specify
+     it. One rule for both, because the two panels rank equally. */
+  .duo--detail .duocard:hover{
+    background:color-mix(in srgb, var(--text-primary) 16%, var(--card-surface));
+    border-color:var(--border-strong);
+  }
   .duocard:active{ transform:translateY(0) scale(.985); box-shadow:0 1px 2px var(--shadow-press); }
 
   .tlink:hover svg{ transform:translateX(4px); }
-  .sched__row:hover .sched__chev{ transform:translateX(3px); }
 
   /* HEADER HOVER. The underline grows out from the left on a destination, the one
      prominent action lifts 2px, and the quiet controls come up from secondary to
@@ -1983,13 +2129,20 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
      nothing gains an outline, and none of it reaches a touch screen. */
   .topnav a:hover::after{ transform:scaleX(1); }
   .topnav a:hover{ opacity:.9; }
-  .btn-login:hover{ transform:translateY(-3px); background:rgba(var(--ghost-edge),.18); border-color:rgba(var(--ghost-edge),.78);
-    box-shadow:0 8px 18px -7px var(--shadow-lift), 0 2px 6px -2px var(--shadow-lift); }
-  .btn-login:active{ transform:translateY(0) scale(.985); box-shadow:0 1px 2px var(--shadow-press); }
-  /* One step above the login button at rest and one step above it on hover, which
-     is the whole of the hierarchy between them. Still a wash, still see-through. */
-  :root.nav-cta .nav-book-cta:hover{ background:rgba(var(--ghost-edge),.26); border-color:rgba(var(--ghost-edge),.88); }
-  .acct__btn:hover{ background:rgba(var(--ghost-fill),.22); border-color:rgba(var(--ghost-edge),.66); }
+  /* A quiet control answers quietly: a wash arrives under it and it does not
+     lift. The lift belongs to Play, and two controls rising together is the
+     ranking undone on hover. */
+  .btn-login:hover{ background:rgba(var(--ghost-edge),.12); }
+  .btn-login:active{ background:rgba(var(--ghost-edge),.18); transform:scale(.985); }
+  /* The one control in the bar that lifts. It is the primary action, so it is the
+     only one whose hover promises something at the other end of it. */
+  :root.nav-cta .nav-book-cta:hover{
+    transform:translateY(-2px);
+    background:rgba(var(--ghost-edge),.26); border-color:rgba(var(--ghost-edge),.88);
+    box-shadow:0 8px 18px -7px rgba(8,8,8,.55), 0 2px 6px -2px rgba(8,8,8,.45);
+  }
+  :root.nav-cta .nav-book-cta:active{ transform:translateY(0) scale(.985); box-shadow:0 1px 2px rgba(8,8,8,.4); }
+  .acct__btn:hover{ background:rgba(var(--ghost-fill),.18); }
   .acct__menu button:hover{ background:color-mix(in srgb, var(--text-primary) 8%, transparent); }
   .barmenu:hover{ opacity:.75; }
 }
@@ -2003,14 +2156,14 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 .btn-login:focus-visible,
 .nav-book-cta:focus-visible{ box-shadow:0 0 0 5px var(--focus-halo); }
 
-.tlink svg, .sched__chev{ transition:transform var(--dur-ui) var(--ease); }
+.tlink svg{ transition:transform var(--dur-ui) var(--ease); }
 
 @media (prefers-reduced-motion:reduce){
-  .btn, .btn svg, .duocard, .tlink svg, .sched__chev, .topnav a::after{ transition:none; }
+  .btn, .btn svg, .duocard, .tlink svg, .topnav a::after{ transition:none; }
   /* The movement goes. The colour change and the shadow stay, because neither is
      motion and both are the feedback this setting still needs. */
   .btn:hover, .duocard:hover, .btn:active, .duocard:active{ transform:none; }
-  .btn:hover svg:last-child, .tlink:hover svg, .sched__row:hover .sched__chev{ transform:none; }
+  .btn:hover svg:last-child, .tlink:hover svg{ transform:none; }
   .btn-login:hover{ transform:none; }
   .acct__btn .chev, .acct.is-open .acct__btn .chev{ transition:none; }
   /* --dur-ui is already 0.01ms at this setting, so the fade is effectively instant
@@ -2043,35 +2196,62 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 .topnav a[aria-current="page"]::after{ transform:scaleX(1); }
 
 /* ---------- EDITORIAL BANDS ----------
-   Two column bands and the rented-venue promo. Single column and unremarkable
-   until there is width to justify anything else. */
+   Single column and unremarkable until there is width to justify anything else. */
 .band2{ display:grid; gap:var(--section-gap); align-items:start; }
 .band2__col{ display:grid; gap:var(--block-gap); align-content:start; }
-.promo{
+
+/* ---------- THE PLANNING CALLOUT ----------
+   Was .promo, the rented-venue block, and it is the same shape with a shorter
+   question in it. INFORMATIONAL: two hairlines and nothing else, no card, no
+   fill, no outline. The button inside it is the interactive part and carries the
+   only edge in the block, which is the border rule in two lines of CSS. */
+.planner{
   display:grid; gap:var(--s3);
   background:transparent; border:0; border-radius:0;
-  border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline);
+  border-top:1px solid var(--border-info); border-bottom:1px solid var(--border-info);
   padding:var(--s6) 0;
 }
-.promo .btn{ margin-inline:0; }
-/* With a supporting sentence in each panel, two 160px columns on a phone would set
+.planner .btn{ margin-inline:0; }
+.planner__p{ max-width:46ch; text-wrap:pretty; }
+
+/* The one line of supporting copy on the Play page, under the heading and above
+   the choice. Mono, on the long-form settings, because it is a sentence rather
+   than a label. */
+.lede--play{ color:var(--text-secondary); line-height:1.65; max-width:52ch; text-wrap:pretty; margin-top:var(--s3); }
+
+/* ---------- THE TWO CHOICES, IN DETAIL ----------
+   With a supporting sentence in each panel, two 160px columns on a phone would set
    the copy four words to a line. It stacks until there is room for two. */
 .duo--detail{ grid-template-columns:1fr; gap:12px; }
 @media (min-width:600px){ .duo--detail{ grid-template-columns:1fr 1fr; gap:16px; } }
-.duo--detail .duocard{ min-height:0; padding:18px 16px 16px; }
+/* align-items:stretch is the default and is load bearing here: the two cards are
+   the page's whole content and one of them being shorter than the other reads as
+   one of them mattering less. */
+.duo--detail .duocard{ min-height:0; padding:20px 18px 18px; height:100%; }
 /* In the compact hero pair the price is pinned to the foot of the card. Here the
    supporting sentence follows it, and two sentences of different lengths would
    leave the two prices sitting at different heights. Straight stack instead. */
 .duo--detail .duocard .num{ margin-top:12px; }
-/* One panel filled, one panel outlined. That is the whole distinction, and it is
-   made of fill weight and border weight rather than of a second colour. */
-.duo--detail .duocard:nth-child(1){
-  background:color-mix(in srgb, var(--text-primary) 12%, var(--card-surface));
-  border-color:var(--border-strong);
-}
-.duo--detail .duocard:nth-child(2){
-  background:var(--surface);
-  border-color:var(--border-default);
+/* THE TWO PANELS ARE NOW IDENTICAL AT REST, and this is the fix to the treatment
+   the pass calls visually wrong. They used to rank: the first filled with a 12%
+   ink wash and edged --border-strong, the second left on the page colour with a
+   default edge. Nothing in the product ranks them. They are two products at two
+   prices, sold to two kinds of visitor, and on a page whose entire job is to let
+   someone choose between them a filled panel beside an empty one is an
+   instruction, not a choice. Open Play was the second one.
+
+   What tells them apart now is what always should have: the icon, the name, the
+   price, and the sentence. What they share is the interaction, so the difference
+   a reader sees when they touch one is caused by them rather than by which one it
+   was.
+
+   The resting fill is one step off the card, and the edge is --border-default,
+   which is the interactive weight in the border rule. These are the loudest
+   interactive elements in the build, so they are allowed the stronger edge the
+   rule permits: 2px rather than the 1px a button carries. */
+.duo--detail .duocard{
+  background:color-mix(in srgb, var(--text-primary) 6%, var(--card-surface));
+  border-width:2px; border-color:var(--border-default);
 }
 
 /* ---------- TABLET ----------
@@ -2086,7 +2266,6 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   }
   .tabbar{ padding-inline:max(0px, calc((100% - 34rem) / 2)); }
   .hero{ min-height:64svh; padding:calc(var(--appbar-h) + var(--s6)) var(--bleed) var(--s7); }
-  .hero .duo{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width:768px){
   :root{
@@ -2145,9 +2324,6 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
      thing left to ask for is a harder edge on it. The strip's own divider is not
      asked for here any more: it carries one at every width now, and
      console-nav.css strengthens it under this same setting. */
-  @media (prefers-contrast:more){
-    .appbar{ border-bottom-color:var(--text-inverse); }
-  }
   .appbar--ends{ grid-template-columns:none; }
   #bar-start .textbtn{ padding-right:var(--s5); }
   #bar-mid{ display:flex; align-items:center; justify-self:auto; }
@@ -2230,7 +2406,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .dock__inner{ max-width:var(--measure); }
 
   /* text-heavy blocks stay on a readable measure inside the wider frame */
-  .sampleband, .banner, .lede, .steps__b p, .promo__t p, .marquee__copy p{ max-width:var(--measure); }
+  .sampleband, .banner, .lede, .steps__b p, .planner__p, .marquee__copy p{ max-width:var(--measure); }
   .duocard .note{ max-width:46ch; }
 
   /* HERO: full viewport width, square cornered, composed to the left */
@@ -2255,22 +2431,22 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .hero h1{ font-size:clamp(58px, 5.6vw, 78px); max-width:13ch; }
   .hero p.sub{ margin-top:var(--s4); font-size:20px; line-height:30px; max-width:42ch; }
   .hero .maplink{ margin-top:var(--s4); font-size:16px; }
-  .hero .duo{ margin-top:var(--s7); grid-template-columns:repeat(2, minmax(0, 290px)); gap:var(--s4); }
-  .hero .duocard{ min-height:160px; padding:20px 20px 18px; }
-  .hero .duocard b{ font-size:21px; line-height:25px; }
-  .hero .duocard .num{ font-size:34px; line-height:36px; }
 
-  /* what is open, beside the proof numbers */
   .band2{ grid-template-columns:1.55fr 1fr; gap:var(--s9); }
-  .band2__col--facts{ padding-top:var(--s2); }
-  .band2__col--facts .facts{ flex-direction:column; }
-  .band2__col--facts .facts li{ text-align:left; padding:var(--s3) 0; }
-  .band2__col--facts .facts li + li{ border-left:0; border-top:1px solid var(--hairline); }
-  .band2__col--facts .facts b{ font-size:30px; line-height:34px; }
-  .band2__col--facts .facts span{ font-size:14px; }
-  .sched__t{ font-size:19px; line-height:24px; }
-  .sched__s{ font-size:15px; line-height:20px; }
-  .sched__row{ min-height:72px; }
+  /* THE AVAILABILITY ROWS USE THE DESKTOP WIDTH. They used to share it with a
+     column of statistics; with the statistics gone the rows have the whole
+     container, and a full 1280px row with three items in it is mostly empty
+     space between them. Two rows side by side instead: the same list, laid out
+     as a pair, so the two live facts are read in one glance rather than one
+     under the other with a screen's worth of nothing to their right.
+     The list keeps one top rule across both columns and the rows keep their
+     own bottom rules, so the block still reads as ruled editorial rather than
+     as two cards. */
+  .avlist{ display:grid; grid-template-columns:1fr 1fr; column-gap:var(--s9); }
+  .avrow{ align-content:start; }
+  .avrow__t{ font-size:22px; line-height:28px; }
+  .avrow__m{ font-size:16px; line-height:23px; }
+  .avrow{ padding:var(--s5) 0; }
 
   /* FILM STRIP: full viewport width, taller again, still square cornered */
   .marquee{ --strip-h:clamp(420px, 36vw, 560px); border-radius:0; }
@@ -2304,9 +2480,9 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .duo--detail .duocard .per{ font-size:15px; }
   .duo--detail .duocard .note{ margin-top:14px; font-size:17px; line-height:25px; }
 
-  /* the promo reads across rather than down */
-  .promo{ grid-template-columns:1fr auto; align-items:center; column-gap:var(--s9); padding:var(--s7) 0; }
-  .promo__a{ margin:0; }
+  /* the callout reads across rather than down */
+  .planner{ grid-template-columns:1fr auto; align-items:center; column-gap:var(--s9); padding:var(--s7) 0; }
+  .planner__a{ margin:0; }
 
   /* four steps across, numbered above a thin rule */
   .steps{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s6); }
@@ -2343,21 +2519,19 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 /* ============================================================
    APP BAR AT NARROW WIDTHS
    Two controls sit to the right of the wordmark on a browse route now: the swap
-   slot, holding whichever of the account and the booking action applies, and the
-   menu. Below 420px the swap slot tightens its padding, which is the difference
-   between "Book Court" fitting beside the mark at 320px and not.
+   slot, holding whichever of Play and the account applies, and the menu. Below
+   420px the swap slot tightens its padding. The label it has to fit is "Play"
+   rather than "Book Court" now, which is four characters instead of ten, so the
+   320px case has slack it did not have; the tightening stays because the slack
+   belongs to the wordmark rather than to the button.
 
    NOT INSIDE THE FRAME. Both rules below are about a bar with a wordmark, two
-   controls, and no room; the staging strip has two 26px controls on an
-   otherwise empty line and none of that pressure. The label is what makes the
-   flask askable for, and hiding it on the only widths where the strip is the
-   reader's whole view of the harness is the wrong half to drop. These rules
-   used to reach it because the demo button was in this bar; it is in the frame
-   now and the frame is the only thing left that draws one.
+   controls, and no room; the staging strip is one status indicator and one 26px
+   control on an otherwise empty line and has none of that pressure. It does its
+   own folding: below 480px the indicator drops its supporting half and keeps the
+   word and the dot. See console-nav.css.
    ============================================================ */
 @media (max-width:419px){
-  .appbar .iconbtn__t{ position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
-  .appbar .iconbtn--demo{ min-width:var(--tap-min); padding:0; }
   .appbar__slot--end{ gap:2px; }
   .nav-book-cta, .btn-login{ padding-inline:var(--s3); font-size:15px; }
   .acct__btn{ padding-inline:var(--s2); }
@@ -2753,14 +2927,58 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
    (0,2,0), which wins on class count, so this layer is genuinely the last word on
    family and weight rather than only usually the last word. */
 
+/* ---------- THE THREE TYPE ROLES, AS CLASSES ----------
+   The split below has always been in this sheet as a list of selectors. These
+   three classes are the same split with a name on each part, so a new component
+   can join a role rather than being added to a selector list, and so the roles
+   can be pointed at in review.
+
+     .t-display  the large bold cream face. Hero headlines, campaign statements,
+                 high-impact editorial. Deliberately not for routine UI: it has
+                 one weight, no italic, and it stops being loud the moment
+                 everything is set in it.
+     .t-ui       the bold treatment that names things. Section headings, card
+                 titles, buttons, important labels.
+     .t-mono     supporting copy, metadata, availability detail, small labels.
+
+   Everything the existing selector lists already cover keeps working unchanged.
+   These are for what comes next. */
+.t-display{ font-family:var(--font-display); font-weight:400; letter-spacing:-.015em; text-wrap:balance; }
+.t-ui{ font-family:var(--font-display); font-weight:400; letter-spacing:-.015em; }
+.t-mono{ font-family:var(--font); font-weight:var(--fw-note); }
+/* MONO HAS A CEILING, and this is it. A monospaced face sets about 20% wider than
+   a proportional one at the same size, so a paragraph of it runs long, and long
+   lines of even-width characters are the specific thing mono is worst at. Past a
+   sentence or two the fix is more leading and a shorter measure; past a short
+   paragraph the fix is not to use mono. .t-mono--long is the first of those, and
+   the note beside it is the second. */
+.t-mono--long{
+  font-family:var(--font); font-weight:var(--fw-note);
+  line-height:1.65; max-width:58ch; text-wrap:pretty;
+}
+/* When a block is longer than .t-mono--long is comfortable with, it takes the
+   body weight instead of the note weight and keeps the measure. There is no
+   second family to fall back to in this build: the fallback is weight and
+   leading, because a third face would be a new typeface in a system whose whole
+   argument is that it has two. */
+.t-body-long{
+  font-family:var(--font); font-weight:var(--fw-body);
+  font-size:var(--fs-body); line-height:1.7; max-width:var(--measure); text-wrap:pretty;
+}
+
 /* ---------- display: headings and CTA labels ---------- */
 :root h1, :root h2, :root h3,
 :root .display, :root .sec, :root .amount, :root .screen,
 :root .hero h1, :root .marquee__copy h2,
-:root .duocard b, :root .facts b, :root .dock__summary strong,
+:root .duocard b, :root .avrow__t, :root .dock__summary strong,
 :root .pass__who, :root .scanres__who, :root .qrm__head h2,
 :root .sheet__head h2, :root .plate__amount,
-:root .btn, :root .btn-login, :root .duocard .num{
+/* The nav CTA joined the display list and Log In left it. They are the two ends
+   of the header ranking and the face is one of the things carrying it: the one
+   prominent action is set in the same face every other call to action in the
+   build is set in, and the quiet one is set in the navigation's own mono, level
+   with the two destinations beside it. */
+:root .btn, :root .nav-book-cta, :root .duocard .num{
   font-family:var(--font-display);
   font-weight:400;
   letter-spacing:-.015em;
@@ -2771,13 +2989,13 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 :root .hero h1{ font-weight:900; letter-spacing:-.035em; }
 /* A monospaced digit inside a black heading jumps out of it, so the tabular figures
    these blocks ask for are turned off wherever the display face is doing the work. */
-:root .amount, :root .duocard .num, :root .facts b{ font-variant-numeric:normal; }
+:root .amount, :root .duocard .num{ font-variant-numeric:normal; }
 /* Small caps labels stay mono. In a black face at 13px, letterspaced and uppercased,
    the counters close up and the word turns into a bar. */
 :root .eyebrow{ font-family:var(--font); font-weight:var(--fw-med); letter-spacing:.14em; }
 
 /* ---------- navigation: light ---------- */
-:root .topnav a{ font-family:var(--font); font-weight:var(--fw-nav); letter-spacing:.01em; }
+:root .topnav a, :root .btn-login{ font-family:var(--font); font-weight:var(--fw-nav); letter-spacing:.01em; }
 /* The current page is the underline first. The weight moves one step, to medium, not
    to bold: against a light navigation one step is already the loudest thing in the row. */
 :root .topnav a[aria-current="page"]{ font-weight:var(--fw-med); }
@@ -2790,15 +3008,15 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 :root .legal, :root .footnote, :root .hint,
 :root .dock__note, :root .dock__summary small,
 :root .duocard .note, :root .duocard .per,
-:root .sched__s, :root .facts span, :root .row__sub,
+:root .avrow__m, :root .featstrip, :root .row__sub,
 :root .acct__who, :root .sampleband, :root .stagingband, :root .injected,
 :root .qrm__hint, :root .pass__of, :root .scanres__meta, :root .field__hint,
-:root .steps__b p, :root .promo__t p,
+:root .steps__b p, :root .planner__p, :root .demostat__s,
 :root .hero p.sub, :root .marquee__copy p, :root .harness .legal{
   font-family:var(--font); font-weight:var(--fw-note);
 }
 /* One step up from a note: the line in a row or a block that carries its meaning. */
-:root .sched__t, :root .row__title, :root .stat, :root .chip,
+:root .row__title, :root .stat, :root .chip, :root .demostat__t,
 :root .menurow, :root .acct__btn, :root .acct__menu button,
 :root .card__head strong, :root .plate__label, :root .steps__n{
   font-family:var(--font); font-weight:var(--fw-med);
@@ -3603,22 +3821,33 @@ function paintSidenav(view, path){
    navigations at once and the landing page carried Book and Open Play in the bar
    while the hero's own two cards were on screen saying the same thing.
    What is left is the header, at every width, and these three destinations.
-   Book and Open Play are not among them on purpose. They are conversion actions,
-   the hero owns them, and once the hero's cards scroll away the header offers one
-   compact Book Court in their place rather than both of them back again.
+   Play is not among them, and that is a ranking rather than an omission: it is
+   the one conversion action, it is drawn as the header's single prominent
+   control in the swap slot rather than as a text link in this list, and building
+   it from this array would make it the fourth plain word in a row of four.
 
    menuOnly:  in the phone menu, never in the desktop navigation strip. Visit is
               directions and a phone number, which is a task for someone standing
               outside the building and a footer line on a desktop page that already
               prints the address.
-   authHide:  leaves the navigation when there is an account to put it behind.
-              My Bookings beside an Account button is the same destination twice.
    dyn:       resolves against the account, so signed out it lands on Find My
-              Booking rather than on a sign-in wall with no explanation. */
+              Booking rather than on a sign-in wall with no explanation.
+
+   authHide IS GONE, and My Bookings is a text link at both states now. It used
+   to leave the strip whenever an account existed, on the argument that My
+   Bookings beside an Account button is one destination drawn twice. The system
+   design settles that differently: the navigation is Rates, My Bookings, Play,
+   and then the account control, and the account control is understated on
+   purpose. A quiet control that has to be opened before it will admit to holding
+   your bookings is not the same offer as a link that says so on the bar, and the
+   ranking the design asks for is Play loudest and the account quietest, which
+   only reads if the account is not also carrying a primary destination inside
+   it. The row inside the account menu stays: a menu that lists what it holds is
+   not a competing navigation. */
 const PUBLIC_NAV = [
   { to:"/rates",    label:"Rates",       aria:"Rates & How It Works",   glyph:"tag",    match:["/rates"] },
   { to:"/visit",    label:"Visit",       aria:"Visit / Contact",        glyph:"pin",    match:["/visit"], menuOnly:true },
-  { to:null,        label:"My Bookings", aria:"My Bookings",            glyph:"person", match:["/find","/me","/signin"], dyn:true, authHide:true }
+  { to:null,        label:"My Bookings", aria:"My Bookings",            glyph:"person", match:["/find","/me","/signin"], dyn:true }
 ];
 /* The five real destinations of a shift. All five are still here; what changed
    is that only four of them hold a permanent slot in the bar, because the fifth
@@ -3721,7 +3950,7 @@ function tabHref(t){
    because of a width. */
 function navItems(path){
   return PUBLIC_NAV
-    .filter(function(t){ return !t.menuOnly && !(t.authHide && S.account); })
+    .filter(function(t){ return !t.menuOnly; })
     .map(function(t){ return { href: tabHref(t), cur: t.match.indexOf(path) >= 0, t: t }; });
 }
 
@@ -3779,7 +4008,7 @@ function render(){
      and data-action="demo" in its own handler, because demo means a harness
      sheet here and a staging notice there. */
   document.getElementById("bar-util").innerHTML =
-    CONSOLE_NAV.utilbar({ icon: icon, theme: currentTheme(), demoName: "Demo, the staging harness" });
+    CONSOLE_NAV.utilbar({ icon: icon, theme: currentTheme(), demoOpens: "the staging harness" });
 
   /* NAVIGATION STRIP, right hand end.
      Two things, in this order: the swap slot and the menu button.
@@ -3922,19 +4151,26 @@ function syncOverHero(){
      under the header's bottom edge. */
   root.classList.toggle("over-hero", hero.getBoundingClientRect().bottom > h);
 }
-/* ---------- THE SCROLLED BOOKING ACTION ----------
-   The header offers Book Court only once the hero's own two cards have gone. While
-   they are on screen the reader is already looking at the choice and a third copy
-   of it in the bar is noise; once they are past it, the bar is the only way back to
-   the decision without scrolling up.
-   The gate is the bottom of the hero's card pair against the bottom of the header,
-   which is the same geometry read syncOverHero does and for the same reason: an
-   IntersectionObserver constructed in this document never delivers a callback, not
-   even the initial one, so the CTA would never arrive. Both reads happen on a frame
-   that is already being laid out for the back-to-top button.
-   Every route that is not the landing page has no hero cards at all, so the action
-   is present from the first frame there. A task route has no header nav and no
-   button to find, and the class comes off. */
+/* ---------- THE HEADER'S PLAY CONTROL ----------
+   This used to be a gate. The header offered Book Court only once the hero's own
+   two cards had scrolled away, because while they were on screen a third copy of
+   the same choice in the bar was noise.
+
+   THE GATE NO LONGER FIRES ON ANY ROUTE, and the function is kept rather than
+   deleted. There are no cards in the hero to wait for, so the second branch below
+   returns immediately and Play is present from the first frame everywhere: which
+   is what the system design asks for, a navigation that reads Rates, My Bookings,
+   Play, Log In at every scroll position. The measurement stays because the
+   condition it tests is a property of the page rather than a decision: put a
+   choice pair back into a hero and the control goes back to waiting for it,
+   without anybody having to remember that it once did.
+
+   The geometry is a rectangle read rather than an IntersectionObserver, which is
+   the same choice syncOverHero makes and for the same reason: an observer
+   constructed in this document never delivers a callback, not even the initial
+   one, so the control would never arrive. Both reads happen on a frame that is
+   already being laid out for the back-to-top button.
+   A task route has no header nav and no button to find, and the class comes off. */
 function syncNavCta(){
   const root = document.documentElement;
   if (!document.querySelector(".nav-book-cta")){ root.classList.remove("nav-cta"); return; }
@@ -4128,6 +4364,104 @@ function duoCTA(detail){
       '<span class="num">₱150</span><span class="per">per player</span>' + noteB + "</button>" +
   "</div>";
 }
+/* ---------- AVAILABILITY ROW ----------
+   The system's row for a live fact plus the one way to act on it. It replaced a
+   pair of .sched rows that read as venue metadata: "Courts today / Venue time,
+   Asia/Manila" is a caption, not an answer to what a visitor came to the page
+   asking, which is whether they can play now.
+
+   THE BORDER RULE, WORKED THROUGH. The row is informational, so it carries
+   hairlines between rows and no box of its own; the control inside it is
+   interactive, so it carries the visible edge. That is also why the row is not
+   itself a button: a row that was one could not hold a bordered control without
+   nesting a button in a button, and the alternative, a whole row drawn with a
+   control's edge, is the boxed-in rectangle the design asks this pass to reduce.
+
+   The status is the build's existing dot plus its word. It is never colour
+   alone and it never was: this file carries no third hue. */
+function availRow(o){
+  /* THE STATUS SITS INSIDE THE META LINE, not in a column of its own. It had one
+     for a first pass and two things were wrong with it. It was the third item in
+     a row that also holds a heading, a line of detail, and a control, which on a
+     half-width desktop column left the detail about 180px to wrap in; and on the
+     Open Play row it printed the capacity phrase twice, once in the meta and once
+     in the dot beside it. One line reading "7:00 PM to 11:00 PM, Places
+     available" with the dot on the phrase is what the copy asks for and is one
+     statement rather than two.
+
+     The court row passes no status at all, because its heading IS the status:
+     "Available now" over "4 courts, Open until 11:00 PM" does not need a second
+     control saying Available. */
+  return '<li class="avrow">' +
+    '<div class="avrow__b">' +
+      '<h3 class="avrow__t">' + esc(o.title) + "</h3>" +
+      /* THE SEPARATOR TRAILS ITS OWN ITEM RATHER THAN LEADING THE NEXT ONE.
+         The line is two flex items and it wraps at a narrow column. With the dot
+         attached to the phrase that follows it, a wrap put a lone middle dot at
+         the start of the second line, which reads as a bullet in a list nobody
+         wrote. Attached to the item before it, a wrap leaves it at the end of the
+         first line, which is what a continuation looks like. Same reasoning
+         applies to the feature strip and it is built the same way. */
+      '<p class="avrow__m">' +
+        '<span class="avrow__hrs">' + esc(o.meta) +
+          (o.status ? '<span class="avrow__sep" aria-hidden="true">·</span>' : "") + "</span>" +
+        /* The separator and the phrase wrap as one unit. Loose, the dot ended a
+           line on its own whenever the hours and the phrase did not fit
+           together. */
+        (o.status ? statusDot(o.status) : "") +
+      "</p>" +
+    "</div>" +
+    '<div class="avrow__a"><button class="btn btn--secondary btn--sm" ' + o.act + ">" +
+      esc(o.cta) + icon("chev-r") + "</button></div>" +
+  "</li>";
+}
+
+/* Tonight, tomorrow, or the date. The window model carries a day offset and the
+   copy has to follow it: a card that says "tonight" over a session that is not
+   today is the one kind of wrong a live availability block cannot be. */
+function windowWhen(w){
+  if (w.dayOffset === 0) return "tonight";
+  if (w.dayOffset === 1) return "tomorrow";
+  return "on " + windowTitle(w);
+}
+
+/* ---------- THE VENUE FEATURE STRIP ----------
+   What the four big statistics became. They were a 24px display face in their own
+   column beside the availability, which ranked "4 Courts" level with whether
+   anything is free tonight. These are standing facts about the building: true
+   every day, unchanged by any dial in the harness, and therefore support rather
+   than news. One mono line, under the rows, secondary by size and by weight.
+   Read from the club record, so the count and the opening days cannot drift from
+   the values the rest of the product books against. */
+function featureStrip(){
+  /* Each fact carries its own trailing separator, for the reason availRow gives:
+     a strip that wraps must not start a line with a lone middle dot. */
+  const sep = '<span class="featstrip__sep" aria-hidden="true">·</span>';
+  return '<p class="featstrip">' +
+    "<span>" + esc(VENUE.courts + " indoor courts") + sep + "</span>" +
+    "<span>Open daily" + sep + "</span>" +
+    "<span>Rain or shine</span></p>";
+}
+
+/* ---------- PLANNING SOMETHING BIGGER ----------
+   One component, printed on the landing page and on the Play page, which is the
+   whole reason it is a function. It replaces the "Rent the whole place" promo:
+   same destination, same offer, fewer lines, and a question rather than an
+   instruction, because a visitor who is organising a tournament recognises
+   themselves in the question and everyone else can skip it.
+
+   Informational, so it has no box: two hairlines and the copy between them. The
+   one interactive thing in it is the button, and the button is the only thing in
+   it wearing an edge. */
+function plannerBlock(){
+  return '<div class="section"><div class="planner">' +
+    '<div class="planner__t"><h2 class="sec">Planning something bigger?</h2>' +
+    '<p class="planner__p">Rent all ' + esc(String(VENUE.courts)) +
+      " courts for tournaments, club days, or private events.</p></div>" +
+    '<div class="planner__a"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/event">' +
+      "Plan a private event" + icon("chev-r") + "</button></div></div></div>";
+}
+
 function footerBlock(){
   return '<footer class="pagefoot">' +
     '<div class="footgrid">' +
@@ -4163,16 +4497,28 @@ function scrLanding(){
      the same glance. The hero opens on the headline.
      Two spans, and .hero h1 span is display:block, so the break is structural at
      every width rather than a wrap that a wider column could undo. */
+  /* THE HERO'S OWN CARD PAIR IS GONE, and this is the one composition change in
+     the pass. The photograph, the headline, the supporting line, and the map link
+     are untouched; what left is the two choice cards, and they left because the
+     decision they carry now has a page of its own. Keeping them here would put
+     the whole of /play on the landing page directly above a header offering Play,
+     which is the duplicate booking action this pass exists to remove.
+     What replaces them is nothing. The header's Play control is present from the
+     first frame on this route now rather than arriving when the cards scroll
+     away, which is exactly what syncNavCta already does when it finds no pair. */
   html += '<section class="hero">' +
     '<h1><span>Ready when</span><span>you are.</span></h1>' +
-    '<p class="sub">Pick a time, pay, walk straight in.</p>' +
+    '<p class="sub">Pick a time, scan, walk straight in.</p>' +
     '<a class="maplink" href="' + MAPS_URL + '" target="_blank" rel="noopener">' + icon("pin") +
       '<span>Silway 8, Polomolok, South Cotabato</span></a>';
-  if (!bookingOff) html += duoCTA();
   html += "</section>";
 
-  html += '<p class="sampleband" style="margin-top:var(--s5)">' + icon("flask") +
-    "<span>Staging build. Sample times and availability. Nothing here is a real reservation.</span></p>";
+  /* THE SAMPLE BAND IS GONE FROM HERE. It was a dashed card in the reading column
+     saying the build is staging and the times are samples. The same statement is
+     in the frame at the top left of every screen of both builds now, where it is
+     always on screen instead of only at the top of one page, and the harness
+     behind it says it at length. A second copy in the content would be the
+     bordered staging card the compact indicator replaced. */
 
   if (bookingOff){
     html += '<div class="section"><div class="banner">' + icon("alert") +
@@ -4180,49 +4526,76 @@ function scrLanding(){
       '<p class="legal">Nothing is being held or reserved. Call the venue on ' + esc(VENUE.phone) + " to ask about court time.</p></div></div></div>";
   }
 
-  /* What is open and what the venue is, side by side once there is width for it.
-     One column and unchanged below 1024px. */
-  html += '<div class="section band2"><div class="band2__col"><h2 class="sec">Open right now</h2>';
+  /* ---------- OPEN RIGHT NOW ----------
+     Two availability rows and a supporting strip, in that order, and the order is
+     the point. This block used to be a two column band: a pair of schedule rows
+     on the left and four large statistics on the right, which gave a standing
+     fact about the building the same visual weight as whether anything is free
+     tonight. The statistics are the strip under the rows now and the band is one
+     column that uses its width on the rows themselves.
+
+     EVERY VALUE IS READ, NOT WRITTEN DOWN. The court count and the closing time
+     come from the club record, the window's hours and its day come from the
+     window, and the capacity phrase comes from the same dial the Open Play screen
+     reads. A row that could disagree with the screen it links to would be worse
+     than no row.
+
+     The three interruption states are unchanged in substance and keep their own
+     shapes: a failed availability read is a banner with a retry, an empty
+     schedule is a card, and neither is dressed up as a live row it is not. */
+  html += '<div class="section"><h2 class="sec">Open right now</h2>';
   if (availOff){
     html += '<div class="banner">' + icon("alert") + "<div><p><strong>Live availability could not be loaded.</strong></p>" +
       '<p class="legal">Prices and contact details below are still correct.</p>' +
       '<p style="margin-top:var(--s2)"><button class="btn btn--secondary btn--sm" data-action="retry">Retry</button></p></div></div>';
-  } else if (S.scenario === "empty"){
-    html += '<div class="card"><p><strong>No Open Play is scheduled yet.</strong></p>' +
-      '<p class="legal" style="margin-top:var(--s2)">This is normal between published schedules. Reserve a private court instead.</p></div>';
   } else {
+    const w = OP_WINDOWS.w1;
     const cap = S.capacityDial === "full" ? "full" : S.capacityDial === "almost" ? "almost" : "places";
-    html += '<ul class="sched">' +
-      '<li><div class="sched__row">' + icon("court") +
-        '<span class="sched__main"><span class="sched__t">Courts today</span>' +
-        '<span class="sched__s">Venue time, Asia/Manila</span></span>' + statusDot("available") + "</div></li>" +
-      '<li><button class="sched__row" data-action="nav" data-to="/openplay">' + icon("users") +
-        '<span class="sched__main"><span class="sched__t">' + esc(windowTitle(OP_WINDOWS.w1)) + "</span>" +
-        '<span class="sched__s">' + esc(OP_WINDOWS.w1.start + " to " + OP_WINDOWS.w1.end) + "</span></span>" +
-        statusDot(cap) + icon("chev-r", "sched__chev") + "</button></li>" +
-      "</ul>";
+    let rows = "";
+    /* The court row is present whenever availability is readable. Booking being
+       paused does not make the courts stop existing, and the control it carries
+       goes through the same guard every other booking entry point does. */
+    rows += availRow({
+      title:  bookingOff ? "Courts today" : "Available now",
+      meta:   VENUE.courts + " courts · Open until " + VENUE.closes,
+      cta:    "View court times",
+      act:    'data-action="startcourt"'
+    });
+    if (S.scenario === "empty"){
+      html += '<ul class="avlist">' + rows + "</ul>";
+      html += '<div class="card"><p><strong>No Open Play is scheduled yet.</strong></p>' +
+        '<p class="legal" style="margin-top:var(--s2)">This is normal between published schedules. Reserve a private court instead.</p></div>';
+    } else {
+      rows += availRow({
+        title:  "Open Play " + windowWhen(w),
+        meta:   w.start + " to " + w.end,
+        status: cap,
+        cta:    "See Open Play",
+        act:    'data-action="nav" data-to="/openplay"'
+      });
+      html += '<ul class="avlist">' + rows + "</ul>";
+    }
   }
+  html += featureStrip();
   html += "</div>";
-
-  html += '<div class="band2__col band2__col--facts"><ul class="facts">' +
-    "<li><b>4</b><span>Courts</span></li>" +
-    "<li><b>7</b><span>Days a week</span></li>" +
-    "<li><b>Indoor</b><span>Rain or shine</span></li>" +
-    "</ul></div></div>";
 
   /* The film strip carries the headline and nothing else. What Open Play actually
      is now belongs to the Open Play choice itself, further down. */
   html += '<div class="section">' + communityMarquee() +
     '<p style="margin-top:var(--s5)"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/openplay">See Open Play times' + icon("chev-r") + "</button></p></div>";
 
-  html += '<div class="section"><div class="promo">' +
-    '<div class="promo__t"><h2 class="sec">Rent the whole place</h2>' +
-    '<p class="legal" style="margin-top:var(--s2)">All 4 courts for a club day, tournament, or company event.</p></div>' +
-    '<p class="promo__a"><button class="btn btn--secondary btn--sm" data-action="nav" data-to="/event">Plan a private event' + icon("chev-r") + "</button></p></div></div>";
+  /* PICK YOUR WAY IN HAS LEFT THIS PAGE. The pair of detailed choice cards, their
+     prices, and their descriptions are the whole of /play now, reached from the
+     header's Play control. Nothing was dropped: the same duoCTA builds them there
+     with the same copy and the same icons.
 
-  if (!bookingOff){
-    html += '<div class="section"><h2 class="sec">Pick your way in</h2>' + duoCTA(true) + "</div>";
-  }
+     PLANNING SOMETHING BIGGER MOVED DOWN, and it is now printed after How it
+     works rather than before the choice. It used to sit between the community
+     strip and the booking content, which put a question only a tournament
+     organiser is asking directly in front of every visitor on their way to the
+     one decision the page wanted them to make. After How it works it lands on a
+     reader who has finished the ordinary path and is still reading, which is who
+     it is for. */
 
   /* How it works is a section, not a link out. Find My Booking and Sign in are in
      the app bar, and Visit repeats the footer, so none of them are rows any more. */
@@ -4235,6 +4608,8 @@ function scrLanding(){
     '<p style="margin-top:var(--s5)"><button class="tlink" data-action="nav" data-to="/rates">' +
     "See the full rates and policies" + icon("chev-r") + "</button></p></div>";
 
+  html += plannerBlock();
+
   html += footerBlock();
   /* wide:true asks for the whole desktop container rather than a reading column.
      The landing page is the only screen that composes across it; every task route
@@ -4242,6 +4617,53 @@ function scrLanding(){
   return { id:"pub-landing", shell:"browse", title:"Fit Club Courts", html:html,
     wide:true, mount:mountMarquee, dock:null };
 }
+/* ---------- SCR pub-play ----------
+   The decision page, and the destination of the header's one prominent control.
+   It carries what "Pick your way in" carried on the landing page and nothing it
+   did not: the same two choices, the same two prices, the same two descriptions,
+   the same two icons, built by the same duoCTA the rest of the file uses.
+
+   WHY IT IS A PAGE. Book Court named one product and led to a screen that sells
+   two, and the landing page answered that by printing the choice twice, once in
+   the hero and once further down. A destination that holds the decision lets the
+   header carry one label that is true, lets the hero be a photograph and a
+   headline, and gives the choice a screen where neither option is competing with
+   a section above or below it.
+
+   WHAT IS ON IT, AND WHY NOTHING ELSE IS. The two cards, the bigger-event
+   question, and the footer. No hero, because the reader has already chosen to
+   come here and does not need selling to again; no second copy of How it works,
+   because Rates carries it and the footer links there; no availability rows,
+   because those belong to the page a visitor lands on rather than to the page
+   they arrive at having decided.
+
+   Maintenance is handled where every other booking entry point handles it: the
+   Play control routes here, and the cards themselves are withheld when booking is
+   paused, with the same banner the landing page prints. Sending a reader to a
+   decision page and then refusing both of its choices without saying why is the
+   one arrangement this had to avoid. */
+function scrPlay(){
+  const bookingOff = S.connectivity === "maintenance";
+  let html = '<h1 class="screen">Pick your way in</h1>';
+  html += '<p class="lede lede--play">Two ways to play, both bookable in the same few taps.</p>';
+
+  if (bookingOff){
+    html += '<div class="section"><div class="banner">' + icon("alert") +
+      "<div><p><strong>Online booking is temporarily unavailable.</strong></p>" +
+      '<p class="legal">Nothing is being held or reserved. Call the venue on ' + esc(VENUE.phone) +
+      " to ask about court time.</p></div></div></div>";
+  } else {
+    html += '<div class="section">' + duoCTA(true) + "</div>";
+  }
+
+  html += plannerBlock();
+  html += footerBlock();
+  /* wide:true, the same container the landing page asks for. The two cards are
+     the widest thing on the page and a reading measure would set them in a column
+     narrower than the header above them. */
+  return { id:"pub-play", shell:"browse", title:"Play", html:html, wide:true, dock:null };
+}
+
 /* ---------- community marquee ----------
    The only images in this build that are not inlined. All 18 come to 3.4MB, which
    as base64 would put this file past 5MB, so they are fetched from ./carousel.
@@ -7467,7 +7889,8 @@ function scrExceptions(){
    screen read as they did. */
 const SCENARIOS = window.SCENARIOS;
 const ALL_ROUTES = [
-  ["/", "pub-landing, Landing"], ["/rates","pub-rates, Rates & How It Works"], ["/visit","pub-visit, Visit / Contact"],
+  ["/", "pub-landing, Landing"], ["/play","pub-play, Play, pick your way in"],
+  ["/rates","pub-rates, Rates & How It Works"], ["/visit","pub-visit, Visit / Contact"],
   ["/court","pub-court-when, Reserve a Court"], ["/court/review","pub-court-review, Court review and details"],
   ["/openplay","pub-openplay, Open Play schedule"], ["/openplay/w1","pub-op-window, Open Play window"],
   ["/openplay/w1/players","pub-op-players, Organizer and player names"],
@@ -7759,6 +8182,7 @@ function closeSheet(){ const d = document.getElementById("sheet"); unanchorSheet
    ROUTE TABLE
    ============================================================ */
 route("/", scrLanding);
+route("/play", scrPlay);
 route("/rates", scrRates);
 route("/visit", scrVisit);
 route("/policies", scrPolicies);
@@ -8565,16 +8989,31 @@ STAGING.subscribe(function(state, changed){
    beside it, a My Bookings link is the same destination drawn twice, and the one
    that reads as an account's contents is the one inside the account.
    ============================================================ */
-/* One action, not two. The hero offers the choice between a private court and Open
-   Play because that is a decision worth a pair of cards; the header, once that pair
-   has scrolled away, offers the way back into booking and lets the flow ask which.
-   startcourt rather than a plain nav, so the maintenance interruption is handled by
-   the same guard the hero card goes through and there is no second booking route. */
+/* PLAY, NOT BOOK COURT, and it is a destination now rather than a flow start.
+   Book Court named one of the two ways in and the place it leads holds both, so
+   the label was describing half of its own destination. Play names the decision
+   instead, and the decision has a page: /play carries the two choices, their
+   prices, and their descriptions, and each of them starts the flow it belongs
+   to. That also removes the reason this control used to run startcourt rather
+   than a plain nav. The maintenance guard has not been dropped, it has moved to
+   where the choice is actually made: /play routes to the interruption screen
+   when booking is paused, which is the same guard covering both products
+   instead of only the court.
+
+   THE CLASS NAME IS STILL nav-book-cta. It is the stylesheet's name for the one
+   prominent control in the header and it is referenced in eight rules and two
+   geometry reads; renaming it would be a large diff that changes no pixel. What
+   the control IS has not changed, only where it goes. */
 /* Wrapped, because the width is the animation. The wrapper is a one-column grid
    that runs from 0fr to 1fr, which is the only way to transition a control from no
    width to its own width without naming that width in the stylesheet. */
 function bookCtaHtml(){
-  return '<span class="navcta"><button class="nav-book-cta" data-action="startcourt">Book Court</button></span>';
+  /* aria-current on the control that leads to the page you are already on. It is
+     still rendered and still operable, because the swap slot's width is what
+     holds the bar still and because on a phone this is the only Play in the
+     chrome, but a reader is told it is where they are. */
+  const here = currentPath() === "/play" ? ' aria-current="page"' : "";
+  return '<span class="navcta"><button class="nav-book-cta" data-action="nav" data-to="/play"' + here + ">Play</button></span>";
 }
 function loginButtonHtml(){
   return '<div class="headeraccount">' +
@@ -8611,9 +9050,12 @@ function closeAccountMenu(){
    lives, because the app bar carries the wordmark, one action, and this button, and
    there is no room in it for destinations as well. It holds three things in this
    order: where you can go, who you are, and what this build is.
-   What it deliberately does not hold is Book or Open Play. Those are the hero's two
-   cards, and once they scroll away the bar itself carries Book Court, so putting
-   them in here as well would be the third and fourth copy of the same action.
+   What it deliberately does not hold is Play. The app bar carries it at this width
+   and carries it permanently now, one tap from the same thumb that opens this
+   sheet, so a row for it in here would be the second copy of a control that is
+   already on screen. Log in is in here rather than in the bar for the mirror
+   image of that reason: the bar has room for one of the two and the design ranks
+   Play above the account.
    This is the same sheet the harness uses, so it already traps focus, closes on
    Escape, and restores focus on the way out.
    ============================================================ */
@@ -9128,7 +9570,7 @@ STAGING.subscribe(function(state, changed, origin){
   let opener = null;
   d.innerHTML = '<div class="sheet staging__panel">' +
     CONSOLE_NAV.notice({ icon: icon, half: "booking app", close: "x",
-      reopen: "The flask in the strip at the top of the window opens the staging harness, where the dials are." }) + "</div>";
+      reopen: "The DEMO indicator at the top left of the window opens the staging harness, where the dials are." }) + "</div>";
   /* A click on the backdrop lands on the dialog itself, because the panel does
      not fill the box. Escape is the platform's, and so is the focus trap. */
   d.addEventListener("click", function(ev){ if (ev.target === d) d.close(); });

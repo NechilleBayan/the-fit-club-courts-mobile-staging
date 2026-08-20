@@ -235,19 +235,64 @@
      rule was about two copies inside one product, and the strip is no longer
      inside it: it is staging furniture that will be deleted whole, and a
      product whose theme toggle leaves with it was never complete. */
+  /* ONE CONTROL LEFT IN THE LIST, and the flask is no longer in it. The demo
+     control moved to the left end of the strip and became the status indicator
+     described below, which opens the same dialog the flask opened. Two controls
+     that open one dialog is the duplication this file exists to prevent, so the
+     flask left rather than being kept beside its own replacement. */
   var UTIL = [
-    { id: "theme", kind: "toggle" },
-    /* name is the accessible label and is passed in, because the flask opens
-       the harness sheet in the customer build and the staging notice in the
-       console. Same control, same place, two things to open, and a button whose
-       name is a lie about which one is worse than no name. */
-    { id: "demo",  kind: "dialog", icon: "flask", label: "Demo" }
+    { id: "theme", kind: "toggle" }
   ];
+
+  /* ---------- THE DEMO STATUS INDICATOR ----------
+     What the flask used to be, said out loud. The flask was a 26px glyph at the
+     far right of the strip that opened the harness and told a reviewer nothing;
+     the thing it replaces in the PRODUCT was a bordered staging card sitting in
+     the main content area of the landing page, which told them everything and
+     took a block of the page to do it. This is the trade between the two: a
+     compact status line, pinned to the top left of the frame at every width, on
+     screen on every route of both builds.
+
+     LEFT, and the strip's controls went to the right of it. A status indicator
+     is read, not operated, so it goes where reading starts; the build controls
+     are operated, so they stay where the last sweep put them.
+
+     THE DOT IS DRAWN, NOT TYPED. The brief's mark is a filled ring, and a ring
+     with a slow halo around it is what a live indicator looks like. Typed as a
+     character it could not carry the halo, and a screen reader would announce a
+     bullet before the word. It is a span with a pseudo element and it is
+     aria-hidden, so the accessible name is the words only.
+
+     IT IS STILL THE DIALOG TRIGGER. Same data-action, so both shells keep the
+     handler they already have and the harness stays one tap from every screen.
+
+     WCAG 2.5.3. The accessible name opens with the visible words, in order,
+     before it says what the control opens, so a voice control reader can ask
+     for what they can see. */
+  function demoStatus(opts) {
+    var opens = opts.demoOpens || opts.demoName || "the staging harness";
+    return '<div class="demostat">' +
+      '<button class="demostat__btn" type="button" data-action="demo"' +
+        ' aria-haspopup="dialog" aria-describedby="demostat-note"' +
+        ' aria-label="' + esc("DEMO, sample availability only. Opens " + opens) + '">' +
+        '<span class="demostat__dot" aria-hidden="true"></span>' +
+        '<span class="demostat__t">DEMO</span>' +
+        '<span class="demostat__sep" aria-hidden="true">·</span>' +
+        '<span class="demostat__s">Sample availability only</span>' +
+      "</button>" +
+      /* Secondary and unobtrusive: it is a tooltip on hover and on keyboard
+         focus, it is never the only place a fact is stated, and the dialog
+         behind the button carries the same three sentences at length. */
+      '<span class="demostat__note" id="demostat-note" role="tooltip">' +
+        "This is a staging build. Reservations and availability are simulated." +
+      "</span>" +
+    "</div>";
+  }
 
   function utilbar(opts) {
     var icon = opts.icon;
     var dark = opts.theme === "dark";
-    return UTIL.map(function (c) {
+    return demoStatus(opts) + '<div class="utilbar__controls">' + UTIL.map(function (c) {
       if (c.kind === "toggle") {
         /* NO aria-pressed, and the previous sweep put one here deliberately, so
            the reversal owes a reason. aria-pressed says a control is IN a state;
@@ -265,19 +310,8 @@
           ' aria-label="' + (dark ? "Switch to the day theme" : "Switch to the night theme") + '">' +
           icon(dark ? "sun" : "moon") + "</button>";
       }
-      /* The label is a real word and is hidden by CSS at widths where the strip
-         has to share the line, not dropped from the markup. A button whose only
-         name is a flask is a button nobody can ask for.
-
-         The accessible name has to CONTAIN the visible one, which is WCAG 2.5.3
-         and is not pedantry here: the visible word is "Demo" and a reader using
-         voice control says what they can see. So the caller passes a name that
-         starts with it and then says which dialog it opens, rather than
-         replacing it. */
-      return '<button class="iconbtn iconbtn--demo" type="button" data-action="' + c.id + '"' +
-        ' aria-haspopup="dialog" aria-label="' + esc(opts.demoName || "Demo, the staging harness") + '">' +
-        icon(c.icon) + '<span class="iconbtn__t">' + esc(c.label) + "</span></button>";
-    }).join("");
+      return "";
+    }).join("") + "</div>";
   }
 
   /* ---------- THE STAGING NOTICE ----------

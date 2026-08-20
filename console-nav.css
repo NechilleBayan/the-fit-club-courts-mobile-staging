@@ -88,7 +88,10 @@
   padding-top:max(0px,env(safe-area-inset-top));
 }
 .utilbar__inner{
-  display:flex; align-items:center; justify-content:flex-end; gap:var(--s2);
+  /* space-between, because the strip now carries two things rather than one
+     cluster: the status indicator at the reading edge and the build controls at
+     the far end. */
+  display:flex; align-items:center; justify-content:space-between; gap:var(--s3);
   min-height:var(--utilbar-bar);
   /* Placement is here rather than in each shell, which is the reversal this
      change forces and is the whole point of it: the strip used to line its
@@ -97,6 +100,99 @@
      the only inset, on both edges, at every width. */
   padding-inline:var(--gutter);
 }
+.utilbar__controls{ display:flex; align-items:center; gap:var(--s2); flex:none; }
+
+/* ---------- THE DEMO STATUS INDICATOR ----------
+   The compact replacement for the bordered staging card that used to sit in the
+   main content area of the landing page. It is a quiet live indicator: a ring
+   with a slow halo, the word, and one line saying what is sampled.
+
+   NO BORDER AT REST, which is the border rule this build now states out loud
+   applied to a thing that is read rather than operated. It IS operable, so it
+   grows an edge on hover and on focus rather than never having one: the rule
+   ranks a resting appearance, it does not forbid an interactive one.
+
+   The supporting half folds away below 480px. The word and the dot never do:
+   the point of a frame is that the same signal is in the same corner at every
+   width, and DEMO on its own still says the thing that matters most. */
+.demostat{ position:relative; display:flex; align-items:center; min-width:0; }
+.demostat__btn{
+  display:inline-flex; align-items:center; gap:var(--s2);
+  min-height:26px; padding:0 var(--s2); margin-inline-start:calc(-1 * var(--s2));
+  border:1px solid transparent; border-radius:var(--r-btn);
+  color:inherit; background:none;
+  font-size:12px; line-height:1.2; letter-spacing:.08em; white-space:nowrap;
+  transition:border-color var(--dur-ui) var(--ease), background var(--dur-ui) var(--ease);
+}
+.demostat__t{ font-weight:600; letter-spacing:.14em; }
+.demostat__sep{ opacity:.55; }
+/* The supporting half is the quiet one, and it is held back with opacity rather
+   than with a second colour so it reads the same in both themes. */
+.demostat__s{ opacity:.72; letter-spacing:.02em; text-transform:none; }
+@media (max-width:479px){
+  .demostat__sep, .demostat__s{ display:none; }
+}
+
+/* THE DOT. A filled ring, which is the mark the copy asks for, drawn rather than
+   typed so it can carry a halo and so a screen reader is not read a bullet
+   before the word. */
+.demostat__dot{
+  position:relative; flex:none; width:9px; height:9px; border-radius:50%;
+  background:currentColor;
+}
+/* The halo is a second ring on a pseudo element, so the dot itself never moves
+   or fades: a status light that dims is saying something it does not mean. */
+.demostat__dot::after{
+  content:""; position:absolute; inset:-3px; border-radius:50%;
+  border:1px solid currentColor; opacity:0;
+}
+/* Slow, soft, continuous, and it never flashes: the ring travels out from the
+   dot and fades, on a four second cycle with two thirds of it at rest. Peak
+   opacity is .38, so at no point in the cycle is there a hard edge appearing. */
+@media (prefers-reduced-motion:no-preference){
+  .demostat__dot::after{ animation:demopulse 4s var(--ease) infinite; }
+}
+@keyframes demopulse{
+  0%   { transform:scale(.7); opacity:0; }
+  22%  { opacity:.38; }
+  55%  { transform:scale(2.5); opacity:0; }
+  100% { transform:scale(2.5); opacity:0; }
+}
+
+/* ---------- ITS TOOLTIP ----------
+   Secondary and unobtrusive, and it says nothing that is not also in the dialog
+   the button opens, so a reader who never hovers loses nothing. Hover AND focus,
+   because a keyboard reader gets the same explanation a mouse reader does.
+   pointer-events:none so it can never sit between the pointer and the control
+   that summoned it. */
+.demostat__note{
+  position:absolute; top:calc(100% + 6px); inset-inline-start:0; z-index:2;
+  max-width:min(20rem, calc(100vw - 2 * var(--gutter)));
+  padding:var(--s2) var(--s3);
+  background:var(--surface-raised); color:var(--text-primary);
+  border:1px solid var(--border-default); border-radius:var(--r-btn);
+  box-shadow:0 6px 16px var(--shadow-card);
+  font-size:12px; line-height:17px; letter-spacing:0; text-transform:none;
+  opacity:0; visibility:hidden; transform:translateY(-2px); pointer-events:none;
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease),
+             visibility 0s linear var(--dur-ui);
+}
+.demostat__btn:focus-visible ~ .demostat__note{
+  opacity:1; visibility:visible; transform:none;
+  transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), visibility 0s;
+}
+@media (hover:hover) and (pointer:fine){
+  .demostat__btn:hover{ border-color:var(--border-default); background:var(--surface-raised); }
+  .demostat__btn:hover ~ .demostat__note{
+    opacity:1; visibility:visible; transform:none;
+    transition:opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), visibility 0s;
+  }
+}
+@media (prefers-contrast:more){
+  .demostat__btn{ border-color:var(--border-default); }
+  .demostat__s{ opacity:1; }
+}
+
 /* Compact: These are not decisions, so they do not get decision-sized targets.
    The 44px minimum belongs to touch and this is the one control cluster on a
    phone that is deliberately not a product control, so it stays the size it is
@@ -111,12 +207,6 @@
   font-size:12px; letter-spacing:.08em;
   transition:opacity var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
 }
-/* The strip is a flat surface, so this button's edge is drawn straight onto the
-   page rather than onto a card. At rgba(--ghost-edge,.30) that measured 1.94:1
-   in light and 2.56:1 in dark, the same wash-on-a-control mistake the
-   stylesheet's ghost-glass block names, and here it was the only thing marking
-   the one control in the strip that has a boundary at all. */
-.utilbar .iconbtn--demo{ border-style:solid; border-color:var(--border-default); border-radius:var(--r-btn); }
 .utilbar .iconbtn svg{ width:16px; height:16px; }
 .utilbar .iconbtn--bare{ min-width:26px; }
 .utilbar .iconbtn--bare svg{ width:17px; height:17px; }
@@ -127,10 +217,6 @@
 @media (prefers-contrast:more){
   .utilbar{ border-bottom-color:var(--border-strong); }
   .utilbar .iconbtn{ opacity:1; }
-  /* --border-strong, because --border-default is what the button already wears
-     at rest now and a strong reading that repeats the default does nothing.
-     Same move as the control list in admin.css. */
-  .utilbar .iconbtn--demo{ border-color:var(--border-strong); }
 }
 
 @media (min-width:1024px){
