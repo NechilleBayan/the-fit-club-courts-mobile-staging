@@ -879,9 +879,40 @@ main:focus{ outline:none; }
    1.4.11 asks of a control boundary, which is to say it ranked three edges a
    reader could not reliably find. The edges are --border-default now and the
    ranking is carried by the two things that were already carrying it. */
+/* ---------- THE THREE WEIGHTS, ALL ON THE CREAM ----------
+   Every button rests on --card-surface and the ranking is carried entirely by the
+   edge: primary takes --border-strong, secondary --border-interactive, ghost
+   --border-interactive dashed. Same width on all three, so a primary and a
+   secondary side by side are the same height and nothing shifts.
+
+   PRIMARY GAVE UP ITS FILL, and that is the change. It was
+   `color-mix(--text-primary 14%, --card-surface)`, which in the dark theme washes
+   toward the cream and reads as the loud one, and in the light theme washes toward
+   near black and lands on a tan: a cream button with a grey film over it, which is
+   what it looked like. The rank it was buying is available from the edge for free,
+   and near black on cream is a louder edge than mid grey on cream by a wide
+   margin, in both themes, because --border-strong follows the theme.
+
+   THIS IS NOT THE EDGE-ALPHA RANKING THE OLD COMMENT WARNED OFF. That warning was
+   about running .42 / .35 / .32 of an ink wash, which put all three inside the
+   band where the edge measures 2.0 to 2.6:1 on this paper, under the 3:1 that
+   1.4.11 asks of a control boundary: it ranked three edges a reader could not
+   reliably find. These are two solved tokens rather than three alphas.
+   --border-interactive is the value tuned to clear 3:1 against all three grounds
+   and --border-strong is the ink itself. Both clear; only their loudness differs,
+   which is the thing being ranked. */
 .btn--primary{
-  background:color-mix(in srgb, var(--text-primary) 14%, var(--card-surface));
-  color:var(--text-primary); border-color:rgba(var(--ghost-edge),.85);
+  background:var(--card-surface);
+  color:var(--text-primary);
+  /* 2px, and it costs no height: box-sizing is border-box globally and these
+     buttons are governed by min-height, so the edge grows inward and a primary
+     sitting beside a secondary still lines up.
+     Width rather than colour alone, because a 1px edge is subject to device pixel
+     rounding: at a 1.5x ratio the same declared 1px lands as 0.67 or 1.33 used
+     pixels depending on where the box falls, and the primary was losing that
+     lottery often enough to render THINNER than the secondary beside it. Two
+     declared pixels never round below one. */
+  border-width:2px; border-color:var(--border-strong);
 }
 .btn--secondary{ background:var(--card-surface); color:var(--text-primary); border-color:var(--border-interactive); }
 .btn--ghost{ background:var(--card-surface); border-width:1px; border-style:dashed; border-color:var(--border-interactive); min-height:var(--tap-min); font-size:var(--fs-label); }
@@ -1493,14 +1524,20 @@ body::before{
    hover to lead into it. A press is the only feedback a finger gets, so it carries
    the whole response on its own: the wash steps up, the edge firms, and the control
    sits down onto a short shadow. */
+/* One press rule for all three weights. The variants used to press to 34%, 26%,
+   and 20% of the ink, a three step ladder inside a state that lasts as long as a
+   finger is down and that nobody has ever seen two of side by side. What a press
+   has to say is "this one, now", and it says it in the same voice whichever button
+   it is. The button returns to its own colour rather than washing further toward
+   the ink, for the reason the choice cards do: on a cream resting fill, washing
+   26% of near black into it lands on a dark tan and the press reads as a different
+   component rather than as the same one being pressed. */
 .btn:active{
   transform:scale(.985);
-  background:color-mix(in srgb, var(--text-primary) 26%, var(--card-surface));
+  background:var(--card-surface);
   border-color:var(--border-strong);
-  box-shadow:0 1px 2px var(--shadow-press);
+  box-shadow:0 0 18px 2px rgba(var(--glow),.58), 0 1px 2px var(--shadow-press);
 }
-.btn--primary:active{ background:color-mix(in srgb, var(--text-primary) 34%, var(--card-surface)); border-color:rgba(var(--ghost-edge),.95); }
-.btn--ghost:active{ background:color-mix(in srgb, var(--text-primary) 20%, var(--card-surface)); border-color:var(--border-strong); }
 .btn[disabled]:active{ transform:none; background:var(--card-surface); border-color:var(--border-default); box-shadow:none; }
 
 /* ---------- the two front doors, side by side ----------
@@ -2194,31 +2231,42 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
    through every one of these states, which is the whole point of the resting
    values they move from. */
 @media (hover:hover) and (pointer:fine){
+  /* One hover rule for all three weights, for the reason the press rule gives.
+     The variants ranked their hovers 22 / 18 / 12 percent of the ink, which in the
+     light theme is three shades of one tan and in neither theme is a distinction
+     anybody can use, because a hover happens to one button at a time. */
   .btn:hover{
     transform:translateY(-3px);
-    background:color-mix(in srgb, var(--text-primary) 22%, var(--card-surface));
+    background:var(--card-hi);
     border-color:var(--border-strong);
-    box-shadow:0 10px 22px -8px var(--shadow-lift), 0 3px 8px -3px var(--shadow-lift);
+    box-shadow:0 0 20px 2px rgba(var(--glow),.66),
+               0 10px 22px -8px var(--shadow-lift), 0 3px 8px -3px var(--shadow-lift);
   }
-  .btn--primary:hover{ background:color-mix(in srgb, var(--text-primary) 22%, var(--card-surface)); border-color:rgba(var(--ghost-edge),.92); }
-  .btn--secondary:hover{ background:color-mix(in srgb, var(--text-primary) 18%, var(--card-surface)); border-color:var(--border-strong); }
-  .btn--ghost:hover{ background:color-mix(in srgb, var(--text-primary) 12%, var(--card-surface)); border-color:var(--border-strong); }
   .btn:hover svg:last-child{ transform:translateX(3px); }
   /* A backward control leads with its chevron, so the nudge has to lead with it too.
      Same specificity as the rule above and later in source, which is what wins it. */
   .btn--back:hover svg:last-child{ transform:translateX(-3px); }
   .btn[disabled]:hover{ transform:none; background:var(--card-surface); border-color:var(--border-default); box-shadow:none; }
   /* Coming down out of the hover lift rather than up from rest, so a press reads as
-     the end of a movement the pointer already started. */
-  .btn:active{ transform:translateY(0) scale(.985); box-shadow:0 1px 2px var(--shadow-press); }
+     the end of a movement the pointer already started. The halo is restated rather
+     than left to the base rule: this declaration wins on order and a bare
+     box-shadow here would take the glow off every pointer press, which is the
+     half of the interaction a mouse reader actually sees. */
+  .btn:active{
+    transform:translateY(0) scale(.985);
+    box-shadow:0 0 18px 2px rgba(var(--glow),.58), 0 1px 2px var(--shadow-press);
+  }
 
   /* A hover response is a promise that something happens on click. .card is a content
      block and is never a button or a link in this build, so it does not get one; the
      rows, radio rows, and segments below are controls, so they do. */
+  /* Brighten, not wash. These are not buttons and they do not take the halo, but
+     they were reaching for the same ink mix and going tan on the light theme for
+     the same reason, so they take the same token the buttons do. */
   button.row:hover, a.row:hover,
   .optrow:hover > span,
   .seg button:not([aria-pressed="true"]):hover{
-    background:color-mix(in srgb, var(--text-primary) 10%, var(--card-surface)); border-color:var(--border-default);
+    background:var(--card-hi); border-color:var(--border-default);
   }
   .field input:hover, .field select:hover, .field textarea:hover{ border-color:var(--border-strong); }
 
