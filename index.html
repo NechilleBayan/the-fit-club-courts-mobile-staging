@@ -1514,18 +1514,49 @@ body::before{
   transform:none; box-shadow:0 1px 2px var(--shadow-card);
 }
 
-/* THE HERO'S OWN CARD PAIR HAS NO RULES HERE ANY MORE.
-   Twenty lines used to sit at this point: cream ink over the photograph, a 1.5px
-   backdrop blur, a text shadow doing the work an opaque fill used to do, and two
-   sheer surfaces tinted in opposite directions so the picture read through both.
-   All of it described a composition that no longer exists. The landing hero is a
-   photograph, a headline, a supporting line, and the map link; the two choices
-   live on /play, on the page surface, where the ordinary .duocard rules above are
-   the correct treatment and the ones over a photograph would be wrong.
+/* ---------- THE CARD PAIR OVER THE PHOTOGRAPH ----------
+   Both panels carry cream text, because the hero gradient is at its darkest
+   exactly where they sit. Blur is 1.5px: enough to settle the type, far short of
+   frosting the picture out. The text shadow does the readability work that an
+   opaque fill used to do, which is what lets the surface drop to a tenth. */
+.hero .duocard{
+  color:#F5F3DC; opacity:1;
+  -webkit-backdrop-filter:blur(1.5px); backdrop-filter:blur(1.5px);
+  text-shadow:0 1px 10px rgba(8,8,8,.72);
+}
+.hero .duocard .per, .hero .duocard .note{ color:#DFDCC2; }
 
-   Kept as a note rather than deleted silently, because the treatment was solved
-   rather than guessed and whoever puts a card back over this photograph should
-   start from git history rather than from scratch. */
+/* ONE TREATMENT FOR BOTH PANELS, and this is the one thing about the pair that
+   did not come back unchanged.
+
+   It used to be two sheer surfaces tinted in OPPOSITE directions: Reserve a Court
+   washing toward near black at .10 with a .38 edge, Open Play washing toward the
+   cream at .10 with a .48 edge. The argument was that the tint direction and the
+   edge weight tell them apart without reaching for a hue, and the palette rule
+   this build keeps does forbid the hue. But over a dark photograph a cream wash
+   is the brighter of the two and a heavier edge is the louder of the two, so the
+   pair was ranked, in the same direction, by both of the things separating them.
+   Which one it favoured is not the point: the system design settled that these
+   are two products at two prices and neither outranks the other, and the detailed
+   pair on /play was flattened for exactly this reason. A hero that ranks them and
+   a decision page that does not would be two answers to one question, which is
+   the split this pass exists to close.
+
+   So both are the cream wash and the firmer edge: the more legible of the two
+   readings, applied to both. What tells them apart is the icon, the name, and the
+   price, which is what the detailed pair uses too. */
+.hero .duo .duocard{
+  background:rgba(246,244,221,.10);
+  border:1px solid rgba(246,244,221,.48);
+}
+.hero .duo .duocard:active, .hero .duo .duocard.is-on{
+  background:rgba(246,244,221,.28); border-color:rgba(246,244,221,.78); color:#F5F3DC; }
+.hero .duo .duocard:active .per, .hero .duo .duocard.is-on .per{ color:#DFDCC2; }
+@media (prefers-reduced-motion:reduce){ .hero .duocard{ transition:none; } }
+@media (prefers-contrast:more){
+  .hero .duocard{ -webkit-backdrop-filter:none; backdrop-filter:none; text-shadow:none; }
+  .hero .duo .duocard{ background:rgba(8,8,8,.88); border-color:#F5F3DC; }
+}
 
 /* ---------- community marquee ----------
    Edge to edge in the app column, the same break out the hero uses. The track, the
@@ -1709,6 +1740,7 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
   text-decoration-color:rgba(218,215,208,.45); text-underline-offset:4px;
 }
 .hero .maplink svg{ width:19px; height:19px; }
+.hero .duo{ margin-top:22px; }
 
 /* ---------- photography, colour except the hero ---------- */
 /* Photography is square cornered everywhere. A rounded photograph reads as a card
@@ -2113,6 +2145,13 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   /* Over the photograph the shadow is its own heavier value rather than the token.
      The token is mixed for the page surface, and on a dark photograph it would not
      be visible at all. */
+  /* Over the photograph the shadow is its own heavier value rather than the token.
+     The token is mixed for the page surface and would not be visible at all on a
+     dark photograph. One rule for both panels, matching their resting treatment. */
+  .hero .duo .duocard:hover{
+    background:rgba(246,244,221,.28); border-color:rgba(246,244,221,.88);
+    transform:translateY(-3px); box-shadow:0 14px 30px -10px rgba(8,8,8,.72);
+  }
   /* The detailed pair sets its own resting fill, so its hover has to out-specify
      it. One rule for both, because the two panels rank equally. */
   .duo--detail .duocard:hover{
@@ -2266,6 +2305,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   }
   .tabbar{ padding-inline:max(0px, calc((100% - 34rem) / 2)); }
   .hero{ min-height:64svh; padding:calc(var(--appbar-h) + var(--s6)) var(--bleed) var(--s7); }
+  .hero .duo{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width:768px){
   :root{
@@ -2431,6 +2471,10 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
   .hero h1{ font-size:clamp(58px, 5.6vw, 78px); max-width:13ch; }
   .hero p.sub{ margin-top:var(--s4); font-size:20px; line-height:30px; max-width:42ch; }
   .hero .maplink{ margin-top:var(--s4); font-size:16px; }
+  .hero .duo{ margin-top:var(--s7); grid-template-columns:repeat(2, minmax(0, 290px)); gap:var(--s4); }
+  .hero .duocard{ min-height:160px; padding:20px 20px 18px; }
+  .hero .duocard b{ font-size:21px; line-height:25px; }
+  .hero .duocard .num{ font-size:34px; line-height:36px; }
 
   .band2{ grid-template-columns:1.55fr 1fr; gap:var(--s9); }
   /* THE AVAILABILITY ROWS USE THE DESKTOP WIDTH. They used to share it with a
@@ -4152,34 +4196,40 @@ function syncOverHero(){
   root.classList.toggle("over-hero", hero.getBoundingClientRect().bottom > h);
 }
 /* ---------- THE HEADER'S PLAY CONTROL ----------
-   This used to be a gate. The header offered Book Court only once the hero's own
-   two cards had scrolled away, because while they were on screen a third copy of
-   the same choice in the bar was noise.
+   Present from the first frame on every browse route, including the top of the
+   landing page while the hero's own two cards are on screen.
 
-   THE GATE NO LONGER FIRES ON ANY ROUTE, and the function is kept rather than
-   deleted. There are no cards in the hero to wait for, so the second branch below
-   returns immediately and Play is present from the first frame everywhere: which
-   is what the system design asks for, a navigation that reads Rates, My Bookings,
-   Play, Log In at every scroll position. The measurement stays because the
-   condition it tests is a property of the page rather than a decision: put a
-   choice pair back into a hero and the control goes back to waiting for it,
-   without anybody having to remember that it once did.
+   THE SCROLL GATE IS RETIRED, and it is retired deliberately rather than by
+   accident, which is why the measurement it used is gone from this function
+   instead of being left to evaluate to true. The gate offered Book Court only
+   once the hero's cards had scrolled away, on the argument that a third copy of a
+   choice the reader is already looking at is noise. Two things changed under that
+   argument.
 
-   The geometry is a rectangle read rather than an IntersectionObserver, which is
-   the same choice syncOverHero makes and for the same reason: an observer
-   constructed in this document never delivers a callback, not even the initial
-   one, so the control would never arrive. Both reads happen on a frame that is
-   already being laid out for the back-to-top button.
+   FIRST, IT IS NOT A THIRD COPY OF THE SAME THING ANY MORE. The cards start
+   flows: one begins a court reservation, the other opens the Open Play schedule.
+   Play is a destination, /play, which is where the two are compared. A reader who
+   knows which they want takes a card; a reader who does not takes Play. Hiding
+   the second of those while the first is on screen hides the one control that
+   serves the undecided reader at the exact moment they are deciding.
+
+   SECOND, THE NAVIGATION IS SPECIFIED. The system design draws the bar as Rates,
+   My Bookings, Play, Log In, and a bar whose primary action is absent above the
+   fold is a different bar. It matters most on a phone, where the swap slot shows
+   Play or the account and not both: with the gate, a phone reader at the top of
+   the landing page had no Play in the chrome at all.
+
+   THE COST, STATED. At the very top of the landing page the word Play now sits
+   about 200 pixels above two cards that are also ways to play. That is the trade,
+   and it is accepted rather than unnoticed.
+
+   syncOverHero next door still does its rectangle read, and still does it as a
+   rectangle read rather than as an IntersectionObserver: an observer constructed
+   in this document never delivers a callback, not even the initial one.
    A task route has no header nav and no button to find, and the class comes off. */
 function syncNavCta(){
   const root = document.documentElement;
-  if (!document.querySelector(".nav-book-cta")){ root.classList.remove("nav-cta"); return; }
-  const duo = document.querySelector(".hero .duo");
-  if (!duo){ root.classList.add("nav-cta"); return; }
-  const group = document.getElementById("headergroup");
-  /* bottom rather than height, for the reason syncOverHero gives. */
-  const h = group ? group.getBoundingClientRect().bottom : 0;
-  root.classList.toggle("nav-cta", duo.getBoundingClientRect().bottom <= h);
+  root.classList.toggle("nav-cta", !!document.querySelector(".nav-book-cta"));
 }
 /* Called on every render so a route change lands in the right state on the first
    frame rather than on the first scroll. A control created already in its final
@@ -4497,20 +4547,23 @@ function scrLanding(){
      the same glance. The hero opens on the headline.
      Two spans, and .hero h1 span is display:block, so the break is structural at
      every width rather than a wrap that a wider column could undo. */
-  /* THE HERO'S OWN CARD PAIR IS GONE, and this is the one composition change in
-     the pass. The photograph, the headline, the supporting line, and the map link
-     are untouched; what left is the two choice cards, and they left because the
-     decision they carry now has a page of its own. Keeping them here would put
-     the whole of /play on the landing page directly above a header offering Play,
-     which is the duplicate booking action this pass exists to remove.
-     What replaces them is nothing. The header's Play control is present from the
-     first frame on this route now rather than arriving when the cards scroll
-     away, which is exactly what syncNavCta already does when it finds no pair. */
+  /* THE HERO KEEPS ITS OWN CARD PAIR, and the two ways in are offered against the
+     photograph exactly as they always were. They were briefly moved to /play with
+     the rest of the choice and are back by decision; see DECISIONS row 272 for
+     what that reversed and what it costs.
+
+     WHAT THE PAIR IS FOR HERE, NOW THAT /play EXISTS. The two are not the same
+     offer at two sizes. These cards go straight into a flow: this one starts a
+     court reservation, that one opens the Open Play schedule. The header's Play
+     control goes to the decision page, which is where the prices, the
+     descriptions, and the comparison live. A visitor who already knows which of
+     the two they want takes a card; one who does not takes Play. */
   html += '<section class="hero">' +
     '<h1><span>Ready when</span><span>you are.</span></h1>' +
     '<p class="sub">Pick a time, scan, walk straight in.</p>' +
     '<a class="maplink" href="' + MAPS_URL + '" target="_blank" rel="noopener">' + icon("pin") +
       '<span>Silway 8, Polomolok, South Cotabato</span></a>';
+  if (!bookingOff) html += duoCTA();
   html += "</section>";
 
   /* THE SAMPLE BAND IS GONE FROM HERE. It was a dashed card in the reading column
