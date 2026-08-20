@@ -524,7 +524,12 @@ svg{ display:block; width:20px; height:20px; flex:none; }
 .appbar #bar-mid, .appbar .topnav, .appbar .appbar__slot{
   text-shadow:0 1px 8px rgba(8,8,8,.62);
 }
-.appbar .wordmark__img{ filter:drop-shadow(0 1px 6px rgba(8,8,8,.55)); }
+/* Both effects in one declaration. See the block on --logo-ground-dark for why a
+   second `filter` here is not additive and what it cost last time. */
+.appbar{ --logo-ground-dark:1; }
+.appbar .wordmark__img{
+  filter:invert(var(--logo-ground-dark)) drop-shadow(0 1px 6px rgba(8,8,8,.55));
+}
 .appbar svg{ filter:drop-shadow(0 1px 4px rgba(8,8,8,.5)); }
 /* Quiet is a choice this reader has already declined: the fade goes back to a
    plate and the divider comes back with it. */
@@ -535,7 +540,11 @@ svg{ display:block; width:20px; height:20px; flex:none; }
     -webkit-backdrop-filter:none; backdrop-filter:none;
   }
   .appbar #bar-mid, .appbar .topnav, .appbar .appbar__slot{ text-shadow:none; }
-  .appbar .wordmark__img, .appbar svg{ filter:none; }
+  /* The shadow goes, the inversion stays. `filter:none` here would take both, and
+     the mark does not stop needing to be the light version because the reader
+     asked for more contrast. */
+  .appbar .wordmark__img{ filter:invert(var(--logo-ground-dark)); }
+  .appbar svg{ filter:none; }
 }
 /* THE BAR IS INK IN BOTH THEMES, and the four tokens below are pinned rather
    than left to the theme for the reason the console pins them: read from the
@@ -1410,13 +1419,30 @@ body::before{
   aspect-ratio:640 / 337;
   background:var(--img-logo) left center/contain no-repeat;
 }
-/* The mark follows the bar's ink, not the theme's, and the bar is ink in every
-   theme and on every route now. That used to take four conditional rules: two for
-   the dark theme, one for the staff shell, and one for the stretch of the landing
-   where the header floated over the photograph. All four said "invert" and the
-   only thing that varied was when. With the plate unconditional so is the
-   inversion, and the condition is gone rather than made permanently true. */
-.wordmark__img{ filter:invert(1); }
+/* ---------- WHICH VERSION OF THE MARK ----------
+   One asset, inverted or not. The source PNG is the dark mark on transparency, so
+   `invert(1)` is the light version of it and `invert(0)` is the artwork as
+   supplied. The rule is the obvious one and is now written down rather than
+   assumed: a light mark on a dark ground, a dark mark on a light ground.
+
+   --logo-ground-dark IS DECLARED BY THE PLACEMENT, NOT BY THE THEME, and that is
+   the whole design of this. The theme is the wrong thing to ask, because the two
+   grounds this mark actually sits on do not follow it: the app bar is ink in
+   BOTH themes, and the footer is black in both, so a theme-conditional rule would
+   flip the mark to dark-on-dark every time the reader chose the day theme. It is
+   the ground under the mark that decides, so the ground is what sets the flag.
+   Every placement sets it: 1 on the app bar and the footer, 0 on the invoice,
+   which is white paper in every theme.
+
+   A VARIABLE RATHER THAN A SECOND RULE, because `filter` is one property and not
+   a list. The app bar adds a drop shadow to keep the mark legible where the
+   gradient goes clear, and a second `filter` declaration there does not add to
+   the inversion, it REPLACES it. That is exactly what happened: the shadow landed
+   on top and the mark went dark on a dark bar. Composing both into one filter is
+   the fix, and holding the inversion in a variable is what stops the next person
+   adding a third effect and silently dropping it again. */
+:root{ --logo-ground-dark:1; }
+.wordmark__img{ filter:invert(var(--logo-ground-dark)); }
 
 /* ---------- tab bar: the pill, and only the pill ----------
    The brush stroke that used to sit above the current tab is gone. It was a
@@ -2047,7 +2073,10 @@ body:not(.has-tabbar) .totop{ bottom:calc(var(--dock-h) + var(--s4) + env(safe-a
    on the text as an inline box of its own height. */
 .footcol p.footline{ display:flex; align-items:center; gap:8px; min-height:var(--tap-min); padding:0; }
 .footcol p.dim{ color:#7E7B76; }
-.footmark{ width:170px; height:38px; background:var(--img-logo) left center/contain no-repeat; filter:invert(1); margin-bottom:16px; }
+/* The footer is a black plate in both themes, so it declares a dark ground and
+   takes the light mark from the same rule everything else does. */
+.pagefoot{ --logo-ground-dark:1; }
+.footmark{ width:170px; height:38px; background:var(--img-logo) left center/contain no-repeat; filter:invert(var(--logo-ground-dark)); margin-bottom:16px; }
 .footnote{ max-width:var(--content-max); margin:26px auto 0; padding-top:18px; border-top:1px solid #26262A;
   font-family:var(--mono); font-size:12px; line-height:19px; color:#6E6B67; }
 
@@ -2796,10 +2825,15 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 
 /* The mark, large and faint, under the type rather than over it. aria-hidden
    because the same name is already printed at the top of the document in words. */
+/* WHITE PAPER IN EVERY THEME, so the mark is the dark artwork as supplied. Stated
+   rather than left to the absence of a filter, because the flag is inherited and
+   an unstated 0 here is indistinguishable from a forgotten one. */
+.inv{ --logo-ground-dark:0; }
 .inv__mark{ position:absolute; inset:0; z-index:0; display:grid; place-items:center; pointer-events:none; }
 .inv__mark i{
   display:block; width:min(74%, 380px); aspect-ratio:640 / 337;
   background:var(--img-logo) center/contain no-repeat;
+  filter:invert(var(--logo-ground-dark));
   opacity:.07; transform:rotate(-9deg);
 }
 .inv__paper{ position:relative; z-index:1; padding:18px 14px 22px; }
@@ -2811,6 +2845,7 @@ h1.screen{ letter-spacing:-.028em; font-weight:800; }
 .inv__logo{
   flex:none; width:112px; height:59px;
   background:var(--img-logo) right center/contain no-repeat;
+  filter:invert(var(--logo-ground-dark));
 }
 
 .inv__rule{ height:1px; background:#D9D6CF; border:0; margin:16px 0; }
@@ -9631,7 +9666,7 @@ STAGING.subscribe(function(state, changed, origin){
   let opener = null;
   d.innerHTML = '<div class="sheet staging__panel">' +
     CONSOLE_NAV.notice({ icon: icon, half: "booking app", close: "x",
-      reopen: "The DEMO indicator at the top left of the window opens the staging harness, where the dials are." }) + "</div>";
+      reopen: "Staging Dial, in the strip at the top of the window, opens the harness where the dials are." }) + "</div>";
   /* A click on the backdrop lands on the dialog itself, because the panel does
      not fill the box. Escape is the platform's, and so is the focus trap. */
   d.addEventListener("click", function(ev){ if (ev.target === d) d.close(); });

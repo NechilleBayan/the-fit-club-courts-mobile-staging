@@ -207,6 +207,18 @@
   font-size:12px; letter-spacing:.08em;
   transition:opacity var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
 }
+/* The strip is a flat surface, so this button's edge is drawn straight onto the
+   page rather than onto a card. --border-default rather than a wash: at
+   rgba(--ghost-edge,.30) it measured 1.94:1 in light and 2.56:1 in dark, and it
+   is the only thing marking the one control in the strip that has a boundary. */
+.utilbar .iconbtn--demo{ border-style:solid; border-color:var(--border-default); border-radius:var(--r-btn); }
+/* The label is hidden by CSS where the strip has to share the line, never dropped
+   from the markup, so the accessible name still contains the visible one. The
+   flask on its own stays a 26px target. */
+@media (max-width:479px){
+  .utilbar .iconbtn__t{ position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .utilbar .iconbtn--demo{ padding:0 var(--s2); }
+}
 .utilbar .iconbtn svg{ width:16px; height:16px; }
 .utilbar .iconbtn--bare{ min-width:26px; }
 .utilbar .iconbtn--bare svg{ width:17px; height:17px; }
@@ -217,6 +229,9 @@
 @media (prefers-contrast:more){
   .utilbar{ border-bottom-color:var(--border-strong); }
   .utilbar .iconbtn{ opacity:1; }
+  /* --border-strong, because --border-default is what the button already wears at
+     rest and a strong reading that repeats the default does nothing. */
+  .utilbar .iconbtn--demo{ border-color:var(--border-strong); }
 }
 
 @media (min-width:1024px){

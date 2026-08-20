@@ -235,12 +235,28 @@
      rule was about two copies inside one product, and the strip is no longer
      inside it: it is staging furniture that will be deleted whole, and a
      product whose theme toggle leaves with it was never complete. */
-  /* ONE CONTROL LEFT IN THE LIST, and the flask is no longer in it. The demo
-     control moved to the left end of the strip and became the status indicator
-     described below, which opens the same dialog the flask opened. Two controls
-     that open one dialog is the duplication this file exists to prevent, so the
-     flask left rather than being kept beside its own replacement. */
+  /* TWO CONTROLS FOR ONE DIALOG, ON PURPOSE, and the reason is that they are not
+     doing the same job.
+
+     The strip briefly had only the theme toggle: the flask had been folded into
+     the status indicator on the argument that two controls opening one dialog is
+     the duplication this file exists to prevent. That argument was about
+     duplication of PURPOSE, and it does not hold here. The indicator on the left
+     is a status: it is read, it says what the build is without being touched, and
+     being operable is a convenience on top of that. The flask is a labelled
+     control: it is looked FOR, by a reviewer who wants the dials, and it is named
+     so it can be asked for by name. A status that happens to open something is
+     not discoverable as the way to open it.
+
+     THE NAME IS THE POINT. "Staging Dial" says what is behind it, which neither
+     "Demo" nor a bare flask did, and it is why this is worth a second control
+     rather than a second copy of the first. */
   var UTIL = [
+    /* label is visible from 480px up and is in the markup at every width, so the
+       accessible name always contains it. icon and label are the model's, the
+       dialog it opens is the document's: demo means the harness sheet in the
+       customer build and the staging notice in the console. */
+    { id: "demo",  kind: "dialog", icon: "flask", label: "Staging Dial" },
     { id: "theme", kind: "toggle" }
   ];
 
@@ -310,7 +326,13 @@
           ' aria-label="' + (dark ? "Switch to the day theme" : "Switch to the night theme") + '">' +
           icon(dark ? "sun" : "moon") + "</button>";
       }
-      return "";
+      /* WCAG 2.5.3: the accessible name opens with the visible words, in order,
+         before it says which dialog the control opens, so a voice control reader
+         can ask for what they can see. */
+      return '<button class="iconbtn iconbtn--demo" type="button" data-action="' + c.id + '"' +
+        ' aria-haspopup="dialog" aria-label="' +
+        esc(c.label + ", opens " + (opts.demoOpens || "the staging harness")) + '">' +
+        icon(c.icon) + '<span class="iconbtn__t">' + esc(c.label) + "</span></button>";
     }).join("") + "</div>";
   }
 

@@ -427,7 +427,7 @@
     d.classList.remove("staging--harness");
     d.querySelector(".staging__panel").innerHTML = CONSOLE_NAV.notice({
       icon: svg, half: "console",
-      reopen: "The DEMO indicator at the top left of the window opens the staging harness, where the dials are." });
+      reopen: "Staging Dial, in the strip at the top of the window, opens the harness where the dials are." });
     hydrateIcons(d);
   }
 
